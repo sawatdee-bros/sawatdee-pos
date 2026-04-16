@@ -341,7 +341,8 @@ const TABLE_NAMES = {
   '8': 'カウンター3・4', '9': 'カウンター5', '10': '奥席'
 };
 function tableName(t) { return TABLE_NAMES[String(t)] || 'T'+t; }
-const DRINKS = ["お冷", "生ビール 中ジョッキ", "瓶ビール 大びん", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガ角ハイボール", "角ハイボール", "ジンジャー角ハイボール", "コーク角ハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "ホッピー中", "ホッピー外", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク", "生ビール ジョッキ（アサヒ　スーパードライ）", "メガハイボール", "ジンジャーハイボール", "コークハイボール", "瓶ビール 大びん（サッポロ　赤星）"];
+// ドリンク名はFirebaseのmenu/drinkから動的に取得（ハードコードなし）
+let DRINKS = [];
 let orders = {};
 let firstLoad = true;
 
@@ -432,6 +433,16 @@ function playBillSound() {
 
 var _prevCallCount = 0;
 var _prevBillCallCount = 0;
+
+// Firebaseのmenu/drinkからドリンク名を動的ロード
+get(ref(db, 'menu/drink')).then(function(snap) {
+  var drinkData = snap.val() || {};
+  Object.values(drinkData).forEach(function(items) {
+    (items || []).forEach(function(item) {
+      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
+    });
+  });
+});
 
 onValue(ref(db, 'calls'), snap => {
   var data = snap.val() || {};

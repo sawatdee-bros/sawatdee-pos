@@ -155,7 +155,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, update, push, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, ref, onValue, update, push, remove, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 var FC = {
   apiKey: 'AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ',
@@ -171,7 +171,15 @@ var db = getDatabase(app);
 var allOrders = {};
 var currentFilter = 'all';
 var paxStore = {};
-var DRINKS = ["生ビール ジョッキ（アサヒ　スーパードライ）", "瓶ビール 大びん（サッポロ　赤星）", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガハイボール", "角ハイボール", "ジンジャーハイボール", "コークハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク"];
+var DRINKS = []; // Firebaseのmenu/drinkから動的ロード
+get(ref(db, 'menu/drink')).then(function(snap) {
+  var drinkData = snap.val() || {};
+  Object.values(drinkData).forEach(function(items) {
+    (items || []).forEach(function(item) {
+      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
+    });
+  });
+});
 var CHARGE = 250;
 var MENU_ALL = [
   {name:'パッタイ',price:1200},{name:'カオパット',price:900},
