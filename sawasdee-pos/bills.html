@@ -171,15 +171,7 @@ var db = getDatabase(app);
 var allOrders = {};
 var currentFilter = 'all';
 var paxStore = {};
-var DRINKS = []; // Firebaseのmenu/drinkから動的ロード
-get(ref(db, 'menu/drink')).then(function(snap) {
-  var drinkData = snap.val() || {};
-  Object.values(drinkData).forEach(function(items) {
-    (items || []).forEach(function(item) {
-      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
-    });
-  });
-});
+var DRINKS = []; // Firebaseのmenu/drinkから動的ロード（onValue開始前に完了）
 var CHARGE = 250;
 var MENU_ALL = [
   {name:'パッタイ',price:1200},{name:'カオパット',price:900},
@@ -647,22 +639,30 @@ document.addEventListener('click', function _initAudio() {
   document.removeEventListener('click', _initAudio);
 }, { once: true });
 
-var _knownOrderIds = null;
-onValue(ref(db,'orders'), function(snap) {
-  var all = snap.val()||{};
-  var todayStart = getTodayStart();
-  // 新規注文検知
-  var currentIds = Object.keys(all).filter(function(id){ return all[id].status !== 'done' && all[id].status !== 'paid'; });
-  if (_knownOrderIds !== null) {
-    var newIds = currentIds.filter(function(id){ return _knownOrderIds.indexOf(id) < 0; });
-    if (newIds.length > 0) _playBeep();
-  }
-  _knownOrderIds = currentIds;
-  allOrders = {};
-  Object.keys(all).forEach(function(id) {
-    if ((all[id].timestamp || 0) >= todayStart) allOrders[id] = all[id];
+// menu/drinkを先に取得してからonValue開始
+get(ref(db, 'menu/drink')).then(function(snap) {
+  var drinkData = snap.val() || {};
+  Object.values(drinkData).forEach(function(items) {
+    (items || []).forEach(function(item) {
+      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
+    });
   });
-  render();
+  var _knownOrderIds = null;
+  onValue(ref(db,'orders'), function(snap) {
+    var all = snap.val()||{};
+    var todayStart = getTodayStart();
+    var currentIds = Object.keys(all).filter(function(id){ return all[id].status !== 'done' && all[id].status !== 'paid'; });
+    if (_knownOrderIds !== null) {
+      var newIds = currentIds.filter(function(id){ return _knownOrderIds.indexOf(id) < 0; });
+      if (newIds.length > 0) _playBeep();
+    }
+    _knownOrderIds = currentIds;
+    allOrders = {};
+    Object.keys(all).forEach(function(id) {
+      if ((all[id].timestamp || 0) >= todayStart) allOrders[id] = all[id];
+    });
+    render();
+  });
 });
 </script>
 </body>

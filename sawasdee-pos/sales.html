@@ -131,15 +131,7 @@ var db = getDatabase(app);
 var allOrders = {};
 var allPax = {};
 var currentPeriod = 'today';
-var DRINKS = []; // Firebaseのmenu/drinkから動的ロード
-get(ref(db, 'menu/drink')).then(function(snap) {
-  var drinkData = snap.val() || {};
-  Object.values(drinkData).forEach(function(items) {
-    (items || []).forEach(function(item) {
-      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
-    });
-  });
-});
+var DRINKS = []; // Firebaseのmenu/drinkから動的ロード（onValue開始前に完了）
 var CAT_COLORS = { 'ドリンク':'#0ea5e9', '麺・ご飯':'#f97316', 'カレー':'#eab308', '前菜':'#22c55e' };
 var MENU_CAT = {
   'パッタイ':'麺・ご飯','カオパット':'麺・ご飯','クイッティアオ':'麺・ご飯','カオマンガイ':'麺・ご飯',
@@ -557,15 +549,24 @@ var TABLE_NAMES = {
 };
 window.TABLE_NAMES = TABLE_NAMES;
 
-onValue(ref(db, 'orders'), function(snap) {
-  allOrders = snap.val() || {};
-  if (currentPeriod === 'calendar') renderCalendar();
-  else render();
-});
-onValue(ref(db, 'pax'), function(snap) {
-  allPax = snap.val() || {};
-  if (currentPeriod === 'calendar') renderCalendar();
-  else render();
+// menu/drinkを先に取得してからonValue開始（DRINKS未ロードによる計算ミスを防ぐ）
+get(ref(db, 'menu/drink')).then(function(snap) {
+  var drinkData = snap.val() || {};
+  Object.values(drinkData).forEach(function(items) {
+    (items || []).forEach(function(item) {
+      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
+    });
+  });
+  onValue(ref(db, 'orders'), function(snap) {
+    allOrders = snap.val() || {};
+    if (currentPeriod === 'calendar') renderCalendar();
+    else render();
+  });
+  onValue(ref(db, 'pax'), function(snap) {
+    allPax = snap.val() || {};
+    if (currentPeriod === 'calendar') renderCalendar();
+    else render();
+  });
 });
 </script>
 <div class="bills-modal" id="bills-modal">

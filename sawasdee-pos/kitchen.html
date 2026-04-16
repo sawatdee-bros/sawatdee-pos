@@ -434,13 +434,67 @@ function playBillSound() {
 var _prevCallCount = 0;
 var _prevBillCallCount = 0;
 
-// Firebaseのmenu/drinkからドリンク名を動的ロード
+// 伝票・注文関連の状態変数（onValue内で使うので先に宣言）
+var _bOrders = {};
+var _bFilter = 'unpaid';
+var _bPax = {};
+var _bEdit = null;
+var _bCHARGE = 250;
+const _newIdTs = new Map(); // 新着注文IDとその検知時刻
+var _bRange = 'today'; // 'today' or 'week'
+
+// Firebaseのmenu/drinkからドリンク名を動的ロード（ordersのonValue開始前に完了させる）
 get(ref(db, 'menu/drink')).then(function(snap) {
   var drinkData = snap.val() || {};
   Object.values(drinkData).forEach(function(items) {
     (items || []).forEach(function(item) {
       if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
     });
+  });
+
+  onValue(ref(db, 'orders'), (snap) => {
+    // _allOrdersCacheは常に最新に保つ（ignoreNextに関わらず）
+    window._allOrdersCache = snap.val() || {};
+    if (ignoreNext) { ignoreNext = false; return; }
+    const data = snap.val() || {};
+    const newIds = Object.keys(data).filter(id => !orders[id] && data[id].status !== 'done' && data[id].status !== 'paid');
+    if (!firstLoad && newIds.length > 0) {
+      const now = Date.now();
+      newIds.forEach(id => _newIdTs.set(id, now));
+      // 新規注文にフード・ドリンクが含まれるか判定
+      let hasDrink = false, hasFood = false;
+      newIds.forEach(id => {
+        const items = data[id].items || [];
+        items.forEach(item => {
+          if (DRINKS.some(d => item.name === d || item.name.startsWith(d + '（'))) hasDrink = true;
+          else hasFood = true;
+        });
+      });
+      showBell(hasDrink, hasFood);
+    }
+    Object.keys(orders).forEach(id => delete orders[id]);
+    // まず全注文を仮読み込み
+    Object.keys(data).forEach(id => {
+      if (data[id].status !== 'paid') orders[id] = data[id];
+    });
+    // doneのうち同テーブルに未完了がない注文は除外
+    Object.keys(orders).forEach(id => {
+      if (orders[id].status !== 'done') return;
+      const tbl = orders[id].table;
+      const hasPending = Object.keys(orders).some(oid => oid !== id && orders[oid].table === tbl && orders[oid].status !== 'done');
+      if (!hasPending) delete orders[id];
+    });
+    renderOrders();
+    if (firstLoad) applyAudioState();
+    firstLoad = false;
+    _updateBillsData(window._allOrdersCache);
+  });
+
+  // Firebase paxノードを監視して_bPaxを同期
+  onValue(ref(db, 'pax'), function(snap) {
+    var data = snap.val() || {};
+    Object.keys(data).forEach(function(t) { _bPax[t] = data[t]; });
+    if (currentMode === 'bills') _billsRenderWrap();
   });
 });
 
@@ -909,60 +963,9 @@ function showBell(hasDrink, hasFood) {
   }
 }
 
-onValue(ref(db, 'orders'), (snap) => {
-  // _allOrdersCacheは常に最新に保つ（ignoreNextに関わらず）
-  window._allOrdersCache = snap.val() || {};
-  if (ignoreNext) { ignoreNext = false; return; }
-  const data = snap.val() || {};
-  const newIds = Object.keys(data).filter(id => !orders[id] && data[id].status !== 'done' && data[id].status !== 'paid');
-  if (!firstLoad && newIds.length > 0) {
-    const now = Date.now();
-    newIds.forEach(id => _newIdTs.set(id, now));
-    // 新規注文にフード・ドリンクが含まれるか判定
-    let hasDrink = false, hasFood = false;
-    newIds.forEach(id => {
-      const items = data[id].items || [];
-      items.forEach(item => {
-        if (DRINKS.some(d => item.name === d || item.name.startsWith(d + '（'))) hasDrink = true;
-        else hasFood = true;
-      });
-    });
-    showBell(hasDrink, hasFood);
-  }
-  Object.keys(orders).forEach(id => delete orders[id]);
-  // まず全注文を仮読み込み
-  Object.keys(data).forEach(id => {
-    if (data[id].status !== 'paid') orders[id] = data[id];
-  });
-  // doneのうち同テーブルに未完了がない注文は除外
-  Object.keys(orders).forEach(id => {
-    if (orders[id].status !== 'done') return;
-    const tbl = orders[id].table;
-    const hasPending = Object.keys(orders).some(oid => oid !== id && orders[oid].table === tbl && orders[oid].status !== 'done');
-    if (!hasPending) delete orders[id];
-  });
-  renderOrders();
-  if (firstLoad) applyAudioState();
-  firstLoad = false;
-  _updateBillsData(window._allOrdersCache);
-});
-
 // === 伝票機能 ===
-var _bOrders = {};
-var _bFilter = 'unpaid';
-var _bPax = {};
 
-// Firebase paxノードを監視して_bPaxを同期
-onValue(ref(db, 'pax'), function(snap) {
-  var data = snap.val() || {};
-  Object.keys(data).forEach(function(t) { _bPax[t] = data[t]; });
-  if (currentMode === 'bills') _billsRenderWrap();
-});
-var _bEdit = null;
-var _bCHARGE = 250;
-const _newIdTs = new Map(); // 新着注文IDとその検知時刻
 
-var _bRange = 'today'; // 'today' or 'week'
 function _updateBillsData(allData) {
   var now = new Date(); var start = new Date(now);
   if (now.getHours() < 6) start.setDate(start.getDate() - 1);
