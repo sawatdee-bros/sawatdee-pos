@@ -262,7 +262,7 @@ function renderCatTabs() {
 
 // サブカテゴリタブ描画
 function renderSubcatTabs() {
-  const order = (MENU_DATA['_order'] || {})[currentCat] || [];
+  const order = (MENU_DATA['subcatOrder'] || {})[currentCat] || [];
   const all = Object.keys(MENU_DATA[currentCat] || {});
   // _orderにある順番で並べ、残りは後ろに追加
   const subcats = order.filter(function(s) { return all.includes(s); })
