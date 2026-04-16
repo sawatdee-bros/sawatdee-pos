@@ -281,6 +281,7 @@ function makeBadges(item) {
     else if (item.popular.includes('当店名物')) html += '<span class="badge badge-popular">⭐ 名物</span>';
     else if (item.popular.includes('おス') || item.popular.includes('オス')) html += '<span class="badge badge-recommend">👍 おすすめ</span>';
   }
+  if (item.sake) html += '<span class="badge badge-sake">🍺 酒に合う</span>';
   if (item.pakchi) html += '<span class="badge badge-pakchi">🌿 パクチー</span>';
   if (item.spicy > 0) {
     var count = item.spicy >= 3 ? 3 : item.spicy >= 2 ? 2 : 1;
