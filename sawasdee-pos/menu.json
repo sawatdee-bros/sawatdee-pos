@@ -1,0 +1,1182 @@
+{
+  "drink": {
+    "ビール": [
+      {
+        "id": "D-BE-01",
+        "name": "生ビール 中ジョッキ",
+        "price": 490,
+        "desc": "アサヒスーパードライ",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-BE-02",
+        "name": "瓶ビール 大びん",
+        "price": 740,
+        "desc": "サッポロ赤星",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-BE-03",
+        "name": "ノンアルビール 小びん",
+        "price": 420,
+        "desc": "アサヒ",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "タイビール": [
+      {
+        "id": "D-BE-04",
+        "name": "シンハー",
+        "price": 570,
+        "desc": "タイビールといえばこれ！苦みと爽やかな口当たりが特徴",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-BE-05",
+        "name": "チャーン",
+        "price": 570,
+        "desc": "シンハーと肩を並べる大人気ブランド！強い苦みと軽い後味が特徴",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-BE-06",
+        "name": "リオ",
+        "price": 570,
+        "desc": "苦みが少なく飲みやすい！人気急上昇のビールです",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "ビアカクテル": [
+      {
+        "id": "D-BC-01",
+        "name": "マンゴービア",
+        "price": 590,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-BC-02",
+        "name": "グアバビア",
+        "price": 590,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "ハイボール": [
+      {
+        "id": "D-HB-01",
+        "name": "メガ角ハイボール",
+        "price": 680,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-HB-02",
+        "name": "角ハイボール",
+        "price": 380,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-HB-03",
+        "name": "ジンジャー角ハイボール",
+        "price": 440,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-HB-04",
+        "name": "コーク角ハイボール",
+        "price": 440,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-HB-05",
+        "name": "メコンハイボール",
+        "price": 490,
+        "desc": "メコンウイスキー",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-HB-06",
+        "name": "メコンジンジャー",
+        "price": 540,
+        "desc": "メコンウイスキー",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-HB-07",
+        "name": "メコンコーク",
+        "price": 540,
+        "desc": "メコンウイスキー",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "おすすめ": [
+      {
+        "id": "D-OS-01",
+        "name": "タイサワー",
+        "price": 650,
+        "desc": "生ライムのサワーをベースに、レモングラス・パクチー・唐辛子・こぶみかんの葉などのタイハーブをトッピングしたスペシャルサワー！",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-OS-02",
+        "name": "パクチーレモンサワー",
+        "price": 580,
+        "desc": "パクチー好きにはたまらない！爽やかなパクチーの香りとすっきりレモンのサワーです！",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-OS-03",
+        "name": "タイ式漢方サワー",
+        "price": 580,
+        "desc": "知る人ぞ知る！タイの薬草酒（ヤードン）を使ったサワー！癖強な味ですが一度はまると病みつきに！日本でこれが飲めるのはかなりレアです。",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "サワー・お茶割り": [
+      {
+        "id": "D-SA-01",
+        "name": "レモンサワー",
+        "price": 420,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-02",
+        "name": "クエン酸サワー",
+        "price": 420,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-03",
+        "name": "バイス(梅しそ)サワー",
+        "price": 420,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-04",
+        "name": "チューハイ",
+        "price": 420,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-05",
+        "name": "ウーロンハイ",
+        "price": 380,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-06",
+        "name": "ジャスミンハイ",
+        "price": 380,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-07",
+        "name": "ホッピー",
+        "price": 480,
+        "desc": "中250・外250",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-08",
+        "name": "ホッピー中",
+        "price": 250,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SA-09",
+        "name": "ホッピー外",
+        "price": 250,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "トロピカルハイ・カクテル": [
+      {
+        "id": "D-TH-01",
+        "name": "マンゴーハイ",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-02",
+        "name": "グアバハイ",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-03",
+        "name": "タイ紅茶ハイ",
+        "price": 550,
+        "desc": "タイ式ミルクティー割り",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-04",
+        "name": "マンゴーミルクハイ",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-05",
+        "name": "グアバミルクハイ",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-06",
+        "name": "カシスソーダ",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-07",
+        "name": "カシスウーロン",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-08",
+        "name": "カシスマンゴー",
+        "price": 580,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-09",
+        "name": "テキーラコーク",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-10",
+        "name": "テキーラグアバ",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-TH-11",
+        "name": "テキーラショット",
+        "price": 400,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "焼酎・その他": [
+      {
+        "id": "D-SH-01",
+        "name": "泡盛(久米仙)",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SH-02",
+        "name": "ジャスミン焼酎(茉莉花)",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SH-03",
+        "name": "梅酒",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "ワイン": [
+      {
+        "id": "D-WN-01",
+        "name": "グラスワイン 赤",
+        "price": 380,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-WN-02",
+        "name": "グラスワイン 白",
+        "price": 380,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-WN-03",
+        "name": "デキャンタ 赤",
+        "price": 1600,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-WN-04",
+        "name": "デキャンタ 白",
+        "price": 1600,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-WN-05",
+        "name": "ボトルワイン 赤",
+        "price": 2200,
+        "desc": "チリ産　カベルネソーヴィニヨン",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-WN-06",
+        "name": "ボトルワイン 白",
+        "price": 2200,
+        "desc": "チリ産　シャルドネ",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "ソフトドリンク": [
+      {
+        "id": "D-SD-01",
+        "name": "マンゴージュース",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-02",
+        "name": "グアバジュース",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-03",
+        "name": "タイ紅茶(タイ式ミルクティー)",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-04",
+        "name": "炭酸水(カットレモン入り)",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-05",
+        "name": "コカコーラ",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-06",
+        "name": "ジンジャーエール(辛口)",
+        "price": 480,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-07",
+        "name": "ウーロン茶",
+        "price": 440,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-08",
+        "name": "ジャスミン茶",
+        "price": 440,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-09",
+        "name": "ノンアル★タイサワー",
+        "price": 650,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-10",
+        "name": "ノンアル★マンゴーミルク",
+        "price": 550,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "D-SD-11",
+        "name": "お冷",
+        "price": 0,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ]
+  },
+  "food": {
+    "つまみ": [
+      {
+        "id": "F-TS-01",
+        "name": "キャベツ",
+        "price": 120,
+        "desc": "ピリ辛ダレ＆マヨネーズ付き",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-02",
+        "name": "セロリ",
+        "price": 220,
+        "desc": "ピリ辛ダレ＆マヨネーズ付き",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-03",
+        "name": "タイの海老せん",
+        "price": 280,
+        "desc": "大人から子供まで大好き！コショウが効いた海老せん。食べると止められない",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-04",
+        "name": "ピリ辛枝豆",
+        "price": 280,
+        "desc": "タイ人も大好きな枝豆。ピリ辛ナンプラー味",
+        "pakchi": false,
+        "spicy": 0.5,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-05",
+        "name": "タイの漬物缶詰",
+        "price": 280,
+        "desc": "程よい酸っぱさがクセになる茎レタスの漬物。",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-06",
+        "name": "おつまみキュウリ",
+        "price": 280,
+        "desc": "さっぱり胡瓜とピリ辛スイートチリソース。砕いたピーナッツがアクセント",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "人気料理",
+        "active": true
+      },
+      {
+        "id": "F-TS-07",
+        "name": "カリカリ厚揚げ",
+        "price": 280,
+        "desc": "表面をカリカリに揚げたスナック感覚の厚揚げです",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-08",
+        "name": "パク乗せ冷奴",
+        "price": 280,
+        "desc": "冷や奴にパクチー乗せました。濃厚ピリ辛ダレと豆腐の相性バツグン",
+        "pakchi": true,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-09",
+        "name": "コリコリ豚耳",
+        "price": 280,
+        "desc": "タイのたまり醤油とナンプラーで甘じょっぱく煮込んだコリコリの豚耳は、お酒が進みます",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-10",
+        "name": "アジのトマト煮",
+        "price": 420,
+        "desc": "タイの鯵や鰯をトマトソースで煮たタイ定番惣菜。香味野菜を乗せて、仕上げにライムを絞ります。酒のつまみにぴったりです",
+        "pakchi": true,
+        "spicy": 0.5,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-TS-11",
+        "name": "タイ式生ソーセージ(ネーム)",
+        "price": 440,
+        "desc": "程よい酸味がクセになるタイの生ソーセージ。通好みの一品！タイの生唐辛子入り。※カット位置によっては激辛です",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "サラダ・和え物": [
+      {
+        "id": "F-SL-01",
+        "name": "青パパイヤのサラダ",
+        "price": 780,
+        "desc": "タイではあちこちに専門店があるほど人気の料理！サラダではありますが、クセになる辛さで酒のつまみにも！",
+        "pakchi": false,
+        "spicy": 3.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-SL-02",
+        "name": "青パパイヤのサラダ（激辛バージョン）",
+        "price": 880,
+        "desc": "尋常ではない辛さです。心して挑んでください",
+        "pakchi": false,
+        "spicy": 10.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-SL-03",
+        "name": "青パパイヤのサラダ（豚グリル入り）",
+        "price": 880,
+        "desc": "タイ東北名物ソムタムに、これまた東北名物の豚グリルをトッピングした贅沢な一品",
+        "pakchi": false,
+        "spicy": 3.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-SL-04",
+        "name": "温かい春雨サラダ",
+        "price": 780,
+        "desc": "タイのサラダといえばコレ！というくらい代表的なサラダ。干し海老やひき肉の出し汁をたっぷり含んだ春雨は旨みたっぷり！当店は本場同様、温かい状態でお出ししています",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "人気料理",
+        "active": true
+      },
+      {
+        "id": "F-SL-05",
+        "name": "揚げ目玉焼きのサラダ",
+        "price": 680,
+        "desc": "外側カリッと黄身は半熟！目玉焼きのまろやかさとライムの爽やかな酸味がベストマッチ！",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-SL-06",
+        "name": "茹で鶏のサラダ",
+        "price": 680,
+        "desc": "茹でた鶏肉とたっぷり野菜でヘルシーなサラダです",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-SL-07",
+        "name": "海老とレモングラスのサラダ",
+        "price": 880,
+        "desc": "プリプリの海老がごろごろ。レモングラスが爽やかに香るさっぱりサラダ",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "一品": [
+      {
+        "id": "F-IP-01",
+        "name": "鶏もも肉のタイ式グリル",
+        "price": 580,
+        "desc": "ボリュームたっぷり！秘伝の自家製タレに漬け込んだ鶏もも肉を、香ばしくジューシーに焼き上げた当店自慢の一品です。",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "当店名物",
+        "active": true
+      },
+      {
+        "id": "F-IP-02",
+        "name": "豚肉のタイ式グリル",
+        "price": 580,
+        "desc": "自家製タレに漬け込んだ豚肩ロース肉をじっくり焼き上げます。ナンプラーをベースにライムを効かせた特製ダレでどうぞ。酒のつまみに最高の人気料理です",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "当店名物",
+        "active": true
+      },
+      {
+        "id": "F-IP-03",
+        "name": "タイ式海老のグリル",
+        "price": 980,
+        "desc": "シンプルに塩焼きした大ぶりの海老に、特性の自家製シーフードソースをたっぷりつけて食べればぶっ飛びます。オススメ！",
+        "pakchi": true,
+        "spicy": 0.0,
+        "popular": "おススメ",
+        "active": true
+      },
+      {
+        "id": "F-IP-04",
+        "name": "タイ式豚グリルのハーブ和え",
+        "price": 880,
+        "desc": "ジューシーな豚肉グリルをたっぷりのタイハーブで和えた、ガツンとスパイシーな一品。ハーブ＆スパイスでこれぞタイの醍醐味！",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "おススメ",
+        "active": true
+      },
+      {
+        "id": "F-IP-05",
+        "name": "タイ式ヌードル香味野菜和え",
+        "price": 720,
+        "desc": "タイのインスタントヌードルをたっぷり野菜と和えました！タイでは定番の屋台メニューです。つまみにバッチリ。リピーター多し！",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-IP-06",
+        "name": "キャベツの海老味噌醤炒め",
+        "price": 440,
+        "desc": "ガピと呼ばれるタイの海老味噌醤でキャベツを炒めたエスニックなアンチョビキャベツのような味わいです",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-IP-07",
+        "name": "蒸し鶏 生姜ソース",
+        "price": 440,
+        "desc": "柔らか鶏肉と生姜・にんにくの効いた自家製ソースがベストマッチ。前菜にも最適です。",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "おススメ",
+        "active": true
+      },
+      {
+        "id": "F-IP-08",
+        "name": "鶏ひき肉のハーブ和え",
+        "price": 780,
+        "desc": "鶏ひき肉を香味野菜とタイハーブで和えたサラダ感覚の一品。タイ東北部およびラオスの名物郷土料理です",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "揚げ物": [
+      {
+        "id": "F-AG-01",
+        "name": "スパイシー鶏唐揚げ",
+        "price": 580,
+        "desc": "秘伝のタレに漬け込んで揚げた唐揚げに甘辛スパイシーソースをかけました。ビールやハイボールの共にテッパンの逸品です",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-AG-02",
+        "name": "タイ式揚げ春巻き(パクチー入)",
+        "price": 620,
+        "desc": "パクチーを根っこから葉までまるごと刻んで混ぜ込んだ特製の揚げ春巻きです",
+        "pakchi": true,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-AG-03",
+        "name": "揚げ海老のニンニク炒め",
+        "price": 1020,
+        "desc": "殻付きのまま衣をつけて揚げた海老に、香ばしいガーリックソースを絡めました",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-AG-04",
+        "name": "ポテトフライ 2種のソース",
+        "price": 380,
+        "desc": "皆大好きサクサクのフライドポテトです。ケチャップとスイートチリの2種のソースで",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-AG-05",
+        "name": "タイ式揚げオムレツ",
+        "price": 580,
+        "desc": "玉ねぎ、しめじの入ったふわふわ揚げオムレツ。家庭的なタイのおふくろの味",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-AG-06",
+        "name": "タイ式揚げオムレツ(ソーセージ入)",
+        "price": 680,
+        "desc": "タイの酸味ソーセージの入ったタイ式揚げオムレツです",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "スープ": [
+      {
+        "id": "F-AG-07",
+        "name": "海老とハーブの酸っぱ辛いスープ",
+        "price": 980,
+        "desc": "言わずと知れた世界三大スープの一つ。プリプリの海老とタイハーブの入った酸っぱ辛いスープ。当店は牛乳を使用した優しい甘みのあるクリーミーなタイプです",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-AG-08",
+        "name": "鶏肉のココナッツミルクスープ",
+        "price": 880,
+        "desc": "鶏肉のコナッツミルクスープ。タイのスープはトムヤムクンだけではありません。コナッツミルクの濃厚さと、ライムのさっぱりとした酸味が絶妙なマッチング。知る人ぞ知る逸品",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "炒め物": [
+      {
+        "id": "F-IT-01",
+        "name": "鶏もも肉のガパオ炒め",
+        "price": 680,
+        "desc": "大定番のガパオ炒め。当店はひき肉ではなくゴロっとした鶏肉で食べごたえたっぷり！タイのバジル(ガパオ)で香り豊かな味わい。つまみとしても、ご飯と一緒に食べても！",
+        "pakchi": false,
+        "spicy": 1.0,
+        "popular": "人気料理",
+        "active": true
+      },
+      {
+        "id": "F-IT-02",
+        "name": "豚肉のカレー炒め",
+        "price": 780,
+        "desc": "豚肉と色々野菜を玉子でとってもまろやかに仕上げたカレー炒め。当店人気メニューです",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "人気料理",
+        "active": true
+      },
+      {
+        "id": "F-IT-03",
+        "name": "海老のカレー炒め",
+        "price": 880,
+        "desc": "海老と色々野菜をカレー粉で炒めて玉子とじに。海老好きにはたまらない一品",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-IT-04",
+        "name": "鶏肉とセロリの生姜炒め",
+        "price": 780,
+        "desc": "生姜が香る鶏肉とセロリの炒め物。セロリの食感と風味がアクセント",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "おススメ",
+        "active": true
+      },
+      {
+        "id": "F-IT-05",
+        "name": "豚肉のガーリック炒め",
+        "price": 680,
+        "desc": "豚肉とニンニクの芽を炒め、フライドガーリックをまぶしたスタミナバツグンの一品",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-IT-06",
+        "name": "季節の青菜炒め",
+        "price": 680,
+        "desc": "強力火力でサッと炒めます。夏期は空心菜、春・秋・冬はその他の青菜となります",
+        "pakchi": false,
+        "spicy": 0.5,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-IT-07",
+        "name": "厚揚げともやしの炒め",
+        "price": 620,
+        "desc": "タイの生コショウが香る厚揚げともやしの炒め物。オイスターソースベースの優しい味付けです",
+        "pakchi": false,
+        "spicy": 0.5,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-IT-08",
+        "name": "茄子と豚肉のバジル炒め",
+        "price": 680,
+        "desc": "トロトロの茄子がおいしい！ナンプラーとオイスターソースで甘辛く炒めたバジルの香りが爽やかな一品です",
+        "pakchi": false,
+        "spicy": 1.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-IT-09",
+        "name": "春雨の旨辛ソース炒め",
+        "price": 780,
+        "desc": "春雨と色々具材を旨辛のソースで炒めたタイ屋台の定番メニューです。ボリューム満点のつまみです",
+        "pakchi": false,
+        "spicy": 1.0,
+        "popular": "おススメ",
+        "active": true
+      },
+      {
+        "id": "F-IT-10",
+        "name": "春雨のオイスター炒め",
+        "price": 780,
+        "desc": "ふんわり玉子と春雨の優しい味の炒め物。つまみとしても主食としてもイケます",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "麺・ご飯": [
+      {
+        "id": "F-MN-01",
+        "name": "タイ式焼きそば",
+        "price": 780,
+        "desc": "一度食べたらやみつき！タイ料理を代表する名物メニューです。中毒者多数！是非一度ご賞味ください",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "人気料理",
+        "active": true
+      },
+      {
+        "id": "F-MN-02",
+        "name": "旨辛バジル炒め麺",
+        "price": 780,
+        "desc": "コショウと唐辛子のWパンチ。バジルが香る激辛焼きそば。隠れた人気メニュー",
+        "pakchi": false,
+        "spicy": 3.0,
+        "popular": "おススメ",
+        "active": true
+      },
+      {
+        "id": "F-MN-03",
+        "name": "タイ式まぜそば",
+        "price": 680,
+        "desc": "ガーリックオイルが香ばしいタイ式のまぜそばです。よく混ぜてどうぞ",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-MN-04",
+        "name": "タイ式汁そば",
+        "price": 680,
+        "desc": "あっさりとしたスープで子供でも食べやすいタイ式汁そば。〆にもオススメ！",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-MN-05",
+        "name": "トムヤムクンヌードル",
+        "price": 980,
+        "desc": "ご存じトムヤムクンに米粉麺を入れました。人気のヌードル",
+        "pakchi": true,
+        "spicy": 2.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-MN-06",
+        "name": "グリーンカレー",
+        "price": 880,
+        "desc": "ナッツミルクが濃厚でクリーミーなタイの定番カレー。ゴロっとした鶏肉とナスでボリュームたっぷり",
+        "pakchi": false,
+        "spicy": 0.5,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-MN-07",
+        "name": "蒸し鶏ご飯",
+        "price": 780,
+        "desc": "鶏ガラスープで炊きこんだご飯の上にしっとりと柔らかな鶏肉を乗せて食べる、タイでも大人気の屋台飯。生姜の効いた特製タレと一緒にどうぞ",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "おススメ",
+        "active": true
+      },
+      {
+        "id": "F-MN-08",
+        "name": "タイ式焼き飯",
+        "price": 780,
+        "desc": "タイの醤油で味付けた炒飯です。生ライムを搾ってさっぱりとどうぞ",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-MN-09",
+        "name": "ライス",
+        "price": 300,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-MN-10",
+        "name": "目玉焼き",
+        "price": 120,
+        "desc": "",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ],
+    "デザート": [
+      {
+        "id": "F-DS-01",
+        "name": "ココナッツアイスサンド",
+        "price": 440,
+        "desc": "こんがり焼いたトーストにクリーミーなナッツアイスをサンドした別腹デザート。濃厚クリーミーなナッツアイスは他では食べられない美味しさ！",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      },
+      {
+        "id": "F-DS-02",
+        "name": "ココナッツアイス",
+        "price": 280,
+        "desc": "濃厚クリーミーなナッツアイスは他では食べられない美味しさ！",
+        "pakchi": false,
+        "spicy": 0.0,
+        "popular": "",
+        "active": true
+      }
+    ]
+  }
+}

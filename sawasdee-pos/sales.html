@@ -129,6 +129,7 @@ var FC = {
 var app = initializeApp(FC);
 var db = getDatabase(app);
 var allOrders = {};
+var allPax = {};
 var currentPeriod = 'today';
 var DRINKS = ['タイアイスティー','マンゴーラッシー','シンハービール','お水'];
 var CAT_COLORS = { 'ドリンク':'#0ea5e9', '麺・ご飯':'#f97316', 'カレー':'#eab308', '前菜':'#22c55e' };
@@ -181,16 +182,27 @@ window.showDayBills = function(ds) {
       var tblName = tableNameFn ? tableNameFn(sess.table) : 'T'+sess.table;
       var statusBadge = sess.isPaid ? '✓ 会計済み' : '提供済み';
       // 全商品をまとめる
+      var drinkNames = ["お冷","生ビール 中ジョッキ", "瓶ビール 大びん", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガ角ハイボール", "角ハイボール", "ジンジャー角ハイボール", "コーク角ハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "ホッピー中", "ホッピー外", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク"];
       var itemMap = {};
-      var sessionTotal = 0;
+      var sessionEx = 0;
+      var drinkQty = 0;
+      var sessPax = 0;
       sess.orders.forEach(function(o) {
-        sessionTotal += Math.round((o.total||0) / 10) * 10;
+        if (o.pax) sessPax = o.pax;
+        (o.items||[]).forEach(function(it) {
+          sessionEx += it.price * it.qty;
+          if (drinkNames.indexOf(it.name) >= 0 && it.name !== 'お冷') drinkQty += it.qty;
+        });
         (o.items||[]).forEach(function(it) {
           var key = it.name;
           if (!itemMap[key]) itemMap[key] = { name: it.name, price: it.price, qty: 0 };
           itemMap[key].qty += it.qty;
         });
       });
+      var paxFinal = sessPax || allPax[sess.table] || 0;
+      var hasFreeCharge = drinkQty >= paxFinal * 2;
+      var chargeEx = 250 * paxFinal;
+      var finalEx = sessionEx + (hasFreeCharge ? 0 : chargeEx);
       html += '<div class="bills-receipt">';
       html += '<div class="bills-receipt-header">'
         + '<span class="bills-receipt-table">' + tblName + '</span>'
@@ -198,7 +210,6 @@ window.showDayBills = function(ds) {
         + '<span class="bills-receipt-status">' + statusBadge + '</span>'
         + '</div>';
       // ドリンク→フードの順にソート
-      var drinkNames = ["お冷","生ビール 中ジョッキ", "瓶ビール 大びん", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガ角ハイボール", "角ハイボール", "ジンジャー角ハイボール", "コーク角ハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "ホッピー中", "ホッピー外", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク"];
       var sortedItems = Object.values(itemMap).sort(function(a, b) {
         var aD = drinkNames.indexOf(a.name) >= 0;
         var bD = drinkNames.indexOf(b.name) >= 0;
@@ -209,6 +220,7 @@ window.showDayBills = function(ds) {
       sortedItems.forEach(function(it) {
         html += '<div class="bills-receipt-item"><span>' + it.name + (it.qty>1?' ×'+it.qty:'') + '</span><span>¥' + (it.price*it.qty).toLocaleString() + '</span></div>';
       });
+      var sessionTotal = Math.round(Math.floor(finalEx*1.1)/10)*10;
       html += '<div class="bills-receipt-total"><span>合計（税込）</span><span>¥' + sessionTotal.toLocaleString() + '</span></div>';
       html += '</div>';
     });
@@ -251,15 +263,39 @@ function render() {
   var cont = document.getElementById('container');
   if (orders.length === 0) { cont.innerHTML = '<div class="no-data">この期間の売上データがありません</div>'; return; }
 
+  // セッション単位（テーブル×paidAt）でまとめて税込10円丸め計算
+  var CHARGE = 250;
+  var drinkNames = ["お冷","生ビール 中ジョッキ","瓶ビール 大びん","ノンアルビール 小びん","シンハー","チャーン","リオ","マンゴービア","グアバビア","メガ角ハイボール","角ハイボール","ジンジャー角ハイボール","コーク角ハイボール","メコンハイボール","メコンジンジャー","メコンコーク","タイサワー","パクチーレモンサワー","タイ式漢方サワー","レモンサワー","クエン酸サワー","バイス(梅しそ)サワー","チューハイ","ウーロンハイ","ジャスミンハイ","ホッピー","ホッピー中","ホッピー外","マンゴーハイ","グアバハイ","タイ紅茶ハイ","マンゴーミルクハイ","グアバミルクハイ","カシスソーダ","カシスウーロン","カシスマンゴー","テキーラコーク","テキーラグアバ","テキーラショット","泡盛(久米仙)","ジャスミン焼酒(茉莉花)","梅酒","グラスワイン 赤","グラスワイン 白","デキャンタ 赤","デキャンタ 白","ボトルワイン 赤","ボトルワイン 白","マンゴージュース","グアバジュース","タイ紅茶(タイ式ミルクティー)","炭酸水(カットレモン入り)","コカコーラ","ジンジャーエール(辛口)","ウーロン茶","ジャスミン茶","ノンアル★タイサワー","ノンアル★マンゴーミルク","生ビール ジョッキ（アサヒ　スーパードライ）","メガハイボール","ジンジャーハイボール","コークハイボール","瓶ビール 大びん（サッポロ　赤星）"];
+  var sessionSalesMap = {};
+  orders.forEach(function(o) {
+    var sk = (o.table||'?') + '__' + (o.paidAt || 'unpaid');
+    if (!sessionSalesMap[sk]) sessionSalesMap[sk] = { table: o.table||'?', ex: 0, ts: o.timestamp, drinkQty: 0, pax: 0 };
+    if (o.timestamp < sessionSalesMap[sk].ts) sessionSalesMap[sk].ts = o.timestamp;
+    if (o.pax) sessionSalesMap[sk].pax = o.pax;
+    (o.items||[]).forEach(function(it) {
+      sessionSalesMap[sk].ex += it.price * it.qty;
+      if (drinkNames.indexOf(it.name) >= 0 && it.name !== 'お冷') sessionSalesMap[sk].drinkQty += it.qty;
+    });
+  });
+  // セッションごとの税込10円丸め売上（チャージ込み）
+  var sessionSales = Object.values(sessionSalesMap).map(function(s) {
+    var pax = s.pax || allPax[s.table] || 0;
+    var hasFreeCharge = s.drinkQty >= pax * 2;
+    var chargeEx = CHARGE * pax;
+    var finalEx = s.ex + (hasFreeCharge ? 0 : chargeEx);
+    return { table: s.table, sales: Math.round(Math.floor(finalEx * 1.1) / 10) * 10 };
+  });
+
   var totalIn = 0, totalOrders = orders.length;
   var itemMap = {}, tableMap = {}, catMap = {};
+  sessionSales.forEach(function(s) {
+    totalIn += s.sales;
+    if (!tableMap[s.table]) tableMap[s.table] = { sales:0, count:0 };
+    tableMap[s.table].sales += s.sales;
+  });
+  orders.forEach(function(o) { tableMap[o.table||'?'].count++; });
   for (var i = 0; i < orders.length; i++) {
     var o = orders[i];
-    totalIn += Math.round((o.total || 0) / 10) * 10;
-    var t = o.table || '?';
-    if (!tableMap[t]) tableMap[t] = { sales:0, count:0 };
-    tableMap[t].sales += Math.round((o.total || 0) / 10) * 10;
-    tableMap[t].count++;
     var items = o.items || [];
     for (var j = 0; j < items.length; j++) {
       var it = items[j];
@@ -287,20 +323,20 @@ function render() {
   if (currentPeriod === 'today') {
     for (var h = 11; h <= 22; h++) {
       var v = 0;
-      for (var i = 0; i < orders.length; i++) { if (new Date(orders[i].timestamp).getHours() === h) v += Math.round((orders[i].total || 0) / 10) * 10; }
+      Object.values(sessionSalesMap).forEach(function(s){ if (new Date(s.ts).getHours() === h) v += Math.round(Math.floor(s.ex*1.1)/10)*10; });
       barData.push({ label: h + '時', val: v, isNow: nowH === h });
     }
   } else if (currentPeriod === 'week') {
     for (var d = 0; d < 7; d++) {
       var v = 0;
-      for (var i = 0; i < orders.length; i++) { if (new Date(orders[i].timestamp).getDay() === d) v += Math.round((orders[i].total || 0) / 10) * 10; }
+      Object.values(sessionSalesMap).forEach(function(s){ if (new Date(s.ts).getDay() === d) v += Math.round(Math.floor(s.ex*1.1)/10)*10; });
       barData.push({ label: DOW[d], val: v, isNow: nowDow === d });
     }
   } else if (currentPeriod === 'month') {
     var dim = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
     for (var d = 1; d <= dim; d++) {
       var v = 0;
-      for (var i = 0; i < orders.length; i++) { if (new Date(orders[i].timestamp).getDate() === d) v += Math.round((orders[i].total || 0) / 10) * 10; }
+      Object.values(sessionSalesMap).forEach(function(s){ if (new Date(s.ts).getDate() === d) v += Math.round(Math.floor(s.ex*1.1)/10)*10; });
       barData.push({ label: d % 5 === 0 ? String(d) : '', val: v, isNow: nowDate === d });
     }
   }
@@ -409,9 +445,31 @@ function renderCalendar() {
     var d = new Date(o.timestamp);
     var ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
     if (!dayMap[ds]) dayMap[ds] = { sales:0, count:0 };
-    dayMap[ds].sales += Math.round((o.total || 0) / 10) * 10;
     dayMap[ds].count++;
   }
+  // 週次売上もセッション単位で計算
+  var drinkNamesC = ["お冷","生ビール 中ジョッキ","瓶ビール 大びん","ノンアルビール 小びん","シンハー","チャーン","リオ","マンゴービア","グアバビア","メガ角ハイボール","角ハイボール","ジンジャー角ハイボール","コーク角ハイボール","メコンハイボール","メコンジンジャー","メコンコーク","タイサワー","パクチーレモンサワー","タイ式漢方サワー","レモンサワー","クエン酸サワー","バイス(梅しそ)サワー","チューハイ","ウーロンハイ","ジャスミンハイ","ホッピー","ホッピー中","ホッピー外","マンゴーハイ","グアバハイ","タイ紅茶ハイ","マンゴーミルクハイ","グアバミルクハイ","カシスソーダ","カシスウーロン","カシスマンゴー","テキーラコーク","テキーラグアバ","テキーラショット","泡盛(久米仙)","ジャスミン焼酒(茉莉花)","梅酒","グラスワイン 赤","グラスワイン 白","デキャンタ 赤","デキャンタ 白","ボトルワイン 赤","ボトルワイン 白","マンゴージュース","グアバジュース","タイ紅茶(タイ式ミルクティー)","炭酸水(カットレモン入り)","コカコーラ","ジンジャーエール(辛口)","ウーロン茶","ジャスミン茶","ノンアル★タイサワー","ノンアル★マンゴーミルク","生ビール ジョッキ（アサヒ　スーパードライ）","メガハイボール","ジンジャーハイボール","コークハイボール","瓶ビール 大びん（サッポロ　赤星）"];
+  var wkSessionMap = {};
+  for (var i = 0; i < keys.length; i++) {
+    var o = allOrders[keys[i]];
+    if (o.status !== 'paid' && o.status !== 'done') continue;
+    var sk = (o.table||'?') + '__' + (o.paidAt || 'unpaid');
+    if (!wkSessionMap[sk]) wkSessionMap[sk] = { table: o.table||'?', ex: 0, ts: o.timestamp, drinkQty: 0, pax: 0 };
+    if (o.timestamp < wkSessionMap[sk].ts) wkSessionMap[sk].ts = o.timestamp;
+    if (o.pax) wkSessionMap[sk].pax = o.pax;
+    (o.items||[]).forEach(function(it) {
+      wkSessionMap[sk].ex += it.price * it.qty;
+      if (drinkNamesC.indexOf(it.name) >= 0 && it.name !== 'お冷') wkSessionMap[sk].drinkQty += it.qty;
+    });
+  }
+  Object.values(wkSessionMap).forEach(function(s) {
+    var pax = s.pax || allPax[s.table] || 0;
+    var hasFreeCharge = s.drinkQty >= pax * 2;
+    s.ex = s.ex + (hasFreeCharge ? 0 : 250 * pax);
+    var d = new Date(s.ts);
+    var ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    if (dayMap[ds]) dayMap[ds].sales += Math.round(Math.floor(s.ex*1.1)/10)*10;
+  });
 
   var maxDay = 1;
   var dk = Object.keys(dayMap);
@@ -493,6 +551,11 @@ window.TABLE_NAMES = TABLE_NAMES;
 
 onValue(ref(db, 'orders'), function(snap) {
   allOrders = snap.val() || {};
+  if (currentPeriod === 'calendar') renderCalendar();
+  else render();
+});
+onValue(ref(db, 'pax'), function(snap) {
+  allPax = snap.val() || {};
   if (currentPeriod === 'calendar') renderCalendar();
   else render();
 });

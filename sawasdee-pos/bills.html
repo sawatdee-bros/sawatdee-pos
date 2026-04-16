@@ -361,14 +361,14 @@ window.saveEdit = async function() {
       if (changes[i].newQty === 0) items.splice(changes[i].idx, 1);
       else items[changes[i].idx].qty = changes[i].newQty;
     }
-    var newTotal = Math.floor(items.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1);
+    var newTotal = Math.round(Math.floor(items.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1)/10)*10;
     await update(ref(db,'orders/'+eid), {items:items, total:newTotal});
   }
 
   // 追加処理（即提供済み）
   if (editState.addItems.length > 0) {
     var addList = editState.addItems.map(function(it){return {name:it.name,qty:1,price:it.price};});
-    var addTotal = Math.floor(addList.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1);
+    var addTotal = Math.round(Math.floor(addList.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1)/10)*10;
     var itemsDone = {};
     for (var x=0;x<addList.length;x++) itemsDone[x]=true;
     await push(ref(db,'orders'), {
@@ -441,7 +441,15 @@ function render() {
   for (var i=0;i<allKeys.length;i++) {
     var o=allOrders[allKeys[i]];
     if (o.status!=='done'&&o.status!=='paid') activeCount++;
-    totalSales += o.total||0;
+  }
+  for (var i=0;i<sessions.length;i++) {
+    var s=sessions[i];
+    var sessionEx=0;
+    for (var j=0;j<s.entries.length;j++) {
+      var items=s.entries[j].o.items||[];
+      for (var k=0;k<items.length;k++) sessionEx+=items[k].price*items[k].qty;
+    }
+    totalSales += Math.round(Math.floor(sessionEx*1.1)/10)*10;
   }
   document.getElementById('sum-count').textContent = allKeys.length;
   document.getElementById('sum-active').textContent = activeCount;
@@ -509,7 +517,8 @@ function render() {
     var chargeEx=CHARGE*pax;
     var hasFreeCharge=totalDrinks>=pax*2;
     var finalEx=totalEx+(hasFreeCharge?0:chargeEx);
-    var finalIn=Math.floor(finalEx*1.1);
+    var finalInRaw=Math.floor(finalEx*1.1);
+    var finalIn=Math.round(finalInRaw/10)*10;
     var finalTax=finalIn-finalEx;
 
     var firstTime=fmtDate(entries[0].o.timestamp);

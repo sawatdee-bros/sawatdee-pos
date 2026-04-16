@@ -16,6 +16,9 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
 .header-title { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .header-table { font-size: 13px; color: #fbbf24; font-weight: 700; }
 
+/* ローディング */
+.loading { text-align: center; padding: 60px 20px; color: #64748b; font-size: 14px; }
+
 /* ラストオーダー表示 */
 .lo-bar { background: #7f1d1d; color: #fca5a5; text-align: center; padding: 8px 16px; font-size: 13px; font-weight: 700; display: none; }
 .lo-bar.show { display: block; }
@@ -23,7 +26,7 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
 
 /* カテゴリタブ */
-.cat-bar { display: grid; grid-template-columns: repeat(2, 1fr); background: #1e293b; border-bottom: 1px solid #334155; }
+.cat-bar { display: grid; background: #1e293b; border-bottom: 1px solid #334155; }
 .cat-btn { padding: 11px 8px; font-size: 12px; font-weight: 600; color: #64748b; border: none; border-bottom: 2px solid transparent; background: transparent; cursor: pointer; text-align: center; }
 .cat-btn.active { color: #22c55e; border-bottom-color: #22c55e; background: #0f2918; }
 
@@ -63,8 +66,10 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
 </header>
 
 <div class="lo-bar" id="lo-bar">⏰ ラストオーダー: --:--</div>
-<div class="cat-bar" id="cat-bar"></div>
-<div class="menu-list" id="menu-list"></div>
+<div class="cat-bar" id="cat-bar" style="grid-template-columns: repeat(2, 1fr);"></div>
+<div class="menu-list" id="menu-list">
+  <div class="loading">メニューを読み込み中...</div>
+</div>
 
 <div class="cart-bar">
   <div class="cart-summary">
@@ -80,7 +85,7 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, ref, push, onValue, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 const FC = {
   apiKey: 'AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ',
@@ -94,54 +99,95 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
-const NOMI_MENU = {"🍺 ビール・HB・サワー": [{"name": "生ビール 中ジョッキ", "price": 490}, {"name": "角ハイボール", "price": 380}, {"name": "レモンサワー", "price": 420}, {"name": "クエン酸サワー", "price": 420}, {"name": "バイス(梅しそ)サワー", "price": 420}, {"name": "チューハイ", "price": 420}, {"name": "ウーロンハイ", "price": 380}, {"name": "ジャスミンハイ", "price": 380}], "🍹 トロピカルハイ・カクテル": [{"name": "マンゴーハイ", "price": 550}, {"name": "グアバハイ", "price": 550}, {"name": "マンゴーミルクハイ", "price": 550}, {"name": "グアバミルクハイ", "price": 550}, {"name": "カシスソーダ", "price": 550}, {"name": "カシスウーロン", "price": 550}], "🍶 焼酎・ワイン": [{"name": "泡盛(久米仙)", "price": 480}, {"name": "ジャスミン焼酎(茉莉花)", "price": 480}, {"name": "梅酒", "price": 480}, {"name": "グラスワイン 赤", "price": 380}, {"name": "グラスワイン 白", "price": 380}], "🥤 ソフトドリンク": [{"name": "マンゴージュース", "price": 480}, {"name": "グアバジュース", "price": 480}, {"name": "炭酸水(カットレモン入り)", "price": 480}, {"name": "コカコーラ", "price": 480}, {"name": "ジンジャーエール(辛口)", "price": 480}, {"name": "ウーロン茶", "price": 440}, {"name": "ジャスミン茶", "price": 440}]};
-const CATS = Object.keys(NOMI_MENU);
-
 // URLパラメータからテーブル番号取得
 const params = new URLSearchParams(location.search);
 const tableNum = params.get('table') || '?';
 document.getElementById('header-table').textContent = 'テーブル ' + tableNum;
 
-let currentCat = CATS[0];
+// ---- 状態変数 ----
+let NOMI_MENU = {};   // Firebaseから読み込む
+let CATS = [];
+let storeConfig = {}; // store_configから読み込む
+let currentCat = '';
 let cart = {};
-let loTime = null; // ラストオーダー時刻（Dateオブジェクト）
+let loTime = null;
 
-// カテゴリタブ描画
+// ---- 初期化：store_config と nomi_menu を並行取得 ----
+async function init() {
+  try {
+    const [configSnap, menuSnap] = await Promise.all([
+      get(ref(db, 'store_config')),
+      get(ref(db, 'nomi_menu'))
+    ]);
+
+    storeConfig = configSnap.val() || {};
+    NOMI_MENU = menuSnap.val() || {};
+    CATS = Object.keys(NOMI_MENU);
+
+    if (CATS.length === 0) {
+      document.getElementById('menu-list').innerHTML =
+        '<div class="loading">メニューが登録されていません</div>';
+      return;
+    }
+
+    // カテゴリ数に応じてグリッド列数を調整
+    const colCount = CATS.length <= 2 ? CATS.length : CATS.length <= 4 ? 2 : 3;
+    document.getElementById('cat-bar').style.gridTemplateColumns = 'repeat(' + colCount + ', 1fr)';
+
+    currentCat = CATS[0];
+    renderCats();
+    renderMenu();
+    renderCart();
+
+    // ラストオーダー監視開始
+    startLOWatch();
+  } catch (e) {
+    document.getElementById('menu-list').innerHTML =
+      '<div class="loading">読み込みに失敗しました。再読み込みしてください。</div>';
+    console.error(e);
+  }
+}
+
+// ---- カテゴリタブ描画 ----
 function renderCats() {
   const bar = document.getElementById('cat-bar');
   bar.innerHTML = '';
-  CATS.forEach(cat => {
+  CATS.forEach(function(cat) {
     const btn = document.createElement('button');
     btn.className = 'cat-btn' + (cat === currentCat ? ' active' : '');
     btn.textContent = cat;
-    btn.onclick = () => { currentCat = cat; renderCats(); renderMenu(); };
+    btn.onclick = function() { currentCat = cat; renderCats(); renderMenu(); };
     bar.appendChild(btn);
   });
 }
 
-// メニュー描画：カード全体タップで+1、1個以上で−表示
+// ---- メニュー描画 ----
 function renderMenu() {
   const items = NOMI_MENU[currentCat] || [];
-  document.getElementById('menu-list').innerHTML = items.map((item, idx) => {
+  const rows = items.map(function(item, idx) {
     const key = currentCat + '__' + idx;
     const qty = cart[key] ? cart[key].qty : 0;
-    const qtyArea = qty > 0
-      ? `<div class="menu-item-qty" onclick="event.stopPropagation()">
-          <button class="qty-btn" onclick="changeQty('${key}',${idx},-1)">−</button>
-          <span class="qty-num">${qty}</span>
-          <button class="qty-btn plus" onclick="event.stopPropagation();changeQty('${key}',${idx},1)">+</button>
-        </div>`
-      : `<button class="qty-btn plus" onclick="event.stopPropagation();changeQty('${key}',${idx},1)">+</button>`;
-    return `<div class="menu-item${qty > 0 ? ' in-cart' : ''}" onclick="changeQty('${key}',${idx},1)">
-      <span class="menu-item-name">${item.name}</span>
-      ${qtyArea}
-    </div>`;
-  }).join('');
+    let qtyArea;
+    if (qty > 0) {
+      qtyArea = '<div class="menu-item-qty" onclick="event.stopPropagation()">'
+        + '<button class="qty-btn" onclick="changeQty(\'' + key + '\',' + idx + ',-1)">−</button>'
+        + '<span class="qty-num">' + qty + '</span>'
+        + '<button class="qty-btn plus" onclick="event.stopPropagation();changeQty(\'' + key + '\',' + idx + ',1)">+</button>'
+        + '</div>';
+    } else {
+      qtyArea = '<button class="qty-btn plus" onclick="event.stopPropagation();changeQty(\'' + key + '\',' + idx + ',1)">+</button>';
+    }
+    return '<div class="menu-item' + (qty > 0 ? ' in-cart' : '') + '" onclick="changeQty(\'' + key + '\',' + idx + ',1)">'
+      + '<span class="menu-item-name">' + item.name + '</span>'
+      + qtyArea
+      + '</div>';
+  });
+  document.getElementById('menu-list').innerHTML = rows.join('');
 }
 
+// ---- 数量変更 ----
 window.changeQty = function(key, idx, delta) {
   const cat = key.split('__')[0];
-  // catはGROUPS_DATAのキーなのでNOMI_MENUから直接引く
   const items = NOMI_MENU[cat];
   if (!items) return;
   const item = items[idx];
@@ -153,27 +199,36 @@ window.changeQty = function(key, idx, delta) {
   renderCart();
 };
 
+// ---- カート表示更新 ----
 function renderCart() {
-  const count = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+  const count = Object.values(cart).reduce(function(s, i) { return s + i.qty; }, 0);
   document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
   document.getElementById('order-btn').disabled = count === 0;
 }
 
+// ---- カートクリア ----
 window.clearCart = function() {
   cart = {};
   renderMenu();
   renderCart();
 };
 
+// ---- 注文送信 ----
 window.placeOrder = async function() {
-  const items = Object.values(cart).map(c => ({ name: c.name, qty: c.qty, price: c.price }));
+  const items = Object.values(cart).map(function(c) {
+    return { name: c.name, qty: c.qty, price: c.price };
+  });
   if (!items.length) return;
-  const total = Math.round(items.reduce((s, i) => s + Math.floor(i.price * 1.1) * i.qty, 0) / 10) * 10;
+  const taxRate = storeConfig.tax_rate || 0.1;
+  const total = Math.round(items.reduce(function(s, i) {
+    return s + Math.floor(i.price * (1 + taxRate)) * i.qty;
+  }, 0) / 10) * 10;
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
   await push(ref(db, 'orders'), {
     table: String(tableNum),
-    items, total,
+    items: items,
+    total: total,
     status: 'new',
     timestamp: Date.now(),
     source: 'nomi'
@@ -184,16 +239,19 @@ window.placeOrder = async function() {
   document.getElementById('order-btn').textContent = '注文する';
   const toast = document.getElementById('toast');
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+  setTimeout(function() { toast.classList.remove('show'); }, 2500);
 };
 
-// ラストオーダー時刻監視（Firebaseの'nomi_lo'ノードを監視）
-onValue(ref(db, 'nomi_lo/' + tableNum), snap => {
-  const ts = snap.val();
-  if (!ts) { loTime = null; updateLOBar(); return; }
-  loTime = new Date(ts + 90 * 60 * 1000); // +1時間半
-  updateLOBar();
-});
+// ---- ラストオーダー監視 ----
+function startLOWatch() {
+  onValue(ref(db, 'nomi_lo/' + tableNum), function(snap) {
+    const ts = snap.val();
+    if (!ts) { loTime = null; updateLOBar(); return; }
+    loTime = new Date(ts + 90 * 60 * 1000);
+    updateLOBar();
+  });
+  setInterval(updateLOBar, 60000);
+}
 
 function updateLOBar() {
   const bar = document.getElementById('lo-bar');
@@ -204,16 +262,12 @@ function updateLOBar() {
   const m = loTime.getMinutes().toString().padStart(2, '0');
   bar.textContent = '⏰ ラストオーダー: ' + h + ':' + m;
   bar.classList.add('show');
-  if (diff < 15 * 60 * 1000) bar.classList.add('warn'); // 15分切ったら点滅
+  if (diff < 15 * 60 * 1000) bar.classList.add('warn');
   else bar.classList.remove('warn');
 }
 
-// 1分ごとにLOバーを更新
-setInterval(updateLOBar, 60000);
-
-renderCats();
-renderMenu();
-renderCart();
+// ---- 起動 ----
+init();
 </script>
 </body>
 </html>

@@ -65,7 +65,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .audio-slash line { stroke: #ef4444; stroke-width: 2.5; stroke-linecap: round; }
 /* タブバー */
 .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 56px; background: #1e293b; border-top: 1px solid #334155; display: flex; z-index: 200; }
-.iframe-view { position: fixed; top: 56px; left: 0; right: 0; bottom: 56px; border: none; display: none; }
+.iframe-view { position: fixed; top: 0; left: 0; width: 100%; height: calc(100% - 56px); border: none; display: none; z-index: 150; }
 .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #64748b; font-size: 10px; cursor: pointer; border: none; background: none; }
 .tab-item.active { color: #22c55e; }
 .tab-item:hover { color: #94a3b8; }
@@ -196,7 +196,8 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
           <line x1="4" y1="4" x2="24" y2="24"/>
         </svg>
       </button>
-
+      <button class="icon-btn" id="tab-sales-hdr" onclick="window.setMode('sales')" title="売上管理">📊</button>
+      <button class="icon-btn" id="tab-admin-hdr" onclick="window.setMode('admin')" title="管理">⚙️</button>
     </div>
   </div>
 </header>
@@ -312,8 +313,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   <button class="tab-item" id="tab-food" onclick="window.setMode('food')"><span class="tab-icon">🍽</span>フード</button>
   <button class="tab-item" id="tab-drink" onclick="window.setMode('drink')"><span class="tab-icon">🥤</span>ドリンク</button>
   <button class="tab-item" id="tab-bills" onclick="window.setMode('bills')"><span class="tab-icon">🧾</span>伝票</button>
-  <button class="tab-item" id="tab-sales" onclick="window.setMode('sales')"><span class="tab-icon">📊</span>売上</button>
-  <button class="tab-item" id="tab-admin" onclick="window.setMode('admin')"><span class="tab-icon">⚙️</span>管理</button>
+
 </nav>
 <button class="restore-fab" id="restore-btn" onclick="window.showRestoreList()">↩ 直前の提供を戻す</button>
 
@@ -385,13 +385,69 @@ window._calls = {};
 window._billCalls = {};
 window._ohiyas = {};
 
+// 呼び出し音（チャイム風：ピポピポ×2）
+function playCallSound() {
+  if (!audioEnabled) return;
+  var ctx;
+  try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
+  function beep(freq, startTime, duration) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, startTime);
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.35, startTime + 0.02);
+    gain.gain.linearRampToValueAtTime(0.35, startTime + duration - 0.04);
+    gain.gain.linearRampToValueAtTime(0, startTime + duration);
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  }
+  var t = ctx.currentTime;
+  beep(1050, t + 0.00, 0.13);
+  beep(800,  t + 0.16, 0.13);
+  beep(1050, t + 0.38, 0.13);
+  beep(800,  t + 0.54, 0.13);
+}
+
+// 会計音（チーン：低めの柔らかい単音）
+function playBillSound() {
+  if (!audioEnabled) return;
+  var ctx;
+  try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(600, ctx.currentTime);
+  osc.frequency.linearRampToValueAtTime(520, ctx.currentTime + 0.5);
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.03);
+  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.9);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 1.0);
+}
+
+var _prevCallCount = 0;
+var _prevBillCallCount = 0;
+
 onValue(ref(db, 'calls'), snap => {
-  window._calls = snap.val() || {};
+  var data = snap.val() || {};
+  var count = Object.keys(data).length;
+  if (count > _prevCallCount) playCallSound();
+  _prevCallCount = count;
+  window._calls = data;
   renderBanner();
 });
 
 onValue(ref(db, 'bill_calls'), snap => {
-  window._billCalls = snap.val() || {};
+  var data = snap.val() || {};
+  var count = Object.keys(data).length;
+  if (count > _prevBillCallCount) playBillSound();
+  _prevBillCallCount = count;
+  window._billCalls = data;
   renderBanner();
 });
 
@@ -737,25 +793,35 @@ function setMode(mode) {
       el.style.pointerEvents = 'none';
     }
   });
-  // iframeビュー
+  // iframeビュー（全画面で表示してタブバーごと覆う）
   var salesFrame = document.getElementById('view-sales');
   var adminFrame = document.getElementById('view-admin');
+  var tabBar = document.querySelector('nav.tab-bar');
   if (mode === 'sales') {
     salesFrame.style.display = 'block';
+    salesFrame.style.top = '0';
+    salesFrame.style.height = '100%';
     if (!salesFrame.src || salesFrame.src === window.location.href) salesFrame.src = 'sales.html';
     adminFrame.style.display = 'none';
+    if (tabBar) tabBar.style.display = 'none';
   } else if (mode === 'admin') {
     adminFrame.style.display = 'block';
+    adminFrame.style.top = '0';
+    adminFrame.style.height = '100%';
     if (!adminFrame.src || adminFrame.src === window.location.href) adminFrame.src = 'menu-admin.html';
     salesFrame.style.display = 'none';
+    if (tabBar) tabBar.style.display = 'none';
   } else {
     salesFrame.style.display = 'none';
     adminFrame.style.display = 'none';
+    if (tabBar) tabBar.style.display = 'flex';
   }
   // タブのアクティブ状態
   ['all','food','drink','bills','sales','admin'].forEach(function(m) {
     var el = document.getElementById('tab-'+m);
     if (el) el.classList.toggle('active', m === mode);
+    var hdr = document.getElementById('tab-'+m+'-hdr');
+    if (hdr) hdr.classList.toggle('active', m === mode);
   });
   var newUrl = window.location.pathname + '?mode=' + mode;
   history.replaceState(null, '', newUrl);
@@ -1303,7 +1369,33 @@ function _billsRender() {
   for (var i=0;i<allKeys.length;i++) {
     var o=_bOrders[allKeys[i]];
     if (o.status!=='done'&&o.status!=='paid') activeCount++;
-    totalSales += o.total||0;
+  }
+  for (var i=0;i<sessions.length;i++) {
+    var s=sessions[i];
+    var sessionEx=0;
+    var totalDrinks=0;
+    var isPaidSession=true;
+    for (var j=0;j<s.entries.length;j++) {
+      if (s.entries[j].o.status!=='paid') { isPaidSession=false; break; }
+    }
+    var pax=0;
+    if (isPaidSession) {
+      for (var j=0;j<s.entries.length;j++) {
+        if (s.entries[j].o.pax) { pax=s.entries[j].o.pax; break; }
+      }
+    }
+    if (!pax) pax=_bPax[s.tableNum]!==undefined?_bPax[s.tableNum]:0;
+    for (var j=0;j<s.entries.length;j++) {
+      var items=s.entries[j].o.items||[];
+      for (var k=0;k<items.length;k++) {
+        sessionEx+=items[k].price*items[k].qty;
+        if (DRINKS.indexOf(items[k].name)>=0&&items[k].name!=='お冷') totalDrinks+=items[k].qty;
+      }
+    }
+    var hasFreeCharge=totalDrinks>=pax*2;
+    var chargeEx=_bCHARGE*pax;
+    var finalEx=sessionEx+(hasFreeCharge?0:chargeEx);
+    totalSales += Math.round(Math.floor(finalEx*1.1)/10)*10;
   }
   document.getElementById('sum-count').textContent = allKeys.length;
   document.getElementById('sum-active').textContent = activeCount;
