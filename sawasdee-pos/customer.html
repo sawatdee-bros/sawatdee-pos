@@ -249,6 +249,257 @@ async function init() {
   }
 }
 
+// カテゴリタブ描画
+function renderCatTabs() {
+  const tabs = [
+    { key: 'drink', label: '🥤 ドリンク' },
+    { key: 'food', label: '🍽 フード' }
+  ];
+  document.getElementById('cat-tabs').innerHTML = tabs.map(function(t) {
+    return '<button class="cat-tab' + (currentCat === t.key ? ' active' : '') + '" onclick="window.selectCat(\'' + t.key + '\')">' + t.label + '</button>';
+  }).join('');
+}
+
+// サブカテゴリタブ描画
+function renderSubcatTabs() {
+  const subcats = Object.keys(MENU_DATA[currentCat] || {});
+  if (!currentSubcat || !subcats.includes(currentSubcat)) currentSubcat = subcats[0];
+  document.getElementById('subcat-tabs').innerHTML = subcats.map(function(s) {
+    return '<button class="subcat-tab' + (currentSubcat === s ? ' active' : '') + '" onclick="window.selectSubcat(\'' + s + '\')">' + s + '</button>';
+  }).join('');
+}
+
+// バッジ生成
+function makeBadges(item) {
+  var html = '';
+  if (item.popular) {
+    if (item.popular.includes('人気')) html += '<span class="badge badge-popular">🔥 人気</span>';
+    else if (item.popular.includes('当店名物')) html += '<span class="badge badge-popular">⭐ 名物</span>';
+    else if (item.popular.includes('おス') || item.popular.includes('オス')) html += '<span class="badge badge-recommend">👍 おすすめ</span>';
+  }
+  if (item.pakchi) html += '<span class="badge badge-pakchi">🌿 パクチー</span>';
+  if (item.spicy > 0) {
+    var count = item.spicy >= 3 ? 3 : item.spicy >= 2 ? 2 : 1;
+    var chilies = '';
+    for (var i = 0; i < count; i++) chilies += '🌶️';
+    html += '<span class="spicy-icons">' + chilies + '</span>';
+  }
+  return html ? '<div class="menu-card-badges">' + html + '</div>' : '';
+}
+
+// メニュー描画
+function renderMenu() {
+  var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active; });
+  var html = items.map(function(item, idx) {
+    var isSoldout = soldout[item.name] === true;
+    var priceEx = item.price;
+    var priceIn = taxIn(item.price);
+    var cartKey = currentCat + '__' + currentSubcat + '__' + idx;
+    var cartQty = cart[cartKey] ? cart[cartKey].qty : 0;
+    var qtyRow = cartQty > 0
+      ? '<div class="qty-row"><button class="qty-btn" onclick="event.stopPropagation();window.changeQty(\'' + cartKey + '\',-1)">−</button><span class="qty-num">' + cartQty + '</span><button class="qty-btn" onclick="event.stopPropagation();window.addToCart(\'' + currentCat + '\',\'' + currentSubcat + '\',' + idx + ')">+</button></div>'
+      : '';
+    var addBtn = (!isSoldout && cartQty === 0)
+      ? '<button class="add-btn" onclick="event.stopPropagation();window.addToCart(\'' + currentCat + '\',\'' + currentSubcat + '\',' + idx + ')">+</button>'
+      : '';
+    return '<div class="menu-card' + (isSoldout ? ' soldout' : '') + ' ' + (item.img ? 'has-img' : 'no-img') + '" onclick="window.addToCart(\'' + currentCat + '\',\'' + currentSubcat + '\',' + idx + ')">'
+      + (item.img ? '<img class="menu-card-img" src="' + item.img + '" alt="' + item.name + '" loading="lazy" onerror="this.style.display=\'none\'">' : '')
+      + '<div class="menu-card-body">'
+      + '<div class="menu-card-name-row"><span class="menu-card-name">' + item.name + '</span>' + makeBadges(item) + (isSoldout ? '<span class="soldout-badge">売り切れ</span>' : '') + '</div>'
+      + (item.desc ? '<div class="menu-card-desc">' + item.desc + '</div>' : '')
+      + (!isSoldout ? '<div class="menu-card-price-row"><span class="menu-card-price">' + (priceEx === 0 ? '無料' : fmtY(priceEx)) + '</span><span class="menu-card-price-in">税込' + fmtY(priceIn) + '</span></div>' : '')
+      + qtyRow
+      + '</div>'
+      + addBtn
+      + '</div>';
+  }).join('');
+  document.getElementById('menu-list').innerHTML = html || '<div style="padding:40px;text-align:center;color:#9ca3af">商品がありません</div>';
+}
+
+// カート描画
+function renderCart() {
+  var totalEx = 0, totalIn = 0, count = 0, previewHTML = '';
+  Object.entries(cart).forEach(function(entry) {
+    var key = entry[0], c = entry[1];
+    var extraPrice = c.extras ? c.extras.reduce(function(s, e) { return s + e.price; }, 0) : 0;
+    var totalPrice = c.item.price + extraPrice;
+    totalEx += totalPrice * c.qty;
+    totalIn += taxIn(totalPrice) * c.qty;
+    count += c.qty;
+    previewHTML += '<div class="cart-item-row">'
+      + '<button class="cart-item-qty-btn" onclick="window.changeQty(\'' + key + '\',-1)">−</button>'
+      + '<span class="cart-item-qty">' + c.qty + '</span>'
+      + '<button class="cart-item-qty-btn" onclick="window.changeQty(\'' + key + '\',1)">+</button>'
+      + '<span class="cart-item-name">' + c.item.name + (c.extras && c.extras.length ? ' +' + c.extras.map(function(e) { return e.label; }).join('・') : '') + '</span>'
+      + '<span class="cart-item-price">' + fmtY(totalPrice * c.qty) + '</span>'
+      + '</div>';
+  });
+  document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
+  document.getElementById('cart-total-ex').textContent = fmtY(totalEx);
+  document.getElementById('cart-total').textContent = '税込 ' + fmtY(totalIn);
+  document.getElementById('cart-preview').innerHTML = previewHTML;
+  document.getElementById('order-btn').disabled = count === 0;
+  document.getElementById('cancel-btn').disabled = count === 0;
+}
+
+// アクション
+window.selectCat = function(cat) { currentCat = cat; currentSubcat = null; renderCatTabs(); renderSubcatTabs(); renderMenu(); };
+window.selectSubcat = function(sub) { currentSubcat = sub; renderSubcatTabs(); renderMenu(); };
+
+var pendingOpt = null;
+var selectedOpt = {};
+
+window.addToCart = function(cat, sub, idx) {
+  var item = (MENU_DATA[cat] || {})[sub];
+  if (!item) return;
+  item = item[idx];
+  if (!item || soldout[item.name]) return;
+  if (item.warning) { if (!confirm(item.warning)) return; }
+  var optDef = ITEM_OPTIONS[item.name];
+  if (optDef) {
+    pendingOpt = { cat: cat, sub: sub, idx: idx, item: item, optDef: optDef };
+    selectedOpt = {};
+    document.getElementById('opt-item-name').textContent = item.name;
+    document.getElementById('opt-label').textContent = optDef.label;
+    var confirmBtn = document.getElementById('opt-confirm');
+    confirmBtn.disabled = optDef.type === 'required';
+    var html = optDef.choices.map(function(c, i) {
+      var label = typeof c === 'string' ? c : c.label;
+      var price = typeof c === 'object' ? c.price : null;
+      var isCheck = optDef.type === 'optional';
+      return '<div class="opt-choice" id="opt-c-' + i + '" onclick="window.selectOpt(' + i + ')">'
+        + '<span class="' + (isCheck ? 'opt-choice-check' : 'opt-choice-radio') + '"></span>'
+        + '<span>' + label + '</span>'
+        + (price ? '<span class="opt-price">+￥' + price.toLocaleString() + '</span>' : '')
+        + '</div>';
+    }).join('');
+    document.getElementById('opt-choices').innerHTML = html;
+    document.getElementById('opt-modal').classList.add('open');
+    return;
+  }
+  addItemToCart(cat, sub, idx, item, null, []);
+};
+
+window.selectOpt = function(i) {
+  var optDef = pendingOpt.optDef;
+  if (optDef.type === 'required') {
+    selectedOpt = { choice: i };
+    document.querySelectorAll('.opt-choice').forEach(function(el, j) { el.classList.toggle('selected', j === i); });
+    document.getElementById('opt-confirm').disabled = false;
+  } else {
+    if (selectedOpt[i]) delete selectedOpt[i]; else selectedOpt[i] = true;
+    document.getElementById('opt-c-' + i).classList.toggle('selected', !!selectedOpt[i]);
+  }
+};
+
+window.confirmOpt = function() {
+  if (!pendingOpt) return;
+  var cat = pendingOpt.cat, sub = pendingOpt.sub, idx = pendingOpt.idx, item = pendingOpt.item, optDef = pendingOpt.optDef;
+  var optLabel = '', extras = [];
+  if (optDef.type === 'required') {
+    optLabel = optDef.choices[selectedOpt.choice];
+  } else {
+    optDef.choices.forEach(function(c, i) {
+      if (selectedOpt[i]) extras.push({ label: c.label, price: c.price });
+    });
+  }
+  addItemToCart(cat, sub, idx, item, optLabel, extras);
+  window.closeOpt();
+};
+
+window.closeOpt = function() { document.getElementById('opt-modal').classList.remove('open'); pendingOpt = null; };
+
+function addItemToCart(cat, sub, idx, item, optLabel, extras) {
+  var optKey = optLabel || extras.map(function(e) { return e.label; }).join(',');
+  var key = cat + '__' + sub + '__' + idx + (optKey ? '__' + optKey : '');
+  var displayName = item.name + (optLabel ? '（' + optLabel + '）' : '');
+  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price }, qty: 0, extras: extras };
+  cart[key].qty++;
+  renderMenu(); renderCart();
+}
+
+window.changeQty = function(key, delta) {
+  if (!cart[key]) return;
+  cart[key].qty += delta;
+  if (cart[key].qty <= 0) delete cart[key];
+  renderMenu(); renderCart();
+};
+
+window.requestBill = function() { document.getElementById('bill-confirm-modal').classList.add('open'); };
+window.closeBillConfirm = function() { document.getElementById('bill-confirm-modal').classList.remove('open'); };
+window.confirmBill = async function() {
+  document.getElementById('bill-confirm-modal').classList.remove('open');
+  var tbl = new URLSearchParams(location.search).get('table') || '?';
+  await set(ref(db, 'bill_calls/' + tbl), { table: tbl, timestamp: Date.now() });
+};
+
+window.callStaff = async function() {
+  var btn = document.getElementById('call-btn');
+  var tbl = new URLSearchParams(location.search).get('table') || '?';
+  if (btn.classList.contains('calling')) {
+    await remove(ref(db, 'calls/' + tbl));
+    btn.classList.remove('calling');
+    btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+  } else {
+    await set(ref(db, 'calls/' + tbl), { table: tbl, timestamp: Date.now() });
+    btn.classList.add('calling');
+    btn.innerHTML = '🔔<span>呼出中<span class="call-dot">.</span><span class="call-dot">.</span><span class="call-dot">.</span></span>';
+    setTimeout(async function() {
+      await remove(ref(db, 'calls/' + tbl));
+      btn.classList.remove('calling');
+      btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+    }, 3 * 60 * 1000);
+  }
+};
+
+window.showHistory = async function() {
+  var snap = await new Promise(function(resolve) { onValue(ref(db, 'orders'), resolve, { onlyOnce: true }); });
+  var data = snap.val() || {};
+  var now = new Date(), todayStart = new Date(now);
+  if (now.getHours() < 6) todayStart.setDate(todayStart.getDate() - 1);
+  todayStart.setHours(6, 0, 0, 0);
+  var itemMap = {};
+  Object.values(data).forEach(function(order) {
+    if (order.table != tableNum) return;
+    if ((order.timestamp || 0) < todayStart.getTime()) return;
+    if (order.status === 'paid') return;
+    (order.items || []).forEach(function(item) {
+      if (!itemMap[item.name]) itemMap[item.name] = { name: item.name, qty: 0 };
+      itemMap[item.name].qty += item.qty;
+    });
+  });
+  var items = Object.values(itemMap);
+  var list = document.getElementById('history-list');
+  list.innerHTML = items.length === 0
+    ? '<div class="history-empty">まだ注文履歴がありません</div>'
+    : items.map(function(it) { return '<div class="history-item"><span>' + it.name + '</span><span class="history-qty">×' + it.qty + '</span></div>'; }).join('');
+  document.getElementById('history-modal').classList.add('open');
+};
+
+window.closeHistory = function() { document.getElementById('history-modal').classList.remove('open'); };
+window.cancelOrder = function() { cart = {}; renderMenu(); renderCart(); };
+
+window.placeOrder = async function() {
+  var items = [];
+  Object.values(cart).forEach(function(c) {
+    var item = { name: c.item.name, qty: c.qty, price: c.item.price };
+    if (c.extras && c.extras.length > 0) {
+      item.extrasStr = c.extras.map(function(e) { return e.label; }).join('・');
+      item.price = c.item.price + c.extras.reduce(function(s, e) { return s + e.price; }, 0);
+    }
+    items.push(item);
+  });
+  if (items.length === 0) return;
+  var total = Math.round(items.reduce(function(s, i) { return s + taxIn(i.price) * i.qty; }, 0) / 10) * 10;
+  document.getElementById('order-btn').disabled = true;
+  document.getElementById('order-btn').textContent = '送信中...';
+  await push(ref(db, 'orders'), { table: tableNum, items: items, total: total, status: 'new', timestamp: Date.now() });
+  cart = {};
+  renderMenu(); renderCart();
+  document.getElementById('order-btn').textContent = '✓ 注文しました！';
+  setTimeout(function() { document.getElementById('order-btn').textContent = '注文する'; }, 2000);
+};
+
 // 起動
 init();
 </script>
