@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>売上管理 - タイ料理レストラン</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+header { background: #1e293b; padding: 14px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #334155; }
+.back-btn { color: #94a3b8; text-decoration: none; font-size: 20px; }
+header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
+.period-bar { display: flex; gap: 8px; padding: 12px 16px; background: #1e293b; border-bottom: 1px solid #334155; overflow-x: auto; }
+.period-btn { padding: 5px 16px; border-radius: 20px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.period-btn.active { background: #0ea5e9; border-color: #0ea5e9; color: white; }
+.period-btn.cal { border-color: #7c3aed; color: #a78bfa; }
+.period-btn.cal.active { background: #7c3aed; border-color: #7c3aed; color: white; }
+.container { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-card { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
+.stat-card.accent { border-color: #0ea5e9; }
+.stat-label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+.stat-value { font-size: 22px; font-weight: 700; color: #f1f5f9; }
+.stat-value.green { color: #22c55e; }
+.stat-sub { font-size: 11px; color: #64748b; margin-top: 4px; }
+.section-title { font-size: 13px; font-weight: 600; color: #64748b; letter-spacing: 0.05em; margin-bottom: 10px; }
+.chart-wrap { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
+.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; margin-bottom: 6px; }
+.bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; gap: 3px; }
+.bar { width: 100%; border-radius: 4px 4px 0 0; background: #0ea5e9; min-height: 2px; }
+.bar.today { background: #22c55e; }
+.bar-label { font-size: 9px; color: #64748b; white-space: nowrap; }
+.bar-val { font-size: 9px; color: #94a3b8; }
+.rank-list { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
+.rank-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #334155; }
+.rank-item:last-child { border-bottom: none; }
+.rank-num { font-size: 13px; font-weight: 700; min-width: 20px; color: #64748b; }
+.rank-num.gold { color: #fbbf24; }
+.rank-num.silver { color: #94a3b8; }
+.rank-num.bronze { color: #b45309; }
+.rank-name { flex: 1; font-size: 13px; color: #e2e8f0; }
+.rank-qty { font-size: 12px; color: #64748b; margin-right: 4px; }
+.rank-sales { font-size: 13px; font-weight: 600; color: #22c55e; }
+.rank-bar-wrap { width: 80px; height: 6px; background: #334155; border-radius: 3px; }
+.rank-bar-fill { height: 100%; border-radius: 3px; background: #0ea5e9; }
+.table-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.table-card { background: #1e293b; border-radius: 10px; padding: 10px 12px; border: 1px solid #334155; text-align: center; }
+.table-card-label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
+.table-card-val { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+.table-card-cnt { font-size: 10px; color: #475569; margin-top: 2px; }
+.ratio-wrap { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
+.ratio-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+.ratio-seg { height: 100%; }
+.ratio-legend { display: flex; flex-wrap: wrap; gap: 8px; }
+.ratio-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ratio-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #94a3b8; }
+.week-block { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
+.week-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #1a2744; border-bottom: 1px solid #334155; cursor: pointer; }
+.week-label { font-size: 13px; font-weight: 700; color: #a78bfa; }
+.week-total { font-size: 14px; font-weight: 700; color: #22c55e; }
+.week-sub { font-size: 11px; color: #64748b; }
+.week-body { display: none; }
+.week-body.open { display: block; }
+.day-bills-btn { padding: 2px 8px; background: #1e3a5f; border: 1px solid #334155; border-radius: 6px; color: #60a5fa; font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.day-bills-btn:hover { background: #1d4ed8; color: white; }
+.bills-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: flex-start; justify-content: center; padding: 20px 8px 40px; overflow-y: auto; }
+.bills-modal.open { display: flex; }
+.bills-box { background: #1e293b; border-radius: 14px; border: 1px solid #334155; width: 420px; max-width: 95vw; color: #e2e8f0; font-family: -apple-system, sans-serif; overflow: hidden; }
+.bills-box-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #334155; }
+.bills-box-body { padding: 12px 16px 16px; max-height: 75vh; overflow-y: auto; }
+.bills-x-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #475569; background: transparent; color: #94a3b8; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; }
+.bills-x-btn:hover { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
+.bills-title { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; }
+.bills-receipt { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; color: #e2e8f0; font-size: 13px; }
+.bills-receipt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.bills-receipt-table { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+.bills-receipt-time { font-size: 11px; color: #64748b; }
+.bills-receipt-status { font-size: 11px; font-weight: 600; color: #22c55e; }
+.bills-receipt-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1e293b; font-size: 12px; color: #cbd5e1; }
+.bills-receipt-item:last-of-type { border-bottom: none; }
+.bills-receipt-total { display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid #334155; margin-top: 6px; padding-top: 6px; font-size: 14px; color: #22c55e; }
+.bills-close-btn { width: 100%; padding: 10px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; margin-top: 8px; }
+.day-row { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid #334155; }
+.day-row:last-child { border-bottom: none; }
+.day-row.today-row { background: rgba(34,197,94,0.07); }
+.day-date { font-size: 13px; color: #e2e8f0; min-width: 52px; }
+.day-date.today-lbl { color: #22c55e; font-weight: 700; }
+.day-dow { font-size: 11px; min-width: 18px; color: #64748b; }
+.day-bar-wrap { flex: 1; height: 8px; background: #334155; border-radius: 4px; }
+.day-bar-fill { height: 100%; border-radius: 4px; background: #0ea5e9; }
+.day-bar-fill.tf { background: #22c55e; }
+.day-sales { font-size: 13px; font-weight: 600; color: #f1f5f9; min-width: 78px; text-align: right; }
+.day-sales.zero { color: #334155; }
+.day-cnt { font-size: 11px; color: #475569; min-width: 28px; text-align: right; }
+.no-data { text-align: center; color: #475569; font-size: 13px; padding: 30px; }
+
+.audio-icon-btn.enabled { color: #22c55e; border-color: #166534; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back-btn" href="kitchen.html">&#8592;</a>
+  <h1>&#128202; 売上管理</h1>
+</header>
+<div class="period-bar">
+  <button class="period-btn active" onclick="setPeriod('today',this)">今日</button>
+  <button class="period-btn" onclick="setPeriod('week',this)">今週</button>
+  <button class="period-btn" onclick="setPeriod('month',this)">今月</button>
+  <button class="period-btn" onclick="setPeriod('all',this)">累計</button>
+  <button class="period-btn cal" onclick="setPeriod('calendar',this)">&#128197; 日別一覧</button>
+</div>
+<div class="container" id="container">
+  <div class="no-data">読み込み中...</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+var FC = {
+  apiKey: "AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ",
+  authDomain: "sawatdee-bros.firebaseapp.com",
+  databaseURL: "https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sawatdee-bros",
+  storageBucket: "sawatdee-bros.firebasestorage.app",
+  messagingSenderId: "1026345346676",
+  appId: "1:1026345346676:web:98478c02d3dfbae3df310e"
+};
+var app = initializeApp(FC);
+var db = getDatabase(app);
+var allOrders = {};
+var currentPeriod = 'today';
+var DRINKS = ['タイアイスティー','マンゴーラッシー','シンハービール','お水'];
+var CAT_COLORS = { 'ドリンク':'#0ea5e9', '麺・ご飯':'#f97316', 'カレー':'#eab308', '前菜':'#22c55e' };
+var MENU_CAT = {
+  'パッタイ':'麺・ご飯','カオパット':'麺・ご飯','クイッティアオ':'麺・ご飯','カオマンガイ':'麺・ご飯',
+  'グリーンカレー':'カレー','レッドカレー':'カレー','マッサマン':'カレー','イエローカレー':'カレー',
+  '生春巻き':'前菜','トートマンプラー':'前菜','ソムタム':'前菜','サテー':'前菜',
+  'タイアイスティー':'ドリンク','マンゴーラッシー':'ドリンク','シンハービール':'ドリンク','お水':'ドリンク'
+};
+var DOW = ['日','月','火','水','木','金','土'];
+
+window.setPeriod = function(p, btn) {
+  currentPeriod = p;
+  var bs = document.querySelectorAll('.period-btn');
+  for (var i = 0; i < bs.length; i++) bs[i].classList.remove('active');
+  btn.classList.add('active');
+  if (p === 'calendar') renderCalendar();
+  else render();
+};
+
+window.showDayBills = function(ds) {
+  var tableNameFn = window.TABLE_NAMES ? function(t) { return window.TABLE_NAMES[String(t)] || 'T'+t; } : null;
+  var start = new Date(ds + 'T06:00:00').getTime();
+  var end = start + 24 * 60 * 60 * 1000;
+  var dayOrders = Object.values(allOrders).filter(function(o) {
+    return o.timestamp >= start && o.timestamp < end && (o.status === 'paid' || o.status === 'done');
+  }).sort(function(a,b){ return a.timestamp - b.timestamp; });
+  var disp = ds.slice(5).replace('-', '/');
+  document.getElementById('bills-modal-title').textContent = disp + ' の伝票';
+  if (dayOrders.length === 0) {
+    document.getElementById('bills-modal-content').innerHTML = '<div style="color:#475569;text-align:center;padding:20px">注文がありません</div>';
+  } else {
+    // テーブルごとにpaidAtでセッショングループ化
+    var sessionMap = {};
+    dayOrders.forEach(function(o) {
+      var tbl = o.table;
+      var sessionKey = tbl + '__' + (o.paidAt || 'unpaid');
+      if (!sessionMap[sessionKey]) sessionMap[sessionKey] = { table: tbl, orders: [], paidAt: o.paidAt, isPaid: o.status === 'paid' };
+      sessionMap[sessionKey].orders.push(o);
+      if (o.status === 'paid') sessionMap[sessionKey].isPaid = true;
+    });
+    // セッションを最初の注文タイムスタンプでソート
+    var sessions = Object.values(sessionMap).sort(function(a,b) {
+      return a.orders[0].timestamp - b.orders[0].timestamp;
+    });
+    var html = '';
+    sessions.forEach(function(sess) {
+      var t = new Date(sess.orders[0].timestamp);
+      var timeStr = ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
+      var tblName = tableNameFn ? tableNameFn(sess.table) : 'T'+sess.table;
+      var statusBadge = sess.isPaid ? '✓ 会計済み' : '提供済み';
+      // 全商品をまとめる
+      var itemMap = {};
+      var sessionTotal = 0;
+      sess.orders.forEach(function(o) {
+        sessionTotal += Math.round((o.total||0) / 10) * 10;
+        (o.items||[]).forEach(function(it) {
+          var key = it.name;
+          if (!itemMap[key]) itemMap[key] = { name: it.name, price: it.price, qty: 0 };
+          itemMap[key].qty += it.qty;
+        });
+      });
+      html += '<div class="bills-receipt">';
+      html += '<div class="bills-receipt-header">'
+        + '<span class="bills-receipt-table">' + tblName + '</span>'
+        + '<span class="bills-receipt-time">' + timeStr + '</span>'
+        + '<span class="bills-receipt-status">' + statusBadge + '</span>'
+        + '</div>';
+      // ドリンク→フードの順にソート
+      var drinkNames = ["お冷","生ビール 中ジョッキ", "瓶ビール 大びん", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガ角ハイボール", "角ハイボール", "ジンジャー角ハイボール", "コーク角ハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "ホッピー中", "ホッピー外", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク"];
+      var sortedItems = Object.values(itemMap).sort(function(a, b) {
+        var aD = drinkNames.indexOf(a.name) >= 0;
+        var bD = drinkNames.indexOf(b.name) >= 0;
+        if (aD && !bD) return -1;
+        if (!aD && bD) return 1;
+        return 0;
+      });
+      sortedItems.forEach(function(it) {
+        html += '<div class="bills-receipt-item"><span>' + it.name + (it.qty>1?' ×'+it.qty:'') + '</span><span>¥' + (it.price*it.qty).toLocaleString() + '</span></div>';
+      });
+      html += '<div class="bills-receipt-total"><span>合計（税込）</span><span>¥' + sessionTotal.toLocaleString() + '</span></div>';
+      html += '</div>';
+    });
+    document.getElementById('bills-modal-content').innerHTML = html;
+  }
+  document.getElementById('bills-modal').classList.add('open');
+};
+window.closeDayBills = function() {
+  document.getElementById('bills-modal').classList.remove('open');
+};
+window.toggleWeek = function(id) {
+  var el = document.getElementById(id);
+  if (el.classList.contains('open')) el.classList.remove('open');
+  else el.classList.add('open');
+};
+
+function startOf(unit) {
+  var d = new Date();
+  if (unit === 'today') { d.setHours(0,0,0,0); return d.getTime(); }
+  if (unit === 'week') { var dow = d.getDay(); var diff = (dow >= 3) ? dow - 3 : dow + 4; d.setDate(d.getDate() - diff); d.setHours(0,0,0,0); return d.getTime(); }
+  if (unit === 'month') { d.setDate(1); d.setHours(0,0,0,0); return d.getTime(); }
+  return 0;
+}
+
+function getFiltered() {
+  var from = startOf(currentPeriod);
+  var result = [];
+  var keys = Object.keys(allOrders);
+  for (var i = 0; i < keys.length; i++) {
+    var o = allOrders[keys[i]];
+    if (o.status !== 'paid' && o.status !== 'done') continue;
+    if (o.timestamp < from) continue;
+    result.push(o);
+  }
+  return result;
+}
+
+function render() {
+  var orders = getFiltered();
+  var cont = document.getElementById('container');
+  if (orders.length === 0) { cont.innerHTML = '<div class="no-data">この期間の売上データがありません</div>'; return; }
+
+  var totalIn = 0, totalOrders = orders.length;
+  var itemMap = {}, tableMap = {}, catMap = {};
+  for (var i = 0; i < orders.length; i++) {
+    var o = orders[i];
+    totalIn += Math.round((o.total || 0) / 10) * 10;
+    var t = o.table || '?';
+    if (!tableMap[t]) tableMap[t] = { sales:0, count:0 };
+    tableMap[t].sales += Math.round((o.total || 0) / 10) * 10;
+    tableMap[t].count++;
+    var items = o.items || [];
+    for (var j = 0; j < items.length; j++) {
+      var it = items[j];
+      if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, qty:0, sales:0 };
+      itemMap[it.name].qty += it.qty;
+      itemMap[it.name].sales += it.price * it.qty;
+      var cat = MENU_CAT[it.name] || 'その他';
+      if (!catMap[cat]) catMap[cat] = 0;
+      catMap[cat] += it.price * it.qty;
+    }
+  }
+  var totalEx = Math.round(totalIn / 1.1);
+  var totalTax = totalIn - totalEx;
+  var avg = totalOrders > 0 ? Math.floor(totalIn / totalOrders) : 0;
+
+  var ranking = Object.keys(itemMap).map(function(k){ return itemMap[k]; });
+  ranking.sort(function(a,b){ return b.qty - a.qty; });
+  var maxQty = ranking.length > 0 ? ranking[0].qty : 1;
+
+  // 棒グラフデータ
+  var barData = [];
+  var nowH = new Date().getHours();
+  var nowDow = new Date().getDay();
+  var nowDate = new Date().getDate();
+  if (currentPeriod === 'today') {
+    for (var h = 11; h <= 22; h++) {
+      var v = 0;
+      for (var i = 0; i < orders.length; i++) { if (new Date(orders[i].timestamp).getHours() === h) v += Math.round((orders[i].total || 0) / 10) * 10; }
+      barData.push({ label: h + '時', val: v, isNow: nowH === h });
+    }
+  } else if (currentPeriod === 'week') {
+    for (var d = 0; d < 7; d++) {
+      var v = 0;
+      for (var i = 0; i < orders.length; i++) { if (new Date(orders[i].timestamp).getDay() === d) v += Math.round((orders[i].total || 0) / 10) * 10; }
+      barData.push({ label: DOW[d], val: v, isNow: nowDow === d });
+    }
+  } else if (currentPeriod === 'month') {
+    var dim = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
+    for (var d = 1; d <= dim; d++) {
+      var v = 0;
+      for (var i = 0; i < orders.length; i++) { if (new Date(orders[i].timestamp).getDate() === d) v += Math.round((orders[i].total || 0) / 10) * 10; }
+      barData.push({ label: d % 5 === 0 ? String(d) : '', val: v, isNow: nowDate === d });
+    }
+  }
+  var maxBar = 1;
+  for (var i = 0; i < barData.length; i++) if (barData[i].val > maxBar) maxBar = barData[i].val;
+
+  var catTotal = 0;
+  var catKeys = Object.keys(catMap);
+  for (var i = 0; i < catKeys.length; i++) catTotal += catMap[catKeys[i]];
+  if (catTotal === 0) catTotal = 1;
+
+  var h = '';
+
+  // サマリー
+  h += '<div class="summary-grid">'
+    + '<div class="stat-card accent"><div class="stat-label">売上合計（税込）</div><div class="stat-value green">&#165;' + totalIn.toLocaleString() + '</div>'
+    + '<div class="stat-sub">税抜 &#165;' + totalEx.toLocaleString() + ' / 税 &#165;' + totalTax.toLocaleString() + '</div></div>'
+    + '<div class="stat-card"><div class="stat-label">注文件数</div><div class="stat-value">' + totalOrders + '件</div>'
+    + '<div class="stat-sub">客単価 &#165;' + avg.toLocaleString() + '</div></div>'
+    + '</div>';
+
+  // グラフ
+  if (barData.length > 0) {
+    h += '<div class="chart-wrap"><div class="section-title">'
+      + (currentPeriod==='today'?'時間帯別':currentPeriod==='week'?'曜日別':'日別') + '売上</div>'
+      + '<div class="bar-chart">';
+    for (var i = 0; i < barData.length; i++) {
+      var b = barData[i];
+      var pct = Math.round(b.val / maxBar * 100);
+      h += '<div class="bar-col">'
+        + (b.val > 0 ? '<div class="bar-val">' + (b.val >= 10000 ? Math.round(b.val/1000)+'k' : '') + '</div>' : '')
+        + '<div class="bar' + (b.isNow?' today':'') + '" style="height:' + pct + '%"></div>'
+        + '<div class="bar-label">' + b.label + '</div></div>';
+    }
+    h += '</div></div>';
+  }
+
+  // カテゴリ比率
+  h += '<div class="ratio-wrap"><div class="section-title">カテゴリ別売上比率</div><div class="ratio-bar">';
+  for (var i = 0; i < catKeys.length; i++) {
+    var pct = Math.round(catMap[catKeys[i]] / catTotal * 100);
+    var col = CAT_COLORS[catKeys[i]] || '#64748b';
+    h += '<div class="ratio-seg" style="width:' + pct + '%;background:' + col + '"></div>';
+  }
+  h += '</div><div class="ratio-legend">';
+  for (var i = 0; i < catKeys.length; i++) {
+    var pct = Math.round(catMap[catKeys[i]] / catTotal * 100);
+    var col = CAT_COLORS[catKeys[i]] || '#64748b';
+    h += '<div class="ratio-item"><div class="ratio-dot" style="background:' + col + '"></div>' + catKeys[i] + ' ' + pct + '%</div>';
+  }
+  h += '</div></div>';
+
+  // ランキング
+  h += '<div><div class="section-title">メニュー別ランキング</div><div class="rank-list">';
+  var top = Math.min(ranking.length, 8);
+  for (var i = 0; i < top; i++) {
+    var it = ranking[i];
+    var nc = i===0?'rank-num gold':i===1?'rank-num silver':i===2?'rank-num bronze':'rank-num';
+    var pct = Math.round(it.qty / maxQty * 100);
+    h += '<div class="rank-item"><span class="' + nc + '">' + (i+1) + '</span>'
+      + '<span class="rank-name">' + it.name + '</span>'
+      + '<span class="rank-qty">' + it.qty + '個</span>'
+      + '<div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:' + pct + '%"></div></div>'
+      + '<span class="rank-sales">&#165;' + it.sales.toLocaleString() + '</span></div>';
+  }
+  h += '</div></div>';
+
+  // テーブル別
+  var tnums = Object.keys(tableMap).sort();
+  if (tnums.length > 0) {
+    h += '<div><div class="section-title">テーブル別売上</div><div class="table-grid">';
+    for (var i = 0; i < tnums.length; i++) {
+      var t = tnums[i];
+      h += '<div class="table-card"><div class="table-card-label">T' + t + '</div>'
+        + '<div class="table-card-val">&#165;' + tableMap[t].sales.toLocaleString() + '</div>'
+        + '<div class="table-card-cnt">' + tableMap[t].count + '件</div></div>';
+    }
+    h += '</div></div>';
+  }
+
+  cont.innerHTML = h;
+}
+
+function renderCalendar() {
+  var cont = document.getElementById('container');
+  var now = new Date();
+  var pad = function(n){ return ('0'+n).slice(-2); };
+  var todayStr = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
+
+  // 1/1から今日まで
+  var start = new Date(now.getFullYear(), 0, 1);
+  var days = [];
+  var cur = new Date(start);
+  while (cur <= now) {
+    var ds = cur.getFullYear() + '-' + pad(cur.getMonth()+1) + '-' + pad(cur.getDate());
+    days.push({ ds: ds, dow: cur.getDay() });
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  // 日別集計
+  var dayMap = {};
+  var keys = Object.keys(allOrders);
+  for (var i = 0; i < keys.length; i++) {
+    var o = allOrders[keys[i]];
+    if (o.status !== 'paid' && o.status !== 'done') continue;
+    var d = new Date(o.timestamp);
+    var ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    if (!dayMap[ds]) dayMap[ds] = { sales:0, count:0 };
+    dayMap[ds].sales += Math.round((o.total || 0) / 10) * 10;
+    dayMap[ds].count++;
+  }
+
+  var maxDay = 1;
+  var dk = Object.keys(dayMap);
+  for (var i = 0; i < dk.length; i++) if (dayMap[dk[i]].sales > maxDay) maxDay = dayMap[dk[i]].sales;
+
+  // 週グループ
+  var weeks = [];
+  var curWeek = null;
+  for (var i = 0; i < days.length; i++) {
+    var day = days[i];
+    if (day.dow === 3 || curWeek === null) {
+      curWeek = { days:[], total:0, count:0 };
+      weeks.push(curWeek);
+    }
+    curWeek.days.push(day);
+    if (dayMap[day.ds]) { curWeek.total += dayMap[day.ds].sales; curWeek.count += dayMap[day.ds].count; }
+  }
+
+  var totalAll = 0, countAll = 0;
+  for (var i = 0; i < weeks.length; i++) { totalAll += weeks[i].total; countAll += weeks[i].count; }
+
+  var h = '<div class="summary-grid">'
+    + '<div class="stat-card accent"><div class="stat-label">年間売上合計（税込）</div><div class="stat-value green">&#165;' + totalAll.toLocaleString() + '</div><div class="stat-sub">1/1〜今日</div></div>'
+    + '<div class="stat-card"><div class="stat-label">総注文件数</div><div class="stat-value">' + countAll + '件</div>'
+    + '<div class="stat-sub">平均 &#165;' + (countAll > 0 ? Math.floor(totalAll/countAll).toLocaleString() : 0) + '/件</div></div>'
+    + '</div>';
+
+  h += '<div class="section-title">週別・日別売上一覧</div>';
+
+  for (var wi = weeks.length - 1; wi >= 0; wi--) {
+    var wk = weeks[wi];
+    var wStart = wk.days[0].ds.slice(5).replace('-', '/');
+    var wEnd = wk.days[wk.days.length-1].ds.slice(5).replace('-', '/');
+    var isCurrent = wi === weeks.length - 1;
+    var wid = 'wk' + wi;
+
+    h += '<div class="week-block">'
+      + '<div class="week-header" onclick="toggleWeek(' + "'" + wid + "'" + ')">'
+      + '<div><span class="week-label">第' + (wi+1) + '週　' + wStart + '〜' + wEnd + '</span>'
+      + (isCurrent ? '&nbsp;<span style="font-size:10px;color:#22c55e">今週</span>' : '') + '</div>'
+      + '<div style="text-align:right"><div class="week-total">&#165;' + wk.total.toLocaleString() + '</div>'
+      + '<div class="week-sub">' + wk.count + '件</div></div>'
+      + '</div>'
+      + '<div class="week-body' + (isCurrent ? ' open' : '') + '" id="' + wid + '">';
+
+    for (var di = wk.days.length - 1; di >= 0; di--) {
+      var day = wk.days[di];
+      var isToday = day.ds === todayStr;
+      var data = dayMap[day.ds];
+      var sales = data ? data.sales : 0;
+      var cnt = data ? data.count : 0;
+      var pct = Math.round(sales / maxDay * 100);
+      var disp = day.ds.slice(5).replace('-', '/');
+      var dow = DOW[day.dow];
+      var dowStyle = day.dow === 0 ? 'color:#ef4444' : day.dow === 6 ? 'color:#60a5fa' : 'color:#64748b';
+
+      h += '<div class="day-row' + (isToday ? ' today-row' : '') + '">'
+        + '<span class="day-date' + (isToday ? ' today-lbl' : '') + '">' + disp + (isToday ? '&#9312;' : '') + '</span>'
+        + '<span class="day-dow" style="' + dowStyle + '">' + dow + '</span>'
+        + '<div class="day-bar-wrap"><div class="day-bar-fill' + (isToday ? ' tf' : '') + '" style="width:' + pct + '%"></div></div>'
+        + '<span class="day-sales' + (sales === 0 ? ' zero' : '') + '">' + (sales > 0 ? '&#165;' + sales.toLocaleString() : '&minus;') + '</span>'
+        + '<span class="day-cnt">' + (cnt > 0 ? cnt + '件' : '') + '</span>'
+        + (cnt > 0 ? '<button class="day-bills-btn" onclick="window.showDayBills(\'' + day.ds + '\')">\u4f1d\u7968</button>' : '<span style="width:24px"></span>')
+        + '</div>';
+    }
+    h += '</div></div>';
+  }
+
+  cont.innerHTML = h;
+}
+
+
+var TABLE_NAMES = {
+  '1': 'テーブル1', '2': 'テーブル2', '3': 'テーブル3', '4': 'テーブル4',
+  '5': 'コーラ卓', '6': '座敷席', '7': 'カウンター1・2',
+  '8': 'カウンター3・4', '9': 'カウンター5', '10': '奥席'
+};
+window.TABLE_NAMES = TABLE_NAMES;
+
+onValue(ref(db, 'orders'), function(snap) {
+  allOrders = snap.val() || {};
+  if (currentPeriod === 'calendar') renderCalendar();
+  else render();
+});
+</script>
+<div class="bills-modal" id="bills-modal">
+  <div class="bills-box">
+    <div class="bills-box-header">
+      <div class="bills-title" id="bills-modal-title"></div>
+      <button class="bills-x-btn" onclick="window.closeDayBills()">✕</button>
+    </div>
+    <div class="bills-box-body">
+      <div id="bills-modal-content"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

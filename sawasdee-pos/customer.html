@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ご注文 - サワディーブロス</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; min-height: 100vh; padding-bottom: 180px; }
+header { background: #1a1a2e; color: white; padding: 12px 16px; text-align: center; }
+header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.05em; }
+header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
+
+/* タブ */
+.cat-tabs { display: flex; gap: 0; background: #fff; border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; z-index: 100; align-items: center; }
+.cat-tabs-scroll { display: flex; flex: 1; overflow-x: auto; }
+.history-icon-btn { flex-shrink: 0; padding: 0 10px; height: 44px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #6b7280; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
+.call-btn { flex-shrink: 0; padding: 0 10px; height: 44px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #dc2626; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
+.bill-btn { flex-shrink: 0; padding: 0 10px; height: 44px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #1d4ed8; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
+.bill-confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px; }
+.bill-confirm-modal.open { display: flex; }
+.bill-confirm-box { background: white; border-radius: 16px; padding: 24px 20px; width: 100%; max-width: 300px; text-align: center; }
+.bill-confirm-title { font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+.bill-confirm-sub { font-size: 13px; color: #6b7280; margin-bottom: 20px; line-height: 1.6; }
+.bill-confirm-btns { display: flex; gap: 10px; }
+.bill-cancel-btn { flex: 1; padding: 12px; background: #f3f4f6; border: none; border-radius: 10px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
+.bill-ok-btn { flex: 2; padding: 12px; background: #1d4ed8; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
+.call-btn.calling { color: #dc2626; }
+.call-dot { display: inline-block; opacity: 0.2; animation: dotFade 1.2s infinite; }
+.call-dot:nth-child(1) { animation-delay: 0s; }
+.call-dot:nth-child(2) { animation-delay: 0.4s; }
+.call-dot:nth-child(3) { animation-delay: 0.8s; }
+@keyframes dotFade { 0%,100%{opacity:0.2} 30%{opacity:1} }
+.cat-tab { flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; }
+.cat-tab.active { color: #166534; border-bottom-color: #166534; }
+.subcat-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: #f0fdf4; border-bottom: 1px solid #e5e7eb; position: sticky; top: 44px; z-index: 99; }
+.subcat-tab { flex-shrink: 0; padding: 4px 12px; font-size: 12px; border-radius: 20px; border: 1px solid #d1d5db; background: white; color: #6b7280; cursor: pointer; white-space: nowrap; }
+.subcat-tab.active { background: #166534; border-color: #166534; color: white; }
+
+/* メニューカード */
+.menu-list { padding: 8px 12px; display: flex; flex-direction: column; gap: 0; }
+.menu-card { background: white; border-radius: 10px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid #e5e7eb; position: relative; cursor: pointer; }
+.menu-card:active { background: #f0fdf4; }
+.menu-card.soldout { opacity: 0.45; pointer-events: none; }
+.menu-card-img { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+.menu-card.no-img { padding: 6px 10px; }
+.menu-card-body { flex: 1; min-width: 0; }
+.menu-card-name-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 2px; }
+.menu-card-name { font-size: 14px; font-weight: 700; color: #111827; }
+.menu-card-badges { display: flex; flex-wrap: wrap; gap: 3px; }
+.badge { display: inline-flex; align-items: center; gap: 2px; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+.badge-popular { background: #fef3c7; color: #92400e; }
+.badge-recommend { background: #ede9fe; color: #5b21b6; }
+.badge-sake { background: #dbeafe; color: #1e40af; }
+.badge-pakchi { background: #d1fae5; color: #065f46; }
+.spicy-icons { display: inline-flex; align-items: center; gap: 1px; }
+.chili { font-size: 11px; }
+.menu-card-lang { font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.menu-card-desc { font-size: 11px; color: #6b7280; line-height: 1.4; margin-bottom: 2px; }
+.menu-card-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: 2px; }
+.menu-card-price { font-size: 15px; font-weight: 700; color: #166534; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.menu-card-price-in { font-size: 10px; color: #9ca3af; }
+.soldout-badge { display: inline-block; background: #fee2e2; color: #dc2626; font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 10px; margin-top: 2px; }
+.add-btn { position: absolute; right: 10px; bottom: 10px; width: 30px; height: 30px; border-radius: 50%; background: #166534; color: white; border: none; font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* カート */
+/* オプションモーダル */
+.opt-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
+.opt-modal.open { display: flex; }
+.opt-box { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 340px; }
+.opt-title { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.opt-subtitle { font-size: 12px; color: #6b7280; margin-bottom: 14px; }
+.opt-choice { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; margin-bottom: 8px; cursor: pointer; font-size: 14px; color: #374151; }
+.opt-choice.selected { border-color: #166534; background: #f0fdf4; color: #166534; font-weight: 600; }
+.opt-choice-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #d1d5db; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.opt-choice.selected .opt-choice-radio { border-color: #166534; background: #166534; }
+.opt-choice.selected .opt-choice-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: white; display: block; }
+.opt-choice-check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #d1d5db; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.opt-choice.selected .opt-choice-check { border-color: #166534; background: #166534; color: white; }
+.opt-price { margin-left: auto; font-size: 12px; color: #6b7280; }
+.opt-btns { display: flex; gap: 8px; margin-top: 14px; }
+.opt-cancel { flex: 1; padding: 12px; background: white; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; color: #6b7280; cursor: pointer; }
+.opt-confirm { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; color: white; cursor: pointer; }
+.opt-confirm:disabled { background: #d1d5db; cursor: default; }
+
+.cart-wrap { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 2px solid #e5e7eb; padding: 10px 14px 14px; z-index: 200; }
+.cart-summary { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
+.cart-count { font-size: 13px; color: #6b7280; }
+.cart-total-ex { font-size: 22px; font-weight: 700; color: #166534; }
+.cart-total-amount { font-size: 12px; color: #9ca3af; }
+.cart-items-preview { font-size: 12px; color: #374151; margin-bottom: 6px; max-height: 90px; overflow-y: auto; }
+.cart-item-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; border-bottom: 1px solid #f3f4f6; }
+.cart-item-row:last-child { border-bottom: none; }
+.cart-item-name { flex: 1; font-size: 12px; color: #374151; }
+.cart-item-qty-btn { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+.cart-item-qty { font-size: 12px; font-weight: 600; min-width: 18px; text-align: center; }
+.cart-item-price { font-size: 11px; color: #6b7280; white-space: nowrap; }
+.btn-row { display: flex; gap: 8px; }
+.cancel-btn { padding: 12px 16px; background: white; color: #ef4444; border: 1px solid #ef4444; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.cancel-btn:disabled { color: #d1d5db; border-color: #d1d5db; cursor: default; }
+.order-btn { flex: 1; padding: 14px; background: #166534; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+.order-btn:disabled { background: #d1d5db; color: #9ca3af; cursor: default; }
+.qty-row { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.qty-btn { width: 22px; height: 22px; border-radius: 50%; border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.qty-num { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+
+.history-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; display: none; align-items: flex-end; justify-content: center; }
+.history-modal.open { display: flex; }
+.history-box { background: white; border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-height: 70vh; overflow-y: auto; }
+.history-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 14px; text-align: center; }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #374151; }
+.history-item:last-child { border-bottom: none; }
+.history-qty { color: #6b7280; font-size: 13px; }
+.history-empty { text-align: center; color: #9ca3af; padding: 30px 0; font-size: 14px; }
+.history-close { width: 100%; margin-top: 14px; padding: 12px; background: #f3f4f6; border: none; border-radius: 10px; color: #374151; font-size: 14px; cursor: pointer; font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <div class="table-no" id="table-no">テーブル ?</div>
+  <h1>SAWATDEE BROS ご注文</h1>
+</header>
+<div class="cat-tabs"><div class="cat-tabs-scroll" id="cat-tabs"></div><button class="history-icon-btn" onclick="window.showHistory()">📋<span>注文履歴</span></button><button class="call-btn" id="call-btn" onclick="window.callStaff()">🔔<span>店員を呼ぶ</span></button><button class="bill-btn" onclick="window.requestBill()">💳<span>会計する</span></button></div>
+<div class="subcat-tabs" id="subcat-tabs"></div>
+<div class="menu-list" id="menu-list"></div>
+<!-- オプションモーダル -->
+<div class="opt-modal" id="opt-modal">
+  <div class="opt-box">
+    <div class="opt-title" id="opt-item-name"></div>
+    <div class="opt-subtitle" id="opt-label"></div>
+    <div id="opt-choices"></div>
+    <div class="opt-btns">
+      <button class="opt-cancel" onclick="window.closeOpt()">キャンセル</button>
+      <button class="opt-confirm" id="opt-confirm" onclick="window.confirmOpt()">カートに追加</button>
+    </div>
+  </div>
+</div>
+
+<div class="cart-wrap">
+  <div class="cart-items-preview" id="cart-preview"></div>
+  <div class="cart-summary">
+    <div class="cart-count" id="cart-count">カート: 0品</div>
+    <div style="display:flex;align-items:baseline;gap:6px">
+      <div class="cart-total-ex" id="cart-total-ex">¥0</div>
+      <div class="cart-total-amount" id="cart-total">税込 ¥0</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="cancel-btn" id="cancel-btn" onclick="window.cancelOrder()" disabled>✕ キャンセル</button>
+    <button class="order-btn" id="order-btn" onclick="window.placeOrder()" disabled>注文する</button>
+  </div>
+</div>
+
+
+<!-- 注文履歴モーダル -->
+<div class="bill-confirm-modal" id="bill-confirm-modal">
+  <div class="bill-confirm-box">
+    <div class="bill-confirm-title">💳 お会計</div>
+    <div class="bill-confirm-sub">お会計でよろしいですか？<br>伝票をお持ちします。</div>
+    <div class="bill-confirm-btns">
+      <button class="bill-cancel-btn" onclick="window.closeBillConfirm()">キャンセル</button>
+      <button class="bill-ok-btn" onclick="window.confirmBill()">お会計</button>
+    </div>
+  </div>
+</div>
+
+<div class="history-modal" id="history-modal">
+  <div class="history-box">
+    <div class="history-title">📋 注文履歴</div>
+    <div id="history-list"></div>
+    <button class="history-close" onclick="window.closeHistory()">閉じる</button>
+  </div>
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, push, onValue, set, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FC = {
+  apiKey: 'AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ',
+  authDomain: 'sawatdee-bros.firebaseapp.com',
+  databaseURL: 'https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'sawatdee-bros',
+  storageBucket: 'sawatdee-bros.firebasestorage.app',
+  messagingSenderId: '1026345346676',
+  appId: '1:1026345346676:web:98478c02d3dfbae3df310e'
+};
+const app = initializeApp(FC);
+const db = getDatabase(app);
+
+const TAX = 0.1;
+
+// オプション定義
+const ITEM_OPTIONS = {
+  '泡盛(久米仙)': {
+    type: 'required', label: '飲み方を選択してください',
+    choices: ['ロック', 'ソーダ割', '水割り']
+  },
+  'ジャスミン焼酎(茉莉花)': {
+    type: 'required', label: '飲み方を選択してください',
+    choices: ['ロック', 'ソーダ割', '水割り', 'ジャスミン茶割']
+  },
+  '梅酒': {
+    type: 'required', label: '飲み方を選択してください',
+    choices: ['ロック', 'ソーダ割', '水割り']
+  },
+  '鶏もも肉のガパオ炒め': {
+    type: 'optional', label: 'サイドメニューを追加しますか？',
+    choices: [
+      { label: 'ライス', price: 300 },
+      { label: '目玉焼き', price: 120 }
+    ]
+  }
+};
+const taxIn = p => Math.floor(p * (1 + TAX));
+const fmtY = p => '\uffe5' + p.toLocaleString();
+
+// テーブル番号
+const params = new URLSearchParams(window.location.search);
+const tableNum = params.get('table') || '?';
+document.getElementById('table-no').textContent = 'テーブル ' + tableNum;
+
+
+// メニューデータ
+const MENU_DATA = {"drink": {"ビール": [{"id": "D-BE-01", "name": "生ビール 中ジョッキ", "price": 490, "desc": "アサヒスーパードライ", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-BE-02", "name": "瓶ビール 大びん", "price": 740, "desc": "サッポロ赤星", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-BE-03", "name": "ノンアルビール 小びん", "price": 420, "desc": "アサヒ", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}], "タイビール": [{"id": "D-BE-04", "name": "シンハー", "price": 570, "desc": "タイビールといえばこれ！苦みと爽やかな口当たりが特徴", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/シンハー.jpg"}, {"id": "D-BE-05", "name": "チャーン", "price": 570, "desc": "シンハーと肩を並べる大人気ブランド！強い苦みと軽い後味が特徴", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/チャーン.jpg"}, {"id": "D-BE-06", "name": "リオ", "price": 570, "desc": "苦みが少なく飲みやすい！人気急上昇のビールです", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/リオ.jpg"}], "ビアカクテル": [{"id": "D-BC-01", "name": "マンゴービア", "price": 590, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-BC-02", "name": "グアバビア", "price": 590, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}], "ハイボール": [{"id": "D-HB-01", "name": "メガ角ハイボール", "price": 680, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-HB-02", "name": "角ハイボール", "price": 380, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-HB-03", "name": "ジンジャー角ハイボール", "price": 440, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-HB-04", "name": "コーク角ハイボール", "price": 440, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-HB-05", "name": "メコンハイボール", "price": 490, "desc": "メコンウイスキー", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-HB-06", "name": "メコンジンジャー", "price": 540, "desc": "メコンウイスキー", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-HB-07", "name": "メコンコーク", "price": 540, "desc": "メコンウイスキー", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}], "おすすめ": [{"id": "D-OS-01", "name": "タイサワー", "price": 650, "desc": "生ライムのサワーをベースに、レモングラス・パクチー・唐辛子・こぶみかんの葉などのタイハーブをトッピングしたスペシャルサワー！", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/タイサワー.jpg"}, {"id": "D-OS-02", "name": "パクチーレモンサワー", "price": 580, "desc": "パクチー好きにはたまらない！爽やかなパクチーの香りとすっきりレモンのサワーです！", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/パクチーレモンサワー.jpg"}, {"id": "D-OS-03", "name": "タイ式漢方サワー", "price": 580, "desc": "知る人ぞ知る！タイの薬草酒（ヤードン）を使ったサワー！癖強な味ですが一度はまると病みつきに！日本でこれが飲めるのはかなりレアです。", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/タイ式漢方サワー.jpg"}], "サワー・お茶割り": [{"id": "D-SA-01", "name": "レモンサワー", "price": 420, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-02", "name": "クエン酸サワー", "price": 420, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-03", "name": "バイス(梅しそ)サワー", "price": 420, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-04", "name": "チューハイ", "price": 420, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-05", "name": "ウーロンハイ", "price": 380, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-06", "name": "ジャスミンハイ", "price": 380, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-07", "name": "ホッピー", "price": 480, "desc": "中250・外250", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-08", "name": "ホッピー中", "price": 250, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SA-09", "name": "ホッピー外", "price": 250, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}], "トロピカルハイ・カクテル": [{"id": "D-TH-01", "name": "マンゴーハイ", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-02", "name": "グアバハイ", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-03", "name": "タイ紅茶ハイ", "price": 550, "desc": "タイ式ミルクティー割り", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-04", "name": "マンゴーミルクハイ", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-05", "name": "グアバミルクハイ", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-06", "name": "カシスソーダ", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-07", "name": "カシスウーロン", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-08", "name": "カシスマンゴー", "price": 580, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-09", "name": "テキーラコーク", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-10", "name": "テキーラグアバ", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-TH-11", "name": "テキーラショット", "price": 400, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}], "焼酎・その他": [{"id": "D-SH-01", "name": "泡盛(久米仙)", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SH-02", "name": "ジャスミン焼酎(茉莉花)", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SH-03", "name": "梅酒", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}], "ワイン": [{"id": "D-WN-01", "name": "グラスワイン 赤", "price": 380, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-WN-02", "name": "グラスワイン 白", "price": 380, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-WN-03", "name": "デキャンタ 赤", "price": 1600, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-WN-04", "name": "デキャンタ 白", "price": 1600, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-WN-05", "name": "ボトルワイン 赤", "price": 2200, "desc": "チリ産　カベルネソーヴィニヨン", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-WN-06", "name": "ボトルワイン 白", "price": 2200, "desc": "チリ産　シャルドネ", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}], "ソフトドリンク": [{"id": "D-SD-01", "name": "マンゴージュース", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-02", "name": "グアバジュース", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-03", "name": "タイ紅茶(タイ式ミルクティー)", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-04", "name": "炭酸水(カットレモン入り)", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-05", "name": "コカコーラ", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-06", "name": "ジンジャーエール(辛口)", "price": 480, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-07", "name": "ウーロン茶", "price": 440, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-08", "name": "ジャスミン茶", "price": 440, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-09", "name": "ノンアル★タイサワー", "price": 650, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-10", "name": "ノンアル★マンゴーミルク", "price": 550, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}, {"id": "D-SD-11", "name": "お冷", "price": 0, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true}]}, "food": {"つまみ": [{"id": "F-TS-01", "name": "キャベツ", "price": 120, "desc": "ピリ辛ダレ＆マヨネーズ付き", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/キャベツ.jpg"}, {"id": "F-TS-02", "name": "セロリ", "price": 220, "desc": "ピリ辛ダレ＆マヨネーズ付き", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/セロリ.jpg"}, {"id": "F-TS-03", "name": "タイの海老せん", "price": 280, "desc": "大人から子供まで大好き！コショウが効いた海老せん。食べると止められない", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/えびせん.jpg"}, {"id": "F-TS-04", "name": "ピリ辛枝豆", "price": 280, "desc": "タイ人も大好きな枝豆。ピリ辛ナンプラー味", "pakchi": false, "spicy": 0.5, "popular": "", "active": true, "img": "img/ピリ辛枝豆.jpg"}, {"id": "F-TS-05", "name": "タイの漬物缶詰", "price": 280, "desc": "程よい酸っぱさがクセになる茎レタスの漬物。", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/缶詰.jpg"}, {"id": "F-TS-06", "name": "おつまみキュウリ", "price": 280, "desc": "さっぱり胡瓜とピリ辛スイートチリソース。砕いたピーナッツがアクセント", "pakchi": false, "spicy": 0.0, "popular": "人気料理", "active": true, "img": "img/キュウリ.jpg"}, {"id": "F-TS-07", "name": "カリカリ厚揚げ", "price": 280, "desc": "表面をカリカリに揚げたスナック感覚の厚揚げです", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/カリカリ厚揚げ.jpg"}, {"id": "F-TS-08", "name": "パク乗せ冷奴", "price": 280, "desc": "冷や奴にパクチー乗せました。濃厚ピリ辛ダレと豆腐の相性バツグン", "pakchi": true, "spicy": 0.0, "popular": "", "active": true, "img": "img/パク乗せ冷奴.jpg"}, {"id": "F-TS-09", "name": "コリコリ豚耳", "price": 280, "desc": "タイのたまり醤油とナンプラーで甘じょっぱく煮込んだコリコリの豚耳は、お酒が進みます", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/コリコリ豚耳.jpg"}, {"id": "F-TS-10", "name": "アジのトマト煮", "price": 420, "desc": "タイの鯵や鰯をトマトソースで煮たタイ定番惣菜。香味野菜を乗せて、仕上げにライムを絞ります。酒のつまみにぴったりです", "pakchi": true, "spicy": 0.5, "popular": "", "active": true, "img": "img/アジのトマト煮.jpg"}, {"id": "F-TS-11", "name": "タイ式生ソーセージ(ネーム)", "price": 440, "desc": "程よい酸味がクセになるタイの生ソーセージ。通好みの一品！タイの生唐辛子入り。※カット位置によっては激辛です", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/タイ式生ソーセージ（ネーム）.jpg"}], "サラダ・和え物": [{"id": "F-SL-01", "name": "青パパイヤのサラダ", "price": 780, "desc": "タイではあちこちに専門店があるほど人気の料理！サラダではありますが、クセになる辛さで酒のつまみにも！", "pakchi": false, "spicy": 3.0, "popular": "", "active": true, "img": "img/ソムタム.jpg"}, {"id": "F-SL-02", "name": "青パパイヤのサラダ（激辛バージョン）", "price": 880, "desc": "尋常ではない辛さです。心して挑んでください", "pakchi": false, "spicy": 10.0, "popular": "", "active": true, "img": "img/ソムタムラオ.jpg"}, {"id": "F-SL-03", "name": "青パパイヤのサラダ（豚グリル入り）", "price": 880, "desc": "タイ東北名物ソムタムに、これまた東北名物の豚グリルをトッピングした贅沢な一品", "pakchi": false, "spicy": 3.0, "popular": "", "active": true, "img": "img/ソムタムムーヤーン.jpg"}, {"id": "F-SL-04", "name": "温かい春雨サラダ", "price": 780, "desc": "タイのサラダといえばコレ！というくらい代表的なサラダ。干し海老やひき肉の出し汁をたっぷり含んだ春雨は旨みたっぷり！当店は本場同様、温かい状態でお出ししています", "pakchi": true, "spicy": 2.0, "popular": "人気料理", "active": true, "img": "img/ヤムウンセン.jpg"}, {"id": "F-SL-05", "name": "揚げ目玉焼きのサラダ", "price": 680, "desc": "外側カリッと黄身は半熟！目玉焼きのまろやかさとライムの爽やかな酸味がベストマッチ！", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/ヤムカイダオ.jpg"}, {"id": "F-SL-06", "name": "茹で鶏のサラダ", "price": 680, "desc": "茹でた鶏肉とたっぷり野菜でヘルシーなサラダです", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/ヤムガイ.jpg"}, {"id": "F-SL-07", "name": "海老とレモングラスのサラダ", "price": 880, "desc": "プリプリの海老がごろごろ。レモングラスが爽やかに香るさっぱりサラダ", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/ヤムクン.jpg"}], "一品": [{"id": "F-IP-01", "name": "鶏もも肉のタイ式グリル", "price": 580, "desc": "ボリュームたっぷり！秘伝の自家製タレに漬け込んだ鶏もも肉を、香ばしくジューシーに焼き上げた当店自慢の一品です。", "pakchi": false, "spicy": 0.0, "popular": "当店名物", "active": true, "img": "img/ガイヤーン.jpg"}, {"id": "F-IP-02", "name": "豚肉のタイ式グリル", "price": 580, "desc": "自家製タレに漬け込んだ豚肩ロース肉をじっくり焼き上げます。ナンプラーをベースにライムを効かせた特製ダレでどうぞ。酒のつまみに最高の人気料理です", "pakchi": false, "spicy": 0.0, "popular": "当店名物", "active": true, "img": "img/ムーヤーン.jpg"}, {"id": "F-IP-03", "name": "タイ式海老のグリル", "price": 980, "desc": "シンプルに塩焼きした大ぶりの海老に、特性の自家製シーフードソースをたっぷりつけて食べればぶっ飛びます。オススメ！", "pakchi": true, "spicy": 0.0, "popular": "おススメ", "active": true, "img": "img/タイ式海老のグリル.jpg"}, {"id": "F-IP-04", "name": "タイ式豚グリルのハーブ和え", "price": 880, "desc": "ジューシーな豚肉グリルをたっぷりのタイハーブで和えた、ガツンとスパイシーな一品。ハーブ＆スパイスでこれぞタイの醍醐味！", "pakchi": true, "spicy": 2.0, "popular": "おススメ", "active": true, "img": "img/ナムトックムー.jpg"}, {"id": "F-IP-05", "name": "タイ式ヌードル香味野菜和え", "price": 720, "desc": "タイのインスタントヌードルをたっぷり野菜と和えました！タイでは定番の屋台メニューです。つまみにバッチリ。リピーター多し！", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/ヤムマーマー.jpg"}, {"id": "F-IP-06", "name": "キャベツの海老味噌醤炒め", "price": 440, "desc": "ガピと呼ばれるタイの海老味噌醤でキャベツを炒めたエスニックなアンチョビキャベツのような味わいです", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/ガピキャベツ.jpg"}, {"id": "F-IP-07", "name": "蒸し鶏 生姜ソース", "price": 440, "desc": "柔らか鶏肉と生姜・にんにくの効いた自家製ソースがベストマッチ。前菜にも最適です。", "pakchi": false, "spicy": 0.0, "popular": "おススメ", "active": true, "img": "img/蒸し鶏生姜ソース.jpg"}, {"id": "F-IP-08", "name": "鶏ひき肉のハーブ和え", "price": 780, "desc": "鶏ひき肉を香味野菜とタイハーブで和えたサラダ感覚の一品。タイ東北部およびラオスの名物郷土料理です", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/ラープガイ.jpg"}], "揚げ物": [{"id": "F-AG-01", "name": "スパイシー鶏唐揚げ", "price": 580, "desc": "秘伝のタレに漬け込んで揚げた唐揚げに甘辛スパイシーソースをかけました。ビールやハイボールの共にテッパンの逸品です", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/スパイシー鶏唐揚げ.jpg"}, {"id": "F-AG-02", "name": "タイ式揚げ春巻き(パクチー入)", "price": 620, "desc": "パクチーを根っこから葉までまるごと刻んで混ぜ込んだ特製の揚げ春巻きです", "pakchi": true, "spicy": 0.0, "popular": "", "active": true, "img": "img/ポッピアトード.jpg"}, {"id": "F-AG-03", "name": "揚げ海老のニンニク炒め", "price": 1020, "desc": "殻付きのまま衣をつけて揚げた海老に、香ばしいガーリックソースを絡めました", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "warning": "お料理提供にお時間をいただいております。よろしいですか？", "img": "img/クンガティアム.jpg"}, {"id": "F-AG-04", "name": "ポテトフライ 2種のソース", "price": 380, "desc": "皆大好きサクサクのフライドポテトです。ケチャップとスイートチリの2種のソースで", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/ポテトフライ2種のソース.jpg"}, {"id": "F-AG-05", "name": "タイ式揚げオムレツ", "price": 580, "desc": "玉ねぎ、しめじの入ったふわふわ揚げオムレツ。家庭的なタイのおふくろの味", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/カイジャオ.jpg"}, {"id": "F-AG-06", "name": "タイ式揚げオムレツ(ソーセージ入)", "price": 680, "desc": "タイの酸味ソーセージの入ったタイ式揚げオムレツです", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/カイジャオネーム.jpg"}], "スープ": [{"id": "F-AG-07", "name": "海老とハーブの酸っぱ辛いスープ", "price": 980, "desc": "言わずと知れた世界三大スープの一つ。プリプリの海老とタイハーブの入った酸っぱ辛いスープ。当店は牛乳を使用した優しい甘みのあるクリーミーなタイプです", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/トムヤムクン.jpg"}, {"id": "F-AG-08", "name": "鶏肉のココナッツミルクスープ", "price": 880, "desc": "鶏肉のコナッツミルクスープ。タイのスープはトムヤムクンだけではありません。コナッツミルクの濃厚さと、ライムのさっぱりとした酸味が絶妙なマッチング。知る人ぞ知る逸品", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/トムカーガイ.jpg"}], "炒め物": [{"id": "F-IT-01", "name": "鶏もも肉のガパオ炒め", "price": 680, "desc": "大定番のガパオ炒め。当店はひき肉ではなくゴロっとした鶏肉で食べごたえたっぷり！タイのバジル(ガパオ)で香り豊かな味わい。つまみとしても、ご飯と一緒に食べても！", "pakchi": false, "spicy": 1.0, "popular": "人気料理", "active": true, "img": "img/パガパオ.jpg"}, {"id": "F-IT-02", "name": "豚肉のカレー炒め", "price": 780, "desc": "豚肉と色々野菜を玉子でとってもまろやかに仕上げたカレー炒め。当店人気メニューです", "pakchi": false, "spicy": 0.0, "popular": "人気料理", "active": true, "img": "img/ムーパッポンカリー.jpg"}, {"id": "F-IT-03", "name": "海老のカレー炒め", "price": 880, "desc": "海老と色々野菜をカレー粉で炒めて玉子とじに。海老好きにはたまらない一品", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/クンパッポンカリー.jpg"}, {"id": "F-IT-04", "name": "鶏肉とセロリの生姜炒め", "price": 780, "desc": "生姜が香る鶏肉とセロリの炒め物。セロリの食感と風味がアクセント", "pakchi": false, "spicy": 0.0, "popular": "おススメ", "active": true, "img": "img/ガイパッキン.jpg"}, {"id": "F-IT-05", "name": "豚肉のガーリック炒め", "price": 680, "desc": "豚肉とニンニクの芽を炒め、フライドガーリックをまぶしたスタミナバツグンの一品", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/ムーガティアム.jpg"}, {"id": "F-IT-06", "name": "季節の青菜炒め", "price": 680, "desc": "強力火力でサッと炒めます。夏期は空心菜、春・秋・冬はその他の青菜となります", "pakchi": false, "spicy": 0.5, "popular": "", "active": true, "img": "img/パックブンファイデーン.jpg"}, {"id": "F-IT-07", "name": "厚揚げともやしの炒め", "price": 620, "desc": "タイの生コショウが香る厚揚げともやしの炒め物。オイスターソースベースの優しい味付けです", "pakchi": false, "spicy": 0.5, "popular": "", "active": true, "img": "img/パットトゥアンゴーク.jpg"}, {"id": "F-IT-08", "name": "茄子と豚肉のバジル炒め", "price": 680, "desc": "トロトロの茄子がおいしい！ナンプラーとオイスターソースで甘辛く炒めたバジルの香りが爽やかな一品です", "pakchi": false, "spicy": 1.0, "popular": "", "active": true, "img": "img/茄子と豚肉のバジル炒め.jpg"}, {"id": "F-IT-09", "name": "春雨の旨辛ソース炒め", "price": 780, "desc": "春雨と色々具材を旨辛のソースで炒めたタイ屋台の定番メニューです。ボリューム満点のつまみです", "pakchi": false, "spicy": 1.0, "popular": "おススメ", "active": true, "img": "img/スッキーヘーン.jpg"}, {"id": "F-IT-10", "name": "春雨のオイスター炒め", "price": 780, "desc": "ふんわり玉子と春雨の優しい味の炒め物。つまみとしても主食としてもイケます", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/春雨オイスター炒め.jpg"}], "麺・ご飯": [{"id": "F-MN-01", "name": "タイ式焼きそば", "price": 780, "desc": "一度食べたらやみつき！タイ料理を代表する名物メニューです。中毒者多数！是非一度ご賞味ください", "pakchi": false, "spicy": 0.0, "popular": "人気料理", "active": true, "img": "img/パッタイ.jpg"}, {"id": "F-MN-02", "name": "旨辛バジル炒め麺", "price": 780, "desc": "コショウと唐辛子のWパンチ。バジルが香る激辛焼きそば。隠れた人気メニュー", "pakchi": false, "spicy": 3.0, "popular": "おススメ", "active": true, "img": "img/パッキーマオ.jpg"}, {"id": "F-MN-03", "name": "タイ式まぜそば", "price": 680, "desc": "ガーリックオイルが香ばしいタイ式のまぜそばです。よく混ぜてどうぞ", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/クイッティオヘーン.jpg"}, {"id": "F-MN-04", "name": "タイ式汁そば", "price": 680, "desc": "あっさりとしたスープで子供でも食べやすいタイ式汁そば。〆にもオススメ！", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/クイッティオナーム.jpg"}, {"id": "F-MN-05", "name": "トムヤムクンヌードル", "price": 980, "desc": "ご存じトムヤムクンに米粉麺を入れました。人気のヌードル", "pakchi": true, "spicy": 2.0, "popular": "", "active": true, "img": "img/トムヤムヌードル.jpg"}, {"id": "F-MN-06", "name": "グリーンカレー", "price": 880, "desc": "ナッツミルクが濃厚でクリーミーなタイの定番カレー。ゴロっとした鶏肉とナスでボリュームたっぷり", "pakchi": false, "spicy": 0.5, "popular": "", "active": true, "img": "img/グリーンカレー.jpg"}, {"id": "F-MN-07", "name": "蒸し鶏ご飯", "price": 780, "desc": "鶏ガラスープで炊きこんだご飯の上にしっとりと柔らかな鶏肉を乗せて食べる、タイでも大人気の屋台飯。生姜の効いた特製タレと一緒にどうぞ", "pakchi": false, "spicy": 0.0, "popular": "おススメ", "active": true, "img": "img/カオマンガイ.jpg"}, {"id": "F-MN-08", "name": "タイ式焼き飯", "price": 780, "desc": "タイの醤油で味付けた炒飯です。生ライムを搾ってさっぱりとどうぞ", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/カオパ.jpg"}, {"id": "F-MN-09", "name": "ライス", "price": 300, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/ライス.jpg"}, {"id": "F-MN-10", "name": "目玉焼き", "price": 120, "desc": "", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/目玉焼き.jpg"}], "デザート": [{"id": "F-DS-01", "name": "ココナッツアイスサンド", "price": 440, "desc": "こんがり焼いたトーストにクリーミーなナッツアイスをサンドした別腹デザート。濃厚クリーミーなナッツアイスは他では食べられない美味しさ！", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/アイスクリームサンド.jpg"}, {"id": "F-DS-02", "name": "ココナッツアイス", "price": 280, "desc": "濃厚クリーミーなナッツアイスは他では食べられない美味しさ！", "pakchi": false, "spicy": 0.0, "popular": "", "active": true, "img": "img/ココナッツアイスクリーム.jpg"}]}};
+
+
+// 売り切れ
+let soldout = {};
+onValue(ref(db, 'soldout'), snap => { soldout = snap.val() || {}; renderMenu(); });
+
+// カテゴリ・サブカテゴリ状態
+let currentCat = 'drink';
+let currentSubcat = 'ビール';
+let cart = {};
+
+// カテゴリタブ描画
+function renderCatTabs() {
+  const tabs = [
+    { key: 'drink', label: '🥤 ドリンク' },
+    { key: 'food', label: '🍽 フード' }
+  ];
+  document.getElementById('cat-tabs').innerHTML = tabs.map(t =>
+    `<button class="cat-tab${currentCat===t.key?' active':''}" onclick="window.selectCat('${t.key}')">${t.label}</button>`
+  ).join('');
+}
+
+// サブカテゴリタブ描画
+function renderSubcatTabs() {
+  const subcats = Object.keys(MENU_DATA[currentCat]);
+  if (!currentSubcat || !subcats.includes(currentSubcat)) currentSubcat = subcats[0];
+  document.getElementById('subcat-tabs').innerHTML = subcats.map(s =>
+    `<button class="subcat-tab${currentSubcat===s?' active':''}" onclick="window.selectSubcat('${s}')">${s}</button>`
+  ).join('');
+}
+
+// バッジ生成
+function makeBadges(item) {
+  let html = '';
+  if (item.popular) {
+    if (item.popular.includes('人気')) html += '<span class="badge badge-popular">🔥 人気</span>';
+    else if (item.popular.includes('当店名物')) html += '<span class="badge badge-popular">⭐ 名物</span>';
+    else if (item.popular.includes('おス') || item.popular.includes('オス')) html += '<span class="badge badge-recommend">👍 おすすめ</span>';
+  }
+  if (item.sake) html += '<span class="badge badge-sake">🍺 酒に合う</span>';
+  if (item.pakchi) html += '<span class="badge badge-pakchi">🌿 パクチー</span>';
+  if (item.spicy > 0) {
+    const count = item.spicy >= 10 ? 3 : item.spicy >= 3 ? 3 : item.spicy >= 2 ? 2 : 1;
+    html += '<span class="spicy-icons">' + '🌶️'.repeat(count) + '</span>';
+  }
+  return html ? `<div class="menu-card-badges">${html}</div>` : '';
+}
+
+// メニュー描画
+function renderMenu() {
+  const items = (MENU_DATA[currentCat][currentSubcat] || []).filter(i => i.active);
+  const html = items.map((item, idx) => {
+    const isSoldout = soldout[item.name] === true;
+    const priceEx = item.price;
+    const priceIn = taxIn(item.price);
+    const cartKey = currentCat + '__' + currentSubcat + '__' + idx;
+    const cartQty = cart[cartKey] ? cart[cartKey].qty : 0;
+    return `<div class="menu-card${isSoldout?' soldout':''} ${item.img?'has-img':'no-img'}" onclick="window.addToCart('${currentCat}','${currentSubcat}',${idx})">
+      ${item.img ? `<img class="menu-card-img" src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+      <div class="menu-card-body">
+        <div class="menu-card-name-row">
+          <span class="menu-card-name">${item.name}</span>
+          ${makeBadges(item)}
+          ${isSoldout ? '<span class="soldout-badge">売り切れ</span>' : ''}
+        </div>
+        ${(item.kata||item.thai||item.en) ? `<div class="menu-card-lang">${[item.kata,item.thai,item.en].filter(Boolean).join(' / ')}</div>` : ''}
+        ${item.desc ? `<div class="menu-card-desc">${item.desc}</div>` : ''}
+        ${!isSoldout ? `<div class="menu-card-price-row">
+          <span class="menu-card-price">${priceEx===0?'無料':fmtY(priceEx)}</span>
+          <span class="menu-card-price-in">税込${fmtY(priceIn)}</span>
+        </div>` : ''}
+        ${cartQty > 0 ? `<div class="qty-row">
+          <button class="qty-btn" onclick="event.stopPropagation();window.changeQty('${cartKey}',-1)">−</button>
+          <span class="qty-num">${cartQty}</span>
+          <button class="qty-btn" onclick="event.stopPropagation();window.addToCart('${currentCat}','${currentSubcat}',${idx})">+</button>
+        </div>` : ''}
+      </div>
+      ${!isSoldout && cartQty===0 ? '<button class="add-btn" onclick="event.stopPropagation();window.addToCart(\''+currentCat+'\',\''+currentSubcat+'\','+idx+')">+</button>' : ''}
+    </div>`;
+  }).join('');
+  document.getElementById('menu-list').innerHTML = html || '<div style="padding:40px;text-align:center;color:#9ca3af">商品がありません</div>';
+}
+
+// カート描画
+function renderCart() {
+  let totalEx = 0, totalIn = 0, count = 0;
+  let previewHTML = '';
+  Object.entries(cart).forEach(([key, c]) => {
+    const extraPrice = c.extras ? c.extras.reduce((s, e) => s + e.price, 0) : 0;
+    const totalPrice = c.item.price + extraPrice;
+    totalEx += totalPrice * c.qty;
+    totalIn += taxIn(totalPrice) * c.qty;
+    count += c.qty;
+    const subPrice = fmtY(totalPrice * c.qty);
+    previewHTML += `<div class="cart-item-row">
+      <button class="cart-item-qty-btn" onclick="window.changeQty('${key}',-1)">−</button>
+      <span class="cart-item-qty">${c.qty}</span>
+      <button class="cart-item-qty-btn" onclick="window.changeQty('${key}',1)">+</button>
+      <span class="cart-item-name">${c.item.name}${c.extras&&c.extras.length?` +${c.extras.map(e=>e.label).join("・")}`:""}</span>
+      <span class="cart-item-price">${subPrice}</span>
+    </div>`;
+  });
+  document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
+  document.getElementById('cart-total-ex').textContent = fmtY(totalEx);
+  document.getElementById('cart-total').textContent = '税込 ' + fmtY(totalIn);
+  document.getElementById('cart-preview').innerHTML = previewHTML;
+  document.getElementById('order-btn').disabled = count === 0;
+  document.getElementById('cancel-btn').disabled = count === 0;
+}
+
+// アクション
+window.selectCat = (cat) => { currentCat = cat; currentSubcat = null; renderCatTabs(); renderSubcatTabs(); renderMenu(); };
+window.selectSubcat = (sub) => { currentSubcat = sub; renderSubcatTabs(); renderMenu(); };
+let pendingOpt = null;
+let selectedOpt = {};
+
+window.addToCart = (cat, sub, idx) => {
+  const item = MENU_DATA[cat][sub][idx];
+  if (!item || soldout[item.name]) return;
+  // 注意フラグがあれば確認ダイアログ
+  if (item.warning) {
+    if (!confirm(item.warning)) return;
+  }
+  const optDef = ITEM_OPTIONS[item.name];
+  if (optDef) {
+    // オプションモーダルを開く
+    pendingOpt = { cat, sub, idx, item, optDef };
+    selectedOpt = {};
+    document.getElementById('opt-item-name').textContent = item.name;
+    document.getElementById('opt-label').textContent = optDef.label;
+    const confirmBtn = document.getElementById('opt-confirm');
+    confirmBtn.disabled = optDef.type === 'required';
+    // 選択肢を描画
+    const html = optDef.choices.map((c, i) => {
+      const label = typeof c === 'string' ? c : c.label;
+      const price = typeof c === 'object' ? c.price : null;
+      const isCheck = optDef.type === 'optional';
+      return `<div class="opt-choice" id="opt-c-${i}" onclick="window.selectOpt(${i})">
+        <span class="${isCheck ? 'opt-choice-check' : 'opt-choice-radio'}"></span>
+        <span>${label}</span>
+        ${price ? `<span class="opt-price">+￥${price.toLocaleString()}</span>` : ''}
+      </div>`;
+    }).join('');
+    document.getElementById('opt-choices').innerHTML = html;
+    document.getElementById('opt-modal').classList.add('open');
+    return;
+  }
+  addItemToCart(cat, sub, idx, item, null, []);
+};
+
+window.selectOpt = (i) => {
+  const optDef = pendingOpt.optDef;
+  if (optDef.type === 'required') {
+    // ラジオ
+    selectedOpt = { choice: i };
+    document.querySelectorAll('.opt-choice').forEach((el, j) => {
+      el.classList.toggle('selected', j === i);
+    });
+    document.getElementById('opt-confirm').disabled = false;
+  } else {
+    // チェックボックス
+    if (selectedOpt[i]) delete selectedOpt[i];
+    else selectedOpt[i] = true;
+    document.getElementById('opt-c-' + i).classList.toggle('selected', !!selectedOpt[i]);
+  }
+};
+
+window.confirmOpt = () => {
+  if (!pendingOpt) return;
+  const { cat, sub, idx, item, optDef } = pendingOpt;
+  let optLabel = '';
+  let extraPrice = 0;
+  const extras = [];
+  if (optDef.type === 'required') {
+    optLabel = optDef.choices[selectedOpt.choice];
+  } else {
+    optDef.choices.forEach((c, i) => {
+      if (selectedOpt[i]) {
+        extras.push({ label: c.label, price: c.price });
+        extraPrice += c.price;
+      }
+    });
+  }
+  addItemToCart(cat, sub, idx, item, optLabel, extras);
+  closeOpt();
+};
+
+window.closeOpt = () => {
+  document.getElementById('opt-modal').classList.remove('open');
+  pendingOpt = null;
+};
+
+function addItemToCart(cat, sub, idx, item, optLabel, extras) {
+  const optKey = optLabel || extras.map(e => e.label).join(',');
+  const key = cat + '__' + sub + '__' + idx + (optKey ? '__' + optKey : '');
+  const displayName = item.name + (optLabel ? '（' + optLabel + '）' : '');
+  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price }, qty: 0, extras: extras };
+  cart[key].qty++;
+  renderMenu(); renderCart();
+}
+window.changeQty = (key, delta) => {
+  if (delta > 0) {
+    if (!cart[key]) return;
+    cart[key].qty += 1;
+  } else {
+    if (!cart[key]) return;
+    cart[key].qty -= 1;
+    if (cart[key].qty <= 0) delete cart[key];
+  }
+  renderMenu(); renderCart();
+};
+
+window.requestBill = function() {
+  document.getElementById('bill-confirm-modal').classList.add('open');
+};
+
+window.closeBillConfirm = function() {
+  document.getElementById('bill-confirm-modal').classList.remove('open');
+};
+
+window.confirmBill = async function() {
+  document.getElementById('bill-confirm-modal').classList.remove('open');
+  const tableNum = new URLSearchParams(location.search).get('table') || '?';
+  await set(ref(db, 'bill_calls/' + tableNum), { table: tableNum, timestamp: Date.now() });
+};
+
+window.callStaff = async function() {
+  const btn = document.getElementById('call-btn');
+  const tableNum = new URLSearchParams(location.search).get('table') || '?';
+  if (btn.classList.contains('calling')) {
+    await remove(ref(db, 'calls/' + tableNum));
+    btn.classList.remove('calling');
+    btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+  } else {
+    await set(ref(db, 'calls/' + tableNum), { table: tableNum, timestamp: Date.now() });
+    btn.classList.add('calling');
+    btn.innerHTML = '🔔<span>呼出中<span class="call-dot">.</span><span class="call-dot">.</span><span class="call-dot">.</span></span>';
+    setTimeout(async function() {
+      await remove(ref(db, 'calls/' + tableNum));
+      btn.classList.remove('calling');
+      btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+    }, 3 * 60 * 1000);
+  }
+};
+
+window.showHistory = async function() {
+  const { get, child } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').catch(()=>({}));
+  // Firebaseから当日の注文を取得してテーブル番号でフィルタ
+  const snap = await new Promise(resolve => {
+    onValue(ref(db, 'orders'), resolve, { onlyOnce: true });
+  });
+  const data = snap.val() || {};
+  const todayStart = (() => {
+    const now = new Date(), s = new Date(now);
+    if (now.getHours() < 6) s.setDate(s.getDate() - 1);
+    s.setHours(6, 0, 0, 0);
+    return s.getTime();
+  })();
+
+  // 自分のテーブルの注文を集計（会計済み除外・当日のみ）
+  const itemMap = {};
+  Object.values(data).forEach(order => {
+    if (order.table != tableNum) return;
+    if ((order.timestamp || 0) < todayStart) return;
+    if (order.status === 'paid') return; // 会計済みは除外
+    (order.items || []).forEach(item => {
+      const key = item.name;
+      if (!itemMap[key]) itemMap[key] = { name: item.name, qty: 0 };
+      itemMap[key].qty += item.qty;
+    });
+  });
+
+  const items = Object.values(itemMap);
+  const list = document.getElementById('history-list');
+  if (items.length === 0) {
+    list.innerHTML = '<div class="history-empty">まだ注文履歴がありません</div>';
+  } else {
+    list.innerHTML = items.map(it =>
+      `<div class="history-item"><span>${it.name}</span><span class="history-qty">×${it.qty}</span></div>`
+    ).join('');
+  }
+  document.getElementById('history-modal').classList.add('open');
+};
+
+window.closeHistory = function() {
+  document.getElementById('history-modal').classList.remove('open');
+};
+window.cancelOrder = () => { cart = {}; renderMenu(); renderCart(); };
+window.placeOrder = async () => {
+  const items = [];
+  Object.values(cart).forEach(c => {
+    const item = { name: c.item.name, qty: c.qty, price: c.item.price };
+    if (c.extras && c.extras.length > 0) {
+      item.extrasStr = c.extras.map(e => e.label).join('・');
+      item.price = c.item.price + c.extras.reduce((s, e) => s + e.price, 0);
+    }
+    items.push(item);
+  });
+  if (items.length === 0) return;
+  const total = items.reduce((s, i) => s + taxIn(i.price) * i.qty, 0);
+  document.getElementById('order-btn').disabled = true;
+  document.getElementById('order-btn').textContent = '送信中...';
+  await push(ref(db, 'orders'), { table: tableNum, items, total, status: 'new', timestamp: Date.now() });
+  cart = {};
+  renderMenu(); renderCart();
+  document.getElementById('order-btn').textContent = '✓ 注文しました！';
+  setTimeout(() => { document.getElementById('order-btn').textContent = '注文する'; }, 2000);
+};
+
+// 初期化
+renderCatTabs();
+renderSubcatTabs();
+renderMenu();
+renderCart();
+</script>
+</body>
+</html>
