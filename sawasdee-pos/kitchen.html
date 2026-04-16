@@ -65,6 +65,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .audio-slash line { stroke: #ef4444; stroke-width: 2.5; stroke-linecap: round; }
 /* タブバー */
 .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 56px; background: #1e293b; border-top: 1px solid #334155; display: flex; z-index: 200; }
+.iframe-view { position: fixed; top: 56px; left: 0; right: 0; bottom: 56px; border: none; display: none; }
 .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #64748b; font-size: 10px; cursor: pointer; border: none; background: none; }
 .tab-item.active { color: #22c55e; }
 .tab-item:hover { color: #94a3b8; }
@@ -195,8 +196,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
           <line x1="4" y1="4" x2="24" y2="24"/>
         </svg>
       </button>
-      <button class="icon-btn" onclick="window.open('menu-admin.html','menu-admin')" title="商品管理">⚙️</button>
-      <button class="icon-btn" onclick="window.open('sales.html','sales')" title="売上管理">📊</button>
+
     </div>
   </div>
 </header>
@@ -304,11 +304,16 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     <button class="edit-close-btn" onclick="window.closeEdit()">キャンセル</button>
   </div>
 </div>
+<iframe class="iframe-view" id="view-sales" src="" title="売上管理"></iframe>
+<iframe class="iframe-view" id="view-admin" src="" title="商品管理"></iframe>
+
 <nav class="tab-bar">
   <button class="tab-item" id="tab-all" onclick="window.setMode('all')"><span class="tab-icon">👁</span>全て</button>
   <button class="tab-item" id="tab-food" onclick="window.setMode('food')"><span class="tab-icon">🍽</span>フード</button>
   <button class="tab-item" id="tab-drink" onclick="window.setMode('drink')"><span class="tab-icon">🥤</span>ドリンク</button>
   <button class="tab-item" id="tab-bills" onclick="window.setMode('bills')"><span class="tab-icon">🧾</span>伝票</button>
+  <button class="tab-item" id="tab-sales" onclick="window.setMode('sales')"><span class="tab-icon">📊</span>売上</button>
+  <button class="tab-item" id="tab-admin" onclick="window.setMode('admin')"><span class="tab-icon">⚙️</span>管理</button>
 </nav>
 <button class="restore-fab" id="restore-btn" onclick="window.showRestoreList()">↩ 直前の提供を戻す</button>
 
@@ -708,6 +713,7 @@ let currentMode = 'all';
 
 function setMode(mode) {
   currentMode = mode;
+  // 通常ビュー
   var views = {
     'all': document.getElementById('view-all'),
     'food': document.getElementById('view-food'),
@@ -731,7 +737,23 @@ function setMode(mode) {
       el.style.pointerEvents = 'none';
     }
   });
-  ['all','food','drink','bills'].forEach(function(m) {
+  // iframeビュー
+  var salesFrame = document.getElementById('view-sales');
+  var adminFrame = document.getElementById('view-admin');
+  if (mode === 'sales') {
+    salesFrame.style.display = 'block';
+    if (!salesFrame.src || salesFrame.src === window.location.href) salesFrame.src = 'sales.html';
+    adminFrame.style.display = 'none';
+  } else if (mode === 'admin') {
+    adminFrame.style.display = 'block';
+    if (!adminFrame.src || adminFrame.src === window.location.href) adminFrame.src = 'menu-admin.html';
+    salesFrame.style.display = 'none';
+  } else {
+    salesFrame.style.display = 'none';
+    adminFrame.style.display = 'none';
+  }
+  // タブのアクティブ状態
+  ['all','food','drink','bills','sales','admin'].forEach(function(m) {
     var el = document.getElementById('tab-'+m);
     if (el) el.classList.toggle('active', m === mode);
   });
@@ -743,7 +765,7 @@ window.setMode = setMode;
 
 // URLパラメータでモード初期化
 var urlMode = new URLSearchParams(window.location.search).get('mode');
-if (urlMode === 'food' || urlMode === 'drink' || urlMode === 'all' || urlMode === 'bills') setMode(urlMode);
+if (urlMode === 'food' || urlMode === 'drink' || urlMode === 'all' || urlMode === 'bills' || urlMode === 'sales' || urlMode === 'admin') setMode(urlMode);
 else setMode('all');
 
 // 音声状態をlocalStorageから復元
