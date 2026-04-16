@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>ハンディ - サワディーブロス</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #0f172a; color: #f1f5f9; min-height: 100vh; user-select: none; }
+
+/* ヘッダー */
+header { background: #1e293b; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; }
+header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+.header-table { font-size: 13px; color: #fbbf24; font-weight: 700; }
+
+/* テーブル選択 */
+.table-bar { background: #1e293b; padding: 10px 12px; border-bottom: 1px solid #334155; display: flex; gap: 6px; overflow-x: auto; }
+.table-bar::-webkit-scrollbar { display: none; }
+.table-btn { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 13px; font-weight: 600; cursor: pointer; }
+.table-btn.active { background: #fbbf24; color: #1a1200; border-color: #fbbf24; }
+
+/* カテゴリタブ */
+.cat-bar { display: flex; overflow-x: auto; background: #1e293b; border-bottom: 1px solid #334155; }
+.cat-bar::-webkit-scrollbar { display: none; }
+.sub-bar { display: flex; overflow-x: auto; background: #0f172a; border-bottom: 1px solid #1e293b; }
+.sub-bar::-webkit-scrollbar { display: none; }
+.cat-btn { flex-shrink: 0; padding: 10px 16px; font-size: 13px; font-weight: 700; color: #64748b; border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; }
+.cat-btn.active { color: #f1f5f9; border-bottom-color: #22c55e; background: #1e293b; }
+.sub-btn { flex-shrink: 0; padding: 8px 14px; font-size: 11px; font-weight: 600; color: #64748b; border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; }
+.sub-btn.active { color: #22c55e; border-bottom-color: #22c55e; }
+
+/* メニューリスト */
+.menu-list { padding: 6px; display: grid; grid-template-columns: repeat(5, 1fr); grid-auto-rows: 1fr; gap: 4px; padding-bottom: 180px; }
+.menu-item { border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px 3px; cursor: pointer; border: 1.5px solid #334155; aspect-ratio: 1; position: relative; text-align: center; -webkit-tap-highlight-color: transparent; }
+.menu-item:active { opacity: 0.6; transform: scale(0.95); }
+.menu-item.in-cart { outline: 2px solid #22c55e; outline-offset: 1px; }
+.menu-item-name { font-size: 9px; color: #e2e8f0; line-height: 1.25; word-break: break-all; }
+.menu-item-badge { position: absolute; top: 2px; right: 2px; background: #22c55e; color: #000; font-size: 9px; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.qty-num { font-size: 14px; font-weight: 700; color: #f1f5f9; min-width: 18px; text-align: center; }
+
+/* カート */
+.cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; border-top: 1px solid #334155; padding: 10px 12px; }
+.cart-summary { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cart-count { font-size: 13px; color: #94a3b8; }
+.cart-total { font-size: 18px; font-weight: 700; color: #22c55e; }
+.cart-btns { display: flex; gap: 8px; }
+.cart-clear { padding: 12px 16px; background: transparent; border: 1px solid #ef4444; border-radius: 10px; color: #ef4444; font-size: 13px; font-weight: 600; cursor: pointer; }
+.cart-order { flex: 1; padding: 12px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; }
+.cart-order:disabled { background: #334155; color: #64748b; }
+.ohiya-btn { padding: 10px 16px; background: #0c4a6e; border: 1px solid #0369a1; border-radius: 10px; color: #7dd3fc; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.ohiya-btn:active { opacity: 0.7; }
+.cart-check { flex: 1; padding: 12px; background: #1d4ed8; border: none; border-radius: 10px; color: white; font-size: 13px; font-weight: 600; cursor: pointer; }
+.cart-check:disabled { background: #334155; color: #64748b; }
+/* 確認モーダル */
+.confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: flex-end; justify-content: center; }
+.confirm-modal.open { display: flex; }
+.confirm-box { background: #1e293b; border-radius: 16px 16px 0 0; padding: 16px; width: 100%; max-height: 70vh; overflow-y: auto; }
+.confirm-title { font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; text-align: center; }
+.confirm-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 13px; }
+.confirm-item:last-child { border-bottom: none; }
+.confirm-item-name { flex: 1; color: #cbd5e1; }
+.confirm-item-qty { color: #fbbf24; font-weight: 700; margin: 0 10px; }
+.confirm-item-price { color: #94a3b8; white-space: nowrap; }
+.confirm-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; color: #f1f5f9; padding: 12px 0 4px; border-top: 1px solid #475569; margin-top: 4px; }
+.confirm-subtotal { display: flex; justify-content: space-between; font-size: 12px; color: #64748b; padding: 2px 0; }
+.confirm-close { width: 100%; padding: 12px; background: #334155; border: none; border-radius: 10px; color: #94a3b8; font-size: 14px; cursor: pointer; margin-top: 12px; }
+.confirm-qty-ctrl { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.confirm-qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #475569; background: #0f172a; color: #94a3b8; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.confirm-qty-btn.minus:active { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
+.confirm-qty-num { font-size: 14px; font-weight: 700; color: #fbbf24; min-width: 20px; text-align: center; }
+
+/* 送信完了 */
+.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #166534; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 200; white-space: nowrap; }
+.toast.show { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍽 ハンディ</h1>
+  <span class="header-table" id="header-table">テーブル未選択</span>
+</header>
+
+<!-- テーブル選択 -->
+<div class="table-bar" id="table-bar"></div>
+
+<!-- カテゴリ -->
+<div class="cat-bar" id="cat-bar"></div>
+<div class="sub-bar" id="sub-bar"></div>
+
+<!-- メニュー -->
+<div class="menu-list" id="menu-list"></div>
+
+<!-- カート -->
+<div class="cart-bar">
+  <div class="cart-summary">
+    <span class="cart-count" id="cart-count">カート: 0品</span>
+    <span class="cart-total" id="cart-total">¥0</span>
+  </div>
+  <div class="cart-btns">
+    <button class="ohiya-btn" id="ohiya-btn" onclick="orderOhiya()" style="display:none">💧 お冷</button>
+    <button class="cart-clear" onclick="clearCart()">✕ クリア</button>
+    <button class="cart-check" id="check-btn" onclick="showConfirm()" disabled>📋 確認</button>
+    <button class="cart-order" id="order-btn" onclick="placeOrder()" disabled>送信</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ 注文を送信しました！</div>
+
+<!-- 注文確認モーダル -->
+<div class="confirm-modal" id="confirm-modal">
+  <div class="confirm-box">
+    <div class="confirm-title">📋 注文内容の確認</div>
+    <div id="confirm-list"></div>
+    <button class="confirm-close" onclick="closeConfirm()">閉じる</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, push, onValue, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FC = {
+  apiKey: 'AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ',
+  authDomain: 'sawatdee-bros.firebaseapp.com',
+  databaseURL: 'https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'sawatdee-bros',
+  storageBucket: 'sawatdee-bros.firebasestorage.app',
+  messagingSenderId: '1026345346676',
+  appId: '1:1026345346676:web:98478c02d3dfbae3df310e'
+};
+const app = initializeApp(FC);
+const db = getDatabase(app);
+
+const TABLE_COUNT = 10;
+const TABLE_NAMES = {
+  1: 'T1', 2: 'T2', 3: 'T3', 4: 'T4',
+  5: 'コ', 6: 'Z', 7: 'C1.2', 8: 'C3.4', 9: 'C5', 10: '奥'
+};
+function tableName(n) { return TABLE_NAMES[n] || 'T'+n; }
+let GROUPS_DATA = {};
+
+let currentTable = null;
+let currentCat = 'drink';
+let currentGroupIdx = 0;
+let cart = {};
+
+// テーブルボタン
+const tableBar = document.getElementById('table-bar');
+for (let i = 1; i <= TABLE_COUNT; i++) {
+  const btn = document.createElement('button');
+  btn.className = 'table-btn';
+  btn.textContent = tableName(i);
+  btn.onclick = () => selectTable(i);
+  tableBar.appendChild(btn);
+}
+
+function selectTable(n) {
+  currentTable = n;
+  document.getElementById('header-table').textContent = tableName(n);
+  document.querySelectorAll('.table-btn').forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === n);
+  });
+  if (!currentCat) {
+    currentCat = 'drink';
+    currentSub = GROUPS_DATA['drink'] ? GROUPS_DATA['drink'][0].name : '';
+  }
+  renderCats();
+  renderMenu();
+}
+
+// カテゴリ・サブカテゴリ
+function renderCats() {
+  // 1行目：ドリンク / フード
+  const catBar = document.getElementById('cat-bar');
+  catBar.innerHTML = '';
+  [['drink','🥤 ドリンク'],['food','🍽 フード']].forEach(([key,label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (key === currentCat ? ' active' : '');
+    btn.textContent = label;
+    btn.onclick = () => { currentCat = key; currentGroupIdx = 0; renderCats(); renderMenu(); };
+    catBar.appendChild(btn);
+  });
+  // 2行目：サブカテゴリ
+  const subBar = document.getElementById('sub-bar');
+  subBar.innerHTML = '';
+  GROUPS_DATA[currentCat].forEach((g, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'sub-btn' + (i === currentGroupIdx ? ' active' : '');
+    btn.textContent = g.name;
+    btn.onclick = () => { currentGroupIdx = i; renderCats(); renderMenu(); };
+    subBar.appendChild(btn);
+  });
+}
+
+function fmtY(n) { return '¥' + n.toLocaleString(); }
+function taxIn(p) { return Math.floor(p * 1.1); }
+
+function renderMenu() {
+  const list = document.getElementById('menu-list');
+  if (!currentTable) { list.innerHTML = '<div style="padding:20px;color:#64748b;text-align:center;grid-column:1/-1">テーブルを選択してください</div>'; return; }
+  const group = GROUPS_DATA[currentCat][currentGroupIdx];
+  if (!group) return;
+  const ohiyaQty = cart['ohiya'] ? cart['ohiya'].qty : 0;
+  const itemsHTML = group.items.map((item, idx) => {
+    const key = currentCat + '__g' + currentGroupIdx + '__' + idx;
+    const qty = cart[key] ? cart[key].qty : 0;
+    return `<div class="menu-item${qty > 0 ? ' in-cart' : ''}"
+      style="background:${item.bg};border-color:${qty > 0 ? '#22c55e' : item.border};"
+      onclick="tapItem('${key}',${idx})">
+      <div class="menu-item-name">${item.name}</div>
+      ${qty > 0 ? `<div class="menu-item-badge">${qty}</div>` : ''}
+    </div>`;
+  }).join('');
+  // お冷ボタンの配置：5行目の左端（21番目）が空いていればそこに、埋まっていれば最後
+  const itemCount = group.items.length;
+  let ohiyaStyle = '';
+  if (itemCount < 21) {
+    // 21番目が空いている→5行目左端に固定配置
+    ohiyaStyle = 'grid-column: 1; grid-row: 5;';
+  }
+  // 21個以上の場合はそのまま最後に追加（styleなし）
+  const ohiyaHTML = `<div class="menu-item${ohiyaQty > 0 ? ' in-cart' : ''}"
+    style="background:#0c4a6e;border-color:${ohiyaQty > 0 ? '#22c55e' : '#7dd3fc'};${ohiyaStyle}"
+    onclick="tapOhiya()">
+    <div class="menu-item-name" style="color:#e0f2fe;">💧 お冷</div>
+    ${ohiyaQty > 0 ? `<div class="menu-item-badge">${ohiyaQty}</div>` : ''}
+  </div>`;
+  list.innerHTML = itemsHTML + ohiyaHTML;
+}
+
+window.tapOhiya = function() {
+  if (!currentTable) { alert('テーブルを選択してください'); return; }
+  if (!cart['ohiya']) cart['ohiya'] = { name: 'お冷', price: 0, qty: 0 };
+  cart['ohiya'].qty += 1;
+  renderMenu();
+  renderCart();
+};
+
+window.tapItem = function(key, idx) {
+  if (!currentTable) { alert('テーブルを選択してください'); return; }
+  const item = GROUPS_DATA[currentCat][currentGroupIdx].items[idx];
+  if (!cart[key]) cart[key] = { name: item.name, price: item.price, qty: 0 };
+  cart[key].qty += 1;
+  renderMenu();
+  renderCart();
+};
+
+function renderCart() {
+  const items = Object.values(cart);
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  const total = items.reduce((s, i) => s + taxIn(i.price) * i.qty, 0);
+  document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
+  document.getElementById('cart-total').textContent = fmtY(total);
+  document.getElementById('order-btn').disabled = count === 0 || !currentTable;
+  document.getElementById('check-btn').disabled = count === 0 || !currentTable;
+}
+
+window.clearCart = function() {
+  cart = {};
+  renderMenu();
+  renderCart();
+};
+
+function renderConfirm() {
+  const entries = Object.entries(cart);
+  let html = '';
+  let totalEx = 0;
+  entries.forEach(([key, item]) => {
+    const ex = item.price * item.qty;
+    totalEx += ex;
+    const inc = taxIn(item.price) * item.qty;
+    const safeKey = key.replace(/'/g, "\\'");
+    html += '<div class="confirm-item">' +
+      '<span class="confirm-item-name">' + item.name + '</span>' +
+      '<div class="confirm-qty-ctrl">' +
+        '<button class="confirm-qty-btn minus" onclick="confirmChangeQty(\'' + safeKey + '\',-1)">−</button>' +
+        '<span class="confirm-qty-num">' + item.qty + '</span>' +
+        '<button class="confirm-qty-btn" onclick="confirmChangeQty(\'' + safeKey + '\',1)">+</button>' +
+      '</div>' +
+      '<span class="confirm-item-price">' + fmtY(ex) + '</span>' +
+      '</div>';
+  });
+  const totalIn = Object.values(cart).reduce((s, i) => s + taxIn(i.price) * i.qty, 0);
+  const tax = totalIn - totalEx;
+  html += '<div class="confirm-subtotal"><span>小計（税抜）</span><span>' + fmtY(totalEx) + '</span></div>';
+  html += '<div class="confirm-subtotal"><span>消費税（10%）</span><span>' + fmtY(tax) + '</span></div>';
+  html += '<div class="confirm-total"><span>合計（税込）</span><span>' + fmtY(totalIn) + '</span></div>';
+  document.getElementById('confirm-list').innerHTML = html;
+}
+
+window.confirmChangeQty = function(key, delta) {
+  if (!cart[key]) return;
+  cart[key].qty += delta;
+  if (cart[key].qty <= 0) delete cart[key];
+  renderConfirm();
+  renderMenu();
+  renderCart();
+  // カートが空になったらモーダルを閉じる
+  if (Object.keys(cart).length === 0) closeConfirm();
+};
+
+window.showConfirm = function() {
+  renderConfirm();
+  document.getElementById('confirm-modal').classList.add('open');
+};
+
+window.closeConfirm = function() {
+  document.getElementById('confirm-modal').classList.remove('open');
+};
+
+window.orderOhiya = async function() {
+  if (!currentTable) { alert('テーブルを選択してください'); return; }
+  const btn = document.getElementById('ohiya-btn');
+  btn.textContent = '💧 送信中...';
+  btn.disabled = true;
+  await set(ref(db, 'ohiya/' + currentTable), {
+    table: String(currentTable),
+    tableName: tableName(currentTable),
+    timestamp: Date.now()
+  });
+  btn.textContent = '💧 お冷 ✓';
+  setTimeout(() => {
+    btn.textContent = '💧 お冷';
+    btn.disabled = false;
+  }, 3000);
+};
+
+window.placeOrder = async function() {
+  const items = Object.values(cart).map(c => ({
+    name: c.name, qty: c.qty, price: c.price
+  }));
+  if (!items.length || !currentTable) return;
+  document.getElementById('order-btn').disabled = true;
+  document.getElementById('order-btn').textContent = '送信中...';
+  const total = Math.round(items.filter(i => i.price > 0).reduce((s, i) => s + taxIn(i.price) * i.qty, 0) / 10) * 10;
+  await push(ref(db, 'orders'), {
+    table: String(currentTable),
+    items, total,
+    status: 'new',
+    timestamp: Date.now(),
+    source: 'handy'
+  });
+  cart = {};
+  renderMenu();
+  renderCart();
+  document.getElementById('order-btn').textContent = '注文を送信';
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+};
+
+// 初期化
+async function init() {
+  try {
+    const snap = await get(ref(db, 'handy_groups'));
+    GROUPS_DATA = snap.val() || {};
+    renderCats();
+    renderMenu();
+    renderCart();
+  } catch(e) {
+    console.error('handy_groups読み込み失敗:', e);
+  }
+}
+init();
+</script>
+</body>
+</html>
