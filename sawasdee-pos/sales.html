@@ -115,7 +115,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 var FC = {
   apiKey: "AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ",
@@ -131,7 +131,7 @@ var db = getDatabase(app);
 var allOrders = {};
 var allPax = {};
 var currentPeriod = 'today';
-var DRINKS = []; // Firebaseのmenu/drinkから動的ロード（onValue開始前に完了）
+var DRINKS = ['タイアイスティー','マンゴーラッシー','シンハービール','お水'];
 var CAT_COLORS = { 'ドリンク':'#0ea5e9', '麺・ご飯':'#f97316', 'カレー':'#eab308', '前菜':'#22c55e' };
 var MENU_CAT = {
   'パッタイ':'麺・ご飯','カオパット':'麺・ご飯','クイッティアオ':'麺・ご飯','カオマンガイ':'麺・ご飯',
@@ -182,7 +182,7 @@ window.showDayBills = function(ds) {
       var tblName = tableNameFn ? tableNameFn(sess.table) : 'T'+sess.table;
       var statusBadge = sess.isPaid ? '✓ 会計済み' : '提供済み';
       // 全商品をまとめる
-      var drinkNames = DRINKS;
+      var drinkNames = ["お冷","生ビール 中ジョッキ", "瓶ビール 大びん", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガ角ハイボール", "角ハイボール", "ジンジャー角ハイボール", "コーク角ハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "ホッピー中", "ホッピー外", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク"];
       var itemMap = {};
       var sessionEx = 0;
       var drinkQty = 0;
@@ -265,7 +265,7 @@ function render() {
 
   // セッション単位（テーブル×paidAt）でまとめて税込10円丸め計算
   var CHARGE = 250;
-  var drinkNames = DRINKS;
+  var drinkNames = ["お冷","生ビール 中ジョッキ","瓶ビール 大びん","ノンアルビール 小びん","シンハー","チャーン","リオ","マンゴービア","グアバビア","メガ角ハイボール","角ハイボール","ジンジャー角ハイボール","コーク角ハイボール","メコンハイボール","メコンジンジャー","メコンコーク","タイサワー","パクチーレモンサワー","タイ式漢方サワー","レモンサワー","クエン酸サワー","バイス(梅しそ)サワー","チューハイ","ウーロンハイ","ジャスミンハイ","ホッピー","ホッピー中","ホッピー外","マンゴーハイ","グアバハイ","タイ紅茶ハイ","マンゴーミルクハイ","グアバミルクハイ","カシスソーダ","カシスウーロン","カシスマンゴー","テキーラコーク","テキーラグアバ","テキーラショット","泡盛(久米仙)","ジャスミン焼酒(茉莉花)","梅酒","グラスワイン 赤","グラスワイン 白","デキャンタ 赤","デキャンタ 白","ボトルワイン 赤","ボトルワイン 白","マンゴージュース","グアバジュース","タイ紅茶(タイ式ミルクティー)","炭酸水(カットレモン入り)","コカコーラ","ジンジャーエール(辛口)","ウーロン茶","ジャスミン茶","ノンアル★タイサワー","ノンアル★マンゴーミルク","生ビール ジョッキ（アサヒ　スーパードライ）","メガハイボール","ジンジャーハイボール","コークハイボール","瓶ビール 大びん（サッポロ　赤星）"];
   var sessionSalesMap = {};
   orders.forEach(function(o) {
     var sk = (o.table||'?') + '__' + (o.paidAt || 'unpaid');
@@ -448,7 +448,7 @@ function renderCalendar() {
     dayMap[ds].count++;
   }
   // 週次売上もセッション単位で計算
-  var drinkNamesC = DRINKS;
+  var drinkNamesC = ["お冷","生ビール 中ジョッキ","瓶ビール 大びん","ノンアルビール 小びん","シンハー","チャーン","リオ","マンゴービア","グアバビア","メガ角ハイボール","角ハイボール","ジンジャー角ハイボール","コーク角ハイボール","メコンハイボール","メコンジンジャー","メコンコーク","タイサワー","パクチーレモンサワー","タイ式漢方サワー","レモンサワー","クエン酸サワー","バイス(梅しそ)サワー","チューハイ","ウーロンハイ","ジャスミンハイ","ホッピー","ホッピー中","ホッピー外","マンゴーハイ","グアバハイ","タイ紅茶ハイ","マンゴーミルクハイ","グアバミルクハイ","カシスソーダ","カシスウーロン","カシスマンゴー","テキーラコーク","テキーラグアバ","テキーラショット","泡盛(久米仙)","ジャスミン焼酒(茉莉花)","梅酒","グラスワイン 赤","グラスワイン 白","デキャンタ 赤","デキャンタ 白","ボトルワイン 赤","ボトルワイン 白","マンゴージュース","グアバジュース","タイ紅茶(タイ式ミルクティー)","炭酸水(カットレモン入り)","コカコーラ","ジンジャーエール(辛口)","ウーロン茶","ジャスミン茶","ノンアル★タイサワー","ノンアル★マンゴーミルク","生ビール ジョッキ（アサヒ　スーパードライ）","メガハイボール","ジンジャーハイボール","コークハイボール","瓶ビール 大びん（サッポロ　赤星）"];
   var wkSessionMap = {};
   for (var i = 0; i < keys.length; i++) {
     var o = allOrders[keys[i]];
@@ -549,24 +549,15 @@ var TABLE_NAMES = {
 };
 window.TABLE_NAMES = TABLE_NAMES;
 
-// menu/drinkを先に取得してからonValue開始（DRINKS未ロードによる計算ミスを防ぐ）
-get(ref(db, 'menu/drink')).then(function(snap) {
-  var drinkData = snap.val() || {};
-  Object.values(drinkData).forEach(function(items) {
-    (items || []).forEach(function(item) {
-      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
-    });
-  });
-  onValue(ref(db, 'orders'), function(snap) {
-    allOrders = snap.val() || {};
-    if (currentPeriod === 'calendar') renderCalendar();
-    else render();
-  });
-  onValue(ref(db, 'pax'), function(snap) {
-    allPax = snap.val() || {};
-    if (currentPeriod === 'calendar') renderCalendar();
-    else render();
-  });
+onValue(ref(db, 'orders'), function(snap) {
+  allOrders = snap.val() || {};
+  if (currentPeriod === 'calendar') renderCalendar();
+  else render();
+});
+onValue(ref(db, 'pax'), function(snap) {
+  allPax = snap.val() || {};
+  if (currentPeriod === 'calendar') renderCalendar();
+  else render();
 });
 </script>
 <div class="bills-modal" id="bills-modal">
