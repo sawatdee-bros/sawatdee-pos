@@ -122,12 +122,28 @@ async function init() {
   const menuSnap = await get(ref(db, 'menu'));
   const menuData = menuSnap.val() || {};
   ALL_ITEMS = [];
+  var foodSubcats = [];
+  var drinkSubcats = [];
   for (const [subcat, items] of Object.entries(menuData.food || {})) {
+    foodSubcats.push(subcat);
     items.forEach(function(item) { ALL_ITEMS.push(Object.assign({}, item, {category:'food', subcat:subcat})); });
   }
   for (const [subcat, items] of Object.entries(menuData.drink || {})) {
+    drinkSubcats.push(subcat);
     items.forEach(function(item) { ALL_ITEMS.push(Object.assign({}, item, {category:'drink', subcat:subcat})); });
   }
+  // フィルターバー生成（ALL_ITEMS読み込み後）
+  var FILTERS = [
+    { key: 'all', label: 'すべて' },
+    { key: 'soldout', label: '🔴 売り切れ中' },
+    { key: 'food', label: '🍽 フード' },
+    { key: 'drink', label: '🥤 ドリンク' },
+  ];
+  foodSubcats.forEach(function(s) { FILTERS.push({ key: 'f_'+s, label: s }); });
+  drinkSubcats.forEach(function(s) { FILTERS.push({ key: 'd_'+s, label: s }); });
+  document.getElementById('filter-bar').innerHTML = FILTERS.map(function(f) {
+    return '<button class="filter-btn' + (currentFilter===f.key?' active':'') + '" onclick="setFilter(\'' + f.key + '\')">' + f.label + '</button>';
+  }).join('');
   startSoldoutWatch();
 }
 
@@ -144,20 +160,6 @@ function startSoldoutWatch() {
 }
 
 init();
-
-// フィルターバー
-const FILTERS = [
-  { key: 'all', label: 'すべて' },
-  { key: 'soldout', label: '🔴 売り切れ中' },
-  { key: 'food', label: '🍽 フード' },
-  { key: 'drink', label: '🥤 ドリンク' },
-  ...Object.keys(MENU_DATA.food).map(s => ({ key: 'f_'+s, label: s })),
-  ...Object.keys(MENU_DATA.drink).map(s => ({ key: 'd_'+s, label: s })),
-];
-
-document.getElementById('filter-bar').innerHTML = FILTERS.map(f =>
-  `<button class="filter-btn${currentFilter===f.key?' active':''}" onclick="setFilter('${f.key}')">${f.label}</button>`
-).join('');
 
 window.setFilter = (key) => {
   currentFilter = key;
@@ -303,8 +305,6 @@ window.saveAllSoldout = async () => {
   await set(ref(db, 'soldout'), soldoutState);
   alert('売り切れ情報を保存しました');
 };
-
-renderList();
 </script>
 </body>
 </html>
