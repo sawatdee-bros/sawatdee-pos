@@ -323,7 +323,7 @@ function renderMenu() {
       + '</div>';
   }).join('');
   // お冷（ソフトドリンクの末尾に追加、store_configでONのときのみ）
-  if (hasOhiya && currentSubcat === '🥤 ソフトドリンク') {
+  if (hasOhiya && currentSubcat === 'ソフトドリンク') {
     var ohiyaKey = 'ohiya__ohiya__0';
     var ohiyaQty = cart[ohiyaKey] ? cart[ohiyaKey].qty : 0;
     var ohiyaQtyRow = ohiyaQty > 0
