@@ -401,40 +401,52 @@ function _getAudioContext() {
   if (!_actx) {
     _actx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  if (_actx.state === 'suspended') _actx.resume();
   return _actx;
+}
+
+// AudioContextをresumeしてから音を鳴らす共通ラッパー
+function _withAudio(fn) {
+  if (!audioEnabled) return;
+  var ctx = _getAudioContext();
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(fn);
+  } else {
+    fn();
+  }
 }
 
 // 呼び出し音（ピポピポ×2）
 function playCallSound() {
-  if (!audioEnabled) return;
-  var ctx = _getAudioContext();
-  var t = ctx.currentTime;
-  [[1050,0.00],[800,0.16],[1050,0.38],[800,0.54]].forEach(function(f) {
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sine'; osc.frequency.value = f[0];
-    var s = t + f[1];
-    gain.gain.setValueAtTime(0,s); gain.gain.linearRampToValueAtTime(0.35,s+0.02);
-    gain.gain.linearRampToValueAtTime(0.35,s+0.09); gain.gain.linearRampToValueAtTime(0,s+0.13);
-    osc.start(s); osc.stop(s+0.13);
+  _withAudio(function() {
+    var ctx = _getAudioContext();
+    var t = ctx.currentTime;
+    [[1050,0.00],[800,0.16],[1050,0.38],[800,0.54]].forEach(function(f) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = f[0];
+      var s = t + f[1];
+      gain.gain.setValueAtTime(0,s); gain.gain.linearRampToValueAtTime(0.35,s+0.02);
+      gain.gain.linearRampToValueAtTime(0.35,s+0.09); gain.gain.linearRampToValueAtTime(0,s+0.13);
+      osc.start(s); osc.stop(s+0.13);
+    });
   });
 }
 
 // 会計音（チーン）
 function playBillSound() {
-  if (!audioEnabled) return;
-  var ctx = _getAudioContext();
-  var osc = ctx.createOscillator();
-  var gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(660, ctx.currentTime);
-  osc.frequency.linearRampToValueAtTime(520, ctx.currentTime + 0.6);
-  gain.gain.setValueAtTime(0.4, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.9);
-  osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 1.0);
+  _withAudio(function() {
+    var ctx = _getAudioContext();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(660, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(520, ctx.currentTime + 0.6);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.9);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 1.0);
+  });
 }
 
 var _prevCallCount = 0;
@@ -881,14 +893,17 @@ window.addEventListener('visibilitychange', function() {
 
 window.toggleAudio = function() {
   if (!audioEnabled) {
-    // AudioContextをユーザー操作起点でアンロック（iOSの制限を突破）
+    // AudioContextをユーザー操作起点でresumeしてアンロック
     var ctx = _getAudioContext();
-    // 無音を一瞬鳴らしてアンロック確定
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.001);
+    ctx.resume().then(function() {
+      // resume後に無音を一瞬再生してiOSのロックを完全解除
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.05);
+    });
     audioEnabled = true;
   } else {
     audioEnabled = false;
@@ -898,32 +913,33 @@ window.toggleAudio = function() {
 
 // 短いビープ
 function playBeep() {
-  if (!audioEnabled) return;
-  var ctx = _getAudioContext();
-  var osc = ctx.createOscillator();
-  var gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.type = 'sine'; osc.frequency.value = 880;
-  gain.gain.setValueAtTime(0.3, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
-  osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.15);
+  _withAudio(function() {
+    var ctx = _getAudioContext();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine'; osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.15);
+  });
 }
 
 // フード・ドリンク別の音
 function playSound(type) {
-  if (!audioEnabled) return;
-  var ctx = _getAudioContext();
-  // drink: 高め2音、food: 低め2音
-  var freqs = type === 'drink' ? [[1200,0],[900,0.18]] : [[700,0],[500,0.18]];
-  freqs.forEach(function(f) {
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sine'; osc.frequency.value = f[0];
-    var s = ctx.currentTime + f[1];
-    gain.gain.setValueAtTime(0,s); gain.gain.linearRampToValueAtTime(0.3,s+0.02);
-    gain.gain.linearRampToValueAtTime(0.3,s+0.10); gain.gain.linearRampToValueAtTime(0,s+0.15);
-    osc.start(s); osc.stop(s+0.15);
+  _withAudio(function() {
+    var ctx = _getAudioContext();
+    var freqs = type === 'drink' ? [[1200,0],[900,0.18]] : [[700,0],[500,0.18]];
+    freqs.forEach(function(f) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = f[0];
+      var s = ctx.currentTime + f[1];
+      gain.gain.setValueAtTime(0,s); gain.gain.linearRampToValueAtTime(0.3,s+0.02);
+      gain.gain.linearRampToValueAtTime(0.3,s+0.10); gain.gain.linearRampToValueAtTime(0,s+0.15);
+      osc.start(s); osc.stop(s+0.15);
+    });
   });
 }
 
