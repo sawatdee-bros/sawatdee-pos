@@ -198,7 +198,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
       </button>
       <button class="icon-btn" id="tab-sales-hdr" onclick="window.setMode('sales')" title="売上管理">📊</button>
       <button class="icon-btn" id="tab-admin-hdr" onclick="window.setMode('admin')" title="管理">⚙️</button>
-      <a class="icon-btn" href="store-settings.html" title="店舗設定">🏪</a>
+      <button class="icon-btn" id="tab-settings-hdr" onclick="window.setMode('settings')" title="店舗設定">🏪</button>
     </div>
   </div>
 </header>
@@ -308,6 +308,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 </div>
 <iframe class="iframe-view" id="view-sales" src="" title="売上管理"></iframe>
 <iframe class="iframe-view" id="view-admin" src="" title="商品管理"></iframe>
+<iframe class="iframe-view" id="view-settings" src="" title="店舗設定"></iframe>
 
 <nav class="tab-bar">
   <button class="tab-item" id="tab-all" onclick="window.setMode('all')"><span class="tab-icon">👁</span>全て</button>
@@ -801,6 +802,7 @@ function setMode(mode) {
   // iframeビュー（全画面で表示してタブバーごと覆う）
   var salesFrame = document.getElementById('view-sales');
   var adminFrame = document.getElementById('view-admin');
+  var settingsFrame = document.getElementById('view-settings');
   var tabBar = document.querySelector('nav.tab-bar');
   if (mode === 'sales') {
     salesFrame.style.display = 'block';
@@ -815,6 +817,15 @@ function setMode(mode) {
     adminFrame.style.height = '100%';
     if (!adminFrame.src || adminFrame.src === window.location.href) adminFrame.src = 'menu-admin.html';
     salesFrame.style.display = 'none';
+    settingsFrame.style.display = 'none';
+    if (tabBar) tabBar.style.display = 'none';
+  } else if (mode === 'settings') {
+    settingsFrame.style.display = 'block';
+    settingsFrame.style.top = '0';
+    settingsFrame.style.height = '100%';
+    if (!settingsFrame.src || settingsFrame.src === window.location.href) settingsFrame.src = 'store-settings.html';
+    salesFrame.style.display = 'none';
+    adminFrame.style.display = 'none';
     if (tabBar) tabBar.style.display = 'none';
   } else {
     salesFrame.style.display = 'none';
@@ -822,7 +833,7 @@ function setMode(mode) {
     if (tabBar) tabBar.style.display = 'flex';
   }
   // タブのアクティブ状態
-  ['all','food','drink','bills','sales','admin'].forEach(function(m) {
+  ['all','food','drink','bills','sales','admin','settings'].forEach(function(m) {
     var el = document.getElementById('tab-'+m);
     if (el) el.classList.toggle('active', m === mode);
     var hdr = document.getElementById('tab-'+m+'-hdr');
@@ -836,7 +847,7 @@ window.setMode = setMode;
 
 // URLパラメータでモード初期化
 var urlMode = new URLSearchParams(window.location.search).get('mode');
-if (urlMode === 'food' || urlMode === 'drink' || urlMode === 'all' || urlMode === 'bills' || urlMode === 'sales' || urlMode === 'admin') setMode(urlMode);
+if (urlMode === 'food' || urlMode === 'drink' || urlMode === 'all' || urlMode === 'bills' || urlMode === 'sales' || urlMode === 'admin' || urlMode === 'settings') setMode(urlMode);
 else setMode('all');
 
 // 音声状態をlocalStorageから復元

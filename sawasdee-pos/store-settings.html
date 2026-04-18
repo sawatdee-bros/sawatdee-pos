@@ -49,7 +49,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <body>
 
 <header>
-  <a class="back-btn" href="kitchen.html">←</a>
+  <a class="back-btn" href="#" onclick="if(window.parent && window.parent.setMode){window.parent.setMode('all');}else{history.back();}return false;">←</a>
   <h1>🏪 店舗設定</h1>
   <button class="save-all-btn" id="save-btn" onclick="saveAll()">保存する</button>
 </header>
