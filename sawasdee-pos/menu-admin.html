@@ -96,6 +96,9 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
+let DAY_START = 8;
+get(ref(db, 'store_config/day_start_hour')).then(function(snap) { if (snap.val() !== null) DAY_START = snap.val(); });
+
 let ALL_ITEMS = []; // Firebaseから読み込む
 
 // 状態
@@ -108,8 +111,8 @@ let openCards = new Set();
   function checkAutoReset(lastResetTs) {
     const now = new Date();
     const todayReset = new Date(now);
-    if (now.getHours() < 6) todayReset.setDate(todayReset.getDate() - 1);
-    todayReset.setHours(6, 0, 0, 0);
+    if (now.getHours() < DAY_START) todayReset.setDate(todayReset.getDate() - 1);
+    todayReset.setHours(DAY_START, 0, 0, 0);
     if (!lastResetTs || lastResetTs < todayReset.getTime()) {
       set(ref(db, 'soldout'), { _reset_at: Date.now() });
     }

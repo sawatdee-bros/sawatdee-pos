@@ -333,6 +333,10 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
+// 営業日切り替え時刻（store_configから動的取得、デフォルト8時）
+let DAY_START = 8;
+get(ref(db, 'store_config/day_start_hour')).then(function(snap) { if (snap.val() !== null) DAY_START = snap.val(); });
+
 const KITCHEN_NAMES = {"生ビール 中ジョッキ": "生ジョッキ", "瓶ビール 大びん": "赤星　大びん", "ノンアルビール 小びん": "ノンアルビール", "シンハー": "シンハー", "チャーン": "チャーン", "リオ": "リオ", "マンゴービア": "マンゴービア", "グアバビア": "グアバビア", "メガ角ハイボール": "メガ角ハイボール", "角ハイボール": "角ハイボール", "ジンジャー角ハイボール": "ジンジャー角ハイボール", "コーク角ハイボール": "コーク角ハイボール", "メコンハイボール": "メコンハイボール", "メコンジンジャー": "メコンジンジャー", "メコンコーク": "メコンコーク", "タイサワー": "タイサワー", "パクチーレモンサワー": "パクチーレモンサワー", "タイ式漢方サワー": "漢方サワー", "レモンサワー": "レモンサワー", "クエン酸サワー": "クエンサンサワー", "バイス(梅しそ)サワー": "バイスサワー", "チューハイ": "チューハイ", "ウーロンハイ": "ウーロンハイ", "ジャスミンハイ": "ジャスミンハイ", "ホッピー": "ホッピー", "ホッピー中": "ホッピー中", "ホッピー外": "ホッピー外", "マンゴーハイ": "マンゴーハイ", "グアバハイ": "グアバハイ", "タイ紅茶ハイ": "タイ紅茶ハイ", "マンゴーミルクハイ": "マンゴーミルクハイ", "グアバミルクハイ": "グアバミルクハイ", "カシスソーダ": "カシスソーダ", "カシスウーロン": "カシスウーロン", "カシスマンゴー": "カシスマンゴー", "テキーラコーク": "テキーラコーク", "テキーラグアバ": "テキーラグアバ", "テキーラショット": "テキーラショット", "泡盛(久米仙)": "泡盛　久米仙", "ジャスミン焼酎(茉莉花)": "ジャスミン焼酎", "梅酒": "梅酒", "グラスワイン 赤": "グラスワイン赤", "グラスワイン 白": "グラスワイン白", "デキャンタ 赤": "デキャンタ赤", "デキャンタ 白": "デキャンタ白", "ボトルワイン 赤": "ボトルワイン赤", "ボトルワイン 白": "ボトルワイン白", "マンゴージュース": "マンゴージュース", "グアバジュース": "グアバジュース", "タイ紅茶(タイ式ミルクティー)": "タイ紅茶", "炭酸水(カットレモン入り)": "炭酸水", "コカコーラ": "コカコーラ", "ジンジャーエール(辛口)": "ジンジャーエール", "ウーロン茶": "ウーロン茶", "ジャスミン茶": "ジャスミン茶", "ノンアル★タイサワー": "ノンアル★タイサワー", "ノンアル★マンゴーミルク": "ノンアル★マンゴーミルク", "お冷": "お冷", "キャベツ": "キャベツ", "セロリ": "セロリ", "タイの海老せん": "海老せん", "ピリ辛枝豆": "枝豆", "タイの漬物缶詰": "漬物缶詰", "おつまみキュウリ": "きゅうり", "カリカリ厚揚げ": "厚揚げ", "パク乗せ冷奴": "冷奴", "コリコリ豚耳": "豚耳", "アジのトマト煮": "アジ", "タイ式生ソーセージ(ネーム)": "ネーム", "青パパイヤのサラダ": "ソムタム", "青パパイヤのサラダ（激辛バージョン）": "ソムタム ラオ", "青パパイヤのサラダ（豚グリル入り）": "ソムタム ムーヤーン", "温かい春雨サラダ": "ヤム ウンセン", "揚げ目玉焼きのサラダ": "ヤム カイダオ", "茹で鶏のサラダ": "ヤム ガイ", "海老とレモングラスのサラダ": "ヤム クン", "鶏もも肉のタイ式グリル": "ガイヤーン", "豚肉のタイ式グリル": "ムーヤーン", "タイ式海老のグリル": "クン パオ", "タイ式豚グリルのハーブ和え": "ナムトック ムー", "タイ式ヌードル香味野菜和え": "ヤム マーマー", "キャベツの海老味噌醤炒め": "ガピキャベツ", "蒸し鶏 生姜ソース": "蒸し鶏", "鶏ひき肉のハーブ和え": "ラープ ガイ", "スパイシー鶏唐揚げ": "ガイトード", "タイ式揚げ春巻き(パクチー入)": "ポッピア トード", "揚げ海老のニンニク炒め": "クンガティアム", "ポテトフライ 2種のソース": "ポテト", "タイ式揚げオムレツ": "カイジャオ", "タイ式揚げオムレツ(ソーセージ入)": "カイジャオネーム", "海老とハーブの酸っぱ辛いスープ": "トムヤムクン", "鶏肉のココナッツミルクスープ": "トムカーガイ", "鶏もも肉のガパオ炒め": "ガパオ", "豚肉のカレー炒め": "ムーパッポンカリー", "海老のカレー炒め": "クンパッポンカリー", "鶏肉とセロリの生姜炒め": "ガイパッキン", "豚肉のガーリック炒め": "ムー ガティアム", "季節の青菜炒め": "パックブン", "厚揚げともやしの炒め": "パット トゥアンゴーク", "茄子と豚肉のバジル炒め": "パット マクワ", "春雨の旨辛ソース炒め": "スッキー ヘーン", "春雨のオイスター炒め": "パット ウンセン", "タイ式焼きそば": "パッタイ", "旨辛バジル炒め麺": "パッキーマオ", "タイ式まぜそば": "ヘーン（まぜそば）", "タイ式汁そば": "ナーム（汁そば）", "トムヤムクンヌードル": "トムヤムヌードル", "グリーンカレー": "ゲーンキャオワーン", "蒸し鶏ご飯": "カオマンガイ", "タイ式焼き飯": "カオパッ", "ライス": "ライス", "目玉焼き": "目玉焼き", "ココナッツアイスサンド": "ココナッツアイスサンド", "ココナッツアイス": "ココナッツアイス"};
 
 const TABLE_NAMES = {
@@ -341,8 +345,7 @@ const TABLE_NAMES = {
   '8': 'カウンター3・4', '9': 'カウンター5', '10': '奥席'
 };
 function tableName(t) { return TABLE_NAMES[String(t)] || 'T'+t; }
-// ドリンク名はFirebaseのmenu/drinkから動的に取得（ハードコードなし）
-let DRINKS = [];
+const DRINKS = ["お冷", "生ビール 中ジョッキ", "瓶ビール 大びん", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガ角ハイボール", "角ハイボール", "ジンジャー角ハイボール", "コーク角ハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "ホッピー中", "ホッピー外", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク", "生ビール ジョッキ（アサヒ　スーパードライ）", "メガハイボール", "ジンジャーハイボール", "コークハイボール", "瓶ビール 大びん（サッポロ　赤星）"];
 let orders = {};
 let firstLoad = true;
 
@@ -433,70 +436,6 @@ function playBillSound() {
 
 var _prevCallCount = 0;
 var _prevBillCallCount = 0;
-
-// 伝票・注文関連の状態変数（onValue内で使うので先に宣言）
-var _bOrders = {};
-var _bFilter = 'unpaid';
-var _bPax = {};
-var _bEdit = null;
-var _bCHARGE = 250;
-const _newIdTs = new Map(); // 新着注文IDとその検知時刻
-var _bRange = 'today'; // 'today' or 'week'
-
-// Firebaseのmenu/drinkからドリンク名を動的ロード（ordersのonValue開始前に完了させる）
-get(ref(db, 'menu/drink')).then(function(snap) {
-  var drinkData = snap.val() || {};
-  Object.values(drinkData).forEach(function(items) {
-    (items || []).forEach(function(item) {
-      if (item && item.name && DRINKS.indexOf(item.name) < 0) DRINKS.push(item.name);
-    });
-  });
-
-  onValue(ref(db, 'orders'), (snap) => {
-    // _allOrdersCacheは常に最新に保つ（ignoreNextに関わらず）
-    window._allOrdersCache = snap.val() || {};
-    if (ignoreNext) { ignoreNext = false; return; }
-    const data = snap.val() || {};
-    const newIds = Object.keys(data).filter(id => !orders[id] && data[id].status !== 'done' && data[id].status !== 'paid');
-    if (!firstLoad && newIds.length > 0) {
-      const now = Date.now();
-      newIds.forEach(id => _newIdTs.set(id, now));
-      // 新規注文にフード・ドリンクが含まれるか判定
-      let hasDrink = false, hasFood = false;
-      newIds.forEach(id => {
-        const items = data[id].items || [];
-        items.forEach(item => {
-          if (DRINKS.some(d => item.name === d || item.name.startsWith(d + '（'))) hasDrink = true;
-          else hasFood = true;
-        });
-      });
-      showBell(hasDrink, hasFood);
-    }
-    Object.keys(orders).forEach(id => delete orders[id]);
-    // まず全注文を仮読み込み
-    Object.keys(data).forEach(id => {
-      if (data[id].status !== 'paid') orders[id] = data[id];
-    });
-    // doneのうち同テーブルに未完了がない注文は除外
-    Object.keys(orders).forEach(id => {
-      if (orders[id].status !== 'done') return;
-      const tbl = orders[id].table;
-      const hasPending = Object.keys(orders).some(oid => oid !== id && orders[oid].table === tbl && orders[oid].status !== 'done');
-      if (!hasPending) delete orders[id];
-    });
-    renderOrders();
-    if (firstLoad) applyAudioState();
-    firstLoad = false;
-    _updateBillsData(window._allOrdersCache);
-  });
-
-  // Firebase paxノードを監視して_bPaxを同期
-  onValue(ref(db, 'pax'), function(snap) {
-    var data = snap.val() || {};
-    Object.keys(data).forEach(function(t) { _bPax[t] = data[t]; });
-    if (currentMode === 'bills') _billsRenderWrap();
-  });
-});
 
 onValue(ref(db, 'calls'), snap => {
   var data = snap.val() || {};
@@ -963,13 +902,64 @@ function showBell(hasDrink, hasFood) {
   }
 }
 
+onValue(ref(db, 'orders'), (snap) => {
+  // _allOrdersCacheは常に最新に保つ（ignoreNextに関わらず）
+  window._allOrdersCache = snap.val() || {};
+  if (ignoreNext) { ignoreNext = false; return; }
+  const data = snap.val() || {};
+  const newIds = Object.keys(data).filter(id => !orders[id] && data[id].status !== 'done' && data[id].status !== 'paid');
+  if (!firstLoad && newIds.length > 0) {
+    const now = Date.now();
+    newIds.forEach(id => _newIdTs.set(id, now));
+    // 新規注文にフード・ドリンクが含まれるか判定
+    let hasDrink = false, hasFood = false;
+    newIds.forEach(id => {
+      const items = data[id].items || [];
+      items.forEach(item => {
+        if (DRINKS.some(d => item.name === d || item.name.startsWith(d + '（'))) hasDrink = true;
+        else hasFood = true;
+      });
+    });
+    showBell(hasDrink, hasFood);
+  }
+  Object.keys(orders).forEach(id => delete orders[id]);
+  // まず全注文を仮読み込み
+  Object.keys(data).forEach(id => {
+    if (data[id].status !== 'paid') orders[id] = data[id];
+  });
+  // doneのうち同テーブルに未完了がない注文は除外
+  Object.keys(orders).forEach(id => {
+    if (orders[id].status !== 'done') return;
+    const tbl = orders[id].table;
+    const hasPending = Object.keys(orders).some(oid => oid !== id && orders[oid].table === tbl && orders[oid].status !== 'done');
+    if (!hasPending) delete orders[id];
+  });
+  renderOrders();
+  if (firstLoad) applyAudioState();
+  firstLoad = false;
+  _updateBillsData(window._allOrdersCache);
+});
+
 // === 伝票機能 ===
+var _bOrders = {};
+var _bFilter = 'unpaid';
+var _bPax = {};
 
+// Firebase paxノードを監視して_bPaxを同期
+onValue(ref(db, 'pax'), function(snap) {
+  var data = snap.val() || {};
+  Object.keys(data).forEach(function(t) { _bPax[t] = data[t]; });
+  if (currentMode === 'bills') _billsRenderWrap();
+});
+var _bEdit = null;
+var _bCHARGE = 250;
+const _newIdTs = new Map(); // 新着注文IDとその検知時刻
 
+var _bRange = 'today'; // 'today' or 'week'
 function _updateBillsData(allData) {
   var now = new Date(); var start = new Date(now);
-  if (now.getHours() < 6) start.setDate(start.getDate() - 1);
-  start.setHours(6,0,0,0);
+  if (now.getHours() < DAY_START) start.setDate(start.getDate() - 1);
+  start.setHours(DAY_START,0,0,0);
   if (_bRange === 'week') start.setDate(start.getDate() - 6); // 過去7日分
   var rangeStart = start.getTime();
   _bOrders = {};
@@ -1563,8 +1553,8 @@ function _billsRender() {
 function getTodayStart() {
   var now = new Date();
   var start = new Date(now);
-  if (now.getHours() < 6) start.setDate(start.getDate() - 1);
-  start.setHours(6, 0, 0, 0);
+  if (now.getHours() < DAY_START) start.setDate(start.getDate() - 1);
+  start.setHours(DAY_START, 0, 0, 0);
   return start.getTime();
 }
 

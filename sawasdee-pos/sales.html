@@ -115,7 +115,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 var FC = {
   apiKey: "AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ",
@@ -128,6 +128,8 @@ var FC = {
 };
 var app = initializeApp(FC);
 var db = getDatabase(app);
+var DAY_START = 8;
+get(ref(db, 'store_config/day_start_hour')).then(function(snap) { if (snap.val() !== null) DAY_START = snap.val(); });
 var allOrders = {};
 var allPax = {};
 var currentPeriod = 'today';
@@ -152,7 +154,7 @@ window.setPeriod = function(p, btn) {
 
 window.showDayBills = function(ds) {
   var tableNameFn = window.TABLE_NAMES ? function(t) { return window.TABLE_NAMES[String(t)] || 'T'+t; } : null;
-  var start = new Date(ds + 'T06:00:00').getTime();
+  var h = String(DAY_START).padStart(2,'0'); var start = new Date(ds + 'T' + h + ':00:00').getTime();
   var end = start + 24 * 60 * 60 * 1000;
   var dayOrders = Object.values(allOrders).filter(function(o) {
     return o.timestamp >= start && o.timestamp < end && (o.status === 'paid' || o.status === 'done');
@@ -239,9 +241,9 @@ window.toggleWeek = function(id) {
 
 function startOf(unit) {
   var d = new Date();
-  if (unit === 'today') { d.setHours(0,0,0,0); return d.getTime(); }
-  if (unit === 'week') { var dow = d.getDay(); var diff = (dow >= 3) ? dow - 3 : dow + 4; d.setDate(d.getDate() - diff); d.setHours(0,0,0,0); return d.getTime(); }
-  if (unit === 'month') { d.setDate(1); d.setHours(0,0,0,0); return d.getTime(); }
+  if (unit === 'today') { if (d.getHours() < DAY_START) d.setDate(d.getDate()-1); d.setHours(DAY_START,0,0,0); return d.getTime(); }
+  if (unit === 'week') { if (d.getHours() < DAY_START) d.setDate(d.getDate()-1); var dow = d.getDay(); var diff = (dow >= 3) ? dow - 3 : dow + 4; d.setDate(d.getDate() - diff); d.setHours(DAY_START,0,0,0); return d.getTime(); }
+  if (unit === 'month') { if (d.getHours() < DAY_START) d.setDate(d.getDate()-1); d.setDate(1); d.setHours(DAY_START,0,0,0); return d.getTime(); }
   return 0;
 }
 
