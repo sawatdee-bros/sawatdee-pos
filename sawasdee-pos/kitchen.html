@@ -810,6 +810,7 @@ function setMode(mode) {
     salesFrame.style.height = '100%';
     if (!salesFrame.src || salesFrame.src === window.location.href) salesFrame.src = 'sales.html';
     adminFrame.style.display = 'none';
+    settingsFrame.style.display = 'none';
     if (tabBar) tabBar.style.display = 'none';
   } else if (mode === 'admin') {
     adminFrame.style.display = 'block';
@@ -830,6 +831,7 @@ function setMode(mode) {
   } else {
     salesFrame.style.display = 'none';
     adminFrame.style.display = 'none';
+    settingsFrame.style.display = 'none';
     if (tabBar) tabBar.style.display = 'flex';
   }
   // タブのアクティブ状態
