@@ -845,6 +845,11 @@ function setMode(mode) {
 }
 window.setMode = setMode;
 
+// iframeからのpostMessageを受け取る（←ボタンで戻るとき）
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'setMode') setMode(e.data.mode);
+});
+
 // URLパラメータでモード初期化
 var urlMode = new URLSearchParams(window.location.search).get('mode');
 if (urlMode === 'food' || urlMode === 'drink' || urlMode === 'all' || urlMode === 'bills' || urlMode === 'sales' || urlMode === 'admin' || urlMode === 'settings') setMode(urlMode);
