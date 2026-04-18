@@ -431,11 +431,25 @@ window.changeQty = function(key, delta) {
 };
 
 window.requestBill = function() { document.getElementById('bill-confirm-modal').classList.add('open'); };
-window.closeBillConfirm = function() { document.getElementById('bill-confirm-modal').classList.remove('open'); };
-window.confirmBill = async function() {
+window.closeBillConfirm = function() {
   document.getElementById('bill-confirm-modal').classList.remove('open');
+  // 中身を元に戻す
+  document.querySelector('#bill-confirm-modal .bill-confirm-box').innerHTML =
+    '<div class="bill-confirm-title">💳 お会計</div>'
+    + '<div class="bill-confirm-sub">お会計でよろしいですか？<br>伝票をお持ちします。</div>'
+    + '<div class="bill-confirm-btns">'
+    + '<button class="bill-cancel-btn" onclick="window.closeBillConfirm()">キャンセル</button>'
+    + '<button class="bill-ok-btn" onclick="window.confirmBill()">お会計</button>'
+    + '</div>';
+};
+window.confirmBill = async function() {
   var tbl = new URLSearchParams(location.search).get('table') || '?';
   await set(ref(db, 'bill_calls/' + tbl), { table: tbl, timestamp: Date.now() });
+  // モーダルの中身を「お待ちください」に差し替え
+  document.querySelector('#bill-confirm-modal .bill-confirm-box').innerHTML =
+    '<div class="bill-confirm-title">💳 ありがとうございます</div>'
+    + '<div class="bill-confirm-sub">少々お待ちください。<br>店員が参ります。</div>'
+    + '<div class="bill-confirm-btns"><button class="bill-cancel-btn" onclick="window.closeBillConfirm()">閉じる</button></div>';
 };
 
 window.callStaff = async function() {
