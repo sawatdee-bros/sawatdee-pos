@@ -191,6 +191,7 @@ const TAX = 0.1;
 
 // ---- 状態変数 ----
 let MENU_DATA = {};
+let hasOhiya = false; // store_config/has_ohiya
 
 // オプション定義
 const ITEM_OPTIONS = {
@@ -233,6 +234,9 @@ async function init() {
   try {
     const menuSnap = await get(ref(db, 'menu'));
     MENU_DATA = menuSnap.val() || {};
+    // 店舗設定：お冷ON/OFF
+    const ohiyaSnap = await get(ref(db, 'store_config/has_ohiya'));
+    hasOhiya = ohiyaSnap.val() === true;
     if (Object.keys(MENU_DATA).length === 0) {
       document.getElementById('menu-list').innerHTML = '<div style="padding:40px;text-align:center;color:#9ca3af">メニューを読み込めませんでした</div>';
       return;
@@ -318,6 +322,25 @@ function renderMenu() {
       + addBtn
       + '</div>';
   }).join('');
+  // お冷（ソフトドリンクの末尾に追加、store_configでONのときのみ）
+  if (hasOhiya && currentSubcat === '🥤 ソフトドリンク') {
+    var ohiyaKey = 'ohiya__ohiya__0';
+    var ohiyaQty = cart[ohiyaKey] ? cart[ohiyaKey].qty : 0;
+    var ohiyaQtyRow = ohiyaQty > 0
+      ? '<div class="qty-row"><button class="qty-btn" onclick="event.stopPropagation();window.changeQty(\'' + ohiyaKey + '\',-1)">−</button><span class="qty-num">' + ohiyaQty + '</span><button class="qty-btn" onclick="event.stopPropagation();window.addOhiya()">+</button></div>'
+      : '';
+    var ohiyaAddBtn = ohiyaQty === 0
+      ? '<button class="add-btn" onclick="event.stopPropagation();window.addOhiya()">+</button>'
+      : '';
+    html += '<div class="menu-card no-img" onclick="window.addOhiya()">'
+      + '<div class="menu-card-body">'
+      + '<div class="menu-card-name-row"><span class="menu-card-name">お冷</span></div>'
+      + '<div class="menu-card-price-row"><span class="menu-card-price">無料</span><span class="menu-card-price-in">税込¥0</span></div>'
+      + ohiyaQtyRow
+      + '</div>'
+      + ohiyaAddBtn
+      + '</div>';
+  }
   document.getElementById('menu-list').innerHTML = html || '<div style="padding:40px;text-align:center;color:#9ca3af">商品がありません</div>';
 }
 
@@ -497,6 +520,17 @@ window.showHistory = async function() {
 
 window.closeHistory = function() { document.getElementById('history-modal').classList.remove('open'); };
 window.cancelOrder = function() { cart = {}; renderMenu(); renderCart(); };
+
+// お冷をカートに追加
+window.addOhiya = function() {
+  var key = 'ohiya__ohiya__0';
+  if (cart[key]) {
+    cart[key].qty += 1;
+  } else {
+    cart[key] = { item: { name: 'お冷', price: 0 }, qty: 1 };
+  }
+  renderMenu(); renderCart();
+};
 
 window.placeOrder = async function() {
   var items = [];
