@@ -438,23 +438,29 @@ function playBillSound() {
   osc.stop(ctx.currentTime + 1.0);
 }
 
-var _prevCallCount = 0;
-var _prevBillCallCount = 0;
+var _prevCallTs = {};
+var _prevBillCallTs = {};
 
 onValue(ref(db, 'calls'), snap => {
   var data = snap.val() || {};
-  var count = Object.keys(data).length;
-  if (count > _prevCallCount) playCallSound();
-  _prevCallCount = count;
+  var hasNew = Object.keys(data).some(function(k) {
+    return !_prevCallTs[k] || data[k].timestamp > _prevCallTs[k];
+  });
+  if (hasNew) playCallSound();
+  _prevCallTs = {};
+  Object.keys(data).forEach(function(k) { _prevCallTs[k] = data[k].timestamp; });
   window._calls = data;
   renderBanner();
 });
 
 onValue(ref(db, 'bill_calls'), snap => {
   var data = snap.val() || {};
-  var count = Object.keys(data).length;
-  if (count > _prevBillCallCount) playBillSound();
-  _prevBillCallCount = count;
+  var hasNew = Object.keys(data).some(function(k) {
+    return !_prevBillCallTs[k] || data[k].timestamp > _prevBillCallTs[k];
+  });
+  if (hasNew) playBillSound();
+  _prevBillCallTs = {};
+  Object.keys(data).forEach(function(k) { _prevBillCallTs[k] = data[k].timestamp; });
   window._billCalls = data;
   renderBanner();
 });
