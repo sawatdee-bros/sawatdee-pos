@@ -481,6 +481,7 @@ window.dismissOhiya = async function(tableNum) {
   await remove(ref(db, 'ohiya/' + tableNum));
 };
 let ignoreNext = false;
+const _selfWriteIds = new Set(); // 自分が書き込んだorderID（新着通知スキップ用）
 const recentDone = [];
 const RESTORE_LIMIT = 3 * 60 * 1000;
 
@@ -534,7 +535,7 @@ window.doRestore = async function(i) {
   restored.status = 'new';
   restored.itemsDone = r.prev || {};
   orders[r.id] = restored;
-  ignoreNext = true;
+  _selfWriteIds.add(r.id);
   await update(ref(db, 'orders/'+r.id), { status: 'new', itemsDone: restored.itemsDone || {} });
   const idx = recentDone.indexOf(r);
   if (idx > -1) recentDone.splice(idx, 1);
@@ -697,7 +698,7 @@ window.toggleItem = async function(id, idx) {
   if (wasDone) {
     orders[id].itemsDone[idx] = false;
     orders[id].status = 'new';
-    ignoreNext = true;
+    _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone, status: 'new' });
     renderOrders(); _syncOrderToBills(id);
   } else {
@@ -705,19 +706,12 @@ window.toggleItem = async function(id, idx) {
     const allDone = orders[id].items.every((_,i) => orders[id].itemsDone[i]);
     if (allDone) {
       orders[id].status = 'done';
-      ignoreNext = true;
+      _selfWriteIds.add(id);
       await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone, status: 'done' });
       saveRecentDone(id, 'all', prev, prevStatus);
       renderOrders(); _syncOrderToBills(id);
-      // グループ内に他の未完了注文がある場合は削除しない（グレーアウトで残す）
-      setTimeout(function() {
-        if (!orders[id] || orders[id].status !== 'done') return;
-        // 同じテーブルで未完了の注文があるか確認
-        const sameTable = Object.keys(orders).some(oid => oid !== id && orders[oid].table === orders[id].table);
-        if (!sameTable) { delete orders[id]; renderOrders(); }
-      }, 5000);
     } else {
-      ignoreNext = true;
+      _selfWriteIds.add(id);
       await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone });
       renderOrders(); _syncOrderToBills(id);
     }
@@ -752,14 +746,13 @@ window.groupDone = async function(id, type) {
   const allDone = orders[id].items.every((_,i) => orders[id].itemsDone[i]);
   if (allDone) {
     orders[id].status = 'done';
-    ignoreNext = true;
+    _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone, status: 'done' });
     saveRecentDone(id, type, prev, prevStatus);
     const doneItemsDone = JSON.parse(JSON.stringify(orders[id].itemsDone));
     renderOrders(); _syncOrderToBills(id, doneItemsDone);
-    setTimeout(function() { if (orders[id] && orders[id].status === 'done') { delete orders[id]; renderOrders(); _syncOrderToBills(id, doneItemsDone); } }, 5000);
   } else {
-    ignoreNext = true;
+    _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone });
     saveRecentDone(id, type, prev, prevStatus);
     renderOrders(); _syncOrderToBills(id);
@@ -944,11 +937,12 @@ function showBell(hasDrink, hasFood) {
 }
 
 onValue(ref(db, 'orders'), (snap) => {
-  // _allOrdersCacheは常に最新に保つ（ignoreNextに関わらず）
+  // _allOrdersCacheは常に最新に保つ
   window._allOrdersCache = snap.val() || {};
-  if (ignoreNext) { ignoreNext = false; return; }
   const data = snap.val() || {};
-  const newIds = Object.keys(data).filter(id => !orders[id] && data[id].status !== 'done' && data[id].status !== 'paid');
+  // 自分の書き込み以外の新着注文だけを検知（ignoreNextによる全スキップをやめた）
+  const newIds = Object.keys(data).filter(id => !orders[id] && !_selfWriteIds.has(id) && data[id].status !== 'done' && data[id].status !== 'paid');
+  _selfWriteIds.clear();
   if (!firstLoad && newIds.length > 0) {
     const now = Date.now();
     newIds.forEach(id => _newIdTs.set(id, now));
