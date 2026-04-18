@@ -53,15 +53,30 @@
     @page { size: A4 portrait; margin: 6mm; }
     body { background: white; padding: 0; }
     .screen-only { display: none; }
-    .print-sheet {
+
+    /* 通常QR: 10卓×1枚 → 2列×5行 */
+    .print-sheet.normal-sheet {
       width: 198mm;
       height: 285mm;
       gap: 0;
       padding: 3mm;
       margin-bottom: 0;
+      grid-template-columns: repeat(2, 1fr);
       grid-template-rows: auto repeat(5, 1fr);
     }
-    .print-sheet.nomi-sheet { page-break-before: always; }
+
+    /* 飲み放題QR: 5卓×2枚 → 2列×5行 */
+    .print-sheet.nomi-sheet {
+      width: 198mm;
+      height: 285mm;
+      gap: 0;
+      padding: 3mm;
+      margin-bottom: 0;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: auto repeat(5, 1fr);
+      page-break-before: always;
+    }
+
     .qr-card {
       border: 0.5px solid #bbb;
       padding: 2mm;
@@ -78,7 +93,7 @@
 <body>
 <div class="screen-only">
   <h1>🌿 テーブルQRコード</h1>
-  <p class="subtitle">通常（10卓×2枚）・飲み放題（T1〜T5×2枚）それぞれ1ページで印刷</p>
+  <p class="subtitle">通常（10卓×1枚）・飲み放題（T1〜T5×2枚）それぞれ1ページで印刷</p>
   <div class="url-row">
     <input type="text" id="base-url" value="https://sawatdee-pos.pages.dev" />
   </div>
@@ -88,8 +103,8 @@
   </div>
 </div>
 
-<!-- 通常QR（1ページ目）: 10卓×2枚 = 20枚 -->
-<div class="print-sheet" id="qr-normal"></div>
+<!-- 通常QR（1ページ目）: 10卓×1枚 = 10枚 -->
+<div class="print-sheet normal-sheet" id="qr-normal"></div>
 
 <!-- 飲み放題QR（2ページ目）: T1〜T5×2枚 = 10枚 -->
 <div class="print-sheet nomi-sheet" id="qr-nomi"></div>
@@ -103,28 +118,26 @@ function generateQR() {
   const base = document.getElementById('base-url').value.trim();
   if (!base) { alert('URLを入力してください'); return; }
 
-  // 通常QR: 10卓×2枚
+  // 通常QR: 10卓×1枚
   const normalGrid = document.getElementById('qr-normal');
   normalGrid.innerHTML = '<div class="sheet-title">🌿 通常注文 QRコード</div>';
   for (let i = 1; i <= 10; i++) {
-    for (let c = 0; c < 2; c++) {
-      const url = base + '/customer.html?table=' + i;
-      const uid = 'n' + i + '_' + c;
-      const card = document.createElement('div');
-      card.className = 'qr-card';
-      card.innerHTML =
-        '<h2>テーブル ' + i + '</h2>' +
-        '<div id="' + uid + '"></div>' +
-        '<div class="qr-store">' + STORE + '</div>' +
-        '<div class="qr-note">' + NOTE1 + '</div>' +
-        '<div class="qr-note">' + NOTE2 + '</div>';
-      normalGrid.appendChild(card);
-      new QRCode(document.getElementById(uid), {
-        text: url, width: 100, height: 100,
-        colorDark: '#166534', colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.M,
-      });
-    }
+    const url = base + '/customer.html?table=' + i;
+    const uid = 'n' + i;
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+    card.innerHTML =
+      '<h2>テーブル ' + i + '</h2>' +
+      '<div id="' + uid + '"></div>' +
+      '<div class="qr-store">' + STORE + '</div>' +
+      '<div class="qr-note">' + NOTE1 + '</div>' +
+      '<div class="qr-note">' + NOTE2 + '</div>';
+    normalGrid.appendChild(card);
+    new QRCode(document.getElementById(uid), {
+      text: url, width: 100, height: 100,
+      colorDark: '#166534', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
   }
 
   // 飲み放題QR: T1〜T5×2枚
