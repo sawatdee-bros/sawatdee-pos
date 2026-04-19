@@ -911,37 +911,18 @@ window.toggleAudio = function() {
   applyAudioState();
 };
 
-// audioタグをWeb Audio API経由で再生して音量を増幅
-function playAudioBoosted(id) {
-  var ctx = getAudioCtx();
-  if (!ctx) return;
-  if (ctx.state === 'suspended') { ctx.resume(); return; }
-  var audio = document.getElementById(id);
-  if (!audio) return;
-  // MediaElementSourceは1要素につき1回しか作れないのでキャッシュ
-  if (!audio._mediaSource) {
-    try { audio._mediaSource = ctx.createMediaElementSource(audio); } catch(e) { return; }
-  }
-  var gain = ctx.createDynamicsCompressor();
-  var boost = ctx.createGain();
-  boost.gain.value = 3.0;
-  audio._mediaSource.connect(boost);
-  boost.connect(gain);
-  gain.connect(ctx.destination);
-  audio.currentTime = 0;
-  audio.play().catch(function(){});
-}
-
 function playBeep() {
   if (!audioEnabled) return;
-  playAudioBoosted('beep-audio');
+  var beep = document.getElementById('beep-audio');
+  if (beep) { beep.currentTime = 0; beep.play().catch(function(){}); }
 }
 
 // フード・ドリンク別の音（audioタグで再生・iOS/iPad対応）
 function playSound(type) {
   if (!audioEnabled) return;
   var id = type === 'drink' ? 'drink-audio' : 'food-audio';
-  playAudioBoosted(id);
+  var audio = document.getElementById(id);
+  if (audio) { audio.currentTime = 0; audio.play().catch(function(){}); }
 }
 
 function showBell(hasDrink, hasFood) {
