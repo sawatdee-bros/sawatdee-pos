@@ -400,13 +400,15 @@ function playCallSound() {
   function beep(freq, startTime, duration) {
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
+    var comp = ctx.createDynamicsCompressor();
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(comp);
+    comp.connect(ctx.destination);
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, startTime);
     gain.gain.setValueAtTime(0, startTime);
-    gain.gain.linearRampToValueAtTime(0.35, startTime + 0.02);
-    gain.gain.linearRampToValueAtTime(0.35, startTime + duration - 0.04);
+    gain.gain.linearRampToValueAtTime(1.5, startTime + 0.02);
+    gain.gain.linearRampToValueAtTime(1.5, startTime + duration - 0.04);
     gain.gain.linearRampToValueAtTime(0, startTime + duration);
     osc.start(startTime);
     osc.stop(startTime + duration);
@@ -426,13 +428,15 @@ function playBillSound() {
   if (ctx.state === 'suspended') { ctx.resume(); return; }
   var osc = ctx.createOscillator();
   var gain = ctx.createGain();
+  var comp = ctx.createDynamicsCompressor();
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(comp);
+  comp.connect(ctx.destination);
   osc.type = 'sine';
   osc.frequency.setValueAtTime(600, ctx.currentTime);
   osc.frequency.linearRampToValueAtTime(520, ctx.currentTime + 0.5);
   gain.gain.setValueAtTime(0, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.03);
+  gain.gain.linearRampToValueAtTime(1.5, ctx.currentTime + 0.03);
   gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.9);
   osc.start(ctx.currentTime);
   osc.stop(ctx.currentTime + 1.0);
@@ -907,18 +911,37 @@ window.toggleAudio = function() {
   applyAudioState();
 };
 
+// audioタグをWeb Audio API経由で再生して音量を増幅
+function playAudioBoosted(id) {
+  var ctx = getAudioCtx();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') { ctx.resume(); return; }
+  var audio = document.getElementById(id);
+  if (!audio) return;
+  // MediaElementSourceは1要素につき1回しか作れないのでキャッシュ
+  if (!audio._mediaSource) {
+    try { audio._mediaSource = ctx.createMediaElementSource(audio); } catch(e) { return; }
+  }
+  var gain = ctx.createDynamicsCompressor();
+  var boost = ctx.createGain();
+  boost.gain.value = 3.0;
+  audio._mediaSource.connect(boost);
+  boost.connect(gain);
+  gain.connect(ctx.destination);
+  audio.currentTime = 0;
+  audio.play().catch(function(){});
+}
+
 function playBeep() {
   if (!audioEnabled) return;
-  var beep = document.getElementById('beep-audio');
-  if (beep) { beep.currentTime = 0; beep.play().catch(function(){}); }
+  playAudioBoosted('beep-audio');
 }
 
 // フード・ドリンク別の音（audioタグで再生・iOS/iPad対応）
 function playSound(type) {
   if (!audioEnabled) return;
   var id = type === 'drink' ? 'drink-audio' : 'food-audio';
-  var audio = document.getElementById(id);
-  if (audio) { audio.currentTime = 0; audio.play().catch(function(){}); }
+  playAudioBoosted(id);
 }
 
 function showBell(hasDrink, hasFood) {
