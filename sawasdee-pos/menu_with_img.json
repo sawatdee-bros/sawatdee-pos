@@ -999,7 +999,7 @@
         "price": 440,
         "sake": true,
         "spicy": 0,
-        "img": "/img/ガビキャベツ.jpg"
+        "img": "/img/ガピキャベツ.jpg"
       },
       {
         "active": true,
@@ -1111,7 +1111,7 @@
         "price": 680,
         "sake": false,
         "spicy": 1,
-        "img": "/img/パガバオ.jpg"
+        "img": "/img/ガバオ.jpg"
       },
       {
         "active": true,
