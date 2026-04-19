@@ -357,16 +357,16 @@ window.orderOhiya = async function() {
 };
 
 // 手打ち商品
-function openCustomModal() {
+window.openCustomModal = function openCustomModal() {
   document.getElementById('custom-name').value = '手打ち商品';
   document.getElementById('custom-price').value = '';
   document.getElementById('custom-modal').classList.add('open');
   setTimeout(() => document.getElementById('custom-name').focus(), 100);
 }
-function closeCustomModal() {
+window.closeCustomModal = function closeCustomModal() {
   document.getElementById('custom-modal').classList.remove('open');
 }
-function addCustomItem() {
+window.addCustomItem = function addCustomItem() {
   const name = document.getElementById('custom-name').value.trim();
   const price = parseInt(document.getElementById('custom-price').value) || 0;
   if (!name) { alert('商品名を入力してください'); return; }
