@@ -281,9 +281,9 @@ function renderSubcatTabs() {
 function makeBadges(item) {
   var html = '';
   if (item.popular) {
-    if (item.popular.includes('人気')) html += '<span class="badge badge-popular">🔥 人気</span>';
-    else if (item.popular.includes('当店名物')) html += '<span class="badge badge-popular">⭐ 名物</span>';
-    else if (item.popular.includes('おス') || item.popular.includes('オス')) html += '<span class="badge badge-recommend">👍 おすすめ</span>';
+    var icon = item.popular.includes('人気') ? '🔥' : item.popular.includes('名物') ? '⭐' : '👍';
+    var cls = (item.popular.includes('おス') || item.popular.includes('オス')) ? 'badge-recommend' : 'badge-popular';
+    html += '<span class="badge ' + cls + '">' + icon + ' ' + item.popular + '</span>';
   }
   if (item.sake) html += '<span class="badge badge-sake">🍺 酒に合う</span>';
   if (item.pakchi) html += '<span class="badge badge-pakchi">🌿 パクチー</span>';
