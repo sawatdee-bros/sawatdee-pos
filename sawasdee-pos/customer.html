@@ -288,7 +288,7 @@ function makeBadges(item) {
   if (item.sake) html += '<span class="badge badge-sake">🍺 酒に合う</span>';
   if (item.pakchi) html += '<span class="badge badge-pakchi">🌿 パクチー</span>';
   if (item.spicy > 0) {
-    var count = item.spicy >= 3 ? 3 : item.spicy >= 2 ? 2 : 1;
+    var count = Math.min(item.spicy, 10);
     var chilies = '';
     for (var i = 0; i < count; i++) chilies += '🌶️';
     html += '<span class="spicy-icons">' + chilies + '</span>';
