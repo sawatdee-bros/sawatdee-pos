@@ -334,20 +334,22 @@ window.orderOhiya = async function() {
   }, 3000);
 };
 
-// サブカテゴリ名のハッシュから背景色・ボーダー色を生成
+// サブカテゴリ名から衝突しない色を生成
+// 初回登場順に番号を振り、黄金角で均等分散した色相を割り当てる
+var _subcatColorCache = {};
+var _subcatCounter = 0;
+var GOLDEN_ANGLE = 137.508;
 function getSubcatColor(subcat) {
-  // 文字列→数値ハッシュ
-  var hash = 0;
-  for (var i = 0; i < subcat.length; i++) {
-    hash = ((hash << 5) - hash) + subcat.charCodeAt(i);
-    hash |= 0;
+  if (!subcat) subcat = '';
+  if (!_subcatColorCache[subcat]) {
+    var hue = Math.round((_subcatCounter * GOLDEN_ANGLE) % 360);
+    _subcatCounter++;
+    _subcatColorCache[subcat] = {
+      bg: 'hsl(' + hue + ',45%,11%)',
+      border: 'hsl(' + hue + ',75%,42%)'
+    };
   }
-  // ハッシュから色相（0-360）を決める
-  var hue = Math.abs(hash) % 360;
-  // HSL→暗め背景色とボーダー色を生成
-  var bg = 'hsl(' + hue + ',40%,12%)';
-  var border = 'hsl(' + hue + ',70%,45%)';
-  return { bg: bg, border: border };
+  return _subcatColorCache[subcat];
 }
 
 window.placeOrder = async function() {
