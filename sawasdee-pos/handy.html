@@ -208,17 +208,11 @@ function renderMenu() {
   const itemsHTML = group.items.map((item, idx) => {
     const key = currentCat + '__g' + currentGroupIdx + '__' + idx;
     const qty = cart[key] ? cart[key].qty : 0;
-    // グループごとのデフォルト色（bg/borderがない場合のフォールバック）
-    const GROUP_COLORS = [
-      {bg:'#1a2744', border:'#3b5bdb'},
-      {bg:'#1a3020', border:'#2f9e44'},
-      {bg:'#2a1a30', border:'#9c36b5'},
-      {bg:'#2a1a1a', border:'#e03131'},
-      {bg:'#1a2a2a', border:'#0c8599'},
-    ];
-    const gc = GROUP_COLORS[currentGroupIdx % GROUP_COLORS.length];
-    const itemBg = item.bg || gc.bg;
-    const itemBorder = item.border || gc.border;
+    // サブカテゴリ名のハッシュから色を自動生成（マルチテナント対応）
+    const subcat = item.subcat || '';
+    const subcatColor = getSubcatColor(subcat);
+    const itemBg = item.bg || subcatColor.bg;
+    const itemBorder = item.border || subcatColor.border;
     return `<div class="menu-item${qty > 0 ? ' in-cart' : ''}"
       style="background:${itemBg};border-color:${qty > 0 ? '#22c55e' : itemBorder};"
       onclick="tapItem('${key}',${idx})">
@@ -339,6 +333,22 @@ window.orderOhiya = async function() {
     btn.disabled = false;
   }, 3000);
 };
+
+// サブカテゴリ名のハッシュから背景色・ボーダー色を生成
+function getSubcatColor(subcat) {
+  // 文字列→数値ハッシュ
+  var hash = 0;
+  for (var i = 0; i < subcat.length; i++) {
+    hash = ((hash << 5) - hash) + subcat.charCodeAt(i);
+    hash |= 0;
+  }
+  // ハッシュから色相（0-360）を決める
+  var hue = Math.abs(hash) % 360;
+  // HSL→暗め背景色とボーダー色を生成
+  var bg = 'hsl(' + hue + ',40%,12%)';
+  var border = 'hsl(' + hue + ',70%,45%)';
+  return { bg: bg, border: border };
+}
 
 window.placeOrder = async function() {
   const items = Object.values(cart).map(c => ({
