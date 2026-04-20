@@ -41,7 +41,7 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .qty-num { font-size: 14px; font-weight: 700; color: #f1f5f9; min-width: 18px; text-align: center; }
 
 /* カート */
-.cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; border-top: 1px solid #334155; padding: 10px 12px; z-index: 50; }
+.cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; border-top: 1px solid #334155; padding: 10px 12px; }
 .cart-summary { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .cart-count { font-size: 13px; color: #94a3b8; }
 .cart-total { font-size: 18px; font-weight: 700; color: #22c55e; }
@@ -75,17 +75,6 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #166534; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 200; white-space: nowrap; }
 .toast.show { display: block; animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-.custom-btn { padding: 10px 14px; background: #4c1d95; border: 1px solid #7c3aed; border-radius: 10px; color: #c4b5fd; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 600; align-items: center; justify-content: center; }
-.custom-modal.open { display: flex; }
-.custom-box { background: #1e293b; border-radius: 16px; padding: 20px; width: 300px; border: 1px solid #334155; }
-.custom-title { font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; text-align: center; }
-.custom-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
-.custom-input { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f1f5f9; font-size: 15px; font-family: inherit; box-sizing: border-box; margin-bottom: 12px; }
-.custom-input:focus { outline: none; border-color: #7c3aed; }
-.custom-btns { display: flex; gap: 8px; margin-top: 4px; }
-.custom-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; border-radius: 10px; color: #94a3b8; font-size: 14px; cursor: pointer; }
-.custom-add { flex: 2; padding: 12px; background: #4c1d95; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -93,7 +82,6 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 <header>
   <h1>🍽 ハンディ</h1>
   <span class="header-table" id="header-table">テーブル未選択</span>
-  <button class="custom-btn" onclick="openCustomModal()">✏️ 手打ち</button>
 </header>
 
 <!-- テーブル選択 -->
@@ -123,21 +111,6 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 <div class="toast" id="toast">✓ 注文を送信しました！</div>
 
 <!-- 注文確認モーダル -->
-<!-- 手打ち商品モーダル -->
-<div class="custom-modal" id="custom-modal">
-  <div class="custom-box">
-    <div class="custom-title">✏️ 手打ち商品</div>
-    <div class="custom-label">商品名</div>
-    <input class="custom-input" type="text" id="custom-name" placeholder="例：本日のおまかせ">
-    <div class="custom-label">金額（税抜）</div>
-    <input class="custom-input" type="number" id="custom-price" placeholder="例：800" min="0" inputmode="numeric">
-    <div class="custom-btns">
-      <button class="custom-cancel" onclick="closeCustomModal()">キャンセル</button>
-      <button class="custom-add" onclick="addCustomItem()">カートに追加</button>
-    </div>
-  </div>
-</div>
-
 <div class="confirm-modal" id="confirm-modal">
   <div class="confirm-box">
     <div class="confirm-title">📋 注文内容の確認</div>
@@ -235,8 +208,19 @@ function renderMenu() {
   const itemsHTML = group.items.map((item, idx) => {
     const key = currentCat + '__g' + currentGroupIdx + '__' + idx;
     const qty = cart[key] ? cart[key].qty : 0;
+    // グループごとのデフォルト色（bg/borderがない場合のフォールバック）
+    const GROUP_COLORS = [
+      {bg:'#1a2744', border:'#3b5bdb'},
+      {bg:'#1a3020', border:'#2f9e44'},
+      {bg:'#2a1a30', border:'#9c36b5'},
+      {bg:'#2a1a1a', border:'#e03131'},
+      {bg:'#1a2a2a', border:'#0c8599'},
+    ];
+    const gc = GROUP_COLORS[currentGroupIdx % GROUP_COLORS.length];
+    const itemBg = item.bg || gc.bg;
+    const itemBorder = item.border || gc.border;
     return `<div class="menu-item${qty > 0 ? ' in-cart' : ''}"
-      style="background:${item.bg};border-color:${qty > 0 ? '#22c55e' : item.border};"
+      style="background:${itemBg};border-color:${qty > 0 ? '#22c55e' : itemBorder};"
       onclick="tapItem('${key}',${idx})">
       <div class="menu-item-name">${item.name}</div>
       ${qty > 0 ? `<div class="menu-item-badge">${qty}</div>` : ''}
@@ -355,27 +339,6 @@ window.orderOhiya = async function() {
     btn.disabled = false;
   }, 3000);
 };
-
-// 手打ち商品
-window.openCustomModal = function openCustomModal() {
-  document.getElementById('custom-name').value = '手打ち商品';
-  document.getElementById('custom-price').value = '';
-  document.getElementById('custom-modal').classList.add('open');
-  setTimeout(() => document.getElementById('custom-name').focus(), 100);
-}
-window.closeCustomModal = function closeCustomModal() {
-  document.getElementById('custom-modal').classList.remove('open');
-}
-window.addCustomItem = function addCustomItem() {
-  const name = document.getElementById('custom-name').value.trim();
-  const price = parseInt(document.getElementById('custom-price').value) || 0;
-  if (!name) { alert('商品名を入力してください'); return; }
-  const key = 'custom__' + Date.now();
-  cart[key] = { name, price, qty: 1 };
-  closeCustomModal();
-  renderMenu();
-  renderCart();
-}
 
 window.placeOrder = async function() {
   const items = Object.values(cart).map(c => ({

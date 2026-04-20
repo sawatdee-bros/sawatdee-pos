@@ -12,39 +12,63 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-se
 
 /* ヘッダー */
 header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; }
-.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .header-title { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .header-table { font-size: 13px; color: #fbbf24; font-weight: 700; }
 
-/* ローディング */
-.loading { text-align: center; padding: 60px 20px; color: #64748b; font-size: 14px; }
+/* メインタブ（飲み放題/フード） */
+.main-tabs { display: flex; gap: 0; }
+.main-tab { flex: 1; padding: 8px; font-size: 14px; font-weight: 700; border: none; border-radius: 8px; background: #334155; color: #64748b; cursor: pointer; text-align: center; }
+.main-tab.active { background: #1d4ed8; color: white; }
+.main-tab.active.nomi { background: #166534; }
 
-/* ラストオーダー表示 */
+/* ラストオーダー */
 .lo-bar { background: #7f1d1d; color: #fca5a5; text-align: center; padding: 8px 16px; font-size: 13px; font-weight: 700; display: none; }
 .lo-bar.show { display: block; }
 .lo-bar.warn { background: #ef4444; color: white; animation: pulse 1s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
 
-/* カテゴリタブ */
+/* ===== 飲み放題タブ ===== */
 .cat-bar { display: grid; background: #1e293b; border-bottom: 1px solid #334155; }
 .cat-btn { padding: 11px 8px; font-size: 12px; font-weight: 600; color: #64748b; border: none; border-bottom: 2px solid transparent; background: transparent; cursor: pointer; text-align: center; }
 .cat-btn.active { color: #22c55e; border-bottom-color: #22c55e; background: #0f2918; }
 
-/* メニューリスト */
-.menu-list { padding: 12px 12px 120px; display: flex; flex-direction: column; gap: 6px; }
-.menu-item { background: #1e293b; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #334155; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.menu-item:active { opacity: 0.8; }
-.menu-item.in-cart { border-color: #22c55e; background: #0f2918; }
-.menu-item-name { font-size: 14px; color: #e2e8f0; flex: 1; }
-.menu-item-qty { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.nomi-list { padding: 12px 12px 140px; display: flex; flex-direction: column; gap: 6px; }
+.nomi-item { background: #1e293b; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #334155; cursor: pointer; }
+.nomi-item:active { opacity: 0.8; }
+.nomi-item.in-cart { border-color: #22c55e; background: #0f2918; }
+.nomi-item-name { font-size: 14px; color: #e2e8f0; flex: 1; }
+.nomi-item-qty { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .qty-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #475569; background: transparent; color: #94a3b8; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .qty-btn.plus { border-color: #166534; background: #166534; color: white; }
 .qty-num { font-size: 15px; font-weight: 700; color: #f1f5f9; min-width: 20px; text-align: center; }
 
+/* ===== フードタブ ===== */
+.food-subcat-bar { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: #1e293b; border-bottom: 1px solid #334155; position: sticky; top: 94px; z-index: 90; }
+.food-subcat-btn { flex-shrink: 0; padding: 4px 12px; font-size: 12px; border-radius: 20px; border: 1px solid #334155; background: #0f172a; color: #64748b; cursor: pointer; }
+.food-subcat-btn.active { background: #1d4ed8; border-color: #1d4ed8; color: white; }
+
+.food-list { padding: 10px 12px 140px; display: flex; flex-direction: column; gap: 6px; }
+.food-item { background: #1e293b; border-radius: 10px; display: flex; align-items: center; padding: 10px 14px; border: 1px solid #334155; cursor: pointer; gap: 10px; }
+.food-item.in-cart { border-color: #1d4ed8; background: #0c1a3d; }
+.food-item.soldout { opacity: 0.45; pointer-events: none; }
+.food-item-img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+.food-item-body { flex: 1; min-width: 0; }
+.food-item-name { font-size: 13px; color: #e2e8f0; font-weight: 600; }
+.food-item-desc { font-size: 11px; color: #64748b; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.food-item-price { font-size: 13px; color: #22c55e; font-weight: 700; margin-top: 3px; }
+.food-item-price-in { font-size: 10px; color: #64748b; margin-left: 4px; }
+.food-item-soldout { font-size: 11px; color: #ef4444; font-weight: 600; }
+.food-item-qty { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.food-qty-btn { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #475569; background: transparent; color: #94a3b8; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.food-qty-btn.plus { border-color: #1d4ed8; background: #1d4ed8; color: white; }
+.food-qty-num { font-size: 14px; font-weight: 700; color: #f1f5f9; min-width: 18px; text-align: center; }
+
 /* カートバー */
-.cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; border-top: 1px solid #334155; padding: 10px 12px; }
+.cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; border-top: 1px solid #334155; padding: 10px 12px; z-index: 50; }
 .cart-summary { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .cart-count { font-size: 13px; color: #94a3b8; }
+.cart-total { font-size: 18px; font-weight: 700; color: #22c55e; }
 .cart-btns { display: flex; gap: 8px; }
 .cart-clear { padding: 12px 16px; background: transparent; border: 1px solid #ef4444; border-radius: 10px; color: #ef4444; font-size: 13px; font-weight: 600; cursor: pointer; }
 .cart-order { flex: 1; padding: 12px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; }
@@ -54,6 +78,27 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
 .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #166534; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 200; white-space: nowrap; }
 .toast.show { display: block; animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+.loading { text-align: center; padding: 60px 20px; color: #64748b; font-size: 14px; }
+
+/* オプションモーダル */
+.opt-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px; }
+.opt-modal.open { display: flex; }
+.opt-box { background: #1e293b; border-radius: 16px; padding: 20px; width: 100%; max-width: 340px; border: 1px solid #334155; }
+.opt-title { font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+.opt-subtitle { font-size: 12px; color: #64748b; margin-bottom: 14px; }
+.opt-choice { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 1.5px solid #334155; border-radius: 10px; margin-bottom: 8px; cursor: pointer; font-size: 14px; color: #cbd5e1; }
+.opt-choice.selected { border-color: #166534; background: #0f2918; color: #22c55e; font-weight: 600; }
+.opt-choice-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #475569; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.opt-choice.selected .opt-choice-radio { border-color: #22c55e; background: #22c55e; }
+.opt-choice.selected .opt-choice-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: white; display: block; }
+.opt-choice-check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #475569; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.opt-choice.selected .opt-choice-check { border-color: #22c55e; background: #22c55e; color: white; }
+.opt-price { margin-left: auto; font-size: 12px; color: #64748b; }
+.opt-btns { display: flex; gap: 8px; margin-top: 14px; }
+.opt-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; border-radius: 10px; font-size: 14px; color: #94a3b8; cursor: pointer; }
+.opt-confirm { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; color: white; cursor: pointer; }
+.opt-confirm:disabled { background: #334155; cursor: default; color: #64748b; }
 </style>
 </head>
 <body>
@@ -63,17 +108,30 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
     <div class="header-title">🍻 飲み放題オーダー</div>
     <span id="header-table">テーブル --</span>
   </div>
+  <div class="main-tabs">
+    <button class="main-tab active nomi" id="tab-nomi" onclick="switchMain('nomi')">🍺 飲み放題</button>
+    <button class="main-tab" id="tab-food" onclick="switchMain('food')">🍽 フード</button>
+  </div>
 </header>
 
 <div class="lo-bar" id="lo-bar">⏰ ラストオーダー: --:--</div>
-<div class="cat-bar" id="cat-bar" style="grid-template-columns: repeat(2, 1fr);"></div>
-<div class="menu-list" id="menu-list">
-  <div class="loading">メニューを読み込み中...</div>
+
+<!-- 飲み放題セクション -->
+<div id="section-nomi">
+  <div class="cat-bar" id="cat-bar" style="grid-template-columns: repeat(2, 1fr);"></div>
+  <div class="nomi-list" id="nomi-list"><div class="loading">読み込み中...</div></div>
+</div>
+
+<!-- フードセクション -->
+<div id="section-food" style="display:none">
+  <div class="food-subcat-bar" id="food-subcat-bar"></div>
+  <div class="food-list" id="food-list"><div class="loading">読み込み中...</div></div>
 </div>
 
 <div class="cart-bar">
   <div class="cart-summary">
     <span class="cart-count" id="cart-count">カート: 0品</span>
+    <span class="cart-total" id="cart-total"></span>
   </div>
   <div class="cart-btns">
     <button class="cart-clear" onclick="clearCart()">✕ クリア</button>
@@ -82,6 +140,19 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
 </div>
 
 <div class="toast" id="toast">✓ 注文しました！</div>
+
+<!-- オプションモーダル -->
+<div class="opt-modal" id="opt-modal">
+  <div class="opt-box">
+    <div class="opt-title" id="opt-item-name"></div>
+    <div class="opt-subtitle" id="opt-label"></div>
+    <div id="opt-choices"></div>
+    <div class="opt-btns">
+      <button class="opt-cancel" onclick="closeOpt()">キャンセル</button>
+      <button class="opt-confirm" id="opt-confirm" onclick="confirmOpt()" disabled>追加する</button>
+    </div>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -99,142 +170,285 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
-// URLパラメータからテーブル番号取得
 const params = new URLSearchParams(location.search);
 const tableNum = params.get('table') || '?';
 document.getElementById('header-table').textContent = 'テーブル ' + tableNum;
 
 // ---- 状態変数 ----
-let NOMI_MENU = {};   // Firebaseから読み込む
-let CATS = [];
-let storeConfig = {}; // store_configから読み込む
-let currentCat = '';
-let cart = {};
+let NOMI_MENU = {};
+let NOMI_CATS = [];
+let FOOD_DATA = {};
+let soldout = {};
+let storeConfig = {};
+let currentMode = 'nomi'; // 'nomi' | 'food'
+let currentNomiCat = '';
+let currentFoodSubcat = '';
+let cart = {};       // 飲み放題カート
+let foodCart = {};   // フードカート
 let loTime = null;
+let TAX = 0.1;
 
-// ---- 初期化：store_config と nomi_menu を並行取得 ----
+const taxIn = p => Math.floor(p * (1 + TAX));
+
+// ---- メインタブ切替 ----
+window.switchMain = function(mode) {
+  currentMode = mode;
+  document.getElementById('section-nomi').style.display = mode === 'nomi' ? '' : 'none';
+  document.getElementById('section-food').style.display = mode === 'food' ? '' : 'none';
+  document.getElementById('tab-nomi').className = 'main-tab' + (mode === 'nomi' ? ' active nomi' : '');
+  document.getElementById('tab-food').className = 'main-tab' + (mode === 'food' ? ' active' : '');
+  renderCart();
+};
+
+// ---- 初期化 ----
 async function init() {
   try {
-    const [configSnap, menuSnap] = await Promise.all([
+    const [configSnap, nomiSnap, foodSnap] = await Promise.all([
       get(ref(db, 'store_config')),
-      get(ref(db, 'nomi_menu'))
+      get(ref(db, 'nomi_menu')),
+      get(ref(db, 'menu/food'))
     ]);
 
     storeConfig = configSnap.val() || {};
-    NOMI_MENU = menuSnap.val() || {};
-    CATS = Object.keys(NOMI_MENU);
+    TAX = storeConfig.tax_rate || 0.1;
+    NOMI_MENU = nomiSnap.val() || {};
+    // FirebaseはJSONのarrayをobjectに変換するので、Object.values()で配列に戻す
+    var catOrderRaw = NOMI_MENU.catOrder;
+    var catOrder = catOrderRaw
+      ? (Array.isArray(catOrderRaw) ? catOrderRaw : Object.values(catOrderRaw))
+      : null;
+    var allCats = Object.keys(NOMI_MENU).filter(function(k) { return k !== 'catOrder'; });
+    // 各カテゴリのアイテムもFirebaseのobjectを配列に変換
+    allCats.forEach(function(cat) {
+      if (NOMI_MENU[cat] && !Array.isArray(NOMI_MENU[cat])) {
+        NOMI_MENU[cat] = Object.values(NOMI_MENU[cat]);
+      }
+    });
+    if (catOrder && catOrder.length > 0) {
+      NOMI_CATS = catOrder.filter(function(c) { return allCats.includes(c); })
+        .concat(allCats.filter(function(c) { return !catOrder.includes(c); }));
+    } else {
+      NOMI_CATS = allCats;
+    }
+    var rawFood = foodSnap.val() || {};
+    // FirebaseがarrayをobjectにするのでFood各サブカテゴリも変換
+    FOOD_DATA = {};
+    Object.keys(rawFood).forEach(function(sub) {
+      var items = rawFood[sub];
+      FOOD_DATA[sub] = Array.isArray(items) ? items : Object.values(items);
+    });
 
-    if (CATS.length === 0) {
-      document.getElementById('menu-list').innerHTML =
-        '<div class="loading">メニューが登録されていません</div>';
-      return;
+    // 売り切れ監視
+    onValue(ref(db, 'soldout'), function(snap) {
+      soldout = snap.val() || {};
+      if (currentMode === 'food') renderFoodMenu();
+    });
+
+    // 飲み放題初期化
+    if (NOMI_CATS.length === 0) {
+      document.getElementById('nomi-list').innerHTML = '<div class="loading">メニューが登録されていません</div>';
+    } else {
+      const colCount = NOMI_CATS.length <= 2 ? NOMI_CATS.length : NOMI_CATS.length <= 4 ? 2 : 3;
+      document.getElementById('cat-bar').style.gridTemplateColumns = 'repeat(' + colCount + ', 1fr)';
+      currentNomiCat = NOMI_CATS[0];
+      renderNomiCats();
+      renderNomiMenu();
     }
 
-    // カテゴリ数に応じてグリッド列数を調整
-    const colCount = CATS.length <= 2 ? CATS.length : CATS.length <= 4 ? 2 : 3;
-    document.getElementById('cat-bar').style.gridTemplateColumns = 'repeat(' + colCount + ', 1fr)';
+    // フード初期化
+    const foodSubcats = Object.keys(FOOD_DATA);
+    if (foodSubcats.length > 0) {
+      currentFoodSubcat = foodSubcats[0];
+      renderFoodSubcats();
+      renderFoodMenu();
+    } else {
+      document.getElementById('food-list').innerHTML = '<div class="loading">フードメニューがありません</div>';
+    }
 
-    currentCat = CATS[0];
-    renderCats();
-    renderMenu();
     renderCart();
-
-    // ラストオーダー監視開始
     startLOWatch();
-  } catch (e) {
-    document.getElementById('menu-list').innerHTML =
-      '<div class="loading">読み込みに失敗しました。再読み込みしてください。</div>';
+  } catch(e) {
+    document.getElementById('nomi-list').innerHTML = '<div class="loading">読み込みに失敗しました。再読み込みしてください。</div>';
     console.error(e);
   }
 }
 
-// ---- カテゴリタブ描画 ----
-function renderCats() {
+// ---- 飲み放題カテゴリタブ ----
+function renderNomiCats() {
   const bar = document.getElementById('cat-bar');
   bar.innerHTML = '';
-  CATS.forEach(function(cat) {
+  NOMI_CATS.forEach(function(cat) {
     const btn = document.createElement('button');
-    btn.className = 'cat-btn' + (cat === currentCat ? ' active' : '');
+    btn.className = 'cat-btn' + (cat === currentNomiCat ? ' active' : '');
     btn.textContent = cat;
-    btn.onclick = function() { currentCat = cat; renderCats(); renderMenu(); };
+    btn.onclick = function() { currentNomiCat = cat; renderNomiCats(); renderNomiMenu(); };
     bar.appendChild(btn);
   });
 }
 
-// ---- メニュー描画 ----
-function renderMenu() {
-  const items = NOMI_MENU[currentCat] || [];
+// ---- 飲み放題メニュー ----
+function renderNomiMenu() {
+  const items = NOMI_MENU[currentNomiCat] || [];
   const rows = items.map(function(item, idx) {
-    const key = currentCat + '__' + idx;
+    const key = 'nomi__' + currentNomiCat + '__' + idx;
     const qty = cart[key] ? cart[key].qty : 0;
     let qtyArea;
     if (qty > 0) {
-      qtyArea = '<div class="menu-item-qty" onclick="event.stopPropagation()">'
-        + '<button class="qty-btn" onclick="changeQty(\'' + key + '\',' + idx + ',-1)">−</button>'
+      qtyArea = '<div class="nomi-item-qty" onclick="event.stopPropagation()">'
+        + '<button class="qty-btn" onclick="changeNomiQty(\'' + key + '\',' + idx + ',-1)">−</button>'
         + '<span class="qty-num">' + qty + '</span>'
-        + '<button class="qty-btn plus" onclick="event.stopPropagation();changeQty(\'' + key + '\',' + idx + ',1)">+</button>'
+        + '<button class="qty-btn plus" onclick="event.stopPropagation();changeNomiQty(\'' + key + '\',' + idx + ',1)">+</button>'
         + '</div>';
     } else {
-      qtyArea = '<button class="qty-btn plus" onclick="event.stopPropagation();changeQty(\'' + key + '\',' + idx + ',1)">+</button>';
+      qtyArea = '<button class="qty-btn plus" onclick="event.stopPropagation();changeNomiQty(\'' + key + '\',' + idx + ',1)">+</button>';
     }
-    return '<div class="menu-item' + (qty > 0 ? ' in-cart' : '') + '" onclick="changeQty(\'' + key + '\',' + idx + ',1)">'
-      + '<span class="menu-item-name">' + item.name + '</span>'
-      + qtyArea
-      + '</div>';
+    return '<div class="nomi-item' + (qty > 0 ? ' in-cart' : '') + '" onclick="changeNomiQty(\'' + key + '\',' + idx + ',1)">'
+      + '<span class="nomi-item-name">' + item.name + '</span>'
+      + qtyArea + '</div>';
   });
-  document.getElementById('menu-list').innerHTML = rows.join('');
+  document.getElementById('nomi-list').innerHTML = rows.join('') || '<div class="loading">商品がありません</div>';
 }
 
-// ---- 数量変更 ----
-window.changeQty = function(key, idx, delta) {
-  const cat = key.split('__')[0];
-  const items = NOMI_MENU[cat];
-  if (!items) return;
-  const item = items[idx];
+window.changeNomiQty = function(key, idx, delta) {
+  const parts = key.split('__');
+  const cat = parts[1];
+  const item = (NOMI_MENU[cat] || [])[idx];
   if (!item) return;
-  if (!cart[key]) cart[key] = { name: item.name, price: item.price, qty: 0 };
+  if (delta > 0 && NOMI_OPTIONS[item.name]) {
+    openNomiOpt(key, idx, item);
+    return;
+  }
+  if (!cart[key]) cart[key] = { name: item.name, price: 0, qty: 0 };
   cart[key].qty = Math.max(0, cart[key].qty + delta);
   if (cart[key].qty === 0) delete cart[key];
-  renderMenu();
+  renderNomiMenu();
   renderCart();
 };
 
-// ---- カート表示更新 ----
-function renderCart() {
-  const count = Object.values(cart).reduce(function(s, i) { return s + i.qty; }, 0);
-  document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
-  document.getElementById('order-btn').disabled = count === 0;
+// ---- フードサブカテゴリ ----
+function renderFoodSubcats() {
+  const bar = document.getElementById('food-subcat-bar');
+  const subcats = Object.keys(FOOD_DATA);
+  bar.innerHTML = subcats.map(function(s) {
+    return '<button class="food-subcat-btn' + (s === currentFoodSubcat ? ' active' : '') + '" onclick="selectFoodSubcat(\'' + s + '\')">' + s + '</button>';
+  }).join('');
 }
 
-// ---- カートクリア ----
+window.selectFoodSubcat = function(sub) {
+  currentFoodSubcat = sub;
+  renderFoodSubcats();
+  renderFoodMenu();
+};
+
+// ---- フードメニュー ----
+function renderFoodMenu() {
+  const items = (FOOD_DATA[currentFoodSubcat] || []).filter(function(i) { return i && i.active; });
+  const rows = items.map(function(item, idx) {
+    const key = 'food__' + currentFoodSubcat + '__' + idx;
+    const qty = foodCart[key] ? foodCart[key].qty : 0;
+    const isSoldout = soldout[item.name] === true;
+    const priceEx = item.price;
+    const priceIn = taxIn(priceEx);
+    let qtyArea;
+    if (qty > 0) {
+      qtyArea = '<div class="food-item-qty" onclick="event.stopPropagation()">'
+        + '<button class="food-qty-btn" onclick="changeFoodQty(\'' + key + '\',' + idx + ',-1)">−</button>'
+        + '<span class="food-qty-num">' + qty + '</span>'
+        + '<button class="food-qty-btn plus" onclick="event.stopPropagation();changeFoodQty(\'' + key + '\',' + idx + ',1)">+</button>'
+        + '</div>';
+    } else if (!isSoldout) {
+      qtyArea = '<button class="food-qty-btn plus" onclick="event.stopPropagation();changeFoodQty(\'' + key + '\',' + idx + ',1)">+</button>';
+    } else {
+      qtyArea = '';
+    }
+    return '<div class="food-item' + (qty > 0 ? ' in-cart' : '') + (isSoldout ? ' soldout' : '') + '" onclick="changeFoodQty(\'' + key + '\',' + idx + ',1)">'
+      + (item.img ? '<img class="food-item-img" src="' + item.img + '" alt="' + item.name + '" loading="lazy" onerror="this.style.display=\'none\'">' : '')
+      + '<div class="food-item-body">'
+      + '<div class="food-item-name">' + item.name + '</div>'
+      + (item.desc ? '<div class="food-item-desc">' + item.desc + '</div>' : '')
+      + (isSoldout
+          ? '<div class="food-item-soldout">売り切れ</div>'
+          : '<div><span class="food-item-price">¥' + priceEx + '</span><span class="food-item-price-in">税込¥' + priceIn + '</span></div>')
+      + '</div>'
+      + qtyArea + '</div>';
+  });
+  document.getElementById('food-list').innerHTML = rows.join('') || '<div class="loading">商品がありません</div>';
+}
+
+window.changeFoodQty = function(key, idx, delta) {
+  const sub = key.split('__')[1];
+  const item = (FOOD_DATA[sub] || [])[idx];
+  if (!item || soldout[item.name]) return;
+  if (delta > 0 && FOOD_OPTIONS[item.name]) {
+    openFoodOpt(key, idx, item);
+    return;
+  }
+  if (!foodCart[key]) foodCart[key] = { name: item.name, price: item.price, qty: 0 };
+  foodCart[key].qty = Math.max(0, foodCart[key].qty + delta);
+  if (foodCart[key].qty === 0) delete foodCart[key];
+  renderFoodMenu();
+  renderCart();
+};
+
+// ---- カート表示 ----
+function renderCart() {
+  const nomiCount = Object.values(cart).reduce(function(s, i) { return s + i.qty; }, 0);
+  const foodCount = Object.values(foodCart).reduce(function(s, i) { return s + i.qty; }, 0);
+  const totalCount = nomiCount + foodCount;
+  const foodTotal = Math.round(Object.values(foodCart).reduce(function(s, i) { return s + taxIn(i.price) * i.qty; }, 0) / 10) * 10;
+
+  document.getElementById('cart-count').textContent = 'カート: ' + totalCount + '品';
+  document.getElementById('cart-total').textContent = foodTotal > 0 ? '¥' + foodTotal : '';
+  document.getElementById('order-btn').disabled = totalCount === 0;
+}
+
 window.clearCart = function() {
   cart = {};
-  renderMenu();
+  foodCart = {};
+  renderNomiMenu();
+  renderFoodMenu();
   renderCart();
 };
 
 // ---- 注文送信 ----
 window.placeOrder = async function() {
-  const items = Object.values(cart).map(function(c) {
-    return { name: c.name, qty: c.qty, price: c.price };
-  });
-  if (!items.length) return;
-  const taxRate = storeConfig.tax_rate || 0.1;
-  const total = Math.round(items.reduce(function(s, i) {
-    return s + Math.floor(i.price * (1 + taxRate)) * i.qty;
-  }, 0) / 10) * 10;
+  const nomiItems = Object.values(cart).map(function(c) { return { name: c.name, qty: c.qty, price: 0 }; });
+  const foodItems = Object.values(foodCart).map(function(c) { return { name: c.name, qty: c.qty, price: c.price }; });
+  const allItems = nomiItems.concat(foodItems);
+  if (!allItems.length) return;
+
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
-  await push(ref(db, 'orders'), {
-    table: String(tableNum),
-    items: items,
-    total: total,
-    status: 'new',
-    timestamp: Date.now(),
-    source: 'nomi'
-  });
+
+  // 飲み放題とフードを別々のordersとして送信（飲み放題はtotal:0）
+  const promises = [];
+  if (nomiItems.length > 0) {
+    promises.push(push(ref(db, 'orders'), {
+      table: String(tableNum),
+      items: nomiItems,
+      total: 0,
+      status: 'new',
+      timestamp: Date.now(),
+      source: 'nomi'
+    }));
+  }
+  if (foodItems.length > 0) {
+    const foodTotal = Math.round(foodItems.reduce(function(s, i) { return s + taxIn(i.price) * i.qty; }, 0) / 10) * 10;
+    promises.push(push(ref(db, 'orders'), {
+      table: String(tableNum),
+      items: foodItems,
+      total: foodTotal,
+      status: 'new',
+      timestamp: Date.now(),
+      source: 'nomi'
+    }));
+  }
+  await Promise.all(promises);
+
   cart = {};
-  renderMenu();
+  foodCart = {};
+  renderNomiMenu();
+  renderFoodMenu();
   renderCart();
   document.getElementById('order-btn').textContent = '注文する';
   const toast = document.getElementById('toast');
@@ -266,7 +480,111 @@ function updateLOBar() {
   else bar.classList.remove('warn');
 }
 
-// ---- 起動 ----
+// ---- オプション定義 ----
+const NOMI_OPTIONS = {
+  '泡盛(久米仙)': { type: 'required', label: '飲み方を選択してください', choices: ['ロック', 'ソーダ割', '水割り'] },
+  'ジャスミン焼酎(茉莉花)': { type: 'required', label: '飲み方を選択してください', choices: ['ロック', 'ソーダ割', '水割り', 'ジャスミン茶割'] },
+  '梅酒': { type: 'required', label: '飲み方を選択してください', choices: ['ロック', 'ソーダ割', '水割り'] }
+};
+const FOOD_OPTIONS = {
+  '鶏もも肉のガパオ炒め': { type: 'optional', label: 'サイドメニューを追加しますか？', choices: [{ label: 'ライス', price: 300 }, { label: '目玉焼き', price: 120 }] }
+};
+
+let pendingOpt = null;
+let selectedOpt = {};
+
+// オプションが必要な飲み放題アイテムのクリック
+function openNomiOpt(key, idx, item) {
+  var optDef = NOMI_OPTIONS[item.name];
+  if (!optDef) {
+    addNomiToCart(key, idx, item, null);
+    return;
+  }
+  pendingOpt = { type: 'nomi', key, idx, item, optDef };
+  selectedOpt = {};
+  document.getElementById('opt-item-name').textContent = item.name;
+  document.getElementById('opt-label').textContent = optDef.label;
+  document.getElementById('opt-confirm').disabled = true;
+  var html = optDef.choices.map(function(c, i) {
+    return '<div class="opt-choice" id="opt-c-' + i + '" onclick="selectOpt(' + i + ')">'
+      + '<div class="opt-choice-radio"></div>' + c + '</div>';
+  }).join('');
+  document.getElementById('opt-choices').innerHTML = html;
+  document.getElementById('opt-modal').classList.add('open');
+}
+
+// オプションが必要なフードアイテムのクリック
+function openFoodOpt(key, idx, item) {
+  var optDef = FOOD_OPTIONS[item.name];
+  if (!optDef) {
+    addFoodToCart(key, idx, item, []);
+    return;
+  }
+  pendingOpt = { type: 'food', key, idx, item, optDef };
+  selectedOpt = {};
+  document.getElementById('opt-item-name').textContent = item.name;
+  document.getElementById('opt-label').textContent = optDef.label;
+  document.getElementById('opt-confirm').disabled = false;
+  var html = optDef.choices.map(function(c, i) {
+    return '<div class="opt-choice" id="opt-c-' + i + '" onclick="selectOpt(' + i + ')">'
+      + '<div class="opt-choice-check"></div>' + c.label
+      + (c.price ? '<span class="opt-price">+¥' + c.price + '</span>' : '') + '</div>';
+  }).join('');
+  document.getElementById('opt-choices').innerHTML = html;
+  document.getElementById('opt-modal').classList.add('open');
+}
+
+window.selectOpt = function(i) {
+  var optDef = pendingOpt.optDef;
+  if (optDef.type === 'required') {
+    selectedOpt = { choice: i };
+    document.querySelectorAll('.opt-choice').forEach(function(el, j) { el.classList.toggle('selected', j === i); });
+    document.getElementById('opt-confirm').disabled = false;
+  } else {
+    if (selectedOpt[i]) delete selectedOpt[i]; else selectedOpt[i] = true;
+    document.getElementById('opt-c-' + i).classList.toggle('selected', !!selectedOpt[i]);
+  }
+};
+
+window.confirmOpt = function() {
+  if (!pendingOpt) return;
+  var item = pendingOpt.item, optDef = pendingOpt.optDef;
+  if (pendingOpt.type === 'nomi') {
+    var optLabel = optDef.choices[selectedOpt.choice];
+    addNomiToCart(pendingOpt.key, pendingOpt.idx, item, optLabel);
+  } else {
+    var extras = [];
+    optDef.choices.forEach(function(c, i) { if (selectedOpt[i]) extras.push({ label: c.label, price: c.price }); });
+    addFoodToCart(pendingOpt.key, pendingOpt.idx, item, extras);
+  }
+  window.closeOpt();
+};
+
+window.closeOpt = function() {
+  document.getElementById('opt-modal').classList.remove('open');
+  pendingOpt = null;
+};
+
+function addNomiToCart(baseKey, idx, item, optLabel) {
+  var optKey = optLabel ? '__' + optLabel : '';
+  var key = baseKey + optKey;
+  var displayName = item.name + (optLabel ? '（' + optLabel + '）' : '');
+  if (!cart[key]) cart[key] = { name: displayName, price: 0, qty: 0 };
+  cart[key].qty++;
+  renderNomiMenu();
+  renderCart();
+}
+
+function addFoodToCart(baseKey, idx, item, extras) {
+  var optKey = extras.length ? '__' + extras.map(function(e) { return e.label; }).join(',') : '';
+  var key = baseKey + optKey;
+  var price = item.price + extras.reduce(function(s, e) { return s + e.price; }, 0);
+  if (!foodCart[key]) foodCart[key] = { name: item.name, price: price, qty: 0, extras: extras };
+  foodCart[key].qty++;
+  renderFoodMenu();
+  renderCart();
+}
+
 init();
 </script>
 </body>
