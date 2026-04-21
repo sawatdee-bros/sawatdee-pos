@@ -315,6 +315,7 @@ function renderMenu() {
       + (item.img ? '<img class="menu-card-img" src="' + item.img + '" alt="' + item.name + '" loading="lazy" onerror="this.style.display=\'none\'">' : '')
       + '<div class="menu-card-body">'
       + '<div class="menu-card-name-row"><span class="menu-card-name">' + item.name + '</span>' + makeBadges(item) + (isSoldout ? '<span class="soldout-badge">売り切れ</span>' : '') + '</div>'
+      + ([item.kana, item.thai, item.en].filter(Boolean).length ? '<div class="menu-card-lang">' + [item.kana, item.thai, item.en].filter(Boolean).join(' / ') + '</div>' : '')
       + (item.desc ? '<div class="menu-card-desc">' + item.desc + '</div>' : '')
       + (!isSoldout ? '<div class="menu-card-price-row"><span class="menu-card-price">' + (priceEx === 0 ? '無料' : fmtY(priceEx)) + '</span><span class="menu-card-price-in">税込' + fmtY(priceIn) + '</span></div>' : '')
       + qtyRow
