@@ -358,8 +358,8 @@ function renderBanner() {
   const billCalls = window._billCalls || {};
   let html = '';
   Object.values(billCalls).forEach(c => {
-    html += '<div class="call-item" style="background:#1d4ed8;border-bottom-color:#1e40af;">💳 ' + tableName(c.table) + ' がお会計を希望しています' +
-      '<button onclick="window.dismissBillCall(\''+c.table+'\')" style="background:rgba(0,0,0,0.2);border:none;color:white;padding:4px 12px;border-radius:20px;cursor:pointer;font-size:12px;">対応済み</button>' +
+    html += '<div class="call-item" style="background:#1d4ed8;border-bottom-color:#1e40af;cursor:pointer;" onclick="window.gotoBill(\''+c.table+'\')">💳 ' + tableName(c.table) + ' がお会計を希望しています' +
+      '<button onclick="event.stopPropagation();window.dismissBillCall(\''+c.table+'\')" style="background:rgba(0,0,0,0.2);border:none;color:white;padding:4px 12px;border-radius:20px;cursor:pointer;font-size:12px;">対応済み</button>' +
       '</div>';
   });
   Object.values(calls).forEach(c => {
@@ -475,6 +475,14 @@ window.dismissCall = async function(tableNum) {
 
 window.dismissBillCall = async function(tableNum) {
   await remove(ref(db, 'bill_calls/' + tableNum));
+};
+
+window.gotoBill = function(tableNum) {
+  setMode('bills');
+  setTimeout(function() {
+    var el = document.querySelector('[data-table="' + tableNum + '"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300);
 };
 
 window.dismissOhiya = async function(tableNum) {
@@ -1202,6 +1210,7 @@ window.markPaid = function(tableNum, idStr) {
   // 描画後にpaxを削除（削除前に描画することでチャージ計算を正確に）
   setTimeout(function() {
     remove(ref(db, 'pax/' + tableNum));
+    remove(ref(db, 'bill_calls/' + tableNum));
     _bPax[tableNum] = 0;
   }, 500);
 };
@@ -1588,7 +1597,7 @@ function _billsRender() {
 
     var receiptCls='receipt'+(isPaid?' paid':hasActive?' active':allDone?' done':'');
 
-    html+='<div class="'+receiptCls+'">'
+    html+='<div class="'+receiptCls+'" data-table="'+tableNum+'">'
       +'<div class="receipt-top"></div>'
       +'<div class="receipt-inner">'
       +'<div class="receipt-table">'+tableName(tableNum)+'</div>'
