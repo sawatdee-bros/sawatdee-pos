@@ -536,7 +536,15 @@ window.showHistory = async function() {
     if (order.status === 'paid') return;
     (order.items || []).forEach(function(item) {
       var key = item.name + (item.extrasStr ? '__' + item.extrasStr : '');
-      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0 };
+      var baseName = item.name.replace(/（.*?）$/, '');
+      var drinkNames = [];
+      if (MENU_DATA['drink']) {
+        Object.values(MENU_DATA['drink']).forEach(function(subcatItems) {
+          (Array.isArray(subcatItems) ? subcatItems : Object.values(subcatItems)).forEach(function(i) { if (i.name) drinkNames.push(i.name); });
+        });
+      }
+      var isDrink = baseName !== 'お冷' && drinkNames.indexOf(baseName) >= 0;
+      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink };
       itemMap[key].qty += item.qty;
     });
   });
@@ -554,14 +562,14 @@ function renderHistoryModal() {
   }
   var totalEx = 0;
   var itemsHTML = _historyItems.map(function(it) {
-    var linePrice = taxIn(it.price) * it.qty;
+    var linePrice = it.price * it.qty;
     totalEx += linePrice;
     return '<div class="history-item"><span>' + it.name + '</span><div style="display:flex;gap:10px;align-items:center"><span class="history-qty">×' + it.qty + '</span><span class="history-price">' + fmtY(linePrice) + '</span></div></div>';
   }).join('');
   // チャージ計算（store_configのcharge_modeに従う）
   var drinkCount = 0;
   _historyItems.forEach(function(it) {
-    if (it.name !== 'お冷') drinkCount += it.qty;
+    if (it.isDrink) drinkCount += it.qty;
   });
   var chargeBase = _CHARGE_PER_PERSON * _historyPax;
   var chargeTotal = 0;
@@ -579,7 +587,10 @@ function renderHistoryModal() {
       ? 'チャージ料（免除：ドリンク' + drinkCount + '杯 / ' + _historyPax + '名 × ' + _CHARGE_FREE_DRINK_COUNT + '杯）'
       : 'チャージ料（¥' + _CHARGE_PER_PERSON.toLocaleString() + ' × ' + _historyPax + '名）';
   }
-  var grandTotal = Math.round((totalEx + chargeTotal) / 10) * 10;
+  // 消費税・合計計算（小計税抜＋チャージ税抜に対して消費税）
+  var finalEx = totalEx + chargeTotal;
+  var finalIn = Math.floor(finalEx * 1.1 / 10) * 10;
+  var finalTax = finalIn - finalEx;
   var paxHTML = _CHARGE_MODE === 'none' ? '' :
     '<div class="history-pax-row">'
     + '<span class="history-pax-label">人数（チャージ計算用）</span>'
@@ -588,9 +599,10 @@ function renderHistoryModal() {
     + '<button class="history-pax-btn" onclick="window.changeHistoryPax(1)">+</button>'
     + '</div>';
   var summaryHTML = '<hr class="history-divider">'
-    + '<div class="history-charge-row"><span>小計（税込）</span><span>' + fmtY(totalEx) + '</span></div>'
+    + '<div class="history-charge-row"><span>小計（税抜）</span><span>' + fmtY(totalEx) + '</span></div>'
     + (_CHARGE_MODE !== 'none' ? '<div class="history-charge-row"><span>' + chargeLabel + '</span><span>' + fmtY(chargeTotal) + '</span></div>' : '')
-    + '<div class="history-total-row"><span>合計</span><span>' + fmtY(grandTotal) + '</span></div>';
+    + '<div class="history-charge-row"><span>消費税（10%）</span><span>' + fmtY(finalTax) + '</span></div>'
+    + '<div class="history-total-row"><span>合計</span><span>' + fmtY(finalIn) + '</span></div>';
   list.innerHTML = paxHTML + itemsHTML + summaryHTML;
 }
 
@@ -624,7 +636,7 @@ window.placeOrder = async function() {
     items.push(item);
   });
   if (items.length === 0) return;
-  var total = Math.round(items.reduce(function(s, i) { return s + taxIn(i.price) * i.qty; }, 0) / 10) * 10;
+  var total = Math.floor(items.reduce(function(s, i) { return s + taxIn(i.price) * i.qty; }, 0) / 10) * 10;
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
   var orderData = { table: tableNum, items: items, total: total, status: 'new', timestamp: Date.now() };
