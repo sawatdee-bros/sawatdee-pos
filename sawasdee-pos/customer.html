@@ -314,7 +314,7 @@ function makeBadges(item) {
 
 // メニュー描画
 function renderMenu() {
-  var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active; });
+  var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active && !i.hidden; });
   var html = items.map(function(item, idx) {
     var isSoldout = soldout[item.name] === true;
     var priceEx = item.price;
