@@ -1035,13 +1035,14 @@ var _bEdit = null;
 // チャージはグローバル変数 _CHARGE_PER_PERSON / _CHARGE_MODE / _CHARGE_FREE_DRINK_COUNT を使用
 
 // チャージ計算共通関数
-function calcCharge(pax, totalDrinks) {
-  if (_CHARGE_MODE === 'none') return { chargeEx: 0, hasFreeCharge: false, isFree: true };
+// hasChargeExemptItem: 注文にcharge_exempt商品が含まれる場合はtrue
+function calcCharge(pax, totalDrinks, hasChargeExemptItem) {
+  if (_CHARGE_MODE === 'none' || hasChargeExemptItem) return { chargeEx: 0, hasFreeCharge: false, isFree: true, isExempt: !!hasChargeExemptItem };
   var chargeEx = _CHARGE_PER_PERSON * pax;
-  if (_CHARGE_MODE === 'always') return { chargeEx: chargeEx, hasFreeCharge: false, isFree: false };
+  if (_CHARGE_MODE === 'always') return { chargeEx: chargeEx, hasFreeCharge: false, isFree: false, isExempt: false };
   // conditional
   var hasFreeCharge = pax > 0 && totalDrinks >= pax * _CHARGE_FREE_DRINK_COUNT;
-  return { chargeEx: chargeEx, hasFreeCharge: hasFreeCharge, isFree: hasFreeCharge };
+  return { chargeEx: chargeEx, hasFreeCharge: hasFreeCharge, isFree: hasFreeCharge, isExempt: false };
 }
 
 const _newIdTs = new Map(); // 新着注文IDとその検知時刻
@@ -1167,7 +1168,12 @@ window.openCheckout = function(tableNum, idStr) {
   // 伝票と完全に同じ計算式
   var totalEx = 0;
   sorted.forEach(function(it){ totalEx += it.price * it.qty; });
-  var chargeResult = calcCharge(pax, totalDrinks);
+  // charge_exempt商品が含まれるか判定
+  var hasExempt = keys.some(function(id) {
+    var o = _bOrders[id]; if (!o) return false;
+    return (o.items||[]).some(function(it) { return it.charge_exempt; });
+  });
+  var chargeResult = calcCharge(pax, totalDrinks, hasExempt);
   var chargeEx = chargeResult.chargeEx;
   var hasFreeCharge = chargeResult.hasFreeCharge;
   var finalEx = totalEx + (chargeResult.isFree ? 0 : chargeEx);
@@ -1489,7 +1495,8 @@ function _billsRender() {
         if (DRINKS.indexOf(items[k].name)>=0&&items[k].name!=='お冷') totalDrinks+=items[k].qty;
       }
     }
-    var chargeResult=calcCharge(pax,totalDrinks);
+    var hasExempt2=s.entries.some(function(e){return (e.o.items||[]).some(function(it){return it.charge_exempt;});});
+    var chargeResult=calcCharge(pax,totalDrinks,hasExempt2);
     var hasFreeCharge=chargeResult.hasFreeCharge;
     var chargeEx=chargeResult.chargeEx;
     var finalEx=sessionEx+(chargeResult.isFree?0:chargeEx);
@@ -1580,7 +1587,8 @@ function _billsRender() {
     for (var j=0;j<drinkList.length;j++) {
       if (drinkList[j].name !== 'お冷') totalDrinks+=drinkList[j].qty;
     }
-    var chargeResult=calcCharge(pax,totalDrinks);
+    var hasExempt3=entries.some(function(e){return (e.o.items||[]).some(function(it){return it.charge_exempt;});});
+    var chargeResult=calcCharge(pax,totalDrinks,hasExempt3);
     var chargeEx=chargeResult.chargeEx;
     var hasFreeCharge=chargeResult.hasFreeCharge;
     var finalEx=totalEx+(chargeResult.isFree?0:chargeEx);

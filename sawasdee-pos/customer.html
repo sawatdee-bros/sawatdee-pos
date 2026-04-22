@@ -314,7 +314,7 @@ function makeBadges(item) {
 
 // メニュー描画
 function renderMenu() {
-  var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active && !i.hidden; });
+  var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active; });
   var html = items.map(function(item, idx) {
     var isSoldout = soldout[item.name] === true;
     var priceEx = item.price;
@@ -544,7 +544,7 @@ window.showHistory = async function() {
         });
       }
       var isDrink = baseName !== 'お冷' && drinkNames.indexOf(baseName) >= 0;
-      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink };
+      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink, charge_exempt: !!item.charge_exempt };
       itemMap[key].qty += item.qty;
     });
   });
@@ -568,15 +568,17 @@ function renderHistoryModal() {
   }).join('');
   // チャージ計算（store_configのcharge_modeに従う）
   var drinkCount = 0;
+  var hasExemptItem = false;
   _historyItems.forEach(function(it) {
     if (it.isDrink) drinkCount += it.qty;
+    if (it.charge_exempt) hasExemptItem = true;
   });
   var chargeBase = _CHARGE_PER_PERSON * _historyPax;
   var chargeTotal = 0;
   var chargeLabel = '';
-  if (_CHARGE_MODE === 'none') {
+  if (_CHARGE_MODE === 'none' || hasExemptItem) {
     chargeTotal = 0;
-    chargeLabel = 'チャージなし';
+    chargeLabel = hasExemptItem ? 'チャージ料（コース注文のため免除）' : 'チャージなし';
   } else if (_CHARGE_MODE === 'always') {
     chargeTotal = chargeBase;
     chargeLabel = 'チャージ料（¥' + _CHARGE_PER_PERSON.toLocaleString() + ' × ' + _historyPax + '名）';
