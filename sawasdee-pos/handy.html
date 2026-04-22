@@ -369,7 +369,7 @@ window.placeOrder = async function() {
   if (!items.length || !currentTable) return;
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
-  const total = Math.round(items.filter(i => i.price > 0).reduce((s, i) => s + taxIn(i.price) * i.qty, 0) / 10) * 10;
+  const total = Math.floor(items.filter(i => i.price > 0).reduce((s, i) => s + taxIn(i.price) * i.qty, 0) / 10) * 10;
   const hasSetItems = Object.keys(cart).some(k => k.startsWith('set__'));
   const hasNonSetItems = Object.keys(cart).some(k => !k.startsWith('set__') && k !== 'ohiya');
   const orderData = {

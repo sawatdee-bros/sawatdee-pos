@@ -1171,7 +1171,7 @@ window.openCheckout = function(tableNum, idStr) {
   var chargeEx = chargeResult.chargeEx;
   var hasFreeCharge = chargeResult.hasFreeCharge;
   var finalEx = totalEx + (chargeResult.isFree ? 0 : chargeEx);
-  var grandTotal = Math.round(Math.floor(finalEx * 1.1) / 10) * 10;
+  var grandTotal = Math.floor(Math.floor(finalEx * 1.1) / 10) * 10;
   var grandTax = grandTotal - finalEx;
 
   // 伝票スタイルで組み立て
@@ -1493,7 +1493,7 @@ function _billsRender() {
     var hasFreeCharge=chargeResult.hasFreeCharge;
     var chargeEx=chargeResult.chargeEx;
     var finalEx=sessionEx+(chargeResult.isFree?0:chargeEx);
-    totalSales += Math.round(Math.floor(finalEx*1.1)/10)*10;
+    totalSales += Math.floor(Math.floor(finalEx*1.1)/10)*10;
   }
   document.getElementById('sum-count').textContent = allKeys.length;
   document.getElementById('sum-active').textContent = activeCount;
@@ -1584,7 +1584,7 @@ function _billsRender() {
     var chargeEx=chargeResult.chargeEx;
     var hasFreeCharge=chargeResult.hasFreeCharge;
     var finalEx=totalEx+(chargeResult.isFree?0:chargeEx);
-    var finalIn=Math.round(Math.floor(finalEx*1.1)/10)*10;
+    var finalIn=Math.floor(Math.floor(finalEx*1.1)/10)*10;
     var finalTax=finalIn-finalEx;
 
     var firstTime=fmtDate(entries[0].o.timestamp);
