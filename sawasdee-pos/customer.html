@@ -379,9 +379,10 @@ function renderCart() {
       + '<span class="cart-item-price">' + fmtY(totalPrice * c.qty) + '</span>'
       + '</div>';
   });
+  var totalInRounded = Math.floor(totalIn / 10) * 10;
   document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
   document.getElementById('cart-total-ex').textContent = fmtY(totalEx);
-  document.getElementById('cart-total').textContent = '税込 ' + fmtY(totalIn);
+  document.getElementById('cart-total').textContent = '税込 ' + fmtY(totalInRounded);
   document.getElementById('cart-preview').innerHTML = previewHTML;
   document.getElementById('order-btn').disabled = count === 0;
   document.getElementById('cancel-btn').disabled = count === 0;
