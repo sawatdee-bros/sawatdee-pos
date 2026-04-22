@@ -41,6 +41,16 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .toggle input:checked + .toggle-slider { background: #166534; }
 .toggle input:checked + .toggle-slider:before { transform: translateX(22px); }
 
+/* チャージモード選択 */
+.radio-group { display: flex; flex-direction: column; gap: 0; }
+.radio-row { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid #334155; cursor: pointer; }
+.radio-row:first-child { border-top: none; }
+.radio-label { font-size: 14px; color: #f1f5f9; flex: 1; }
+.radio-label-sub { font-size: 11px; color: #64748b; margin-top: 1px; }
+.radio-input { width: 18px; height: 18px; accent-color: #166534; cursor: pointer; flex-shrink: 0; }
+.charge-conditional-opts { padding: 10px 16px 14px; border-top: 1px solid #334155; background: #0f172a; display: none; }
+.charge-conditional-opts.show { display: block; }
+
 /* 時刻セレクト */
 .hour-select { background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; padding: 8px 12px; font-size: 14px; font-family: inherit; cursor: pointer; }
 .hour-select:focus { outline: none; border-color: #166534; }
@@ -109,13 +119,35 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
         <input class="field-input" type="number" id="charge_per_person" min="0">
         <span class="field-unit">円</span>
       </div>
-      <div class="field-row">
-        <div class="field-label">
-          <div class="field-label-main">チャージ免除ドリンク数</div>
-          <div class="field-label-sub">1名あたり〇杯以上でチャージ免除</div>
+      <div class="radio-group">
+        <label class="radio-row" onclick="window.updateChargeMode('none')">
+          <input class="radio-input" type="radio" name="charge_mode" value="none" id="charge_mode_none">
+          <div class="field-label">
+            <div class="radio-label">チャージなし</div>
+            <div class="field-label-sub">チャージ料を請求しない</div>
+          </div>
+        </label>
+        <label class="radio-row" onclick="window.updateChargeMode('conditional')">
+          <input class="radio-input" type="radio" name="charge_mode" value="conditional" id="charge_mode_conditional">
+          <div class="field-label">
+            <div class="radio-label">条件付き免除</div>
+            <div class="field-label-sub">ドリンク○杯以上で免除</div>
+          </div>
+        </label>
+        <label class="radio-row" onclick="window.updateChargeMode('always')">
+          <input class="radio-input" type="radio" name="charge_mode" value="always" id="charge_mode_always">
+          <div class="field-label">
+            <div class="radio-label">常にチャージ</div>
+            <div class="field-label-sub">条件なく必ずチャージを請求する</div>
+          </div>
+        </label>
+      </div>
+      <div class="charge-conditional-opts" id="charge-conditional-opts">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="field-label-main" style="flex:1">免除になるドリンク数（1名あたり）</div>
+          <input class="field-input" type="number" id="charge_free_drink_count" min="1" style="width:80px">
+          <span class="field-unit">杯以上</span>
         </div>
-        <input class="field-input" type="number" id="charge_free_drink_count" min="0">
-        <span class="field-unit">杯</span>
       </div>
     </div>
   </div>
@@ -221,7 +253,9 @@ var DEFAULTS = {
   has_nomi_hodai: true,
   has_call_button: false,
   show_set_on_customer: false,
-  day_start_hour: 8
+  day_start_hour: 8,
+  charge_mode: 'conditional',
+  charge_free_drink_count: 2
 };
 
 // Firebase読み込み
@@ -231,6 +265,9 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('tax_rate').value = cfg.tax_rate;
   document.getElementById('charge_per_person').value = cfg.charge_per_person;
   document.getElementById('charge_free_drink_count').value = cfg.charge_free_drink_count;
+  var mode = cfg.charge_mode || 'conditional';
+  document.querySelector('input[name="charge_mode"][value="' + mode + '"]').checked = true;
+  window.updateChargeMode(mode);
   document.getElementById('table_count').value = cfg.table_count;
   document.getElementById('nomi_table_count').value = cfg.nomi_table_count;
   document.getElementById('has_ohiya').checked = !!cfg.has_ohiya;
@@ -244,6 +281,12 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('loading').textContent = '読み込みに失敗しました: ' + e.message;
 });
 
+window.updateChargeMode = function(mode) {
+  document.querySelectorAll('input[name="charge_mode"]').forEach(function(r) { r.checked = r.value === mode; });
+  var opts = document.getElementById('charge-conditional-opts');
+  if (opts) opts.classList.toggle('show', mode === 'conditional');
+};
+
 window.saveAll = async function() {
   var btn = document.getElementById('save-btn');
   btn.disabled = true;
@@ -252,7 +295,8 @@ window.saveAll = async function() {
     store_name: document.getElementById('store_name').value,
     tax_rate: parseFloat(document.getElementById('tax_rate').value) || 0.1,
     charge_per_person: parseInt(document.getElementById('charge_per_person').value) || 0,
-    charge_free_drink_count: parseInt(document.getElementById('charge_free_drink_count').value) || 0,
+    charge_free_drink_count: parseInt(document.getElementById('charge_free_drink_count').value) || 2,
+    charge_mode: document.querySelector('input[name="charge_mode"]:checked').value || 'conditional',
     table_count: parseInt(document.getElementById('table_count').value) || 1,
     nomi_table_count: parseInt(document.getElementById('nomi_table_count').value) || 0,
     has_ohiya: document.getElementById('has_ohiya').checked,

@@ -335,9 +335,18 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
-// 営業日切り替え時刻（store_configから動的取得、デフォルト8時）
+// 営業日切り替え時刻・チャージ設定（store_configから動的取得）
 let DAY_START = 8;
-get(ref(db, 'store_config/day_start_hour')).then(function(snap) { if (snap.val() !== null) DAY_START = snap.val(); });
+let _CHARGE_PER_PERSON = 250;
+let _CHARGE_MODE = 'conditional'; // none / conditional / always
+let _CHARGE_FREE_DRINK_COUNT = 2;
+get(ref(db, 'store_config')).then(function(snap) {
+  var cfg = snap.val() || {};
+  if (cfg.day_start_hour !== null && cfg.day_start_hour !== undefined) DAY_START = cfg.day_start_hour;
+  if (cfg.charge_per_person !== undefined) _CHARGE_PER_PERSON = cfg.charge_per_person;
+  if (cfg.charge_mode) _CHARGE_MODE = cfg.charge_mode;
+  if (cfg.charge_free_drink_count !== undefined) _CHARGE_FREE_DRINK_COUNT = cfg.charge_free_drink_count;
+});
 
 const KITCHEN_NAMES = {"生ビール 中ジョッキ": "生ジョッキ", "瓶ビール 大びん": "赤星　大びん", "ノンアルビール 小びん": "ノンアルビール", "シンハー": "シンハー", "チャーン": "チャーン", "リオ": "リオ", "マンゴービア": "マンゴービア", "グアバビア": "グアバビア", "メガ角ハイボール": "メガ角ハイボール", "角ハイボール": "角ハイボール", "ジンジャー角ハイボール": "ジンジャー角ハイボール", "コーク角ハイボール": "コーク角ハイボール", "メコンハイボール": "メコンハイボール", "メコンジンジャー": "メコンジンジャー", "メコンコーク": "メコンコーク", "タイサワー": "タイサワー", "パクチーレモンサワー": "パクチーレモンサワー", "タイ式漢方サワー": "漢方サワー", "レモンサワー": "レモンサワー", "クエン酸サワー": "クエンサンサワー", "バイス(梅しそ)サワー": "バイスサワー", "チューハイ": "チューハイ", "ウーロンハイ": "ウーロンハイ", "ジャスミンハイ": "ジャスミンハイ", "ホッピー": "ホッピー", "ホッピー中": "ホッピー中", "ホッピー外": "ホッピー外", "マンゴーハイ": "マンゴーハイ", "グアバハイ": "グアバハイ", "タイ紅茶ハイ": "タイ紅茶ハイ", "マンゴーミルクハイ": "マンゴーミルクハイ", "グアバミルクハイ": "グアバミルクハイ", "カシスソーダ": "カシスソーダ", "カシスウーロン": "カシスウーロン", "カシスマンゴー": "カシスマンゴー", "テキーラコーク": "テキーラコーク", "テキーラグアバ": "テキーラグアバ", "テキーラショット": "テキーラショット", "泡盛(久米仙)": "泡盛　久米仙", "ジャスミン焼酎(茉莉花)": "ジャスミン焼酎", "梅酒": "梅酒", "グラスワイン 赤": "グラスワイン赤", "グラスワイン 白": "グラスワイン白", "デキャンタ 赤": "デキャンタ赤", "デキャンタ 白": "デキャンタ白", "ボトルワイン 赤": "ボトルワイン赤", "ボトルワイン 白": "ボトルワイン白", "マンゴージュース": "マンゴージュース", "グアバジュース": "グアバジュース", "タイ紅茶(タイ式ミルクティー)": "タイ紅茶", "炭酸水(カットレモン入り)": "炭酸水", "コカコーラ": "コカコーラ", "ジンジャーエール(辛口)": "ジンジャーエール", "ウーロン茶": "ウーロン茶", "ジャスミン茶": "ジャスミン茶", "ノンアル★タイサワー": "ノンアル★タイサワー", "ノンアル★マンゴーミルク": "ノンアル★マンゴーミルク", "お冷": "お冷", "キャベツ": "キャベツ", "セロリ": "セロリ", "タイの海老せん": "海老せん", "ピリ辛枝豆": "枝豆", "タイの漬物缶詰": "漬物缶詰", "おつまみキュウリ": "きゅうり", "カリカリ厚揚げ": "厚揚げ", "パク乗せ冷奴": "冷奴", "コリコリ豚耳": "豚耳", "アジのトマト煮": "アジ", "タイ式生ソーセージ(ネーム)": "ネーム", "青パパイヤのサラダ": "ソムタム", "青パパイヤのサラダ（激辛バージョン）": "ソムタム ラオ", "青パパイヤのサラダ（豚グリル入り）": "ソムタム ムーヤーン", "温かい春雨サラダ": "ヤム ウンセン", "揚げ目玉焼きのサラダ": "ヤム カイダオ", "茹で鶏のサラダ": "ヤム ガイ", "海老とレモングラスのサラダ": "ヤム クン", "鶏もも肉のタイ式グリル": "ガイヤーン", "豚肉のタイ式グリル": "ムーヤーン", "タイ式海老のグリル": "クン パオ", "タイ式豚グリルのハーブ和え": "ナムトック ムー", "タイ式ヌードル香味野菜和え": "ヤム マーマー", "キャベツの海老味噌醤炒め": "ガピキャベツ", "蒸し鶏 生姜ソース": "蒸し鶏", "鶏ひき肉のハーブ和え": "ラープ ガイ", "スパイシー鶏唐揚げ": "ガイトード", "タイ式揚げ春巻き(パクチー入)": "ポッピア トード", "揚げ海老のニンニク炒め": "クンガティアム", "ポテトフライ 2種のソース": "ポテト", "タイ式揚げオムレツ": "カイジャオ", "タイ式揚げオムレツ(ソーセージ入)": "カイジャオネーム", "海老とハーブの酸っぱ辛いスープ": "トムヤムクン", "鶏肉のココナッツミルクスープ": "トムカーガイ", "鶏もも肉のガパオ炒め": "ガパオ", "豚肉のカレー炒め": "ムーパッポンカリー", "海老のカレー炒め": "クンパッポンカリー", "鶏肉とセロリの生姜炒め": "ガイパッキン", "豚肉のガーリック炒め": "ムー ガティアム", "季節の青菜炒め": "パックブン", "厚揚げともやしの炒め": "パット トゥアンゴーク", "茄子と豚肉のバジル炒め": "パット マクワ", "春雨の旨辛ソース炒め": "スッキー ヘーン", "春雨のオイスター炒め": "パット ウンセン", "タイ式焼きそば": "パッタイ", "旨辛バジル炒め麺": "パッキーマオ", "タイ式まぜそば": "ヘーン（まぜそば）", "タイ式汁そば": "ナーム（汁そば）", "トムヤムクンヌードル": "トムヤムヌードル", "グリーンカレー": "ゲーンキャオワーン", "蒸し鶏ご飯": "カオマンガイ", "タイ式焼き飯": "カオパッ", "ライス": "ライス", "目玉焼き": "目玉焼き", "ココナッツアイスサンド": "ココナッツアイスサンド", "ココナッツアイス": "ココナッツアイス"};
 
@@ -602,7 +611,7 @@ function renderOrders() {
 
   let fHTML = '', fHTMLCompact = '', dHTML = '';
 
-  // フード用グループで描画（セット商品も含む）
+  // フード用グループで描画
   foodGroups.forEach(g => {
     let foodItems = [];
     g.ids.forEach(id => {
@@ -619,7 +628,7 @@ function renderOrders() {
     fHTMLCompact += makeGroupCard(g, foodItems, 'food', totalMap, true);
   });
 
-  // ドリンク用グループで描画（セット商品も含む）
+  // ドリンク用グループで描画
   drinkGroups.forEach(g => {
     let drinkItems = [];
     g.ids.forEach(id => {
@@ -633,24 +642,6 @@ function renderOrders() {
       });
     });
     dHTML += makeGroupCard(g, drinkItems, 'drink', totalMap, false);
-  });
-
-  // セット商品はフードタブのみに表示
-  foodGroups.forEach(g => {
-    let setItems = [];
-    g.ids.forEach(id => {
-      const o = orders[id];
-      if (o.source !== 'set') return;
-      const done = o.itemsDone || {};
-      const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
-      arr.forEach((i, idx) => {
-        setItems.push({i, idx, id, done: !!done[idx]});
-      });
-    });
-    if (setItems.length > 0) {
-      fHTML += makeGroupCard(g, setItems, 'food', totalMap, false, true);
-      fHTMLCompact += makeGroupCard(g, setItems, 'food', totalMap, true, true);
-    }
   });
 
   const emptyF = '<div class="empty-state" style="height:40vh"><div style="font-size:32px">🍽️</div><div style="font-size:14px;margin-top:8px">注文待ち</div></div>';
@@ -669,7 +660,7 @@ function renderOrders() {
   }
 }
 
-function makeGroupCard(g, items, type, totalMap, compact, isSet) {
+function makeGroupCard(g, items, type, totalMap, compact) {
   if (items.length === 0) return '';
   // 全提供済みなら非表示
   if (items.every(e => e.done)) return '';
@@ -707,7 +698,7 @@ function makeGroupCard(g, items, type, totalMap, compact, isSet) {
   const isNomi = g.ids.some(id => orders[id] && orders[id].source === 'nomi');
   return `<div class="order-card${isGroupNew?' new':''}">
     <div class="order-card-header">
-      <span class="table-label">${tableName(repO.table)}${isNomi?' <span class="nomi-badge">🍻 飲み放題</span>':''}${isSet?' <span class="nomi-badge" style="background:#166534;">🎁 セット</span>':''}</span>
+      <span class="table-label">${tableName(repO.table)}${isNomi?' <span class="nomi-badge">🍻 飲み放題</span>':''}</span>
       <span class="time-label">${fmt(repO.timestamp)}</span>
     </div>
     ${doneBlock}
@@ -767,7 +758,7 @@ window.groupDone = async function(id, type) {
   const prevStatus = orders[id].status;
   (orders[id].items||[]).forEach((i,idx) => {
     const isDrink = DRINKS.some(function(d){return i.name===d||i.name.startsWith(d+'（');});
-    if ((type==='drink'&&isDrink)||(type==='food'&&!isDrink)||(type==='food'&&orders[id].source==='set')) orders[id].itemsDone[idx] = true;
+    if ((type==='drink'&&isDrink)||(type==='food'&&!isDrink)) orders[id].itemsDone[idx] = true;
   });
   const allDone = orders[id].items.every((_,i) => orders[id].itemsDone[i]);
   if (allDone) {
@@ -1041,7 +1032,18 @@ onValue(ref(db, 'pax'), function(snap) {
   if (currentMode === 'bills') _billsRenderWrap();
 });
 var _bEdit = null;
-var _bCHARGE = 250;
+// チャージはグローバル変数 _CHARGE_PER_PERSON / _CHARGE_MODE / _CHARGE_FREE_DRINK_COUNT を使用
+
+// チャージ計算共通関数
+function calcCharge(pax, totalDrinks) {
+  if (_CHARGE_MODE === 'none') return { chargeEx: 0, hasFreeCharge: false, isFree: true };
+  var chargeEx = _CHARGE_PER_PERSON * pax;
+  if (_CHARGE_MODE === 'always') return { chargeEx: chargeEx, hasFreeCharge: false, isFree: false };
+  // conditional
+  var hasFreeCharge = pax > 0 && totalDrinks >= pax * _CHARGE_FREE_DRINK_COUNT;
+  return { chargeEx: chargeEx, hasFreeCharge: hasFreeCharge, isFree: hasFreeCharge };
+}
+
 const _newIdTs = new Map(); // 新着注文IDとその検知時刻
 
 var _bRange = 'today'; // 'today' or 'week'
@@ -1165,9 +1167,10 @@ window.openCheckout = function(tableNum, idStr) {
   // 伝票と完全に同じ計算式
   var totalEx = 0;
   sorted.forEach(function(it){ totalEx += it.price * it.qty; });
-  var chargeEx = _bCHARGE * pax;
-  var hasFreeCharge = totalDrinks >= pax * 2;
-  var finalEx = totalEx + (hasFreeCharge ? 0 : chargeEx);
+  var chargeResult = calcCharge(pax, totalDrinks);
+  var chargeEx = chargeResult.chargeEx;
+  var hasFreeCharge = chargeResult.hasFreeCharge;
+  var finalEx = totalEx + (chargeResult.isFree ? 0 : chargeEx);
   var grandTotal = Math.round(Math.floor(finalEx * 1.1) / 10) * 10;
   var grandTax = grandTotal - finalEx;
 
@@ -1486,9 +1489,10 @@ function _billsRender() {
         if (DRINKS.indexOf(items[k].name)>=0&&items[k].name!=='お冷') totalDrinks+=items[k].qty;
       }
     }
-    var hasFreeCharge=totalDrinks>=pax*2;
-    var chargeEx=_bCHARGE*pax;
-    var finalEx=sessionEx+(hasFreeCharge?0:chargeEx);
+    var chargeResult=calcCharge(pax,totalDrinks);
+    var hasFreeCharge=chargeResult.hasFreeCharge;
+    var chargeEx=chargeResult.chargeEx;
+    var finalEx=sessionEx+(chargeResult.isFree?0:chargeEx);
     totalSales += Math.round(Math.floor(finalEx*1.1)/10)*10;
   }
   document.getElementById('sum-count').textContent = allKeys.length;
@@ -1576,9 +1580,10 @@ function _billsRender() {
     for (var j=0;j<drinkList.length;j++) {
       if (drinkList[j].name !== 'お冷') totalDrinks+=drinkList[j].qty;
     }
-    var chargeEx=_bCHARGE*pax;
-    var hasFreeCharge=totalDrinks>=pax*2;
-    var finalEx=totalEx+(hasFreeCharge?0:chargeEx);
+    var chargeResult=calcCharge(pax,totalDrinks);
+    var chargeEx=chargeResult.chargeEx;
+    var hasFreeCharge=chargeResult.hasFreeCharge;
+    var finalEx=totalEx+(chargeResult.isFree?0:chargeEx);
     var finalIn=Math.round(Math.floor(finalEx*1.1)/10)*10;
     var finalTax=finalIn-finalEx;
 
