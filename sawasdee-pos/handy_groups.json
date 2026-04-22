@@ -1,832 +1,599 @@
 {
   "drink": [
     {
-      "name": "🍺 ビール・HB",
+      "name": "ビール・HB",
       "items": [
         {
           "name": "生ビール 中ジョッキ",
           "price": 490,
-          "sub": "ビール",
-          "bg": "#854d0e",
-          "border": "#fbbf24"
+          "subcat": "ビール"
         },
         {
           "name": "瓶ビール 大びん",
           "price": 740,
-          "sub": "ビール",
-          "bg": "#854d0e",
-          "border": "#fbbf24"
+          "subcat": "ビール"
         },
         {
           "name": "ノンアルビール 小びん",
           "price": 420,
-          "sub": "ビール",
-          "bg": "#854d0e",
-          "border": "#fbbf24"
+          "subcat": "ビール"
         },
         {
           "name": "シンハー",
           "price": 570,
-          "sub": "タイビール",
-          "bg": "#7f1d1d",
-          "border": "#f87171"
+          "subcat": "タイビール"
         },
         {
           "name": "チャーン",
           "price": 570,
-          "sub": "タイビール",
-          "bg": "#7f1d1d",
-          "border": "#f87171"
+          "subcat": "タイビール"
         },
         {
           "name": "リオ",
           "price": 570,
-          "sub": "タイビール",
-          "bg": "#7f1d1d",
-          "border": "#f87171"
+          "subcat": "タイビール"
         },
         {
           "name": "マンゴービア",
           "price": 590,
-          "sub": "ビアカクテル",
-          "bg": "#14532d",
-          "border": "#4ade80"
+          "subcat": "ビアカクテル"
         },
         {
           "name": "グアバビア",
           "price": 590,
-          "sub": "ビアカクテル",
-          "bg": "#14532d",
-          "border": "#4ade80"
+          "subcat": "ビアカクテル"
         },
         {
           "name": "メガ角ハイボール",
           "price": 680,
-          "sub": "ハイボール",
-          "bg": "#4a1d96",
-          "border": "#c084fc"
+          "subcat": "ハイボール"
         },
         {
           "name": "角ハイボール",
           "price": 380,
-          "sub": "ハイボール",
-          "bg": "#4a1d96",
-          "border": "#c084fc"
+          "subcat": "ハイボール"
         },
         {
           "name": "ジンジャー角ハイボール",
           "price": 440,
-          "sub": "ハイボール",
-          "bg": "#4a1d96",
-          "border": "#c084fc"
+          "subcat": "ハイボール"
         },
         {
           "name": "コーク角ハイボール",
           "price": 440,
-          "sub": "ハイボール",
-          "bg": "#4a1d96",
-          "border": "#c084fc"
+          "subcat": "ハイボール"
         },
         {
           "name": "メコンハイボール",
           "price": 490,
-          "sub": "ハイボール",
-          "bg": "#4a1d96",
-          "border": "#c084fc"
+          "subcat": "ハイボール"
         },
         {
           "name": "メコンジンジャー",
           "price": 540,
-          "sub": "ハイボール",
-          "bg": "#4a1d96",
-          "border": "#c084fc"
+          "subcat": "ハイボール"
         },
         {
           "name": "メコンコーク",
           "price": 540,
-          "sub": "ハイボール",
-          "bg": "#4a1d96",
-          "border": "#c084fc"
+          "subcat": "ハイボール"
         }
       ]
     },
     {
-      "name": "🍹 サワー・カクテル",
+      "name": "サワー・カクテル",
       "items": [
         {
           "name": "タイサワー",
           "price": 650,
-          "sub": "おすすめ",
-          "bg": "#7c2d12",
-          "border": "#fb923c"
+          "subcat": "おすすめ"
         },
         {
           "name": "パクチーレモンサワー",
           "price": 580,
-          "sub": "おすすめ",
-          "bg": "#7c2d12",
-          "border": "#fb923c"
+          "subcat": "おすすめ"
         },
         {
           "name": "タイ式漢方サワー",
           "price": 580,
-          "sub": "おすすめ",
-          "bg": "#7c2d12",
-          "border": "#fb923c"
+          "subcat": "おすすめ"
         },
         {
           "name": "レモンサワー",
           "price": 420,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "クエン酸サワー",
           "price": 420,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "バイス(梅しそ)サワー",
           "price": 420,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "チューハイ",
           "price": 420,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "ウーロンハイ",
           "price": 380,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "ジャスミンハイ",
           "price": 380,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "ホッピー",
           "price": 480,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "ホッピー中",
           "price": 250,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "ホッピー外",
           "price": 250,
-          "sub": "サワー・お茶割り",
-          "bg": "#0c4a6e",
-          "border": "#38bdf8"
+          "subcat": "サワー・お茶割り"
         },
         {
           "name": "マンゴーハイ",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "グアバハイ",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "タイ紅茶ハイ",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "マンゴーミルクハイ",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "グアバミルクハイ",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "カシスソーダ",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "カシスウーロン",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "カシスマンゴー",
           "price": 580,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "テキーラコーク",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "テキーラグアバ",
           "price": 550,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         },
         {
           "name": "テキーラショット",
           "price": 400,
-          "sub": "トロピカルハイ・カクテル",
-          "bg": "#831843",
-          "border": "#f472b6"
+          "subcat": "トロピカルハイ・カクテル"
         }
       ]
     },
     {
-      "name": "🍶 焼酎・ワイン・ソフト",
+      "name": "焼酎・ワイン・ソフト",
       "items": [
         {
           "name": "泡盛(久米仙)",
           "price": 480,
-          "sub": "焼酎・その他",
-          "bg": "#1e3a8a",
-          "border": "#60a5fa"
+          "subcat": "焼酎・その他"
         },
         {
           "name": "ジャスミン焼酎(茉莉花)",
           "price": 480,
-          "sub": "焼酎・その他",
-          "bg": "#1e3a8a",
-          "border": "#60a5fa"
+          "subcat": "焼酎・その他"
         },
         {
           "name": "梅酒",
           "price": 480,
-          "sub": "焼酎・その他",
-          "bg": "#1e3a8a",
-          "border": "#60a5fa"
+          "subcat": "焼酎・その他"
         },
         {
           "name": "グラスワイン 赤",
           "price": 380,
-          "sub": "ワイン",
-          "bg": "#500724",
-          "border": "#fda4af"
+          "subcat": "ワイン"
         },
         {
           "name": "グラスワイン 白",
           "price": 380,
-          "sub": "ワイン",
-          "bg": "#500724",
-          "border": "#fda4af"
+          "subcat": "ワイン"
         },
         {
           "name": "デキャンタ 赤",
           "price": 1600,
-          "sub": "ワイン",
-          "bg": "#500724",
-          "border": "#fda4af"
+          "subcat": "ワイン"
         },
         {
           "name": "デキャンタ 白",
           "price": 1600,
-          "sub": "ワイン",
-          "bg": "#500724",
-          "border": "#fda4af"
+          "subcat": "ワイン"
         },
         {
           "name": "ボトルワイン 赤",
           "price": 2200,
-          "sub": "ワイン",
-          "bg": "#500724",
-          "border": "#fda4af"
+          "subcat": "ワイン"
         },
         {
           "name": "ボトルワイン 白",
           "price": 2200,
-          "sub": "ワイン",
-          "bg": "#500724",
-          "border": "#fda4af"
+          "subcat": "ワイン"
         },
         {
           "name": "マンゴージュース",
           "price": 480,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "グアバジュース",
           "price": 480,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "タイ紅茶(タイ式ミルクティー)",
           "price": 480,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "炭酸水(カットレモン入り)",
           "price": 480,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "コカコーラ",
           "price": 480,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "ジンジャーエール(辛口)",
           "price": 480,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "ウーロン茶",
           "price": 440,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "ジャスミン茶",
           "price": 440,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "ノンアル★タイサワー",
           "price": 650,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         },
         {
           "name": "ノンアル★マンゴーミルク",
           "price": 550,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
-        },
-        {
-          "name": "お冷",
-          "price": 0,
-          "sub": "ソフトドリンク",
-          "bg": "#064e3b",
-          "border": "#34d399"
+          "subcat": "ソフトドリンク"
         }
       ]
     }
   ],
   "food": [
     {
-      "name": "🍡 つまみ・サラダ",
+      "name": "つまみ・サラダ",
       "items": [
         {
           "name": "キャベツ",
           "price": 120,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "セロリ",
           "price": 220,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "タイの海老せん",
           "price": 280,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "ピリ辛枝豆",
           "price": 280,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "タイの漬物缶詰",
           "price": 280,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "おつまみキュウリ",
           "price": 280,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "カリカリ厚揚げ",
           "price": 280,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "パク乗せ冷奴",
           "price": 280,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "コリコリ豚耳",
           "price": 280,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "アジのトマト煮",
           "price": 420,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "タイ式生ソーセージ(ネーム)",
           "price": 440,
-          "sub": "つまみ",
-          "bg": "#713f12",
-          "border": "#fde047"
+          "subcat": "つまみ"
         },
         {
           "name": "青パパイヤのサラダ",
           "price": 780,
-          "sub": "サラダ・和え物",
-          "bg": "#166534",
-          "border": "#86efac"
+          "subcat": "サラダ・和え物"
         },
         {
           "name": "青パパイヤのサラダ（激辛バージョン）",
           "price": 880,
-          "sub": "サラダ・和え物",
-          "bg": "#166534",
-          "border": "#86efac"
+          "subcat": "サラダ・和え物"
         },
         {
           "name": "青パパイヤのサラダ（豚グリル入り）",
           "price": 880,
-          "sub": "サラダ・和え物",
-          "bg": "#166534",
-          "border": "#86efac"
+          "subcat": "サラダ・和え物"
         },
         {
           "name": "温かい春雨サラダ",
           "price": 780,
-          "sub": "サラダ・和え物",
-          "bg": "#166534",
-          "border": "#86efac"
+          "subcat": "サラダ・和え物"
         },
         {
           "name": "揚げ目玉焼きのサラダ",
           "price": 680,
-          "sub": "サラダ・和え物",
-          "bg": "#166534",
-          "border": "#86efac"
+          "subcat": "サラダ・和え物"
         },
         {
           "name": "茹で鶏のサラダ",
           "price": 680,
-          "sub": "サラダ・和え物",
-          "bg": "#166534",
-          "border": "#86efac"
+          "subcat": "サラダ・和え物"
         },
         {
           "name": "海老とレモングラスのサラダ",
           "price": 880,
-          "sub": "サラダ・和え物",
-          "bg": "#166534",
-          "border": "#86efac"
+          "subcat": "サラダ・和え物"
         }
       ]
     },
     {
-      "name": "🍖 一品・揚物・スープ",
+      "name": "一品・揚物・スープ",
       "items": [
         {
           "name": "鶏もも肉のタイ式グリル",
           "price": 580,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "豚肉のタイ式グリル",
           "price": 580,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "タイ式海老のグリル",
           "price": 980,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "タイ式豚グリルのハーブ和え",
           "price": 880,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "タイ式ヌードル香味野菜和え",
           "price": 720,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "キャベツの海老味噌醤炒め",
           "price": 440,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "蒸し鶏 生姜ソース",
           "price": 440,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "鶏ひき肉のハーブ和え",
           "price": 780,
-          "sub": "一品",
-          "bg": "#7f1d1d",
-          "border": "#fca5a5"
+          "subcat": "一品"
         },
         {
           "name": "スパイシー鶏唐揚げ",
           "price": 580,
-          "sub": "揚げ物",
-          "bg": "#78350f",
-          "border": "#fdba74"
+          "subcat": "揚げ物"
         },
         {
           "name": "タイ式揚げ春巻き(パクチー入)",
           "price": 620,
-          "sub": "揚げ物",
-          "bg": "#78350f",
-          "border": "#fdba74"
+          "subcat": "揚げ物"
         },
         {
           "name": "揚げ海老のニンニク炒め",
           "price": 1020,
-          "sub": "揚げ物",
-          "bg": "#78350f",
-          "border": "#fdba74"
+          "subcat": "揚げ物"
         },
         {
           "name": "ポテトフライ 2種のソース",
           "price": 380,
-          "sub": "揚げ物",
-          "bg": "#78350f",
-          "border": "#fdba74"
+          "subcat": "揚げ物"
         },
         {
           "name": "タイ式揚げオムレツ",
           "price": 580,
-          "sub": "揚げ物",
-          "bg": "#78350f",
-          "border": "#fdba74"
+          "subcat": "揚げ物"
         },
         {
           "name": "タイ式揚げオムレツ(ソーセージ入)",
           "price": 680,
-          "sub": "揚げ物",
-          "bg": "#78350f",
-          "border": "#fdba74"
+          "subcat": "揚げ物"
         },
         {
           "name": "海老とハーブの酸っぱ辛いスープ",
           "price": 980,
-          "sub": "スープ",
-          "bg": "#1e3a8a",
-          "border": "#93c5fd"
+          "subcat": "スープ"
         },
         {
           "name": "鶏肉のココナッツミルクスープ",
           "price": 880,
-          "sub": "スープ",
-          "bg": "#1e3a8a",
-          "border": "#93c5fd"
+          "subcat": "スープ"
         }
       ]
     },
     {
-      "name": "🥘 炒め・麺飯",
+      "name": "炒め・麺飯・デザート",
       "items": [
         {
           "name": "鶏もも肉のガパオ炒め",
           "price": 680,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "豚肉のカレー炒め",
           "price": 780,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "海老のカレー炒め",
           "price": 880,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "鶏肉とセロリの生姜炒め",
           "price": 780,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "豚肉のガーリック炒め",
           "price": 680,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "季節の青菜炒め",
           "price": 680,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "厚揚げともやしの炒め",
           "price": 620,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "茄子と豚肉のバジル炒め",
           "price": 680,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "春雨の旨辛ソース炒め",
           "price": 780,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "春雨のオイスター炒め",
           "price": 780,
-          "sub": "炒め物",
-          "bg": "#7f1d1d",
-          "border": "#ef4444"
+          "subcat": "炒め物"
         },
         {
           "name": "タイ式焼きそば",
           "price": 780,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "旨辛バジル炒め麺",
           "price": 780,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "タイ式まぜそば",
           "price": 680,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "タイ式汁そば",
           "price": 680,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "トムヤムクンヌードル",
           "price": 980,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "グリーンカレー",
           "price": 880,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "蒸し鶏ご飯",
           "price": 780,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "タイ式焼き飯",
           "price": 780,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "ライス",
           "price": 300,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "目玉焼き",
           "price": 120,
-          "sub": "麺・ご飯",
-          "bg": "#713f12",
-          "border": "#f59e0b"
+          "subcat": "麺・ご飯"
         },
         {
           "name": "ココナッツアイスサンド",
           "price": 440,
-          "sub": "デザート",
-          "bg": "#831843",
-          "border": "#f9a8d4"
+          "subcat": "デザート"
         },
         {
           "name": "ココナッツアイス",
           "price": 280,
-          "sub": "デザート",
-          "bg": "#831843",
-          "border": "#f9a8d4"
+          "subcat": "デザート"
         }
       ]
     }

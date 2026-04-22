@@ -164,9 +164,9 @@ function selectTable(n) {
   document.querySelectorAll('.table-btn').forEach((b, i) => {
     b.classList.toggle('active', i + 1 === n);
   });
-  if (!currentCat) {
+  if (!currentCat || !GROUPS_DATA[currentCat] || !GROUPS_DATA[currentCat].length) {
     currentCat = 'drink';
-    currentSub = GROUPS_DATA['drink'] ? GROUPS_DATA['drink'][0].name : '';
+    currentGroupIdx = 0;
   }
   renderCats();
   renderMenu();
@@ -174,10 +174,14 @@ function selectTable(n) {
 
 // カテゴリ・サブカテゴリ
 function renderCats() {
-  // 1行目：ドリンク / フード
+  // 1行目：ドリンク / フード / セット
   const catBar = document.getElementById('cat-bar');
   catBar.innerHTML = '';
-  [['drink','🥤 ドリンク'],['food','🍽 フード']].forEach(([key,label]) => {
+  const cats = [['drink','🥤 ドリンク'],['food','🍽 フード']];
+  if (GROUPS_DATA['set'] && GROUPS_DATA['set'].length > 0) {
+    cats.push(['set','🎁 セット']);
+  }
+  cats.forEach(([key,label]) => {
     const btn = document.createElement('button');
     btn.className = 'cat-btn' + (key === currentCat ? ' active' : '');
     btn.textContent = label;
@@ -202,8 +206,10 @@ function taxIn(p) { return Math.floor(p * 1.1); }
 function renderMenu() {
   const list = document.getElementById('menu-list');
   if (!currentTable) { list.innerHTML = '<div style="padding:20px;color:#64748b;text-align:center;grid-column:1/-1">テーブルを選択してください</div>'; return; }
+  if (!GROUPS_DATA[currentCat] || !GROUPS_DATA[currentCat][currentGroupIdx]) { list.innerHTML = ''; return; }
   const group = GROUPS_DATA[currentCat][currentGroupIdx];
   if (!group) return;
+  const isSet = currentCat === 'set';
   const ohiyaQty = cart['ohiya'] ? cart['ohiya'].qty : 0;
   const itemsHTML = group.items.map((item, idx) => {
     const key = currentCat + '__g' + currentGroupIdx + '__' + idx;
@@ -220,7 +226,11 @@ function renderMenu() {
       ${qty > 0 ? `<div class="menu-item-badge">${qty}</div>` : ''}
     </div>`;
   }).join('');
-  // お冷ボタンの配置：5行目の左端（21番目）が空いていればそこに、埋まっていれば最後
+  // お冷ボタンの配置：セットカテゴリでは非表示
+  if (isSet) {
+    list.innerHTML = itemsHTML;
+    return;
+  }
   const itemCount = group.items.length;
   let ohiyaStyle = '';
   if (itemCount < 21) {
@@ -360,13 +370,16 @@ window.placeOrder = async function() {
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
   const total = Math.round(items.filter(i => i.price > 0).reduce((s, i) => s + taxIn(i.price) * i.qty, 0) / 10) * 10;
-  await push(ref(db, 'orders'), {
+  const hasSetItems = Object.keys(cart).some(k => k.startsWith('set__'));
+  const hasNonSetItems = Object.keys(cart).some(k => !k.startsWith('set__') && k !== 'ohiya');
+  const orderData = {
     table: String(currentTable),
     items, total,
     status: 'new',
     timestamp: Date.now(),
-    source: 'handy'
-  });
+    source: hasSetItems && !hasNonSetItems ? 'set' : 'handy'
+  };
+  await push(ref(db, 'orders'), orderData);
   cart = {};
   renderMenu();
   renderCart();

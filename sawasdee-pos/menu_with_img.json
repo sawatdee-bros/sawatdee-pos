@@ -11,7 +11,10 @@
         "price": 650,
         "sake": false,
         "spicy": 0,
-        "img": "/img/タイサワー.jpg"
+        "img": "/img/タイサワー.jpg",
+        "kana": "",
+        "thai": "ไทยซาวเวอร์",
+        "en": "Thai Sour"
       },
       {
         "active": true,
@@ -23,7 +26,10 @@
         "price": 580,
         "sake": false,
         "spicy": 0,
-        "img": "/img/パクチーレモンサワー.jpg"
+        "img": "/img/パクチーレモンサワー.jpg",
+        "kana": "",
+        "thai": "ซาวเวอร์ผักชีมะนาว",
+        "en": "Coriander Lemon Sour"
       },
       {
         "active": true,
@@ -35,7 +41,10 @@
         "price": 580,
         "sake": false,
         "spicy": 0,
-        "img": "/img/タイ式漢方サワー.jpg"
+        "img": "/img/タイ式漢方サワー.jpg",
+        "kana": "",
+        "thai": "ซาวเวอร์ยาดอง",
+        "en": "Thai Herbal Sour"
       }
     ],
     "サワー・お茶割り": [
@@ -48,7 +57,10 @@
         "popular": "",
         "price": 420,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ซาวเวอร์มะนาว",
+        "en": "Lemon Sour"
       },
       {
         "active": true,
@@ -59,7 +71,10 @@
         "popular": "",
         "price": 420,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ซาวเวอร์กรดมะนาว",
+        "en": "Citric Acid Sour"
       },
       {
         "active": true,
@@ -70,7 +85,10 @@
         "popular": "",
         "price": 420,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ซาวเวอร์บ๊วยชิโซ",
+        "en": "Umeshiso Sour"
       },
       {
         "active": true,
@@ -81,7 +99,10 @@
         "popular": "",
         "price": 420,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "จูไฮ",
+        "en": "Chuhai"
       },
       {
         "active": true,
@@ -92,7 +113,10 @@
         "popular": "",
         "price": 380,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "อูหลงไฮ",
+        "en": "Oolong Highball"
       },
       {
         "active": true,
@@ -103,7 +127,10 @@
         "popular": "",
         "price": 380,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "จัสมินไฮ",
+        "en": "Jasmine Highball"
       },
       {
         "active": true,
@@ -114,7 +141,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ฮอปปี้",
+        "en": "Hoppy"
       },
       {
         "active": true,
@@ -125,7 +155,10 @@
         "popular": "",
         "price": 250,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ฮอปปี้",
+        "en": "naka"
       },
       {
         "active": true,
@@ -136,7 +169,10 @@
         "popular": "",
         "price": 250,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ฮอปปี้",
+        "en": "soto"
       }
     ],
     "ソフトドリンク": [
@@ -149,7 +185,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "น้ำมะม่วง",
+        "en": "Mango Juice"
       },
       {
         "active": true,
@@ -160,7 +199,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "น้ำฝรั่ง",
+        "en": "Guava Juice"
       },
       {
         "active": true,
@@ -171,7 +213,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ชาไทย",
+        "en": "Thai Milk Tea"
       },
       {
         "active": true,
@@ -182,7 +227,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "น้ำโซดามะนาว",
+        "en": "Sparkling Water w/ Lemon"
       },
       {
         "active": true,
@@ -193,7 +241,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "โค้ก",
+        "en": "Coca-Cola"
       },
       {
         "active": true,
@@ -204,7 +255,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "จินเจอร์เอล",
+        "en": "Ginger Ale (Spicy)"
       },
       {
         "active": true,
@@ -215,7 +269,10 @@
         "popular": "",
         "price": 440,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ชาอูหลง",
+        "en": "Oolong Tea"
       },
       {
         "active": true,
@@ -226,7 +283,10 @@
         "popular": "",
         "price": 440,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ชาจัสมิน",
+        "en": "Jasmine Tea"
       },
       {
         "active": true,
@@ -237,7 +297,10 @@
         "popular": "",
         "price": 650,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไทยซาวเวอร์ไม่มีแอลกอฮอล์",
+        "en": "Non-Alc Thai Sour"
       },
       {
         "active": true,
@@ -248,7 +311,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "มะม่วงมิลค์ไม่มีแอลกอฮอล์",
+        "en": "Non-Alc Mango Milk"
       }
     ],
     "タイビール": [
@@ -262,7 +328,10 @@
         "price": 570,
         "sake": false,
         "spicy": 0,
-        "img": "/img/シンハー.jpg"
+        "img": "/img/シンハー.jpg",
+        "kana": "",
+        "thai": "เบียร์สิงห์",
+        "en": "Singha Beer"
       },
       {
         "active": true,
@@ -274,7 +343,10 @@
         "price": 570,
         "sake": false,
         "spicy": 0,
-        "img": "/img/チャーン.jpg"
+        "img": "/img/チャーン.jpg",
+        "kana": "",
+        "thai": "เบียร์ช้าง",
+        "en": "Chang Beer"
       },
       {
         "active": true,
@@ -286,7 +358,10 @@
         "price": 570,
         "sake": false,
         "spicy": 0,
-        "img": "/img/リオ.jpg"
+        "img": "/img/リオ.jpg",
+        "kana": "",
+        "thai": "เบียร์ลีโอ",
+        "en": "Leo Beer"
       }
     ],
     "トロピカルハイ・カクテル": [
@@ -299,7 +374,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "มะม่วงไฮ",
+        "en": "Mango High"
       },
       {
         "active": true,
@@ -310,7 +388,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ฝรั่งไฮ",
+        "en": "Guava High"
       },
       {
         "active": true,
@@ -321,7 +402,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ชาไทยไฮ",
+        "en": "Thai Milk Tea High"
       },
       {
         "active": true,
@@ -332,7 +416,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "มะม่วงมิลค์ไฮ",
+        "en": "Mango Milk High"
       },
       {
         "active": true,
@@ -343,7 +430,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ฝรั่งมิลค์ไฮ",
+        "en": "Guava Milk High"
       },
       {
         "active": true,
@@ -354,7 +444,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "แคสซิสโซดา",
+        "en": "Cassis Soda"
       },
       {
         "active": true,
@@ -365,7 +458,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "แคสซิสอูหลง",
+        "en": "Cassis Oolong"
       },
       {
         "active": true,
@@ -376,7 +472,10 @@
         "popular": "",
         "price": 580,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "แคสซิสมะม่วง",
+        "en": "Cassis Mango"
       },
       {
         "active": true,
@@ -387,7 +486,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เตกีล่าโค้ก",
+        "en": "Tequila Coke"
       },
       {
         "active": true,
@@ -398,7 +500,10 @@
         "popular": "",
         "price": 550,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เตกีล่าฝรั่ง",
+        "en": "Tequila Guava"
       },
       {
         "active": true,
@@ -409,7 +514,10 @@
         "popular": "",
         "price": 400,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เตกีล่าช็อต",
+        "en": "Tequila Shot"
       }
     ],
     "ハイボール": [
@@ -422,7 +530,10 @@
         "popular": "",
         "price": 680,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เมกะไฮบอล",
+        "en": "Mega Highball"
       },
       {
         "active": true,
@@ -433,7 +544,10 @@
         "popular": "",
         "price": 380,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไฮบอลคาคุ",
+        "en": "Kaku Highball"
       },
       {
         "active": true,
@@ -444,7 +558,10 @@
         "popular": "",
         "price": 440,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไฮบอลขิง",
+        "en": "Ginger Highball"
       },
       {
         "active": true,
@@ -455,7 +572,10 @@
         "popular": "",
         "price": 440,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไฮบอลโค้ก",
+        "en": "Coke Highball"
       },
       {
         "active": true,
@@ -467,7 +587,10 @@
         "price": 490,
         "sake": false,
         "spicy": 0,
-        "img": "/img/メコンウイスキー.jpg"
+        "img": "/img/メコンウイスキー.jpg",
+        "kana": "",
+        "thai": "ไฮบอลแม่โขง",
+        "en": "Mekong Highball"
       },
       {
         "active": true,
@@ -478,7 +601,10 @@
         "popular": "",
         "price": 540,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "แม่โขงขิง",
+        "en": "Mekong Ginger"
       },
       {
         "active": true,
@@ -489,7 +615,10 @@
         "popular": "",
         "price": 540,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "แม่โขงโค้ก",
+        "en": "Mekong Coke"
       }
     ],
     "ビアカクテル": [
@@ -502,7 +631,10 @@
         "popular": "",
         "price": 590,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เบียร์มะม่วง",
+        "en": "Mango Beer"
       },
       {
         "active": true,
@@ -513,7 +645,10 @@
         "popular": "",
         "price": 590,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เบียร์ฝรั่ง",
+        "en": "Guava Beer"
       }
     ],
     "ビール": [
@@ -526,7 +661,10 @@
         "popular": "",
         "price": 490,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เบียร์สด (แก้ว)",
+        "en": "Draft Beer (Mug)"
       },
       {
         "active": true,
@@ -537,7 +675,10 @@
         "popular": "",
         "price": 740,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เบียร์ขวด (ใหญ่)",
+        "en": "Bottled Beer (Large)"
       },
       {
         "active": true,
@@ -548,7 +689,10 @@
         "popular": "",
         "price": 420,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "เบียร์ไม่มีแอลกอฮอล์",
+        "en": "Non-Alcoholic Beer"
       }
     ],
     "ワイン": [
@@ -561,7 +705,10 @@
         "popular": "",
         "price": 380,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไวน์แก้ว",
+        "en": "Glass Wine (Red/White)"
       },
       {
         "active": true,
@@ -572,7 +719,10 @@
         "popular": "",
         "price": 380,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไวน์แก้ว",
+        "en": "Glass Wine (Red/White)"
       },
       {
         "active": true,
@@ -583,7 +733,10 @@
         "popular": "",
         "price": 1600,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ดีแคนเตอร์",
+        "en": "Decanter (Red/White)"
       },
       {
         "active": true,
@@ -594,7 +747,10 @@
         "popular": "",
         "price": 1600,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ดีแคนเตอร์",
+        "en": "Decanter (Red/White)"
       },
       {
         "active": true,
@@ -605,7 +761,10 @@
         "popular": "",
         "price": 2200,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไวน์ขวด",
+        "en": "Bottle Wine (Red/White)"
       },
       {
         "active": true,
@@ -616,7 +775,10 @@
         "popular": "",
         "price": 2200,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "ไวน์ขวด",
+        "en": "Bottle Wine (Red/White)"
       }
     ],
     "焼酎・その他": [
@@ -629,7 +791,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "โชจูอาวาโมริ",
+        "en": "Awamori (Kumesen)"
       },
       {
         "active": true,
@@ -640,7 +805,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "โชจูจัสมิน",
+        "en": "Jasmine Shochu"
       },
       {
         "active": true,
@@ -651,7 +819,10 @@
         "popular": "",
         "price": 480,
         "sake": false,
-        "spicy": 0
+        "spicy": 0,
+        "kana": "",
+        "thai": "อุเมะชู",
+        "en": "Plum Wine"
       }
     ]
   },
@@ -667,7 +838,10 @@
         "price": 120,
         "sake": false,
         "spicy": 0,
-        "img": "/img/キャベツ.jpg"
+        "img": "/img/キャベツ.jpg",
+        "kana": "ガランプリー",
+        "thai": "กะหล่ำปลี",
+        "en": "Cabbage"
       },
       {
         "active": true,
@@ -679,7 +853,10 @@
         "price": 220,
         "sake": false,
         "spicy": 0,
-        "img": "/img/セロリ.jpg"
+        "img": "/img/セロリ.jpg",
+        "kana": "セロリ",
+        "thai": "เซเลอรี่",
+        "en": "Celery"
       },
       {
         "active": true,
@@ -691,7 +868,10 @@
         "price": 280,
         "sake": false,
         "spicy": 0,
-        "img": "/img/えびせん.jpg"
+        "img": "/img/えびせん.jpg",
+        "kana": "カオクリァップクン",
+        "thai": "ข้าวเกรียบกุ้ง",
+        "en": "Thai Shrimp Crackers"
       },
       {
         "active": true,
@@ -703,7 +883,10 @@
         "price": 280,
         "sake": false,
         "spicy": 0.5,
-        "img": "/img/ピリ辛枝豆.jpg"
+        "img": "/img/ピリ辛枝豆.jpg",
+        "kana": "トゥア レ イープン",
+        "thai": "ถั่วแระเผ็ด",
+        "en": "Spicy Edamame"
       },
       {
         "active": true,
@@ -715,7 +898,10 @@
         "price": 280,
         "sake": false,
         "spicy": 0,
-        "img": "/img/缶詰.jpg"
+        "img": "/img/缶詰.jpg",
+        "kana": "パッカドン",
+        "thai": "ผักดองกระป๋อง",
+        "en": "Thai Pickled Vegetable Can"
       },
       {
         "active": true,
@@ -723,11 +909,14 @@
         "id": "F-TS-06",
         "name": "おつまみキュウリ",
         "pakchi": false,
-        "popular": "人気料理",
+        "popular": "人気",
         "price": 280,
         "sake": false,
         "spicy": 0,
-        "img": "/img/キュウリ.jpg"
+        "img": "/img/キュウリ.jpg",
+        "kana": "テーングワー ペット",
+        "thai": "แตงกวาเผ็ด",
+        "en": "Spicy Cucumber"
       },
       {
         "active": true,
@@ -739,7 +928,10 @@
         "price": 280,
         "sake": false,
         "spicy": 0,
-        "img": "/img/カリカリ厚揚げ.jpg"
+        "img": "/img/カリカリ厚揚げ.jpg",
+        "kana": "タオフー トード",
+        "thai": "เต้าหู้ทอด",
+        "en": "Crispy Deep-Fried Tofu"
       },
       {
         "active": true,
@@ -751,7 +943,10 @@
         "price": 280,
         "sake": false,
         "spicy": 0,
-        "img": "/img/パク乗せ冷奴.jpg"
+        "img": "/img/パク乗せ冷奴.jpg",
+        "kana": "タオフー イェン",
+        "thai": "เต้าหู้เย็นผักชี",
+        "en": "Cold Tofu with Coriander"
       },
       {
         "active": true,
@@ -763,7 +958,10 @@
         "price": 280,
         "sake": false,
         "spicy": 0,
-        "img": "/img/コリコリ豚耳.jpg"
+        "img": "/img/コリコリ豚耳.jpg",
+        "kana": "トム フームー",
+        "thai": "หูหมู",
+        "en": "Crunchy Pig Ear"
       },
       {
         "active": true,
@@ -775,7 +973,10 @@
         "price": 420,
         "sake": true,
         "spicy": 0.5,
-        "img": "/img/アジのトマト煮.jpg"
+        "img": "/img/アジのトマト煮.jpg",
+        "kana": "プラーガポン",
+        "thai": "ปลาอาจิต้มมะเขือเทศ",
+        "en": "Mackerel in Tomato Sauce"
       },
       {
         "active": true,
@@ -787,7 +988,10 @@
         "price": 440,
         "sake": true,
         "spicy": 0,
-        "img": "/img/タイ式生ソーセージ（ネーム）.jpg"
+        "img": "/img/タイ式生ソーセージ（ネーム）.jpg",
+        "kana": "ネーム",
+        "thai": "แหนม",
+        "en": "Thai Fermented Sausage"
       }
     ],
     "サラダ・和え物": [
@@ -801,7 +1005,10 @@
         "price": 780,
         "sake": false,
         "spicy": 3,
-        "img": "/img/ソムタム.jpg"
+        "img": "/img/ソムタム.jpg",
+        "kana": "ソムタム",
+        "thai": "ส้มตำ",
+        "en": "Green Papaya Salad"
       },
       {
         "active": true,
@@ -813,7 +1020,10 @@
         "price": 880,
         "sake": false,
         "spicy": 10,
-        "img": "/img/ソムタムラオ.jpg"
+        "img": "/img/ソムタムラオ.jpg",
+        "kana": "ソムタム ラオ",
+        "thai": "ส้มตำลาว",
+        "en": "Spicy Papaya Salad (Lao)"
       },
       {
         "active": true,
@@ -825,7 +1035,10 @@
         "price": 880,
         "sake": false,
         "spicy": 3,
-        "img": "/img/ソムタムムーヤーン.jpg"
+        "img": "/img/ソムタムムーヤーン.jpg",
+        "kana": "ソムタム ムーヤーン",
+        "thai": "ส้มตำหมูย่าง",
+        "en": "Papaya Salad w/ Grilled Pork"
       },
       {
         "active": true,
@@ -833,11 +1046,14 @@
         "id": "F-SL-04",
         "name": "温かい春雨サラダ",
         "pakchi": true,
-        "popular": "人気料理",
+        "popular": "人気",
         "price": 780,
         "sake": false,
         "spicy": 2,
-        "img": "/img/ヤムウンセン.jpg"
+        "img": "/img/ヤムウンセン.jpg",
+        "kana": "ヤム ウンセン",
+        "thai": "ยำวุ้นเส้น",
+        "en": "Glass Noodle Salad"
       },
       {
         "active": true,
@@ -849,7 +1065,10 @@
         "price": 680,
         "sake": false,
         "spicy": 2,
-        "img": "/img/ヤムカイダオ.jpg"
+        "img": "/img/ヤムカイダオ.jpg",
+        "kana": "ヤム カイダオ",
+        "thai": "ยำไข่ดาว",
+        "en": "Fried Egg Salad"
       },
       {
         "active": true,
@@ -861,7 +1080,10 @@
         "price": 680,
         "sake": false,
         "spicy": 2,
-        "img": "/img/ラープガイ.jpg"
+        "img": "/img/ラープガイ.jpg",
+        "kana": "ヤム ガイ",
+        "thai": "ยำไก่",
+        "en": "Chicken Salad"
       },
       {
         "active": true,
@@ -873,7 +1095,10 @@
         "price": 880,
         "sake": false,
         "spicy": 2,
-        "img": "/img/ヤムクン.jpg"
+        "img": "/img/ヤムクン.jpg",
+        "kana": "ヤム クン",
+        "thai": "ยำกุ้ง",
+        "en": "Shrimp Salad"
       }
     ],
     "スープ": [
@@ -887,7 +1112,10 @@
         "price": 980,
         "sake": false,
         "spicy": 2,
-        "img": "/img/トムヤムクン.jpg"
+        "img": "/img/トムヤムクン.jpg",
+        "kana": "トムヤムクン",
+        "thai": "ต้มยำกุ้ง",
+        "en": "Tom Yum Kung"
       },
       {
         "active": true,
@@ -899,7 +1127,10 @@
         "price": 880,
         "sake": false,
         "spicy": 2,
-        "img": "/img/トムカーガイ.jpg"
+        "img": "/img/トムカーガイ.jpg",
+        "kana": "トムカーガイ",
+        "thai": "ต้มข่าไก่",
+        "en": "Tom Kha Gai"
       }
     ],
     "デザート": [
@@ -913,7 +1144,10 @@
         "price": 440,
         "sake": false,
         "spicy": 0,
-        "img": "/img/アイスクリームサンド.jpg"
+        "img": "/img/アイスクリームサンド.jpg",
+        "kana": "ココナッツアイスサンド",
+        "thai": "ไอศกรีมมะพร้าวแซนด์วิช",
+        "en": "Coconut Ice Cream Sandwich"
       },
       {
         "active": true,
@@ -925,7 +1159,10 @@
         "price": 280,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ココナッツアイスクリーム.jpg"
+        "img": "/img/ココナッツアイスクリーム.jpg",
+        "kana": "ココナッツアイス",
+        "thai": "ไอศกรีมมะพร้าว",
+        "en": "Coconut Ice Cream"
       }
     ],
     "一品": [
@@ -939,7 +1176,10 @@
         "price": 580,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ガイヤーン.jpg"
+        "img": "/img/ガイヤーン.jpg",
+        "kana": "ガイヤーン",
+        "thai": "ไก่ย่าง",
+        "en": "Thai Grilled Chicken"
       },
       {
         "active": true,
@@ -951,7 +1191,10 @@
         "price": 580,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ムーヤーン.jpg"
+        "img": "/img/ムーヤーン.jpg",
+        "kana": "ムーヤーン",
+        "thai": "หมูย่าง",
+        "en": "Thai Grilled Pork"
       },
       {
         "active": true,
@@ -963,7 +1206,10 @@
         "price": 980,
         "sake": false,
         "spicy": 0,
-        "img": "/img/タイ式海老のグリル.jpg"
+        "img": "/img/タイ式海老のグリル.jpg",
+        "kana": "クン パオ",
+        "thai": "กุ้งเผา",
+        "en": "Thai Grilled Shrimp"
       },
       {
         "active": true,
@@ -975,7 +1221,10 @@
         "price": 880,
         "sake": true,
         "spicy": 2,
-        "img": "/img/ナムトックムー.jpg"
+        "img": "/img/ナムトックムー.jpg",
+        "kana": "ナムトック ムー",
+        "thai": "น้ำตกหมู",
+        "en": "Pork Herb Salad"
       },
       {
         "active": true,
@@ -987,7 +1236,10 @@
         "price": 720,
         "sake": true,
         "spicy": 2,
-        "img": "/img/ヤムマーマー.jpg"
+        "img": "/img/ヤムマーマー.jpg",
+        "kana": "ヤム マーマー",
+        "thai": "ยำมาม่า",
+        "en": "Spicy Instant Noodle Salad"
       },
       {
         "active": true,
@@ -999,7 +1251,10 @@
         "price": 440,
         "sake": true,
         "spicy": 0,
-        "img": "/img/ガピキャベツ.jpg"
+        "img": "/img/ガピキャベツ.jpg",
+        "kana": "パガランプリー",
+        "thai": "ผัดกะหล่ำกะปิ",
+        "en": "Cabbage with Shrimp Paste"
       },
       {
         "active": true,
@@ -1011,7 +1266,10 @@
         "price": 440,
         "sake": false,
         "spicy": 0,
-        "img": "/img/蒸し鶏生姜ソース.jpg"
+        "img": "/img/蒸し鶏生姜ソース.jpg",
+        "kana": "ガイトム",
+        "thai": "ไก่ตุ๋น",
+        "en": "Steamed Chicken Ginger"
       },
       {
         "active": true,
@@ -1023,7 +1281,10 @@
         "price": 780,
         "sake": false,
         "spicy": 2,
-        "img": "/img/ヤムガイ.jpg"
+        "img": "/img/ヤムガイ.jpg",
+        "kana": "ラープ ガイ",
+        "thai": "ลาบไก่",
+        "en": "Chicken Larb"
       }
     ],
     "揚げ物": [
@@ -1037,7 +1298,10 @@
         "price": 580,
         "sake": true,
         "spicy": 0,
-        "img": "/img/スパイシー鶏唐揚げ.jpg"
+        "img": "/img/スパイシー鶏唐揚げ.jpg",
+        "kana": "ガイトード",
+        "thai": "ไก่ทอด",
+        "en": "Spicy Fried Chicken"
       },
       {
         "active": true,
@@ -1049,7 +1313,10 @@
         "price": 620,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ポッピアトード.jpg"
+        "img": "/img/ポッピアトード.jpg",
+        "kana": "ポッピア トード",
+        "thai": "ปอเปี๊ยะทอด",
+        "en": "Fried Spring Roll"
       },
       {
         "active": true,
@@ -1061,7 +1328,10 @@
         "price": 1020,
         "sake": false,
         "spicy": 0,
-        "img": "/img/クンガティアム.jpg"
+        "img": "/img/クンガティアム.jpg",
+        "kana": "クンガティアム",
+        "thai": "กุ้งทอดกระเทียม",
+        "en": "Fried Shrimp with Garlic"
       },
       {
         "active": true,
@@ -1073,7 +1343,10 @@
         "price": 380,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ポテトフライ2種のソース.jpg"
+        "img": "/img/ポテトフライ2種のソース.jpg",
+        "kana": "マンファラントード",
+        "thai": "มันฝรั่งทอด",
+        "en": "French Fries"
       },
       {
         "active": true,
@@ -1085,7 +1358,10 @@
         "price": 580,
         "sake": false,
         "spicy": 0,
-        "img": "/img/カイジャオ.jpg"
+        "img": "/img/カイジャオ.jpg",
+        "kana": "カイジャオ",
+        "thai": "ไข่เจียว",
+        "en": "Thai Fried Omelette"
       },
       {
         "active": true,
@@ -1097,7 +1373,10 @@
         "price": 680,
         "sake": false,
         "spicy": 0,
-        "img": "/img/カイジャオネーム.jpg"
+        "img": "/img/カイジャオネーム.jpg",
+        "kana": "カイジャオネーム",
+        "thai": "ไข่เจียวแหนม",
+        "en": "Fried Omelette w/ Sausage"
       }
     ],
     "炒め物": [
@@ -1107,11 +1386,14 @@
         "id": "F-IT-01",
         "name": "鶏もも肉のガパオ炒め",
         "pakchi": false,
-        "popular": "人気料理",
+        "popular": "人気",
         "price": 680,
         "sake": false,
         "spicy": 1,
-        "img": "/img/ガバオ.jpg"
+        "img": "/img/ガパオ.jpg",
+        "kana": "ガパオ",
+        "thai": "ผัดกะเพราไก่",
+        "en": "Chicken Basil Stir-Fry"
       },
       {
         "active": true,
@@ -1119,11 +1401,14 @@
         "id": "F-IT-02",
         "name": "豚肉のカレー炒め",
         "pakchi": false,
-        "popular": "人気料理",
+        "popular": "人気",
         "price": 780,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ムーパッポンカリー.jpg"
+        "img": "/img/ムーパッポンカリー.jpg",
+        "kana": "ムーパッポンカリー",
+        "thai": "หมูผัดผงกะหรี่",
+        "en": "Pork Curry Stir-Fry"
       },
       {
         "active": true,
@@ -1135,7 +1420,10 @@
         "price": 880,
         "sake": false,
         "spicy": 0,
-        "img": "/img/クンパッポンカリー.jpg"
+        "img": "/img/クンパッポンカリー.jpg",
+        "kana": "クンパッポンカリー",
+        "thai": "กุ้งผัดผงกะหรี่",
+        "en": "Shrimp Curry Stir-Fry"
       },
       {
         "active": true,
@@ -1147,7 +1435,10 @@
         "price": 780,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ガイパッキン.jpg"
+        "img": "/img/ガイパッキン.jpg",
+        "kana": "ガイパッキン",
+        "thai": "ไก่ผัดขิง",
+        "en": "Chicken Ginger Stir-Fry"
       },
       {
         "active": true,
@@ -1159,7 +1450,10 @@
         "price": 680,
         "sake": true,
         "spicy": 0,
-        "img": "/img/ムーガティアム.jpg"
+        "img": "/img/ムーガティアム.jpg",
+        "kana": "ムー ガティアム",
+        "thai": "หมูกระเทียม",
+        "en": "Pork Garlic Stir-Fry"
       },
       {
         "active": true,
@@ -1171,7 +1465,10 @@
         "price": 680,
         "sake": false,
         "spicy": 0.5,
-        "img": "/img/パックブンファイデーン.jpg"
+        "img": "/img/パックブンファイデーン.jpg",
+        "kana": "パックブン",
+        "thai": "ผักบุ้งไฟแดง",
+        "en": "Stir-Fried Morning Glory"
       },
       {
         "active": true,
@@ -1183,7 +1480,10 @@
         "price": 620,
         "sake": false,
         "spicy": 0.5,
-        "img": "/img/スッキーヘーン.jpg"
+        "img": "/img/スッキーヘーン.jpg",
+        "kana": "パット トゥアンゴーク",
+        "thai": "ผัดถั่วงอก",
+        "en": "Stir-Fried Tofu & Bean Sprouts"
       },
       {
         "active": true,
@@ -1195,7 +1495,10 @@
         "price": 680,
         "sake": false,
         "spicy": 1,
-        "img": "/img/茄子と豚肉のバジル炒め.jpg"
+        "img": "/img/茄子と豚肉のバジル炒め.jpg",
+        "kana": "パット マクワ",
+        "thai": "ผัดมะเขือ",
+        "en": "Eggplant Basil Stir-Fry"
       },
       {
         "active": true,
@@ -1207,7 +1510,10 @@
         "price": 780,
         "sake": false,
         "spicy": 1,
-        "img": "/img/パッキーマオ.jpg"
+        "img": "/img/パッキーマオ.jpg",
+        "kana": "スッキー ヘーン",
+        "thai": "สุกี้แห้ง",
+        "en": "Spicy Glass Noodle Stir-Fry"
       },
       {
         "active": true,
@@ -1219,7 +1525,10 @@
         "price": 780,
         "sake": false,
         "spicy": 0,
-        "img": "/img/春雨オイスター炒め.jpg"
+        "img": "/img/春雨オイスター炒め.jpg",
+        "kana": "パット ウンセン",
+        "thai": "ผัดวุ้นเส้น",
+        "en": "Oyster Glass Noodle Stir-Fry"
       }
     ],
     "麺・ご飯": [
@@ -1229,11 +1538,14 @@
         "id": "F-MN-01",
         "name": "タイ式焼きそば",
         "pakchi": false,
-        "popular": "人気料理",
+        "popular": "人気",
         "price": 780,
         "sake": false,
         "spicy": 0,
-        "img": "/img/パッタイ.jpg"
+        "img": "/img/パッタイ.jpg",
+        "kana": "パッタイ",
+        "thai": "ผัดไทย",
+        "en": "Pad Thai"
       },
       {
         "active": true,
@@ -1245,7 +1557,10 @@
         "price": 780,
         "sake": true,
         "spicy": 3,
-        "img": "/img/パットトゥアンゴーク.jpg"
+        "img": "/img/パットトゥアンゴーク.jpg",
+        "kana": "パッキーマオ",
+        "thai": "ผัดขี้เมา",
+        "en": "Spicy Basil Noodle"
       },
       {
         "active": true,
@@ -1257,7 +1572,10 @@
         "price": 680,
         "sake": false,
         "spicy": 0,
-        "img": "/img/パットウンセン.jpg"
+        "img": "/img/パットウンセン.jpg",
+        "kana": "クイッティオ ヘーン",
+        "thai": "ก๋วยเตี๋ยวแห้ง",
+        "en": "Thai Dry Noodle"
       },
       {
         "active": true,
@@ -1269,7 +1587,10 @@
         "price": 680,
         "sake": false,
         "spicy": 0,
-        "img": "/img/クイッティオナーム.jpg"
+        "img": "/img/クイッティオナーム.jpg",
+        "kana": "クイッティオ ナーム",
+        "thai": "ก๋วยเตี๋ยวน้ำ",
+        "en": "Thai Noodle Soup"
       },
       {
         "active": true,
@@ -1281,7 +1602,10 @@
         "price": 980,
         "sake": false,
         "spicy": 2,
-        "img": "/img/トムヤムヌードル.jpg"
+        "img": "/img/トムヤムヌードル.jpg",
+        "kana": "クイッティオ トムヤム",
+        "thai": "ก๋วยเตี๋ยวต้มยำกุ้ง",
+        "en": "Tom Yum Noodle"
       },
       {
         "active": true,
@@ -1293,7 +1617,10 @@
         "price": 880,
         "sake": false,
         "spicy": 0.5,
-        "img": "/img/グリーンカレー.jpg"
+        "img": "/img/グリーンカレー.jpg",
+        "kana": "ゲーンキャオワーン",
+        "thai": "แกงเขียวหวาน",
+        "en": "Green Curry"
       },
       {
         "active": true,
@@ -1305,7 +1632,10 @@
         "price": 780,
         "sake": false,
         "spicy": 0,
-        "img": "/img/カオマンガイ.jpg"
+        "img": "/img/カオマンガイ.jpg",
+        "kana": "カオマンガイ",
+        "thai": "ข้าวมันไก่",
+        "en": "Khao Man Gai"
       },
       {
         "active": true,
@@ -1317,7 +1647,10 @@
         "price": 780,
         "sake": false,
         "spicy": 0,
-        "img": "/img/カオパ.jpg"
+        "img": "/img/カオパ.jpg",
+        "kana": "カオパッ",
+        "thai": "ข้าวผัด",
+        "en": "Thai Fried Rice"
       },
       {
         "active": true,
@@ -1329,7 +1662,10 @@
         "price": 300,
         "sake": false,
         "spicy": 0,
-        "img": "/img/ライス.jpg"
+        "img": "/img/ライス.jpg",
+        "kana": "ライス",
+        "thai": "ข้าวเปล่า",
+        "en": "Steamed Rice"
       },
       {
         "active": true,
@@ -1341,7 +1677,10 @@
         "price": 120,
         "sake": false,
         "spicy": 0,
-        "img": "/img/目玉焼き.jpg"
+        "img": "/img/目玉焼き.jpg",
+        "kana": "カイダオ",
+        "thai": "ไข่ดาว",
+        "en": "Fried Egg"
       }
     ]
   },

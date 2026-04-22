@@ -169,6 +169,16 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
           <span class="toggle-slider"></span>
         </label>
       </div>
+      <div class="field-row">
+        <div class="field-label">
+          <div class="field-label-main">セットメニューを客席に表示</div>
+          <div class="field-label-sub">お客様の注文画面にセットタブを表示する</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="show_set_on_customer">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
     </div>
   </div>
 
@@ -210,6 +220,7 @@ var DEFAULTS = {
   has_ohiya: true,
   has_nomi_hodai: true,
   has_call_button: false,
+  show_set_on_customer: false,
   day_start_hour: 8
 };
 
@@ -225,6 +236,7 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('has_ohiya').checked = !!cfg.has_ohiya;
   document.getElementById('has_nomi_hodai').checked = !!cfg.has_nomi_hodai;
   document.getElementById('has_call_button').checked = !!cfg.has_call_button;
+  document.getElementById('show_set_on_customer').checked = !!cfg.show_set_on_customer;
   document.getElementById('day_start_hour').value = cfg.day_start_hour !== undefined ? cfg.day_start_hour : 8;
   document.getElementById('loading').style.display = 'none';
   document.getElementById('main').style.display = 'block';
@@ -246,6 +258,7 @@ window.saveAll = async function() {
     has_ohiya: document.getElementById('has_ohiya').checked,
     has_nomi_hodai: document.getElementById('has_nomi_hodai').checked,
     has_call_button: document.getElementById('has_call_button').checked,
+    show_set_on_customer: document.getElementById('show_set_on_customer').checked,
     day_start_hour: parseInt(document.getElementById('day_start_hour').value)
   };
   try {

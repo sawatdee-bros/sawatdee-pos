@@ -192,6 +192,7 @@ const TAX = 0.1;
 // ---- 状態変数 ----
 let MENU_DATA = {};
 let hasOhiya = false; // store_config/has_ohiya
+let showSetOnCustomer = false; // store_config/show_set_on_customer
 
 // オプション定義
 const ITEM_OPTIONS = {
@@ -237,6 +238,9 @@ async function init() {
     // 店舗設定：お冷ON/OFF
     const ohiyaSnap = await get(ref(db, 'store_config/has_ohiya'));
     hasOhiya = ohiyaSnap.val() === true;
+    // 店舗設定：セットメニュー客席表示ON/OFF
+    const setSnap = await get(ref(db, 'store_config/show_set_on_customer'));
+    showSetOnCustomer = setSnap.val() === true;
     if (Object.keys(MENU_DATA).length === 0) {
       document.getElementById('menu-list').innerHTML = '<div style="padding:40px;text-align:center;color:#9ca3af">メニューを読み込めませんでした</div>';
       return;
@@ -259,6 +263,9 @@ function renderCatTabs() {
     { key: 'drink', label: '🥤 ドリンク' },
     { key: 'food', label: '🍽 フード' }
   ];
+  if (showSetOnCustomer && MENU_DATA['set'] && Object.keys(MENU_DATA['set']).length > 0) {
+    tabs.push({ key: 'set', label: '🎁 セット' });
+  }
   document.getElementById('cat-tabs').innerHTML = tabs.map(function(t) {
     return '<button class="cat-tab' + (currentCat === t.key ? ' active' : '') + '" onclick="window.selectCat(\'' + t.key + '\')">' + t.label + '</button>';
   }).join('');
@@ -298,7 +305,7 @@ function makeBadges(item) {
 
 // メニュー描画
 function renderMenu() {
-  var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active; });
+  var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active && !i.hidden; });
   var html = items.map(function(item, idx) {
     var isSoldout = soldout[item.name] === true;
     var priceEx = item.price;
@@ -547,7 +554,12 @@ window.placeOrder = async function() {
   var total = Math.round(items.reduce(function(s, i) { return s + taxIn(i.price) * i.qty; }, 0) / 10) * 10;
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
-  await push(ref(db, 'orders'), { table: tableNum, items: items, total: total, status: 'new', timestamp: Date.now() });
+  var orderData = { table: tableNum, items: items, total: total, status: 'new', timestamp: Date.now() };
+  // セットカテゴリのみの注文はsource:'set'を付ける
+  var hasSetItems = Object.keys(cart).some(function(k) { return k.startsWith('set__'); });
+  var hasNonSetItems = Object.keys(cart).some(function(k) { return !k.startsWith('set__') && !k.startsWith('ohiya__'); });
+  if (hasSetItems && !hasNonSetItems) orderData.source = 'set';
+  await push(ref(db, 'orders'), orderData);
   cart = {};
   renderMenu(); renderCart();
   document.getElementById('order-btn').textContent = '✓ 注文しました！';

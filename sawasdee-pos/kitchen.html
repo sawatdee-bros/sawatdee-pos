@@ -602,7 +602,7 @@ function renderOrders() {
 
   let fHTML = '', fHTMLCompact = '', dHTML = '';
 
-  // フード用グループで描画
+  // フード用グループで描画（セット商品も含む）
   foodGroups.forEach(g => {
     let foodItems = [];
     g.ids.forEach(id => {
@@ -619,7 +619,7 @@ function renderOrders() {
     fHTMLCompact += makeGroupCard(g, foodItems, 'food', totalMap, true);
   });
 
-  // ドリンク用グループで描画
+  // ドリンク用グループで描画（セット商品も含む）
   drinkGroups.forEach(g => {
     let drinkItems = [];
     g.ids.forEach(id => {
@@ -633,6 +633,24 @@ function renderOrders() {
       });
     });
     dHTML += makeGroupCard(g, drinkItems, 'drink', totalMap, false);
+  });
+
+  // セット商品はフードタブのみに表示
+  foodGroups.forEach(g => {
+    let setItems = [];
+    g.ids.forEach(id => {
+      const o = orders[id];
+      if (o.source !== 'set') return;
+      const done = o.itemsDone || {};
+      const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
+      arr.forEach((i, idx) => {
+        setItems.push({i, idx, id, done: !!done[idx]});
+      });
+    });
+    if (setItems.length > 0) {
+      fHTML += makeGroupCard(g, setItems, 'food', totalMap, false, true);
+      fHTMLCompact += makeGroupCard(g, setItems, 'food', totalMap, true, true);
+    }
   });
 
   const emptyF = '<div class="empty-state" style="height:40vh"><div style="font-size:32px">🍽️</div><div style="font-size:14px;margin-top:8px">注文待ち</div></div>';
@@ -651,7 +669,7 @@ function renderOrders() {
   }
 }
 
-function makeGroupCard(g, items, type, totalMap, compact) {
+function makeGroupCard(g, items, type, totalMap, compact, isSet) {
   if (items.length === 0) return '';
   // 全提供済みなら非表示
   if (items.every(e => e.done)) return '';
@@ -689,7 +707,7 @@ function makeGroupCard(g, items, type, totalMap, compact) {
   const isNomi = g.ids.some(id => orders[id] && orders[id].source === 'nomi');
   return `<div class="order-card${isGroupNew?' new':''}">
     <div class="order-card-header">
-      <span class="table-label">${tableName(repO.table)}${isNomi?' <span class="nomi-badge">🍻 飲み放題</span>':''}</span>
+      <span class="table-label">${tableName(repO.table)}${isNomi?' <span class="nomi-badge">🍻 飲み放題</span>':''}${isSet?' <span class="nomi-badge" style="background:#166534;">🎁 セット</span>':''}</span>
       <span class="time-label">${fmt(repO.timestamp)}</span>
     </div>
     ${doneBlock}
@@ -749,7 +767,7 @@ window.groupDone = async function(id, type) {
   const prevStatus = orders[id].status;
   (orders[id].items||[]).forEach((i,idx) => {
     const isDrink = DRINKS.some(function(d){return i.name===d||i.name.startsWith(d+'（');});
-    if ((type==='drink'&&isDrink)||(type==='food'&&!isDrink)) orders[id].itemsDone[idx] = true;
+    if ((type==='drink'&&isDrink)||(type==='food'&&!isDrink)||(type==='food'&&orders[id].source==='set')) orders[id].itemsDone[idx] = true;
   });
   const allDone = orders[id].items.every((_,i) => orders[id].itemsDone[i]);
   if (allDone) {
