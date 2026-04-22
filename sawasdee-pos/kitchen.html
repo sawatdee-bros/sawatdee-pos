@@ -489,8 +489,16 @@ window.dismissBillCall = async function(tableNum) {
 window.gotoBill = function(tableNum) {
   setMode('bills');
   setTimeout(function() {
-    var el = document.querySelector('[data-table="' + tableNum + '"]');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 該当テーブルのフィルタボタンを探してクリック
+    var filterBtns = document.querySelectorAll('.filter-btn');
+    for (var i = 0; i < filterBtns.length; i++) {
+      var btn = filterBtns[i];
+      if (btn.textContent.trim() === tableName(tableNum) || 
+          btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + tableNum + "'")) {
+        window.setFilter(tableNum, btn);
+        break;
+      }
+    }
   }, 300);
 };
 
