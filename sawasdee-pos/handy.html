@@ -402,7 +402,7 @@ async function init() {
         const items = Array.isArray(setData[subcat]) ? setData[subcat] : Object.values(setData[subcat] || {});
         return {
           name: subcat,
-          items: items.filter(i => i.active).map(i => ({ name: i.name, price: i.price, subcat: subcat }))
+          items: items.filter(i => i.active).map(i => ({ name: i.name, price: i.price, subcat: subcat, ...(i.charge_exempt ? { charge_exempt: true } : {}) }))
         };
       }).filter(g => g.items.length > 0);
     }
