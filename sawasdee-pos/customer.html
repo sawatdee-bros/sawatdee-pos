@@ -543,7 +543,7 @@ window.showHistory = async function() {
           (Array.isArray(subcatItems) ? subcatItems : Object.values(subcatItems)).forEach(function(i) { if (i.name) drinkNames.push(i.name); });
         });
       }
-      var isDrink = baseName !== 'お冷' && drinkNames.indexOf(baseName) >= 0;
+      var isDrink = baseName !== 'お冷' && drinkNames.some(function(d) { return baseName === d || baseName.startsWith(d + '（'); });
       if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink, charge_exempt: !!item.charge_exempt };
       itemMap[key].qty += item.qty;
     });
