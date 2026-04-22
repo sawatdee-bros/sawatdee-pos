@@ -394,11 +394,23 @@ async function init() {
   try {
     const snap = await get(ref(db, 'handy_groups'));
     GROUPS_DATA = snap.val() || {};
+    // menu/set をhandy_groups形式に変換して追加
+    const setSnap = await get(ref(db, 'menu/set'));
+    const setData = setSnap.val();
+    if (setData && Object.keys(setData).length > 0) {
+      GROUPS_DATA['set'] = Object.keys(setData).map(subcat => {
+        const items = Array.isArray(setData[subcat]) ? setData[subcat] : Object.values(setData[subcat] || {});
+        return {
+          name: subcat,
+          items: items.filter(i => i.active).map(i => ({ name: i.name, price: i.price, subcat: subcat }))
+        };
+      }).filter(g => g.items.length > 0);
+    }
     renderCats();
     renderMenu();
     renderCart();
   } catch(e) {
-    console.error('handy_groups読み込み失敗:', e);
+    console.error('初期化失敗:', e);
   }
 }
 init();
