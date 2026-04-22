@@ -267,7 +267,7 @@ window.tapItem = function(key, idx) {
 function renderCart() {
   const items = Object.values(cart);
   const count = items.reduce((s, i) => s + i.qty, 0);
-  const total = items.reduce((s, i) => s + taxIn(i.price) * i.qty, 0);
+  const total = Math.floor(items.reduce((s, i) => s + taxIn(i.price) * i.qty, 0) / 10) * 10;
   document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
   document.getElementById('cart-total').textContent = fmtY(total);
   document.getElementById('order-btn').disabled = count === 0 || !currentTable;
@@ -299,7 +299,7 @@ function renderConfirm() {
       '<span class="confirm-item-price">' + fmtY(ex) + '</span>' +
       '</div>';
   });
-  const totalIn = Object.values(cart).reduce((s, i) => s + taxIn(i.price) * i.qty, 0);
+  const totalIn = Math.floor(Object.values(cart).reduce((s, i) => s + taxIn(i.price) * i.qty, 0) / 10) * 10;
   const tax = totalIn - totalEx;
   html += '<div class="confirm-subtotal"><span>小計（税抜）</span><span>' + fmtY(totalEx) + '</span></div>';
   html += '<div class="confirm-subtotal"><span>消費税（10%）</span><span>' + fmtY(tax) + '</span></div>';
