@@ -258,7 +258,7 @@ window.tapOhiya = function() {
 window.tapItem = function(key, idx) {
   if (!currentTable) { alert('テーブルを選択してください'); return; }
   const item = GROUPS_DATA[currentCat][currentGroupIdx].items[idx];
-  if (!cart[key]) cart[key] = { name: item.name, price: item.price, qty: 0 };
+  if (!cart[key]) cart[key] = { name: item.name, price: item.price, qty: 0, charge_exempt: !!item.charge_exempt };
   cart[key].qty += 1;
   renderMenu();
   renderCart();
@@ -364,7 +364,7 @@ function getSubcatColor(subcat) {
 
 window.placeOrder = async function() {
   const items = Object.values(cart).map(c => ({
-    name: c.name, qty: c.qty, price: c.price
+    name: c.name, qty: c.qty, price: c.price, ...(c.charge_exempt ? { charge_exempt: true } : {})
   }));
   if (!items.length || !currentTable) return;
   document.getElementById('order-btn').disabled = true;

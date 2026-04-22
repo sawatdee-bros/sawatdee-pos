@@ -458,7 +458,7 @@ function addItemToCart(cat, sub, idx, item, optLabel, extras) {
   var optKey = optLabel || extras.map(function(e) { return e.label; }).join(',');
   var key = cat + '__' + sub + '__' + idx + (optKey ? '__' + optKey : '');
   var displayName = item.name + (optLabel ? '（' + optLabel + '）' : '');
-  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price }, qty: 0, extras: extras };
+  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price, charge_exempt: !!item.charge_exempt }, qty: 0, extras: extras };
   cart[key].qty++;
   renderMenu(); renderCart();
 }
@@ -631,6 +631,7 @@ window.placeOrder = async function() {
   var items = [];
   Object.values(cart).forEach(function(c) {
     var item = { name: c.item.name, qty: c.qty, price: c.item.price };
+    if (c.item.charge_exempt) item.charge_exempt = true;
     if (c.extras && c.extras.length > 0) {
       item.extrasStr = c.extras.map(function(e) { return e.label; }).join('・');
       item.price = c.item.price + c.extras.reduce(function(s, e) { return s + e.price; }, 0);
