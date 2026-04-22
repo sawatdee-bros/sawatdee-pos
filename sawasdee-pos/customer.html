@@ -12,11 +12,12 @@ header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.05em; }
 header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 
 /* タブ */
-.cat-tabs { display: flex; gap: 0; background: #fff; border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; z-index: 100; align-items: center; }
+.cat-tabs { display: flex; flex-direction: column; background: #fff; border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; z-index: 100; }
+.cat-tabs-action-row { display: flex; justify-content: flex-end; border-bottom: 1px solid #e5e7eb; }
 .cat-tabs-scroll { display: flex; flex: 1; overflow-x: auto; }
-.history-icon-btn { flex-shrink: 0; padding: 0 10px; height: 44px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #6b7280; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
-.call-btn { flex-shrink: 0; padding: 0 10px; height: 44px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #dc2626; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
-.bill-btn { flex-shrink: 0; padding: 0 10px; height: 44px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #1d4ed8; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
+.history-icon-btn { flex-shrink: 0; padding: 0 10px; height: 40px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #6b7280; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
+.call-btn { flex-shrink: 0; padding: 0 10px; height: 40px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #dc2626; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
+.bill-btn { flex-shrink: 0; padding: 0 10px; height: 40px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #1d4ed8; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
 .bill-confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px; }
 .bill-confirm-modal.open { display: flex; }
 .bill-confirm-box { background: white; border-radius: 16px; padding: 24px 20px; width: 100%; max-width: 300px; text-align: center; }
@@ -33,7 +34,7 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 @keyframes dotFade { 0%,100%{opacity:0.2} 30%{opacity:1} }
 .cat-tab { flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; }
 .cat-tab.active { color: #166534; border-bottom-color: #166534; }
-.subcat-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: #f0fdf4; border-bottom: 1px solid #e5e7eb; position: sticky; top: 44px; z-index: 99; }
+.subcat-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: #f0fdf4; border-bottom: 1px solid #e5e7eb; position: sticky; top: 84px; z-index: 99; }
 .subcat-tab { flex-shrink: 0; padding: 4px 12px; font-size: 12px; border-radius: 20px; border: 1px solid #d1d5db; background: white; color: #6b7280; cursor: pointer; white-space: nowrap; }
 .subcat-tab.active { background: #166534; border-color: #166534; color: white; }
 
@@ -113,6 +114,14 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 .history-qty { color: #6b7280; font-size: 13px; }
 .history-empty { text-align: center; color: #9ca3af; padding: 30px 0; font-size: 14px; }
 .history-close { width: 100%; margin-top: 14px; padding: 12px; background: #f3f4f6; border: none; border-radius: 10px; color: #374151; font-size: 14px; cursor: pointer; font-weight: 600; }
+.history-price { color: #166534; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.history-divider { border: none; border-top: 1px solid #e5e7eb; margin: 8px 0; }
+.history-total-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 4px; font-size: 15px; font-weight: 700; color: #111827; }
+.history-charge-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 13px; color: #6b7280; }
+.history-pax-row { display: flex; align-items: center; gap: 8px; padding: 10px 0 6px; border-bottom: 1px solid #e5e7eb; margin-bottom: 6px; }
+.history-pax-label { font-size: 13px; color: #374151; flex: 1; }
+.history-pax-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.history-pax-num { font-size: 15px; font-weight: 700; min-width: 24px; text-align: center; color: #111827; }
 </style>
 </head>
 <body>
@@ -120,7 +129,7 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
   <div class="table-no" id="table-no">テーブル ?</div>
   <h1>SAWATDEE BROS ご注文</h1>
 </header>
-<div class="cat-tabs"><div class="cat-tabs-scroll" id="cat-tabs"></div><button class="history-icon-btn" onclick="window.showHistory()">📋<span>注文履歴</span></button><button class="call-btn" id="call-btn" onclick="window.callStaff()">🔔<span>店員を呼ぶ</span></button><button class="bill-btn" onclick="window.requestBill()">💳<span>会計する</span></button></div>
+<div class="cat-tabs"><div class="cat-tabs-action-row"><button class="history-icon-btn" onclick="window.showHistory()">📋<span>注文履歴</span></button><button class="call-btn" id="call-btn" onclick="window.callStaff()">🔔<span>店員を呼ぶ</span></button><button class="bill-btn" onclick="window.requestBill()">💳<span>会計する</span></button></div><div class="cat-tabs-scroll" id="cat-tabs"></div></div>
 <div class="subcat-tabs" id="subcat-tabs"></div>
 <div class="menu-list" id="menu-list"></div>
 <!-- オプションモーダル -->
@@ -502,28 +511,67 @@ window.callStaff = async function() {
   }
 };
 
+var _historyItems = [];
+var _historyPax = 1;
+var _CHARGE_PER_PERSON = 250;
+
 window.showHistory = async function() {
   var snap = await new Promise(function(resolve) { onValue(ref(db, 'orders'), resolve, { onlyOnce: true }); });
   var data = snap.val() || {};
   var now = new Date(), todayStart = new Date(now);
   if (now.getHours() < 6) todayStart.setDate(todayStart.getDate() - 1);
   todayStart.setHours(6, 0, 0, 0);
+  // チャージ設定を取得
+  var cfgSnap = await get(ref(db, 'store_config'));
+  var cfg = cfgSnap.val() || {};
+  _CHARGE_PER_PERSON = cfg.charge_per_person !== undefined ? cfg.charge_per_person : 250;
   var itemMap = {};
   Object.values(data).forEach(function(order) {
     if (order.table != tableNum) return;
     if ((order.timestamp || 0) < todayStart.getTime()) return;
     if (order.status === 'paid') return;
     (order.items || []).forEach(function(item) {
-      if (!itemMap[item.name]) itemMap[item.name] = { name: item.name, qty: 0 };
-      itemMap[item.name].qty += item.qty;
+      var key = item.name + (item.extrasStr ? '__' + item.extrasStr : '');
+      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0 };
+      itemMap[key].qty += item.qty;
     });
   });
-  var items = Object.values(itemMap);
-  var list = document.getElementById('history-list');
-  list.innerHTML = items.length === 0
-    ? '<div class="history-empty">まだ注文履歴がありません</div>'
-    : items.map(function(it) { return '<div class="history-item"><span>' + it.name + '</span><span class="history-qty">×' + it.qty + '</span></div>'; }).join('');
+  _historyItems = Object.values(itemMap);
+  _historyPax = 1;
+  renderHistoryModal();
   document.getElementById('history-modal').classList.add('open');
+};
+
+function renderHistoryModal() {
+  var list = document.getElementById('history-list');
+  if (_historyItems.length === 0) {
+    list.innerHTML = '<div class="history-empty">まだ注文履歴がありません</div>';
+    return;
+  }
+  var totalEx = 0;
+  var itemsHTML = _historyItems.map(function(it) {
+    var linePrice = taxIn(it.price) * it.qty;
+    totalEx += linePrice;
+    return '<div class="history-item"><span>' + it.name + '</span><div style="display:flex;gap:10px;align-items:center"><span class="history-qty">×' + it.qty + '</span><span class="history-price">' + fmtY(linePrice) + '</span></div></div>';
+  }).join('');
+  var chargeTotal = _CHARGE_PER_PERSON * _historyPax;
+  var grandTotal = totalEx + chargeTotal;
+  var paxHTML = '<div class="history-pax-row">'
+    + '<span class="history-pax-label">人数（チャージ計算用）</span>'
+    + '<button class="history-pax-btn" onclick="window.changeHistoryPax(-1)">−</button>'
+    + '<span class="history-pax-num">' + _historyPax + '名</span>'
+    + '<button class="history-pax-btn" onclick="window.changeHistoryPax(1)">+</button>'
+    + '</div>';
+  var summaryHTML = '<hr class="history-divider">'
+    + '<div class="history-charge-row"><span>小計（税込）</span><span>' + fmtY(totalEx) + '</span></div>'
+    + '<div class="history-charge-row"><span>チャージ料（¥' + _CHARGE_PER_PERSON.toLocaleString() + ' × ' + _historyPax + '名）</span><span>' + fmtY(chargeTotal) + '</span></div>'
+    + '<div class="history-total-row"><span>合計</span><span>' + fmtY(grandTotal) + '</span></div>';
+  list.innerHTML = paxHTML + itemsHTML + summaryHTML;
+}
+
+window.changeHistoryPax = function(delta) {
+  _historyPax = Math.max(1, _historyPax + delta);
+  renderHistoryModal();
 };
 
 window.closeHistory = function() { document.getElementById('history-modal').classList.remove('open'); };
