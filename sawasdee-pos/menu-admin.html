@@ -97,7 +97,6 @@ const app = initializeApp(FC);
 const db = getDatabase(app);
 
 let DAY_START = 8;
-get(ref(db, 'store_config/day_start_hour')).then(function(snap) { if (snap.val() !== null) DAY_START = snap.val(); });
 
 let ALL_ITEMS = []; // Firebaseから読み込む
 
@@ -122,6 +121,10 @@ let openCards = new Set();
 let _resetChecked = false;
 // 初期化：Firebaseからメニューを読み込む
 async function init() {
+  // store_configを先に読んでDAY_STARTを確定
+  const cfgSnap = await get(ref(db, 'store_config/day_start_hour'));
+  if (cfgSnap.val() !== null) DAY_START = cfgSnap.val();
+
   const menuSnap = await get(ref(db, 'menu'));
   const menuData = menuSnap.val() || {};
   ALL_ITEMS = [];
