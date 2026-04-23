@@ -777,13 +777,23 @@ window.groupDoneMulti = async function(idStr, type) {
   }
 
   // typeに関係するアイテムが1つでもあるorderのみsaveRecentDone
+  // 同じorderIDでフード・ドリンク両方ある場合も両方saveRecentDoneに保存
   ids.forEach(id => {
     if (!prevSnapshots[id] || !orders[id]) return;
-    const hasRelevantItem = (orders[id].items || []).some(i => {
-      return type === 'food' ? !isDrinkItem(i.name) : isDrinkItem(i.name);
-    });
-    if (hasRelevantItem) {
-      saveRecentDone(id, type, prevSnapshots[id].itemsDone, prevSnapshots[id].status);
+    const hasFoodItem = (orders[id].items || []).some(i => !isDrinkItem(i.name));
+    const hasDrinkItem = (orders[id].items || []).some(i => isDrinkItem(i.name));
+    if (type === 'food' && hasFoodItem) {
+      saveRecentDone(id, 'food', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
+    }
+    if (type === 'drink' && hasDrinkItem) {
+      saveRecentDone(id, 'drink', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
+    }
+    // フード・ドリンク両方含むorderの場合、両方のtypeでsaveRecentDoneを呼ぶ
+    if (type === 'food' && hasDrinkItem) {
+      saveRecentDone(id, 'drink', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
+    }
+    if (type === 'drink' && hasFoodItem) {
+      saveRecentDone(id, 'food', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
     }
   });
 };
