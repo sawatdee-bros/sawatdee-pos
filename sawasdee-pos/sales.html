@@ -3,34 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>売上管理 - タイ料理レストラン</title>
+<title>売上管理 - サワディーブロス</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+/* ── ヘッダー ── */
 header { background: #1e293b; padding: 14px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #334155; }
 .back-btn { color: #94a3b8; text-decoration: none; font-size: 20px; }
 header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
+.csv-btn { padding: 6px 14px; background: #166534; border: 1px solid #16a34a; border-radius: 8px; color: #4ade80; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.csv-btn:hover { background: #14532d; }
+
+/* ── 期間バー ── */
 .period-bar { display: flex; gap: 8px; padding: 12px 16px; background: #1e293b; border-bottom: 1px solid #334155; overflow-x: auto; }
 .period-btn { padding: 5px 16px; border-radius: 20px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 13px; cursor: pointer; white-space: nowrap; }
 .period-btn.active { background: #0ea5e9; border-color: #0ea5e9; color: white; }
 .period-btn.cal { border-color: #7c3aed; color: #a78bfa; }
 .period-btn.cal.active { background: #7c3aed; border-color: #7c3aed; color: white; }
+
+/* ── コンテナ ── */
 .container { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ── サマリーカード ── */
 .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.summary-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .stat-card { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
 .stat-card.accent { border-color: #0ea5e9; }
+.stat-card.green-accent { border-color: #16a34a; }
+.stat-card.purple-accent { border-color: #7c3aed; }
+.stat-card.orange-accent { border-color: #ea580c; }
 .stat-label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
 .stat-value { font-size: 22px; font-weight: 700; color: #f1f5f9; }
 .stat-value.green { color: #22c55e; }
+.stat-value.blue { color: #38bdf8; }
+.stat-value.purple { color: #a78bfa; }
+.stat-value.orange { color: #fb923c; }
 .stat-sub { font-size: 11px; color: #64748b; margin-top: 4px; }
+.stat-sub.up { color: #22c55e; }
+.stat-sub.down { color: #f87171; }
+
+/* ── セクションタイトル ── */
 .section-title { font-size: 13px; font-weight: 600; color: #64748b; letter-spacing: 0.05em; margin-bottom: 10px; }
+
+/* ── 棒グラフ ── */
 .chart-wrap { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
 .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; margin-bottom: 6px; }
 .bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; gap: 3px; }
 .bar { width: 100%; border-radius: 4px 4px 0 0; background: #0ea5e9; min-height: 2px; }
 .bar.today { background: #22c55e; }
+.bar.prev { background: #475569; opacity: 0.6; }
 .bar-label { font-size: 9px; color: #64748b; white-space: nowrap; }
 .bar-val { font-size: 9px; color: #94a3b8; }
+
+/* ── 月別比較グラフ ── */
+.month-compare-wrap { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
+.month-bars { display: flex; align-items: flex-end; gap: 4px; height: 100px; margin-bottom: 6px; overflow-x: auto; }
+.month-col { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; width: 36px; height: 100%; justify-content: flex-end; gap: 3px; }
+.month-bar { width: 28px; border-radius: 3px 3px 0 0; min-height: 2px; }
+.month-bar.cur { background: #0ea5e9; }
+.month-bar.prev-yr { background: #7c3aed; opacity: 0.7; }
+.month-label { font-size: 9px; color: #64748b; }
+.month-compare-legend { display: flex; gap: 14px; margin-top: 8px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #94a3b8; }
+
+/* ── ランキング ── */
 .rank-list { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
 .rank-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #334155; }
 .rank-item:last-child { border-bottom: none; }
@@ -43,17 +81,33 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .rank-sales { font-size: 13px; font-weight: 600; color: #22c55e; }
 .rank-bar-wrap { width: 80px; height: 6px; background: #334155; border-radius: 3px; }
 .rank-bar-fill { height: 100%; border-radius: 3px; background: #0ea5e9; }
+.rank-tab-bar { display: flex; gap: 1px; background: #334155; border-radius: 8px 8px 0 0; overflow: hidden; }
+.rank-tab { flex: 1; padding: 7px 0; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; background: #1e293b; border: none; }
+.rank-tab.active { background: #0f2a40; color: #38bdf8; font-weight: 600; }
+
+/* ── テーブル別 ── */
 .table-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .table-card { background: #1e293b; border-radius: 10px; padding: 10px 12px; border: 1px solid #334155; text-align: center; }
 .table-card-label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
 .table-card-val { font-size: 15px; font-weight: 700; color: #f1f5f9; }
 .table-card-cnt { font-size: 10px; color: #475569; margin-top: 2px; }
+
+/* ── カテゴリ比率 ── */
 .ratio-wrap { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
 .ratio-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
 .ratio-seg { height: 100%; }
 .ratio-legend { display: flex; flex-wrap: wrap; gap: 8px; }
 .ratio-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .ratio-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #94a3b8; }
+
+/* ── pax分析 ── */
+.pax-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.pax-card { background: #1e293b; border-radius: 10px; padding: 10px 12px; border: 1px solid #334155; text-align: center; }
+.pax-label { font-size: 10px; color: #64748b; margin-bottom: 4px; }
+.pax-value { font-size: 16px; font-weight: 700; color: #a78bfa; }
+.pax-sub { font-size: 10px; color: #475569; margin-top: 2px; }
+
+/* ── カレンダービュー ── */
 .week-block { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
 .week-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #1a2744; border-bottom: 1px solid #334155; cursor: pointer; }
 .week-label { font-size: 13px; font-weight: 700; color: #a78bfa; }
@@ -63,23 +117,6 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .week-body.open { display: block; }
 .day-bills-btn { padding: 2px 8px; background: #1e3a5f; border: 1px solid #334155; border-radius: 6px; color: #60a5fa; font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 .day-bills-btn:hover { background: #1d4ed8; color: white; }
-.bills-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: flex-start; justify-content: center; padding: 20px 8px 40px; overflow-y: auto; }
-.bills-modal.open { display: flex; }
-.bills-box { background: #1e293b; border-radius: 14px; border: 1px solid #334155; width: 420px; max-width: 95vw; color: #e2e8f0; font-family: -apple-system, sans-serif; overflow: hidden; }
-.bills-box-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #334155; }
-.bills-box-body { padding: 12px 16px 16px; max-height: 75vh; overflow-y: auto; }
-.bills-x-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #475569; background: transparent; color: #94a3b8; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; }
-.bills-x-btn:hover { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
-.bills-title { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; }
-.bills-receipt { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; color: #e2e8f0; font-size: 13px; }
-.bills-receipt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.bills-receipt-table { font-size: 16px; font-weight: 700; color: #f1f5f9; }
-.bills-receipt-time { font-size: 11px; color: #64748b; }
-.bills-receipt-status { font-size: 11px; font-weight: 600; color: #22c55e; }
-.bills-receipt-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1e293b; font-size: 12px; color: #cbd5e1; }
-.bills-receipt-item:last-of-type { border-bottom: none; }
-.bills-receipt-total { display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid #334155; margin-top: 6px; padding-top: 6px; font-size: 14px; color: #22c55e; }
-.bills-close-btn { width: 100%; padding: 10px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; margin-top: 8px; }
 .day-row { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid #334155; }
 .day-row:last-child { border-bottom: none; }
 .day-row.today-row { background: rgba(34,197,94,0.07); }
@@ -92,15 +129,49 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .day-sales { font-size: 13px; font-weight: 600; color: #f1f5f9; min-width: 78px; text-align: right; }
 .day-sales.zero { color: #334155; }
 .day-cnt { font-size: 11px; color: #475569; min-width: 28px; text-align: right; }
-.no-data { text-align: center; color: #475569; font-size: 13px; padding: 30px; }
 
-.audio-icon-btn.enabled { color: #22c55e; border-color: #166534; }
+/* ── 伝票モーダル ── */
+.bills-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: flex-start; justify-content: center; padding: 20px 8px 40px; overflow-y: auto; }
+.bills-modal.open { display: flex; }
+.bills-box { background: #1e293b; border-radius: 14px; border: 1px solid #334155; width: 420px; max-width: 95vw; color: #e2e8f0; overflow: hidden; }
+.bills-box-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #334155; }
+.bills-box-body { padding: 12px 16px 16px; max-height: 75vh; overflow-y: auto; }
+.bills-x-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #475569; background: transparent; color: #94a3b8; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.bills-x-btn:hover { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
+.bills-title { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; }
+.bills-receipt { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; font-size: 13px; }
+.bills-receipt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.bills-receipt-table { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+.bills-receipt-time { font-size: 11px; color: #64748b; }
+.bills-receipt-status { font-size: 11px; font-weight: 600; color: #22c55e; }
+.bills-receipt-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1e293b; font-size: 12px; color: #cbd5e1; }
+.bills-receipt-item:last-of-type { border-bottom: none; }
+.bills-receipt-total { display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid #334155; margin-top: 6px; padding-top: 6px; font-size: 14px; color: #22c55e; }
+.bills-close-btn { width: 100%; padding: 10px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; margin-top: 8px; }
+
+/* ── CSVモーダル ── */
+.csv-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 800; display: none; align-items: center; justify-content: center; padding: 20px; }
+.csv-modal.open { display: flex; }
+.csv-box { background: #1e293b; border-radius: 14px; border: 1px solid #334155; width: 360px; max-width: 95vw; padding: 20px; }
+.csv-box h3 { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; }
+.csv-field { margin-bottom: 12px; }
+.csv-field label { font-size: 12px; color: #94a3b8; display: block; margin-bottom: 4px; }
+.csv-field input { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; }
+.csv-field input:focus { outline: none; border-color: #0ea5e9; }
+.csv-actions { display: flex; gap: 8px; margin-top: 16px; }
+.csv-dl-btn { flex: 1; padding: 10px; background: #166534; border: 1px solid #16a34a; border-radius: 8px; color: #4ade80; font-size: 13px; font-weight: 600; cursor: pointer; }
+.csv-dl-btn:hover { background: #14532d; }
+.csv-cancel-btn { padding: 10px 16px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; }
+
+.no-data { text-align: center; color: #475569; font-size: 13px; padding: 30px; }
+.loading-spinner { text-align: center; color: #64748b; font-size: 13px; padding: 40px; }
 </style>
 </head>
 <body>
 <header>
   <a class="back-btn" href="#" onclick="window.parent.postMessage({type:'setMode',mode:'all'},'*');return false;">&#8592;</a>
   <h1>&#128202; 売上管理</h1>
+  <button class="csv-btn" onclick="window.openCsvModal()">&#128190; CSV出力</button>
 </header>
 <div class="period-bar">
   <button class="period-btn active" onclick="setPeriod('today',this)">今日</button>
@@ -110,458 +181,10 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   <button class="period-btn cal" onclick="setPeriod('calendar',this)">&#128197; 日別一覧</button>
 </div>
 <div class="container" id="container">
-  <div class="no-data">読み込み中...</div>
+  <div class="loading-spinner">読み込み中...</div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-var FC = {
-  apiKey: "AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ",
-  authDomain: "sawatdee-bros.firebaseapp.com",
-  databaseURL: "https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "sawatdee-bros",
-  storageBucket: "sawatdee-bros.firebasestorage.app",
-  messagingSenderId: "1026345346676",
-  appId: "1:1026345346676:web:98478c02d3dfbae3df310e"
-};
-var app = initializeApp(FC);
-var db = getDatabase(app);
-var DAY_START = 8;
-get(ref(db, 'store_config/day_start_hour')).then(function(snap) { if (snap.val() !== null) DAY_START = snap.val(); });
-var allOrders = {};
-var allPax = {};
-var currentPeriod = 'today';
-var DRINKS = ['タイアイスティー','マンゴーラッシー','シンハービール','お水'];
-var CAT_COLORS = { 'ドリンク':'#0ea5e9', '麺・ご飯':'#f97316', 'カレー':'#eab308', '前菜':'#22c55e' };
-var MENU_CAT = {
-  'パッタイ':'麺・ご飯','カオパット':'麺・ご飯','クイッティアオ':'麺・ご飯','カオマンガイ':'麺・ご飯',
-  'グリーンカレー':'カレー','レッドカレー':'カレー','マッサマン':'カレー','イエローカレー':'カレー',
-  '生春巻き':'前菜','トートマンプラー':'前菜','ソムタム':'前菜','サテー':'前菜',
-  'タイアイスティー':'ドリンク','マンゴーラッシー':'ドリンク','シンハービール':'ドリンク','お水':'ドリンク'
-};
-var DOW = ['日','月','火','水','木','金','土'];
-
-window.setPeriod = function(p, btn) {
-  currentPeriod = p;
-  var bs = document.querySelectorAll('.period-btn');
-  for (var i = 0; i < bs.length; i++) bs[i].classList.remove('active');
-  btn.classList.add('active');
-  if (p === 'calendar') renderCalendar();
-  else render();
-};
-
-window.showDayBills = function(ds) {
-  var tableNameFn = window.TABLE_NAMES ? function(t) { return window.TABLE_NAMES[String(t)] || 'T'+t; } : null;
-  var h = String(DAY_START).padStart(2,'0'); var start = new Date(ds + 'T' + h + ':00:00').getTime();
-  var end = start + 24 * 60 * 60 * 1000;
-  var dayOrders = Object.values(allOrders).filter(function(o) {
-    return o.timestamp >= start && o.timestamp < end && (o.status === 'paid' || o.status === 'done');
-  }).sort(function(a,b){ return a.timestamp - b.timestamp; });
-  var disp = ds.slice(5).replace('-', '/');
-  document.getElementById('bills-modal-title').textContent = disp + ' の伝票';
-  if (dayOrders.length === 0) {
-    document.getElementById('bills-modal-content').innerHTML = '<div style="color:#475569;text-align:center;padding:20px">注文がありません</div>';
-  } else {
-    // テーブルごとにpaidAtでセッショングループ化
-    var sessionMap = {};
-    dayOrders.forEach(function(o) {
-      var tbl = o.table;
-      var sessionKey = tbl + '__' + (o.paidAt || 'unpaid');
-      if (!sessionMap[sessionKey]) sessionMap[sessionKey] = { table: tbl, orders: [], paidAt: o.paidAt, isPaid: o.status === 'paid' };
-      sessionMap[sessionKey].orders.push(o);
-      if (o.status === 'paid') sessionMap[sessionKey].isPaid = true;
-    });
-    // セッションを最初の注文タイムスタンプでソート
-    var sessions = Object.values(sessionMap).sort(function(a,b) {
-      return a.orders[0].timestamp - b.orders[0].timestamp;
-    });
-    var html = '';
-    sessions.forEach(function(sess) {
-      var t = new Date(sess.orders[0].timestamp);
-      var timeStr = ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
-      var tblName = tableNameFn ? tableNameFn(sess.table) : 'T'+sess.table;
-      var statusBadge = sess.isPaid ? '✓ 会計済み' : '提供済み';
-      // 全商品をまとめる
-      var drinkNames = ["お冷","生ビール 中ジョッキ", "瓶ビール 大びん", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガ角ハイボール", "角ハイボール", "ジンジャー角ハイボール", "コーク角ハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "ホッピー中", "ホッピー外", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク"];
-      var itemMap = {};
-      var sessionEx = 0;
-      var drinkQty = 0;
-      var sessPax = 0;
-      sess.orders.forEach(function(o) {
-        if (o.pax) sessPax = o.pax;
-        (o.items||[]).forEach(function(it) {
-          sessionEx += it.price * it.qty;
-          if (drinkNames.indexOf(it.name) >= 0 && it.name !== 'お冷') drinkQty += it.qty;
-        });
-        (o.items||[]).forEach(function(it) {
-          var key = it.name;
-          if (!itemMap[key]) itemMap[key] = { name: it.name, price: it.price, qty: 0 };
-          itemMap[key].qty += it.qty;
-        });
-      });
-      var paxFinal = sessPax || allPax[sess.table] || 0;
-      var hasFreeCharge = drinkQty >= paxFinal * 2;
-      var chargeEx = 250 * paxFinal;
-      var finalEx = sessionEx + (hasFreeCharge ? 0 : chargeEx);
-      html += '<div class="bills-receipt">';
-      html += '<div class="bills-receipt-header">'
-        + '<span class="bills-receipt-table">' + tblName + '</span>'
-        + '<span class="bills-receipt-time">' + timeStr + '</span>'
-        + '<span class="bills-receipt-status">' + statusBadge + '</span>'
-        + '</div>';
-      // ドリンク→フードの順にソート
-      var sortedItems = Object.values(itemMap).sort(function(a, b) {
-        var aD = drinkNames.indexOf(a.name) >= 0;
-        var bD = drinkNames.indexOf(b.name) >= 0;
-        if (aD && !bD) return -1;
-        if (!aD && bD) return 1;
-        return 0;
-      });
-      sortedItems.forEach(function(it) {
-        html += '<div class="bills-receipt-item"><span>' + it.name + (it.qty>1?' ×'+it.qty:'') + '</span><span>¥' + (it.price*it.qty).toLocaleString() + '</span></div>';
-      });
-      var sessionTotal = Math.round(Math.floor(finalEx*1.1)/10)*10;
-      html += '<div class="bills-receipt-total"><span>合計（税込）</span><span>¥' + sessionTotal.toLocaleString() + '</span></div>';
-      html += '</div>';
-    });
-    document.getElementById('bills-modal-content').innerHTML = html;
-  }
-  document.getElementById('bills-modal').classList.add('open');
-};
-window.closeDayBills = function() {
-  document.getElementById('bills-modal').classList.remove('open');
-};
-window.toggleWeek = function(id) {
-  var el = document.getElementById(id);
-  if (el.classList.contains('open')) el.classList.remove('open');
-  else el.classList.add('open');
-};
-
-function startOf(unit) {
-  var d = new Date();
-  if (unit === 'today') { if (d.getHours() < DAY_START) d.setDate(d.getDate()-1); d.setHours(DAY_START,0,0,0); return d.getTime(); }
-  if (unit === 'week') { if (d.getHours() < DAY_START) d.setDate(d.getDate()-1); var dow = d.getDay(); var diff = (dow >= 3) ? dow - 3 : dow + 4; d.setDate(d.getDate() - diff); d.setHours(DAY_START,0,0,0); return d.getTime(); }
-  if (unit === 'month') { if (d.getHours() < DAY_START) d.setDate(d.getDate()-1); d.setDate(1); d.setHours(DAY_START,0,0,0); return d.getTime(); }
-  return 0;
-}
-
-function getFiltered() {
-  var from = startOf(currentPeriod);
-  var result = [];
-  var keys = Object.keys(allOrders);
-  for (var i = 0; i < keys.length; i++) {
-    var o = allOrders[keys[i]];
-    if (o.status !== 'paid' && o.status !== 'done') continue;
-    if (o.timestamp < from) continue;
-    result.push(o);
-  }
-  return result;
-}
-
-function render() {
-  var orders = getFiltered();
-  var cont = document.getElementById('container');
-  if (orders.length === 0) { cont.innerHTML = '<div class="no-data">この期間の売上データがありません</div>'; return; }
-
-  // セッション単位（テーブル×paidAt）でまとめて税込10円丸め計算
-  var CHARGE = 250;
-  var drinkNames = ["お冷","生ビール 中ジョッキ","瓶ビール 大びん","ノンアルビール 小びん","シンハー","チャーン","リオ","マンゴービア","グアバビア","メガ角ハイボール","角ハイボール","ジンジャー角ハイボール","コーク角ハイボール","メコンハイボール","メコンジンジャー","メコンコーク","タイサワー","パクチーレモンサワー","タイ式漢方サワー","レモンサワー","クエン酸サワー","バイス(梅しそ)サワー","チューハイ","ウーロンハイ","ジャスミンハイ","ホッピー","ホッピー中","ホッピー外","マンゴーハイ","グアバハイ","タイ紅茶ハイ","マンゴーミルクハイ","グアバミルクハイ","カシスソーダ","カシスウーロン","カシスマンゴー","テキーラコーク","テキーラグアバ","テキーラショット","泡盛(久米仙)","ジャスミン焼酒(茉莉花)","梅酒","グラスワイン 赤","グラスワイン 白","デキャンタ 赤","デキャンタ 白","ボトルワイン 赤","ボトルワイン 白","マンゴージュース","グアバジュース","タイ紅茶(タイ式ミルクティー)","炭酸水(カットレモン入り)","コカコーラ","ジンジャーエール(辛口)","ウーロン茶","ジャスミン茶","ノンアル★タイサワー","ノンアル★マンゴーミルク","生ビール ジョッキ（アサヒ　スーパードライ）","メガハイボール","ジンジャーハイボール","コークハイボール","瓶ビール 大びん（サッポロ　赤星）"];
-  var sessionSalesMap = {};
-  orders.forEach(function(o) {
-    var sk = (o.table||'?') + '__' + (o.paidAt || 'unpaid');
-    if (!sessionSalesMap[sk]) sessionSalesMap[sk] = { table: o.table||'?', ex: 0, ts: o.timestamp, drinkQty: 0, pax: 0 };
-    if (o.timestamp < sessionSalesMap[sk].ts) sessionSalesMap[sk].ts = o.timestamp;
-    if (o.pax) sessionSalesMap[sk].pax = o.pax;
-    (o.items||[]).forEach(function(it) {
-      sessionSalesMap[sk].ex += it.price * it.qty;
-      if (drinkNames.indexOf(it.name) >= 0 && it.name !== 'お冷') sessionSalesMap[sk].drinkQty += it.qty;
-    });
-  });
-  // セッションごとの税込10円丸め売上（チャージ込み）
-  var sessionSales = Object.values(sessionSalesMap).map(function(s) {
-    var pax = s.pax || allPax[s.table] || 0;
-    var hasFreeCharge = s.drinkQty >= pax * 2;
-    var chargeEx = CHARGE * pax;
-    var finalEx = s.ex + (hasFreeCharge ? 0 : chargeEx);
-    return { table: s.table, sales: Math.round(Math.floor(finalEx * 1.1) / 10) * 10 };
-  });
-
-  var totalIn = 0, totalOrders = orders.length;
-  var itemMap = {}, tableMap = {}, catMap = {};
-  sessionSales.forEach(function(s) {
-    totalIn += s.sales;
-    if (!tableMap[s.table]) tableMap[s.table] = { sales:0, count:0 };
-    tableMap[s.table].sales += s.sales;
-  });
-  orders.forEach(function(o) { tableMap[o.table||'?'].count++; });
-  for (var i = 0; i < orders.length; i++) {
-    var o = orders[i];
-    var items = o.items || [];
-    for (var j = 0; j < items.length; j++) {
-      var it = items[j];
-      if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, qty:0, sales:0 };
-      itemMap[it.name].qty += it.qty;
-      itemMap[it.name].sales += it.price * it.qty;
-      var cat = MENU_CAT[it.name] || 'その他';
-      if (!catMap[cat]) catMap[cat] = 0;
-      catMap[cat] += it.price * it.qty;
-    }
-  }
-  var totalEx = Math.round(totalIn / 1.1);
-  var totalTax = totalIn - totalEx;
-  var avg = totalOrders > 0 ? Math.floor(totalIn / totalOrders) : 0;
-
-  var ranking = Object.keys(itemMap).map(function(k){ return itemMap[k]; });
-  ranking.sort(function(a,b){ return b.qty - a.qty; });
-  var maxQty = ranking.length > 0 ? ranking[0].qty : 1;
-
-  // 棒グラフデータ
-  var barData = [];
-  var nowH = new Date().getHours();
-  var nowDow = new Date().getDay();
-  var nowDate = new Date().getDate();
-  if (currentPeriod === 'today') {
-    for (var h = 11; h <= 22; h++) {
-      var v = 0;
-      Object.values(sessionSalesMap).forEach(function(s){ if (new Date(s.ts).getHours() === h) v += Math.round(Math.floor(s.ex*1.1)/10)*10; });
-      barData.push({ label: h + '時', val: v, isNow: nowH === h });
-    }
-  } else if (currentPeriod === 'week') {
-    for (var d = 0; d < 7; d++) {
-      var v = 0;
-      Object.values(sessionSalesMap).forEach(function(s){ if (new Date(s.ts).getDay() === d) v += Math.round(Math.floor(s.ex*1.1)/10)*10; });
-      barData.push({ label: DOW[d], val: v, isNow: nowDow === d });
-    }
-  } else if (currentPeriod === 'month') {
-    var dim = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
-    for (var d = 1; d <= dim; d++) {
-      var v = 0;
-      Object.values(sessionSalesMap).forEach(function(s){ if (new Date(s.ts).getDate() === d) v += Math.round(Math.floor(s.ex*1.1)/10)*10; });
-      barData.push({ label: d % 5 === 0 ? String(d) : '', val: v, isNow: nowDate === d });
-    }
-  }
-  var maxBar = 1;
-  for (var i = 0; i < barData.length; i++) if (barData[i].val > maxBar) maxBar = barData[i].val;
-
-  var catTotal = 0;
-  var catKeys = Object.keys(catMap);
-  for (var i = 0; i < catKeys.length; i++) catTotal += catMap[catKeys[i]];
-  if (catTotal === 0) catTotal = 1;
-
-  var h = '';
-
-  // サマリー
-  h += '<div class="summary-grid">'
-    + '<div class="stat-card accent"><div class="stat-label">売上合計（税込）</div><div class="stat-value green">&#165;' + totalIn.toLocaleString() + '</div>'
-    + '<div class="stat-sub">税抜 &#165;' + totalEx.toLocaleString() + ' / 税 &#165;' + totalTax.toLocaleString() + '</div></div>'
-    + '<div class="stat-card"><div class="stat-label">注文件数</div><div class="stat-value">' + totalOrders + '件</div>'
-    + '<div class="stat-sub">客単価 &#165;' + avg.toLocaleString() + '</div></div>'
-    + '</div>';
-
-  // グラフ
-  if (barData.length > 0) {
-    h += '<div class="chart-wrap"><div class="section-title">'
-      + (currentPeriod==='today'?'時間帯別':currentPeriod==='week'?'曜日別':'日別') + '売上</div>'
-      + '<div class="bar-chart">';
-    for (var i = 0; i < barData.length; i++) {
-      var b = barData[i];
-      var pct = Math.round(b.val / maxBar * 100);
-      h += '<div class="bar-col">'
-        + (b.val > 0 ? '<div class="bar-val">' + (b.val >= 10000 ? Math.round(b.val/1000)+'k' : '') + '</div>' : '')
-        + '<div class="bar' + (b.isNow?' today':'') + '" style="height:' + pct + '%"></div>'
-        + '<div class="bar-label">' + b.label + '</div></div>';
-    }
-    h += '</div></div>';
-  }
-
-  // カテゴリ比率
-  h += '<div class="ratio-wrap"><div class="section-title">カテゴリ別売上比率</div><div class="ratio-bar">';
-  for (var i = 0; i < catKeys.length; i++) {
-    var pct = Math.round(catMap[catKeys[i]] / catTotal * 100);
-    var col = CAT_COLORS[catKeys[i]] || '#64748b';
-    h += '<div class="ratio-seg" style="width:' + pct + '%;background:' + col + '"></div>';
-  }
-  h += '</div><div class="ratio-legend">';
-  for (var i = 0; i < catKeys.length; i++) {
-    var pct = Math.round(catMap[catKeys[i]] / catTotal * 100);
-    var col = CAT_COLORS[catKeys[i]] || '#64748b';
-    h += '<div class="ratio-item"><div class="ratio-dot" style="background:' + col + '"></div>' + catKeys[i] + ' ' + pct + '%</div>';
-  }
-  h += '</div></div>';
-
-  // ランキング
-  h += '<div><div class="section-title">メニュー別ランキング</div><div class="rank-list">';
-  var top = Math.min(ranking.length, 8);
-  for (var i = 0; i < top; i++) {
-    var it = ranking[i];
-    var nc = i===0?'rank-num gold':i===1?'rank-num silver':i===2?'rank-num bronze':'rank-num';
-    var pct = Math.round(it.qty / maxQty * 100);
-    h += '<div class="rank-item"><span class="' + nc + '">' + (i+1) + '</span>'
-      + '<span class="rank-name">' + it.name + '</span>'
-      + '<span class="rank-qty">' + it.qty + '個</span>'
-      + '<div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:' + pct + '%"></div></div>'
-      + '<span class="rank-sales">&#165;' + it.sales.toLocaleString() + '</span></div>';
-  }
-  h += '</div></div>';
-
-  // テーブル別
-  var tnums = Object.keys(tableMap).sort();
-  if (tnums.length > 0) {
-    h += '<div><div class="section-title">テーブル別売上</div><div class="table-grid">';
-    for (var i = 0; i < tnums.length; i++) {
-      var t = tnums[i];
-      h += '<div class="table-card"><div class="table-card-label">T' + t + '</div>'
-        + '<div class="table-card-val">&#165;' + tableMap[t].sales.toLocaleString() + '</div>'
-        + '<div class="table-card-cnt">' + tableMap[t].count + '件</div></div>';
-    }
-    h += '</div></div>';
-  }
-
-  cont.innerHTML = h;
-}
-
-function renderCalendar() {
-  var cont = document.getElementById('container');
-  var now = new Date();
-  var pad = function(n){ return ('0'+n).slice(-2); };
-  var todayStr = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
-
-  // 1/1から今日まで
-  var start = new Date(now.getFullYear(), 0, 1);
-  var days = [];
-  var cur = new Date(start);
-  while (cur <= now) {
-    var ds = cur.getFullYear() + '-' + pad(cur.getMonth()+1) + '-' + pad(cur.getDate());
-    days.push({ ds: ds, dow: cur.getDay() });
-    cur.setDate(cur.getDate() + 1);
-  }
-
-  // 日別集計
-  var dayMap = {};
-  var keys = Object.keys(allOrders);
-  for (var i = 0; i < keys.length; i++) {
-    var o = allOrders[keys[i]];
-    if (o.status !== 'paid' && o.status !== 'done') continue;
-    var d = new Date(o.timestamp - DAY_START * 60 * 60 * 1000);
-    var ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-    if (!dayMap[ds]) dayMap[ds] = { sales:0, count:0 };
-    dayMap[ds].count++;
-  }
-  // 週次売上もセッション単位で計算
-  var drinkNamesC = ["お冷","生ビール 中ジョッキ","瓶ビール 大びん","ノンアルビール 小びん","シンハー","チャーン","リオ","マンゴービア","グアバビア","メガ角ハイボール","角ハイボール","ジンジャー角ハイボール","コーク角ハイボール","メコンハイボール","メコンジンジャー","メコンコーク","タイサワー","パクチーレモンサワー","タイ式漢方サワー","レモンサワー","クエン酸サワー","バイス(梅しそ)サワー","チューハイ","ウーロンハイ","ジャスミンハイ","ホッピー","ホッピー中","ホッピー外","マンゴーハイ","グアバハイ","タイ紅茶ハイ","マンゴーミルクハイ","グアバミルクハイ","カシスソーダ","カシスウーロン","カシスマンゴー","テキーラコーク","テキーラグアバ","テキーラショット","泡盛(久米仙)","ジャスミン焼酒(茉莉花)","梅酒","グラスワイン 赤","グラスワイン 白","デキャンタ 赤","デキャンタ 白","ボトルワイン 赤","ボトルワイン 白","マンゴージュース","グアバジュース","タイ紅茶(タイ式ミルクティー)","炭酸水(カットレモン入り)","コカコーラ","ジンジャーエール(辛口)","ウーロン茶","ジャスミン茶","ノンアル★タイサワー","ノンアル★マンゴーミルク","生ビール ジョッキ（アサヒ　スーパードライ）","メガハイボール","ジンジャーハイボール","コークハイボール","瓶ビール 大びん（サッポロ　赤星）"];
-  var wkSessionMap = {};
-  for (var i = 0; i < keys.length; i++) {
-    var o = allOrders[keys[i]];
-    if (o.status !== 'paid' && o.status !== 'done') continue;
-    var sk = (o.table||'?') + '__' + (o.paidAt || 'unpaid');
-    if (!wkSessionMap[sk]) wkSessionMap[sk] = { table: o.table||'?', ex: 0, ts: o.timestamp, drinkQty: 0, pax: 0 };
-    if (o.timestamp < wkSessionMap[sk].ts) wkSessionMap[sk].ts = o.timestamp;
-    if (o.pax) wkSessionMap[sk].pax = o.pax;
-    (o.items||[]).forEach(function(it) {
-      wkSessionMap[sk].ex += it.price * it.qty;
-      if (drinkNamesC.indexOf(it.name) >= 0 && it.name !== 'お冷') wkSessionMap[sk].drinkQty += it.qty;
-    });
-  }
-  Object.values(wkSessionMap).forEach(function(s) {
-    var pax = s.pax || allPax[s.table] || 0;
-    var hasFreeCharge = s.drinkQty >= pax * 2;
-    s.ex = s.ex + (hasFreeCharge ? 0 : 250 * pax);
-    var d = new Date(s.ts - DAY_START * 60 * 60 * 1000);
-    var ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-    if (dayMap[ds]) dayMap[ds].sales += Math.round(Math.floor(s.ex*1.1)/10)*10;
-  });
-
-  var maxDay = 1;
-  var dk = Object.keys(dayMap);
-  for (var i = 0; i < dk.length; i++) if (dayMap[dk[i]].sales > maxDay) maxDay = dayMap[dk[i]].sales;
-
-  // 週グループ
-  var weeks = [];
-  var curWeek = null;
-  for (var i = 0; i < days.length; i++) {
-    var day = days[i];
-    if (day.dow === 3 || curWeek === null) {
-      curWeek = { days:[], total:0, count:0 };
-      weeks.push(curWeek);
-    }
-    curWeek.days.push(day);
-    if (dayMap[day.ds]) { curWeek.total += dayMap[day.ds].sales; curWeek.count += dayMap[day.ds].count; }
-  }
-
-  var totalAll = 0, countAll = 0;
-  for (var i = 0; i < weeks.length; i++) { totalAll += weeks[i].total; countAll += weeks[i].count; }
-
-  var h = '<div class="summary-grid">'
-    + '<div class="stat-card accent"><div class="stat-label">年間売上合計（税込）</div><div class="stat-value green">&#165;' + totalAll.toLocaleString() + '</div><div class="stat-sub">1/1〜今日</div></div>'
-    + '<div class="stat-card"><div class="stat-label">総注文件数</div><div class="stat-value">' + countAll + '件</div>'
-    + '<div class="stat-sub">平均 &#165;' + (countAll > 0 ? Math.floor(totalAll/countAll).toLocaleString() : 0) + '/件</div></div>'
-    + '</div>';
-
-  h += '<div class="section-title">週別・日別売上一覧</div>';
-
-  for (var wi = weeks.length - 1; wi >= 0; wi--) {
-    var wk = weeks[wi];
-    var wStart = wk.days[0].ds.slice(5).replace('-', '/');
-    var wEnd = wk.days[wk.days.length-1].ds.slice(5).replace('-', '/');
-    var isCurrent = wi === weeks.length - 1;
-    var wid = 'wk' + wi;
-
-    h += '<div class="week-block">'
-      + '<div class="week-header" onclick="toggleWeek(' + "'" + wid + "'" + ')">'
-      + '<div><span class="week-label">第' + (wi+1) + '週　' + wStart + '〜' + wEnd + '</span>'
-      + (isCurrent ? '&nbsp;<span style="font-size:10px;color:#22c55e">今週</span>' : '') + '</div>'
-      + '<div style="text-align:right"><div class="week-total">&#165;' + wk.total.toLocaleString() + '</div>'
-      + '<div class="week-sub">' + wk.count + '件</div></div>'
-      + '</div>'
-      + '<div class="week-body' + (isCurrent ? ' open' : '') + '" id="' + wid + '">';
-
-    for (var di = wk.days.length - 1; di >= 0; di--) {
-      var day = wk.days[di];
-      var isToday = day.ds === todayStr;
-      var data = dayMap[day.ds];
-      var sales = data ? data.sales : 0;
-      var cnt = data ? data.count : 0;
-      var pct = Math.round(sales / maxDay * 100);
-      var disp = day.ds.slice(5).replace('-', '/');
-      var dow = DOW[day.dow];
-      var dowStyle = day.dow === 0 ? 'color:#ef4444' : day.dow === 6 ? 'color:#60a5fa' : 'color:#64748b';
-
-      h += '<div class="day-row' + (isToday ? ' today-row' : '') + '">'
-        + '<span class="day-date' + (isToday ? ' today-lbl' : '') + '">' + disp + (isToday ? '&#9312;' : '') + '</span>'
-        + '<span class="day-dow" style="' + dowStyle + '">' + dow + '</span>'
-        + '<div class="day-bar-wrap"><div class="day-bar-fill' + (isToday ? ' tf' : '') + '" style="width:' + pct + '%"></div></div>'
-        + '<span class="day-sales' + (sales === 0 ? ' zero' : '') + '">' + (sales > 0 ? '&#165;' + sales.toLocaleString() : '&minus;') + '</span>'
-        + '<span class="day-cnt">' + (cnt > 0 ? cnt + '件' : '') + '</span>'
-        + (cnt > 0 ? '<button class="day-bills-btn" onclick="window.showDayBills(\'' + day.ds + '\')">\u4f1d\u7968</button>' : '<span style="width:24px"></span>')
-        + '</div>';
-    }
-    h += '</div></div>';
-  }
-
-  cont.innerHTML = h;
-}
-
-
-var TABLE_NAMES = {
-  '1': 'テーブル1', '2': 'テーブル2', '3': 'テーブル3', '4': 'テーブル4',
-  '5': 'コーラ卓', '6': '座敷席', '7': 'カウンター1・2',
-  '8': 'カウンター3・4', '9': 'カウンター5', '10': '奥席'
-};
-window.TABLE_NAMES = TABLE_NAMES;
-
-onValue(ref(db, 'orders'), function(snap) {
-  allOrders = snap.val() || {};
-  if (currentPeriod === 'calendar') renderCalendar();
-  else render();
-});
-onValue(ref(db, 'pax'), function(snap) {
-  allPax = snap.val() || {};
-  if (currentPeriod === 'calendar') renderCalendar();
-  else render();
-});
-</script>
+<!-- 伝票モーダル -->
 <div class="bills-modal" id="bills-modal">
   <div class="bills-box">
     <div class="bills-box-header">
@@ -573,5 +196,769 @@ onValue(ref(db, 'pax'), function(snap) {
     </div>
   </div>
 </div>
+
+<!-- CSVモーダル -->
+<div class="csv-modal" id="csv-modal">
+  <div class="csv-box">
+    <h3>&#128190; CSV出力（確定申告用）</h3>
+    <div class="csv-field">
+      <label>開始日</label>
+      <input type="date" id="csv-from">
+    </div>
+    <div class="csv-field">
+      <label>終了日</label>
+      <input type="date" id="csv-to">
+    </div>
+    <div class="csv-field">
+      <label>出力単位</label>
+      <select id="csv-unit" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:13px;">
+        <option value="session">セッション別（伝票1枚ずつ）</option>
+        <option value="day">日別集計</option>
+        <option value="month">月別集計</option>
+        <option value="item">商品別集計</option>
+      </select>
+    </div>
+    <div class="csv-actions">
+      <button class="csv-cancel-btn" onclick="window.closeCsvModal()">キャンセル</button>
+      <button class="csv-dl-btn" onclick="window.downloadCsv()">&#8595; ダウンロード</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ─────────────────────────────────────────────
+//  Firebase 初期化
+// ─────────────────────────────────────────────
+var FC = {
+  apiKey: "AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ",
+  authDomain: "sawatdee-bros.firebaseapp.com",
+  databaseURL: "https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sawatdee-bros",
+  storageBucket: "sawatdee-bros.firebasestorage.app",
+  messagingSenderId: "1026345346676",
+  appId: "1:1026345346676:web:98478c02d3dfbae3df310e"
+};
+var app = initializeApp(FC);
+var db = getDatabase(app);
+
+// ─────────────────────────────────────────────
+//  グローバル状態
+// ─────────────────────────────────────────────
+var allOrders = {};
+var allPax = {};
+var menuData = {};       // menu/ ノード全体
+var storeConfig = {};    // store_config/ ノード全体
+var drinkKeySet = null;  // Firebaseから構築したドリンク名セット
+var currentPeriod = 'today';
+var rankMode = 'qty';    // 'qty' | 'sales'
+var DOW = ['日','月','火','水','木','金','土'];
+var TABLE_NAMES = {
+  '1':'テーブル1','2':'テーブル2','3':'テーブル3','4':'テーブル4',
+  '5':'コーラ卓','6':'座敷席','7':'カウンター1・2',
+  '8':'カウンター3・4','9':'カウンター5','10':'奥席'
+};
+window.TABLE_NAMES = TABLE_NAMES;
+
+// ─────────────────────────────────────────────
+//  ドリンク判定（CLAUDE.md: isDrinkItem() 相当）
+//  Firebaseのmenu/drinkキーと照合（startsWith対応）
+// ─────────────────────────────────────────────
+function buildDrinkKeySet() {
+  var s = new Set();
+  var drink = menuData.drink || {};
+  Object.values(drink).forEach(function(subcat) {
+    var items = Array.isArray(subcat) ? subcat : Object.values(subcat);
+    items.forEach(function(it) { if (it && it.name) s.add(it.name); });
+  });
+  drinkKeySet = s;
+}
+
+function isDrinkItem(name) {
+  if (!drinkKeySet) return false;
+  if (drinkKeySet.has(name)) return true;
+  // startsWith対応（「梅酒（ロック）」等のオプション付き）
+  for (var k of drinkKeySet) {
+    if (name.startsWith(k)) return true;
+  }
+  return false;
+}
+
+// アイテムのカテゴリを返す（ドリンク / フード / セット / その他）
+function getItemCategory(name) {
+  if (isDrinkItem(name)) return 'ドリンク';
+  // フード
+  var food = menuData.food || {};
+  for (var sub of Object.values(food)) {
+    var items = Array.isArray(sub) ? sub : Object.values(sub);
+    for (var it of items) { if (it && it.name === name) return 'フード'; }
+  }
+  // セット
+  var set = menuData.set || {};
+  for (var sub of Object.values(set)) {
+    var items = Array.isArray(sub) ? sub : Object.values(sub);
+    for (var it of items) { if (it && it.name === name) return 'セット'; }
+  }
+  return 'その他';
+}
+
+// ─────────────────────────────────────────────
+//  チャージ計算（store_config 対応）
+// ─────────────────────────────────────────────
+function calcCharge(drinkQty, pax, hasChargeExempt) {
+  var mode = storeConfig.charge_mode || 'conditional';
+  var chargePerPerson = storeConfig.charge_per_person || 250;
+  var freeDrinkCount = storeConfig.charge_free_drink_count || 2;
+
+  if (hasChargeExempt) return 0;
+  if (mode === 'none') return 0;
+  if (mode === 'always') return chargePerPerson * pax;
+  // conditional
+  var hasFreeCharge = pax > 0 && drinkQty >= pax * freeDrinkCount;
+  return hasFreeCharge ? 0 : chargePerPerson * pax;
+}
+
+// セッション単位の税込売上を計算
+function calcSessionSales(sessionEx, drinkQty, pax, hasChargeExempt) {
+  var charge = calcCharge(drinkQty, pax, hasChargeExempt);
+  var finalEx = sessionEx + charge;
+  return Math.round(Math.floor(finalEx * (1 + (storeConfig.tax_rate || 10) / 100)) / 10) * 10;
+}
+
+// ─────────────────────────────────────────────
+//  セッションマップ構築（共通）
+// ─────────────────────────────────────────────
+function buildSessionMap(orders) {
+  var map = {};
+  orders.forEach(function(o) {
+    var sk = (o.table||'?') + '__' + (o.paidAt || 'unpaid');
+    if (!map[sk]) map[sk] = {
+      table: o.table||'?', ex: 0, ts: o.timestamp,
+      drinkQty: 0, pax: 0, hasChargeExempt: false,
+      items: {}, orders: []
+    };
+    var s = map[sk];
+    if (o.timestamp < s.ts) s.ts = o.timestamp;
+    if (o.pax) s.pax = o.pax;
+    s.orders.push(o);
+    (o.items||[]).forEach(function(it) {
+      s.ex += it.price * it.qty;
+      if (isDrinkItem(it.name) && it.name !== 'お冷') s.drinkQty += it.qty;
+      if (it.charge_exempt) s.hasChargeExempt = true;
+      if (!s.items[it.name]) s.items[it.name] = { name: it.name, price: it.price, qty: 0 };
+      s.items[it.name].qty += it.qty;
+    });
+  });
+  // pax解決
+  Object.values(map).forEach(function(s) {
+    if (!s.pax) s.pax = allPax[s.table] || 0;
+    s.sales = calcSessionSales(s.ex, s.drinkQty, s.pax, s.hasChargeExempt);
+  });
+  return map;
+}
+
+// ─────────────────────────────────────────────
+//  期間フィルタ
+// ─────────────────────────────────────────────
+var DAY_START = 8;
+function startOf(unit) {
+  var d = new Date();
+  if (unit === 'today') {
+    if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
+    d.setHours(DAY_START,0,0,0); return d.getTime();
+  }
+  if (unit === 'week') {
+    if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
+    var dow = d.getDay(); var diff = (dow >= 3) ? dow-3 : dow+4;
+    d.setDate(d.getDate()-diff); d.setHours(DAY_START,0,0,0); return d.getTime();
+  }
+  if (unit === 'month') {
+    if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
+    d.setDate(1); d.setHours(DAY_START,0,0,0); return d.getTime();
+  }
+  return 0;
+}
+
+function getFiltered() {
+  var from = startOf(currentPeriod);
+  return Object.values(allOrders).filter(function(o) {
+    return (o.status === 'paid' || o.status === 'done') && o.timestamp >= from;
+  });
+}
+
+// ─────────────────────────────────────────────
+//  日付文字列ユーティリティ
+// ─────────────────────────────────────────────
+var pad = function(n){ return ('0'+n).slice(-2); };
+function toDayStr(ts) {
+  var d = new Date(ts - DAY_START * 3600000);
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function todayStr() {
+  var d = new Date();
+  if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+
+// ─────────────────────────────────────────────
+//  期間切り替え
+// ─────────────────────────────────────────────
+window.setPeriod = function(p, btn) {
+  currentPeriod = p;
+  document.querySelectorAll('.period-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  if (p === 'calendar') renderCalendar();
+  else render();
+};
+
+// ─────────────────────────────────────────────
+//  メインレンダリング（今日 / 今週 / 今月 / 累計）
+// ─────────────────────────────────────────────
+function render() {
+  var orders = getFiltered();
+  var cont = document.getElementById('container');
+  if (orders.length === 0) {
+    cont.innerHTML = '<div class="no-data">この期間の売上データがありません</div>';
+    return;
+  }
+
+  var sessionMap = buildSessionMap(orders);
+  var sessions = Object.values(sessionMap);
+
+  // 集計
+  var totalIn = 0, totalSessions = sessions.length, totalPax = 0, paxCount = 0;
+  var itemMap = {}, catMap = { 'ドリンク':0, 'フード':0, 'セット':0, 'その他':0 };
+  var tableMap = {};
+
+  sessions.forEach(function(s) {
+    totalIn += s.sales;
+    totalPax += s.pax; if (s.pax > 0) paxCount++;
+    if (!tableMap[s.table]) tableMap[s.table] = { sales:0, sessions:0 };
+    tableMap[s.table].sales += s.sales;
+    tableMap[s.table].sessions++;
+  });
+
+  orders.forEach(function(o) {
+    (o.items||[]).forEach(function(it) {
+      var cat = getItemCategory(it.name);
+      catMap[cat] = (catMap[cat] || 0) + it.price * it.qty;
+      if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, qty:0, sales:0, cat:cat };
+      itemMap[it.name].qty += it.qty;
+      itemMap[it.name].sales += it.price * it.qty;
+    });
+  });
+
+  var taxRate = storeConfig.tax_rate || 10;
+  var totalEx = Math.round(totalIn / (1 + taxRate/100));
+  var totalTax = totalIn - totalEx;
+  var avgPerSession = totalSessions > 0 ? Math.floor(totalIn / totalSessions) : 0;
+  var avgPax = paxCount > 0 ? (totalPax / paxCount).toFixed(1) : '-';
+  var avgPerPax = (totalPax > 0) ? Math.floor(totalIn / totalPax) : 0;
+
+  // 前期比計算
+  var prevSales = 0;
+  if (currentPeriod !== 'all') {
+    var from = startOf(currentPeriod);
+    var duration = Date.now() - from;
+    var prevFrom = from - duration;
+    var prevOrders = Object.values(allOrders).filter(function(o) {
+      return (o.status==='paid'||o.status==='done') && o.timestamp>=prevFrom && o.timestamp<from;
+    });
+    var prevMap = buildSessionMap(prevOrders);
+    Object.values(prevMap).forEach(function(s){ prevSales += s.sales; });
+  }
+  var diffPct = prevSales > 0 ? Math.round((totalIn - prevSales) / prevSales * 100) : null;
+
+  // 棒グラフデータ
+  var barData = [];
+  var now = new Date();
+  if (currentPeriod === 'today') {
+    for (var hh = 11; hh <= 23; hh++) {
+      var v = 0;
+      sessions.forEach(function(s){ if (new Date(s.ts).getHours() === hh) v += s.sales; });
+      barData.push({ label: hh+'時', val: v, isNow: now.getHours()===hh });
+    }
+  } else if (currentPeriod === 'week') {
+    for (var d = 0; d < 7; d++) {
+      var v = 0;
+      sessions.forEach(function(s){ if (new Date(s.ts).getDay()===d) v += s.sales; });
+      barData.push({ label: DOW[d], val: v, isNow: now.getDay()===d });
+    }
+  } else if (currentPeriod === 'month') {
+    var dim = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    for (var d = 1; d <= dim; d++) {
+      var v = 0;
+      sessions.forEach(function(s){ if (new Date(s.ts).getDate()===d) v += s.sales; });
+      barData.push({ label: d%5===0?String(d):'', val: v, isNow: now.getDate()===d });
+    }
+  }
+  var maxBar = barData.reduce(function(m,b){ return Math.max(m, b.val); }, 1);
+
+  // ランキング
+  var ranking = Object.values(itemMap);
+  ranking.sort(function(a,b){ return rankMode==='qty' ? b.qty-a.qty : b.sales-a.sales; });
+  var maxRankQty = ranking.length > 0 ? ranking[0].qty : 1;
+  var maxRankSales = ranking.length > 0 ? ranking[0].sales : 1;
+
+  // カテゴリ比率
+  var catKeys = Object.keys(catMap).filter(function(k){ return catMap[k] > 0; });
+  var catTotal = catKeys.reduce(function(s,k){ return s+catMap[k]; }, 0) || 1;
+  var CAT_COLORS = { 'ドリンク':'#0ea5e9', 'フード':'#f97316', 'セット':'#a78bfa', 'その他':'#64748b' };
+
+  // ── HTML構築 ──
+  var h = '';
+
+  // サマリー
+  h += '<div class="summary-grid">'
+    + '<div class="stat-card accent"><div class="stat-label">売上合計（税込）</div>'
+    + '<div class="stat-value green">&#165;' + totalIn.toLocaleString() + '</div>'
+    + '<div class="stat-sub">税抜 &#165;'+totalEx.toLocaleString()+' ／ 税 &#165;'+totalTax.toLocaleString()+'</div>'
+    + (diffPct !== null ? '<div class="stat-sub '+(diffPct>=0?'up':'down')+'">前期比 '+(diffPct>=0?'+':'')+diffPct+'%</div>' : '')
+    + '</div>'
+    + '<div class="stat-card"><div class="stat-label">会計件数</div>'
+    + '<div class="stat-value">' + totalSessions + '件</div>'
+    + '<div class="stat-sub">客単価 &#165;'+avgPerSession.toLocaleString()+'</div>'
+    + '</div>'
+    + '</div>';
+
+  // pax分析
+  h += '<div class="section-title">&#128101; 人数・客単価分析</div>'
+    + '<div class="pax-grid">'
+    + '<div class="pax-card"><div class="pax-label">平均人数</div><div class="pax-value">' + avgPax + '<span style="font-size:11px;color:#64748b">名</span></div></div>'
+    + '<div class="pax-card"><div class="pax-label">1人あたり単価</div><div class="pax-value" style="font-size:13px;">&#165;'+avgPerPax.toLocaleString()+'</div></div>'
+    + '<div class="pax-card"><div class="pax-label">総来客数</div><div class="pax-value">'+totalPax+'<span style="font-size:11px;color:#64748b">名</span></div></div>'
+    + '</div>';
+
+  // 棒グラフ
+  if (barData.length > 0) {
+    h += '<div class="chart-wrap"><div class="section-title">'
+      + (currentPeriod==='today'?'時間帯別':currentPeriod==='week'?'曜日別':'日別')+'売上</div>'
+      + '<div class="bar-chart">';
+    barData.forEach(function(b) {
+      var pct = Math.round(b.val / maxBar * 100);
+      h += '<div class="bar-col">'
+        + (b.val>0 ? '<div class="bar-val">'+(b.val>=10000?Math.round(b.val/1000)+'k':'')+'</div>' : '')
+        + '<div class="bar'+(b.isNow?' today':'')+'" style="height:'+pct+'%"></div>'
+        + '<div class="bar-label">'+b.label+'</div></div>';
+    });
+    h += '</div></div>';
+  }
+
+  // カテゴリ比率（Firebaseメニューデータから算出）
+  h += '<div class="ratio-wrap"><div class="section-title">カテゴリ別売上比率</div><div class="ratio-bar">';
+  catKeys.forEach(function(k) {
+    var pct = Math.round(catMap[k]/catTotal*100);
+    h += '<div class="ratio-seg" style="width:'+pct+'%;background:'+CAT_COLORS[k]+'"></div>';
+  });
+  h += '</div><div class="ratio-legend">';
+  catKeys.forEach(function(k) {
+    var pct = Math.round(catMap[k]/catTotal*100);
+    h += '<div class="ratio-item"><div class="ratio-dot" style="background:'+CAT_COLORS[k]+'"></div>'
+      + k + ' ' + pct + '% （&#165;'+catMap[k].toLocaleString()+'）</div>';
+  });
+  h += '</div></div>';
+
+  // ランキング（数量 / 売上 切替タブ付き）
+  var top = Math.min(ranking.length, 10);
+  h += '<div>'
+    + '<div class="section-title">メニュー別ランキング</div>'
+    + '<div class="rank-tab-bar">'
+    + '<button class="rank-tab'+(rankMode==='qty'?' active':'')+'" onclick="window.setRankMode(\'qty\')">数量順</button>'
+    + '<button class="rank-tab'+(rankMode==='sales'?' active':'')+'" onclick="window.setRankMode(\'sales\')">売上順</button>'
+    + '</div>'
+    + '<div class="rank-list">';
+  for (var i = 0; i < top; i++) {
+    var it = ranking[i];
+    var nc = i===0?'rank-num gold':i===1?'rank-num silver':i===2?'rank-num bronze':'rank-num';
+    var pct = rankMode==='qty'
+      ? Math.round(it.qty/maxRankQty*100)
+      : Math.round(it.sales/maxRankSales*100);
+    var catDot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+(CAT_COLORS[it.cat]||'#64748b')+';margin-right:4px;flex-shrink:0;"></span>';
+    h += '<div class="rank-item"><span class="'+nc+'">'+(i+1)+'</span>'
+      + catDot + '<span class="rank-name">'+it.name+'</span>'
+      + '<span class="rank-qty">'+it.qty+'個</span>'
+      + '<div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:'+pct+'%"></div></div>'
+      + '<span class="rank-sales">&#165;'+it.sales.toLocaleString()+'</span></div>';
+  }
+  h += '</div></div>';
+
+  // テーブル別
+  var tnums = Object.keys(tableMap).sort(function(a,b){ return Number(a)-Number(b); });
+  if (tnums.length > 0) {
+    h += '<div><div class="section-title">テーブル別売上</div><div class="table-grid">';
+    tnums.forEach(function(t) {
+      var tbl = tableMap[t];
+      h += '<div class="table-card">'
+        + '<div class="table-card-label">'+(TABLE_NAMES[String(t)]||'T'+t)+'</div>'
+        + '<div class="table-card-val">&#165;'+tbl.sales.toLocaleString()+'</div>'
+        + '<div class="table-card-cnt">'+tbl.sessions+'回転</div></div>';
+    });
+    h += '</div></div>';
+  }
+
+  // 月別比較グラフ（今月・今週・累計で表示）
+  if (currentPeriod === 'month' || currentPeriod === 'all') {
+    h += renderMonthCompare();
+  }
+
+  cont.innerHTML = h;
+}
+
+// ─────────────────────────────────────────────
+//  月別比較グラフ
+// ─────────────────────────────────────────────
+function renderMonthCompare() {
+  var now = new Date();
+  var curYear = now.getFullYear();
+  var prevYear = curYear - 1;
+
+  // 月別集計（今年 / 前年）
+  var curMonthly = new Array(12).fill(0);
+  var prevMonthly = new Array(12).fill(0);
+
+  Object.values(allOrders).forEach(function(o) {
+    if (o.status !== 'paid' && o.status !== 'done') return;
+    var d = new Date(o.timestamp - DAY_START * 3600000);
+    var yr = d.getFullYear(); var mo = d.getMonth();
+    if (yr === curYear) curMonthly[mo] += o.total || 0;
+    else if (yr === prevYear) prevMonthly[mo] += o.total || 0;
+  });
+
+  // セッション計算でより正確に
+  var allPaidOrders = Object.values(allOrders).filter(function(o){ return o.status==='paid'||o.status==='done'; });
+  var allSess = buildSessionMap(allPaidOrders);
+  curMonthly = new Array(12).fill(0);
+  prevMonthly = new Array(12).fill(0);
+  Object.values(allSess).forEach(function(s) {
+    var d = new Date(s.ts - DAY_START * 3600000);
+    var yr = d.getFullYear(); var mo = d.getMonth();
+    if (yr === curYear) curMonthly[mo] += s.sales;
+    else if (yr === prevYear) prevMonthly[mo] += s.sales;
+  });
+
+  var maxM = Math.max(1, Math.max.apply(null, curMonthly.concat(prevMonthly)));
+  var MONTHS = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+
+  var h = '<div class="month-compare-wrap">'
+    + '<div class="section-title">月別売上（'+curYear+' vs '+prevYear+'）</div>'
+    + '<div class="month-bars">';
+  for (var m = 0; m < 12; m++) {
+    var cPct = Math.round(curMonthly[m]/maxM*100);
+    var pPct = Math.round(prevMonthly[m]/maxM*100);
+    h += '<div class="month-col">'
+      + '<div style="display:flex;gap:2px;align-items:flex-end;height:100%;">'
+      + '<div class="month-bar cur" style="height:'+cPct+'%;width:13px;"></div>'
+      + '<div class="month-bar prev-yr" style="height:'+pPct+'%;width:13px;"></div>'
+      + '</div>'
+      + '<div class="month-label">'+MONTHS[m]+'月</div></div>';
+  }
+  h += '</div>'
+    + '<div class="month-compare-legend">'
+    + '<div class="legend-item"><div class="legend-dot" style="background:#0ea5e9"></div>'+curYear+'年</div>'
+    + '<div class="legend-item"><div class="legend-dot" style="background:#7c3aed;opacity:0.7"></div>'+prevYear+'年</div>'
+    + '</div>'
+    + '</div>';
+  return h;
+}
+
+// ─────────────────────────────────────────────
+//  ランキングモード切替
+// ─────────────────────────────────────────────
+window.setRankMode = function(mode) {
+  rankMode = mode;
+  render();
+};
+
+// ─────────────────────────────────────────────
+//  日別一覧（カレンダービュー）
+// ─────────────────────────────────────────────
+function renderCalendar() {
+  var cont = document.getElementById('container');
+  var now = new Date();
+  var ts = todayStr();
+
+  var start = new Date(now.getFullYear(), 0, 1);
+  var days = [];
+  var cur = new Date(start);
+  while (cur <= now) {
+    var ds = cur.getFullYear() + '-' + pad(cur.getMonth()+1) + '-' + pad(cur.getDate());
+    days.push({ ds: ds, dow: cur.getDay() });
+    cur.setDate(cur.getDate()+1);
+  }
+
+  // 日別集計（セッション単位）
+  var dayMap = {};
+  days.forEach(function(d){ dayMap[d.ds] = { sales:0, sessions:0 }; });
+
+  var allPaidOrders = Object.values(allOrders).filter(function(o){ return o.status==='paid'||o.status==='done'; });
+  var allSess = buildSessionMap(allPaidOrders);
+  Object.values(allSess).forEach(function(s) {
+    var ds = toDayStr(s.ts);
+    if (dayMap[ds]) { dayMap[ds].sales += s.sales; dayMap[ds].sessions++; }
+  });
+  // 注文件数（orders単位）
+  allPaidOrders.forEach(function(o) {
+    var ds = toDayStr(o.timestamp);
+    if (dayMap[ds]) dayMap[ds].orders = (dayMap[ds].orders||0)+1;
+  });
+
+  var maxDay = Object.values(dayMap).reduce(function(m,d){ return Math.max(m, d.sales); }, 1);
+
+  // 週グループ（水曜始まり）
+  var weeks = [], curWeek = null;
+  days.forEach(function(day) {
+    if (day.dow === 3 || curWeek === null) { curWeek = {days:[],total:0,sessions:0}; weeks.push(curWeek); }
+    curWeek.days.push(day);
+    if (dayMap[day.ds]) { curWeek.total += dayMap[day.ds].sales; curWeek.sessions += dayMap[day.ds].sessions; }
+  });
+
+  var totalAll = 0, sessAll = 0;
+  weeks.forEach(function(w){ totalAll += w.total; sessAll += w.sessions; });
+
+  var h = '<div class="summary-grid">'
+    + '<div class="stat-card accent"><div class="stat-label">年間売上合計（税込）</div>'
+    + '<div class="stat-value green">&#165;'+totalAll.toLocaleString()+'</div>'
+    + '<div class="stat-sub">1/1〜今日</div></div>'
+    + '<div class="stat-card"><div class="stat-label">総会計件数</div>'
+    + '<div class="stat-value">'+sessAll+'件</div>'
+    + '<div class="stat-sub">平均 &#165;'+(sessAll>0?Math.floor(totalAll/sessAll).toLocaleString():0)+'/件</div></div>'
+    + '</div>';
+
+  h += '<div class="section-title">週別・日別売上一覧</div>';
+
+  for (var wi = weeks.length-1; wi >= 0; wi--) {
+    var wk = weeks[wi];
+    var wStart = wk.days[0].ds.slice(5).replace('-','/');
+    var wEnd = wk.days[wk.days.length-1].ds.slice(5).replace('-','/');
+    var isCurrent = wi === weeks.length-1;
+    var wid = 'wk'+wi;
+
+    h += '<div class="week-block">'
+      + '<div class="week-header" onclick="toggleWeek(\''+wid+'\')">'
+      + '<div><span class="week-label">第'+(wi+1)+'週　'+wStart+'〜'+wEnd+'</span>'
+      + (isCurrent ? '&nbsp;<span style="font-size:10px;color:#22c55e">今週</span>' : '') + '</div>'
+      + '<div style="text-align:right"><div class="week-total">&#165;'+wk.total.toLocaleString()+'</div>'
+      + '<div class="week-sub">'+wk.sessions+'件</div></div>'
+      + '</div>'
+      + '<div class="week-body'+(isCurrent?' open':'')+'" id="'+wid+'">';
+
+    for (var di = wk.days.length-1; di >= 0; di--) {
+      var day = wk.days[di];
+      var isToday = day.ds === ts;
+      var data = dayMap[day.ds];
+      var sales = data ? data.sales : 0;
+      var cnt = data ? (data.sessions||0) : 0;
+      var pct = Math.round(sales/maxDay*100);
+      var disp = day.ds.slice(5).replace('-','/');
+      var dow = DOW[day.dow];
+      var dowStyle = day.dow===0?'color:#ef4444':day.dow===6?'color:#60a5fa':'color:#64748b';
+
+      h += '<div class="day-row'+(isToday?' today-row':'')+'">'
+        + '<span class="day-date'+(isToday?' today-lbl':'')+'">'+disp+(isToday?'①':'')+'</span>'
+        + '<span class="day-dow" style="'+dowStyle+'">'+dow+'</span>'
+        + '<div class="day-bar-wrap"><div class="day-bar-fill'+(isToday?' tf':'')+'" style="width:'+pct+'%"></div></div>'
+        + '<span class="day-sales'+(sales===0?' zero':'')+'">'+(sales>0?'&#165;'+sales.toLocaleString():'&minus;')+'</span>'
+        + '<span class="day-cnt">'+(cnt>0?cnt+'件':'')+'</span>'
+        + (cnt>0?'<button class="day-bills-btn" onclick="window.showDayBills(\''+day.ds+'\')">伝票</button>':'<span style="width:24px"></span>')
+        + '</div>';
+    }
+    h += '</div></div>';
+  }
+  h += renderMonthCompare();
+  cont.innerHTML = h;
+}
+
+window.toggleWeek = function(id) {
+  var el = document.getElementById(id);
+  el.classList.toggle('open');
+};
+
+// ─────────────────────────────────────────────
+//  伝票モーダル
+// ─────────────────────────────────────────────
+window.showDayBills = function(ds) {
+  var h = String(DAY_START).padStart(2,'0');
+  var start = new Date(ds + 'T' + h + ':00:00').getTime();
+  var end = start + 86400000;
+  var dayOrders = Object.values(allOrders).filter(function(o) {
+    return o.timestamp >= start && o.timestamp < end && (o.status==='paid'||o.status==='done');
+  }).sort(function(a,b){ return a.timestamp-b.timestamp; });
+
+  document.getElementById('bills-modal-title').textContent = ds.slice(5).replace('-','/') + ' の伝票';
+  if (dayOrders.length === 0) {
+    document.getElementById('bills-modal-content').innerHTML = '<div style="color:#475569;text-align:center;padding:20px">注文がありません</div>';
+    document.getElementById('bills-modal').classList.add('open');
+    return;
+  }
+
+  var sessMap = buildSessionMap(dayOrders);
+  var sessions = Object.values(sessMap).sort(function(a,b){ return a.ts-b.ts; });
+  var html = '';
+  sessions.forEach(function(sess) {
+    var t = new Date(sess.ts);
+    var timeStr = ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
+    var tblName = TABLE_NAMES[String(sess.table)] || 'T'+sess.table;
+    var isPaid = sess.orders.some(function(o){ return o.status==='paid'; });
+    html += '<div class="bills-receipt">'
+      + '<div class="bills-receipt-header">'
+      + '<span class="bills-receipt-table">'+tblName+'</span>'
+      + '<span class="bills-receipt-time">'+timeStr+'</span>'
+      + '<span class="bills-receipt-status">'+(isPaid?'✓ 会計済み':'提供済み')+'</span>'
+      + '</div>';
+
+    var sortedItems = Object.values(sess.items).sort(function(a,b) {
+      var aD = isDrinkItem(a.name), bD = isDrinkItem(b.name);
+      return aD===bD ? 0 : aD ? -1 : 1;
+    });
+    sortedItems.forEach(function(it) {
+      html += '<div class="bills-receipt-item"><span>'+it.name+(it.qty>1?' ×'+it.qty:'')+'</span><span>&#165;'+(it.price*it.qty).toLocaleString()+'</span></div>';
+    });
+
+    var chargeEx = calcCharge(sess.drinkQty, sess.pax, sess.hasChargeExempt);
+    var chargePerPerson = storeConfig.charge_per_person || 250;
+    if (chargeEx > 0) {
+      html += '<div class="bills-receipt-item" style="color:#fb923c"><span>チャージ（'+chargePerPerson+'円×'+sess.pax+'名）</span><span>&#165;'+chargeEx.toLocaleString()+'</span></div>';
+    }
+    html += '<div class="bills-receipt-total"><span>合計（税込）</span><span>&#165;'+sess.sales.toLocaleString()+'</span></div>';
+    html += '</div>';
+  });
+
+  document.getElementById('bills-modal-content').innerHTML = html;
+  document.getElementById('bills-modal').classList.add('open');
+};
+window.closeDayBills = function() {
+  document.getElementById('bills-modal').classList.remove('open');
+};
+
+// ─────────────────────────────────────────────
+//  CSVエクスポート
+// ─────────────────────────────────────────────
+window.openCsvModal = function() {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth()+1, d = now.getDate();
+  document.getElementById('csv-to').value = y+'-'+pad(m)+'-'+pad(d);
+  document.getElementById('csv-from').value = y+'-'+pad(m)+'-01';
+  document.getElementById('csv-modal').classList.add('open');
+};
+window.closeCsvModal = function() {
+  document.getElementById('csv-modal').classList.remove('open');
+};
+
+window.downloadCsv = function() {
+  var fromStr = document.getElementById('csv-from').value;
+  var toStr = document.getElementById('csv-to').value;
+  var unit = document.getElementById('csv-unit').value;
+  if (!fromStr || !toStr) { alert('期間を指定してください'); return; }
+
+  var h = String(DAY_START).padStart(2,'0');
+  var fromTs = new Date(fromStr + 'T' + h + ':00:00').getTime();
+  var toTs = new Date(toStr + 'T' + h + ':00:00').getTime() + 86400000;
+
+  var filtered = Object.values(allOrders).filter(function(o) {
+    return (o.status==='paid'||o.status==='done') && o.timestamp>=fromTs && o.timestamp<toTs;
+  });
+
+  var csv = '';
+  var BOM = '\uFEFF';
+
+  if (unit === 'session') {
+    csv = BOM + '日付,時刻,テーブル,人数,ドリンク杯数,チャージ,税抜売上,消費税,税込売上\n';
+    var sessMap = buildSessionMap(filtered);
+    Object.values(sessMap).sort(function(a,b){ return a.ts-b.ts; }).forEach(function(s) {
+      var dt = new Date(s.ts);
+      var ds = toDayStr(s.ts);
+      var timeStr = ('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
+      var chargeEx = calcCharge(s.drinkQty, s.pax, s.hasChargeExempt);
+      var taxRate = storeConfig.tax_rate || 10;
+      var exWithCharge = s.ex + chargeEx;
+      var tax = s.sales - Math.round(exWithCharge);
+      csv += [ds, timeStr, TABLE_NAMES[String(s.table)]||'T'+s.table,
+        s.pax, s.drinkQty, chargeEx,
+        Math.round(exWithCharge), tax, s.sales].join(',') + '\n';
+    });
+  } else if (unit === 'day') {
+    csv = BOM + '日付,曜日,会計件数,税込売上\n';
+    var dayMap = {};
+    var sessMap = buildSessionMap(filtered);
+    Object.values(sessMap).forEach(function(s) {
+      var ds = toDayStr(s.ts);
+      if (!dayMap[ds]) dayMap[ds] = { sessions:0, sales:0 };
+      dayMap[ds].sessions++; dayMap[ds].sales += s.sales;
+    });
+    Object.keys(dayMap).sort().forEach(function(ds) {
+      var dow = DOW[new Date(ds+'T12:00:00').getDay()];
+      csv += [ds, dow, dayMap[ds].sessions, dayMap[ds].sales].join(',') + '\n';
+    });
+  } else if (unit === 'month') {
+    csv = BOM + '年月,会計件数,税込売上\n';
+    var monthMap = {};
+    var sessMap = buildSessionMap(filtered);
+    Object.values(sessMap).forEach(function(s) {
+      var d = new Date(s.ts - DAY_START*3600000);
+      var ym = d.getFullYear() + '-' + pad(d.getMonth()+1);
+      if (!monthMap[ym]) monthMap[ym] = { sessions:0, sales:0 };
+      monthMap[ym].sessions++; monthMap[ym].sales += s.sales;
+    });
+    Object.keys(monthMap).sort().forEach(function(ym) {
+      csv += [ym, monthMap[ym].sessions, monthMap[ym].sales].join(',') + '\n';
+    });
+  } else if (unit === 'item') {
+    csv = BOM + '商品名,カテゴリ,数量,税抜売上合計\n';
+    var itemMap = {};
+    filtered.forEach(function(o) {
+      (o.items||[]).forEach(function(it) {
+        if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, cat:getItemCategory(it.name), qty:0, sales:0 };
+        itemMap[it.name].qty += it.qty;
+        itemMap[it.name].sales += it.price * it.qty;
+      });
+    });
+    Object.values(itemMap).sort(function(a,b){ return b.sales-a.sales; }).forEach(function(it) {
+      csv += ['"'+it.name+'"', it.cat, it.qty, it.sales].join(',') + '\n';
+    });
+  }
+
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'sawatdee_sales_' + fromStr + '_' + toStr + '_' + unit + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+  window.closeCsvModal();
+};
+
+// ─────────────────────────────────────────────
+//  Firebase リスナー
+// ─────────────────────────────────────────────
+var dataReady = { orders: false, pax: false, menu: false, config: false };
+function checkAndRender() {
+  if (!dataReady.orders || !dataReady.pax || !dataReady.menu || !dataReady.config) return;
+  if (currentPeriod === 'calendar') renderCalendar();
+  else render();
+}
+
+onValue(ref(db, 'orders'), function(snap) {
+  allOrders = snap.val() || {};
+  dataReady.orders = true;
+  checkAndRender();
+});
+onValue(ref(db, 'pax'), function(snap) {
+  allPax = snap.val() || {};
+  dataReady.pax = true;
+  checkAndRender();
+});
+onValue(ref(db, 'menu'), function(snap) {
+  menuData = snap.val() || {};
+  buildDrinkKeySet();
+  dataReady.menu = true;
+  checkAndRender();
+});
+onValue(ref(db, 'store_config'), function(snap) {
+  storeConfig = snap.val() || {};
+  if (storeConfig.day_start_hour != null) DAY_START = storeConfig.day_start_hour;
+  dataReady.config = true;
+  checkAndRender();
+});
+</script>
 </body>
 </html>
