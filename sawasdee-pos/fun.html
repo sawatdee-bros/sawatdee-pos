@@ -527,37 +527,73 @@
     line-height: 1.5;
   }
 
-  /* ===== THAILAND GRID ===== */
-  .thailand-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  /* ===== THAILAND FILM-INSTA ===== */
+  .film-insta {
+    background: #0d0d0d;
+    border-radius: 16px;
+    padding: 12px;
+  }
+  .film-insta-header {
+    display: flex;
+    align-items: center;
     gap: 8px;
+    padding: 0 2px 10px;
+    border-bottom: 1px solid #222;
+    margin-bottom: 10px;
   }
-  .th-item {
-    border-radius: 12px;
-    overflow: hidden;
+  .film-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .film-username { color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
+  .film-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3px;
+  }
+  .film-cell {
     position: relative;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    aspect-ratio: 1;
+    overflow: hidden;
+    cursor: pointer;
   }
-  .th-item img {
-    width: 100%;
-    height: 130px;
-    object-fit: cover;
+  .film-cell.wide { grid-column: span 2; aspect-ratio: 2/1; }
+  .film-cell.tall { grid-row: span 2; aspect-ratio: 1/2; }
+  .film-cell img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    filter: sepia(0.25) contrast(1.12) saturate(0.9) brightness(0.92);
+    transition: filter 0.25s;
+  }
+  .film-cell:active img { filter: sepia(0.25) contrast(1.12) saturate(0.9) brightness(0.65); }
+  .film-cell-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .film-cell-label {
+    position: absolute; bottom: 5px; left: 7px; right: 4px;
+    color: #fff; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.5px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    pointer-events: none;
+  }
+  /* フィルム穴風ボーダー */
+  .film-insta::before, .film-insta::after {
+    content: '';
     display: block;
-    filter: saturate(1.1);
-    transition: transform 0.3s;
+    height: 6px;
+    background: repeating-linear-gradient(
+      90deg, transparent 0px, transparent 10px,
+      #1a1a1a 10px, #1a1a1a 16px,
+      transparent 16px, transparent 26px
+    );
+    margin: 0 -12px;
   }
-  .th-item:active img { transform: scale(1.05); }
-  .th-label {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.65));
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 18px 8px 6px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-  }
+  .film-insta::before { margin-bottom: 10px; }
+  .film-insta::after { margin-top: 10px; }
 
   /* ===== QUIZ CATEGORY ===== */
   .quiz-cat-btn {
@@ -890,41 +926,117 @@
     <div class="card-title">🌆 <span data-i18n="thailand_title">タイ街角スナップ</span></div>
     <p style="font-size:13px;color:var(--text-mid);margin-bottom:16px;line-height:1.7;" data-i18n="thailand_desc">店主がタイで出会った景色・食・人々。サワディ兄弟の世界観のルーツです。</p>
 
-    <div class="thailand-grid">
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&q=80" alt="バンコク夜景" loading="lazy">
-        <div class="th-label" data-i18n="th1">バンコクの夜</div>
+    <div class="film-insta">
+      <div class="film-insta-header">
+        <div>
+          <div class="film-username">sawatdee_bros</div>
+          <div style="color:#888;font-size:10px;">Thailand memories</div>
+        </div>
       </div>
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80" alt="屋台" loading="lazy">
-        <div class="th-label" data-i18n="th2">路上の屋台</div>
-      </div>
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&q=80" alt="寺院" loading="lazy">
-        <div class="th-label" data-i18n="th3">黄金の寺院</div>
-      </div>
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=600&q=80" alt="トゥクトゥク" loading="lazy">
-        <div class="th-label" data-i18n="th4">トゥクトゥク</div>
-      </div>
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=80" alt="タイ料理" loading="lazy">
-        <div class="th-label" data-i18n="th5">本場のガパオ</div>
-      </div>
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=600&q=80" alt="チェンマイ" loading="lazy">
-        <div class="th-label" data-i18n="th6">チェンマイの朝</div>
-      </div>
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?w=600&q=80" alt="フローティングマーケット" loading="lazy">
-        <div class="th-label" data-i18n="th7">水上マーケット</div>
-      </div>
-      <div class="th-item">
-        <img src="https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=600&q=80" alt="ストリートフード" loading="lazy">
-        <div class="th-label" data-i18n="th8">ストリートフード</div>
+
+      <div class="film-grid">
+        <!-- 行1: wide + 1 -->
+        <div class="film-cell wide">
+          <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&q=80" alt="バンコクの夜" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th1">バンコクの夜</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=300&q=80" alt="本場のガパオ" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th5">本場のガパオ</div>
+        </div>
+
+        <!-- 行2: 1 + 1 + 1 -->
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=300&q=80" alt="路上の屋台" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th2">路上の屋台</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=300&q=80" alt="黄金の寺院" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th3">黄金の寺院</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=300&q=80" alt="トゥクトゥク" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th4">トゥクトゥク</div>
+        </div>
+
+        <!-- 行3: 1 + wide -->
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?w=300&q=80" alt="チェンマイの朝" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th6">チェンマイの朝</div>
+        </div>
+        <div class="film-cell wide">
+          <img src="https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?w=600&q=80" alt="水上マーケット" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th7">水上マーケット</div>
+        </div>
+
+        <!-- 行4: 1 + 1 + 1 -->
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=300&q=80" alt="ストリートフード" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label" data-i18n="th8">ストリートフード</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=300&q=80" alt="ワット・アルン" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">ワット・アルン</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=300&q=80" alt="タイのフルーツ" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">南国フルーツ</div>
+        </div>
+
+        <!-- 行5: wide + 1 -->
+        <div class="film-cell wide">
+          <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80" alt="タイの自然" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">タイの山と霧</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=300&q=80" alt="夜市" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">ナイトマーケット</div>
+        </div>
+
+        <!-- 行6: 1 + 1 + 1 -->
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=300&q=80" alt="寺院の装飾" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">寺院の装飾</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?w=300&q=80" alt="タイの海" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">エメラルドの海</div>
+        </div>
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=300&q=80" alt="ロングテールボート" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">ロングテールボート</div>
+        </div>
+
+        <!-- 行7: 1 + wide -->
+        <div class="film-cell">
+          <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=300&q=80" alt="タイの仏像" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">黄金の仏像</div>
+        </div>
+        <div class="film-cell wide">
+          <img src="https://images.unsplash.com/photo-1562602833-0f4ab2fc46e3?w=600&q=80" alt="チェンマイの寺院" loading="lazy">
+          <div class="film-cell-overlay"></div>
+          <div class="film-cell-label">チェンマイの街並み</div>
+        </div>
       </div>
     </div>
-    <p style="font-size:11px;color:#ccc;text-align:center;margin-top:12px;" data-i18n="photo_credit">※写真は順次、実際のタイ訪問写真に差し替え予定</p>
+
+    <p style="font-size:11px;color:#aaa;text-align:center;margin-top:12px;" data-i18n="photo_credit">※写真は順次、実際のタイ訪問写真に差し替え予定</p>
   </div>
 </div>
 
