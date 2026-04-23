@@ -227,7 +227,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // ─────────────────────────────────────────────
 //  Firebase 初期化
@@ -251,7 +251,8 @@ var allOrders = {};
 var allPax = {};
 var menuData = {};       // menu/ ノード全体
 var storeConfig = {};    // store_config/ ノード全体
-var drinkKeySet = null;  // Firebaseから構築したドリンク名セット
+var drinkKeySet = null;    // Firebaseから構築したドリンク名セット
+var itemOverrides = {};    // store_config/item_category_overrides（Firebase保存済み分類）
 var currentPeriod = 'today';
 var rankMode = 'qty';    // 'qty' | 'sales'
 var DOW = ['日','月','火','水','木','金','土'];
@@ -277,6 +278,10 @@ function buildDrinkKeySet() {
 }
 
 function isDrinkItem(name) {
+  // Firebase保存済み分類を最優先
+  if (itemOverrides[name] === 'ドリンク') return true;
+  // 旧名マッピングでドリンクと判定されている場合も true
+  if (LEGACY_ITEM_CAT[name] === 'ドリンク') return true;
   if (!drinkKeySet) return false;
   if (drinkKeySet.has(name)) return true;
   // startsWith対応（「梅酒（ロック）」等のオプション付き）
@@ -286,8 +291,29 @@ function isDrinkItem(name) {
   return false;
 }
 
+// ─────────────────────────────────────────────
+//  旧商品名マッピング（メニュー名を変更した際に追記する）
+//  key: ordersに記録されている旧名  value: カテゴリ('ドリンク'|'フード'|'セット')
+//  ※ マルチテナント対応：このファイルはテナントごとに持つ想定のため
+//    ここに追記すれば他テナントに影響しない
+// ─────────────────────────────────────────────
+var LEGACY_ITEM_CAT = {
+  // ── 2025年以前の旧名 ────────────────────────────────
+  '生ビール ジョッキ（アサヒ　スーパードライ）': 'ドリンク',  // → 生ビール 中ジョッキ に改名
+  'メガハイボール':                             'ドリンク',  // → メガ角ハイボール に改名
+  'コークハイボール':                           'ドリンク',  // → コーク角ハイボール に改名
+  'ジンジャーハイボール':                       'ドリンク',  // → ジンジャー角ハイボール に改名（念のため）
+  // ── 今後名前変更したらここに追記 ────────────────────
+  // '旧商品名': 'ドリンク',
+  // '旧フード名': 'フード',
+};
+
 // アイテムのカテゴリを返す（ドリンク / フード / セット / その他）
 function getItemCategory(name) {
+  // Firebase保存済み分類を最優先
+  if (itemOverrides[name]) return itemOverrides[name];
+  // 旧名マッピングを次にチェック
+  if (LEGACY_ITEM_CAT[name]) return LEGACY_ITEM_CAT[name];
   if (isDrinkItem(name)) return 'ドリンク';
   // フード
   var food = menuData.food || {};
@@ -941,6 +967,7 @@ onValue(ref(db, 'orders'), function(snap) {
   allOrders = snap.val() || {};
   dataReady.orders = true;
   checkAndRender();
+  if (dataReady.config) renderUnclassifiedBanner();
 });
 onValue(ref(db, 'pax'), function(snap) {
   allPax = snap.val() || {};
@@ -956,9 +983,89 @@ onValue(ref(db, 'menu'), function(snap) {
 onValue(ref(db, 'store_config'), function(snap) {
   storeConfig = snap.val() || {};
   if (storeConfig.day_start_hour != null) DAY_START = storeConfig.day_start_hour;
+  // item_category_overrides を同期（Firebase保存済み分類）
+  itemOverrides = storeConfig.item_category_overrides || {};
   dataReady.config = true;
   checkAndRender();
+  renderUnclassifiedBanner(); // バナーも更新
 });
+
+// ─────────────────────────────────────────────
+//  未分類商品バナー
+// ─────────────────────────────────────────────
+function getUnclassifiedItems() {
+  // 全ordersから「その他」に落ちている商品名と売上を集計
+  var map = {};
+  Object.values(allOrders).forEach(function(o) {
+    if (o.status !== 'paid' && o.status !== 'done') return;
+    (o.items || []).forEach(function(it) {
+      if (getItemCategory(it.name) === 'その他' && it.name !== 'お冷') {
+        if (!map[it.name]) map[it.name] = { qty: 0, sales: 0 };
+        map[it.name].qty += it.qty;
+        map[it.name].sales += it.price * it.qty;
+      }
+    });
+  });
+  return Object.entries(map).sort(function(a, b) { return b[1].sales - a[1].sales; });
+}
+
+function renderUnclassifiedBanner() {
+  var existing = document.getElementById('unclassified-banner');
+  var items = getUnclassifiedItems();
+  if (items.length === 0) {
+    if (existing) existing.remove();
+    return;
+  }
+  var html = '<div id="unclassified-banner" style="'
+    + 'margin:12px 16px 0;background:#1c1000;border:1px solid #d97706;border-radius:12px;padding:14px;'
+    + '">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
+    + '<span style="font-size:16px;">⚠️</span>'
+    + '<span style="font-size:13px;font-weight:700;color:#fbbf24;">未分類の商品があります</span>'
+    + '<span style="font-size:11px;color:#92400e;margin-left:auto;">カテゴリを選んで保存するとグラフに反映されます</span>'
+    + '</div>';
+
+  items.forEach(function(entry) {
+    var name = entry[0], info = entry[1];
+    var escapedName = name.replace(/'/g, "\'");
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #292000;">'
+      + '<span style="flex:1;font-size:12px;color:#e2e8f0;">' + name + '</span>'
+      + '<span style="font-size:11px;color:#92400e;min-width:60px;text-align:right;">¥' + info.sales.toLocaleString() + '</span>'
+      + '<div style="display:flex;gap:4px;flex-shrink:0;">'
+      + ['ドリンク','フード','セット'].map(function(cat) {
+          var colors = { 'ドリンク':'#0369a1:#38bdf8', 'フード':'#9a3412:#fb923c', 'セット':'#5b21b6:#a78bfa' };
+          var c = colors[cat].split(':');
+          return '<button onclick="window.saveOverride('' + escapedName + '','' + cat + '')" '
+            + 'style="padding:3px 8px;border-radius:6px;border:1px solid ' + c[0] + ';background:' + c[0] + '33;'
+            + 'color:' + c[1] + ';font-size:11px;cursor:pointer;white-space:nowrap;">'
+            + cat + '</button>';
+        }).join('')
+      + '</div></div>';
+  });
+
+  html += '</div>';
+
+  if (existing) {
+    existing.outerHTML = html;
+  } else {
+    var periodBar = document.querySelector('.period-bar');
+    periodBar.insertAdjacentHTML('afterend', html);
+  }
+}
+
+window.saveOverride = function(name, cat) {
+  // Firebase に保存
+  var updates = {};
+  updates['store_config/item_category_overrides/' + name] = cat;
+  update(ref(db, 'store_config/item_category_overrides'), { [name]: cat })
+    .then(function() {
+      itemOverrides[name] = cat;
+      renderUnclassifiedBanner();
+      if (currentPeriod === 'calendar') renderCalendar();
+      else render();
+    })
+    .catch(function(e) { alert('保存に失敗しました: ' + e.message); });
+};
 </script>
 </body>
 </html>
