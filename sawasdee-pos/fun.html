@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Sarabun:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --thai-red: #C0392B;
+    --thai-red: #A31313;
     --thai-gold: #F0A500;
     --thai-green: #27AE60;
     --thai-blue: #2980B9;
@@ -31,57 +31,63 @@
 
   /* ===== HEADER ===== */
   .hero {
-    background: linear-gradient(135deg, #C0392B 0%, #E85D04 50%, #F0A500 100%);
-    text-align: center;
-    padding: 36px 20px 28px;
+    background: #A31313;
+    text-align: left;
+    padding: 18px 20px 16px;
     position: relative;
     overflow: hidden;
   }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -30px; left: -30px; right: -30px; bottom: -30px;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 1;
+  .hero-kana {
+    color: rgba(255,255,255,0.55);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    position: relative;
   }
-  .hero-emoji { font-size: 52px; display: block; margin-bottom: 8px; animation: bounce 2s ease-in-out infinite; }
-  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   .hero h1 {
     font-family: 'Fredoka One', cursive;
     font-size: 28px;
     color: #fff;
     letter-spacing: 1px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
     position: relative;
+    line-height: 1.1;
+    display: none;
+  }
+  .hero-logo {
+    height: 38px;
+    object-fit: contain;
+    display: block;
+    margin-bottom: 8px;
+    position: relative;
+    filter: brightness(0) invert(1);
   }
   .hero-sub {
-    color: rgba(255,255,255,0.88);
-    font-size: 13px;
-    margin-top: 6px;
+    color: rgba(255,255,255,0.75);
+    font-size: 11px;
+    line-height: 1.6;
     position: relative;
     font-family: 'Sarabun', sans-serif;
+    margin-bottom: 10px;
   }
   .lang-flags {
     display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 14px;
+    gap: 6px;
     position: relative;
   }
   .lang-btn {
-    background: rgba(255,255,255,0.2);
-    border: 2px solid rgba(255,255,255,0.5);
-    color: #fff;
-    font-size: 13px;
-    padding: 4px 14px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+    font-size: 10px;
+    padding: 3px 10px;
     border-radius: 20px;
     cursor: pointer;
     font-family: 'Noto Sans JP', sans-serif;
     transition: all 0.2s;
   }
   .lang-btn.active, .lang-btn:hover {
-    background: rgba(255,255,255,0.95);
-    color: var(--thai-red);
+    background: #fff;
+    color: #A31313;
     border-color: #fff;
     font-weight: 700;
   }
@@ -92,8 +98,8 @@
     top: 0;
     background: #fff;
     z-index: 100;
-    border-bottom: 3px solid var(--thai-gold);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
   }
   .nav-tabs {
     display: flex;
@@ -111,18 +117,32 @@
     cursor: pointer;
     border: none;
     background: none;
-    color: var(--text-mid);
+    color: #bbb;
     white-space: nowrap;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -3px;
+    border-bottom: 2px solid transparent;
     transition: all 0.2s;
     font-family: 'Noto Sans JP', sans-serif;
   }
-  .nav-tab .tab-icon { display: block; font-size: 20px; margin-bottom: 2px; text-align: center; }
-  .nav-tab.active {
-    color: var(--thai-red);
-    border-bottom-color: var(--thai-red);
+  .nav-tab .tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    margin: 0 auto 4px;
+    transition: all 0.2s;
   }
+  .nav-tab .tab-icon svg { stroke: #ccc; }
+  .nav-tab.active {
+    color: #A31313;
+    border-bottom-color: #A31313;
+  }
+  .nav-tab.active .tab-icon {
+    background: #A31313;
+  }
+  .nav-tab.active .tab-icon svg { stroke: #fff; }
 
   /* ===== CONTENT ===== */
   .page { display: none; padding: 16px; }
@@ -218,73 +238,75 @@
     margin-top: 8px;
   }
   .lesson-btn {
-    background: var(--thai-red);
+    background: #A31313;
     color: #fff;
     border: none;
-    padding: 10px 24px;
+    padding: 10px 28px;
     border-radius: 24px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Noto Sans JP', sans-serif;
     transition: background 0.15s;
   }
-  .lesson-btn:hover { background: #A93226; }
-  .lesson-btn.secondary { background: #eee; color: #666; }
+  .lesson-btn:hover { background: #8B1010; }
+  .lesson-btn.secondary { background: rgba(255,255,255,0.15); color: #fff; border: 1.5px solid rgba(255,255,255,0.4); }
 
   /* ===== QUIZ ===== */
   .quiz-question {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 900;
     text-align: center;
     margin-bottom: 8px;
     line-height: 1.5;
+    color: #111;
   }
   .quiz-sub {
     text-align: center;
     font-size: 13px;
-    color: var(--text-mid);
+    color: #999;
     margin-bottom: 20px;
   }
   .quiz-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 16px;
   }
   .quiz-opt {
     background: #f5f5f5;
-    border: 2.5px solid #e0e0e0;
+    border: 1.5px solid #eee;
     border-radius: 12px;
     padding: 14px 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
     font-family: 'Noto Sans JP', sans-serif;
+    color: #333;
   }
-  .quiz-opt:hover { border-color: var(--thai-gold); background: #FFF8E1; }
-  .quiz-opt.correct { background: #E8F5E9; border-color: var(--thai-green); color: var(--thai-green); }
-  .quiz-opt.wrong { background: #FFEBEE; border-color: var(--thai-red); color: var(--thai-red); }
+  .quiz-opt:hover { border-color: #A31313; background: #fff5f5; }
+  .quiz-opt.correct { background: #E8F5E9; border-color: #2E7D32; color: #2E7D32; }
+  .quiz-opt.wrong { background: #FFEBEE; border-color: #A31313; color: #A31313; }
   .quiz-result {
     text-align: center;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     padding: 12px;
     border-radius: 12px;
     margin-bottom: 12px;
   }
   .quiz-score {
-    background: linear-gradient(135deg, var(--thai-gold), var(--accent));
+    background: #8B1010;
     color: #fff;
-    padding: 20px;
+    padding: 24px 20px;
     border-radius: 16px;
     text-align: center;
     display: none;
   }
   .quiz-score.show { display: block; }
-  .quiz-score-num { font-family: 'Fredoka One', cursive; font-size: 48px; }
+  .quiz-score-num { font-family: 'Fredoka One', cursive; font-size: 52px; }
 
   /* ===== MENU PRIDE ===== */
   .dish-card {
@@ -450,29 +472,29 @@
     margin-bottom: 16px;
   }
   .visit-opt {
-    background: #f0f0f0;
-    border: 2px solid #e0e0e0;
+    background: #f5f5f5;
+    border: 1.5px solid #eee;
     border-radius: 20px;
     padding: 7px 16px;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     font-family: 'Noto Sans JP', sans-serif;
     transition: all 0.15s;
     font-weight: 700;
+    color: #666;
   }
-  .visit-opt.active { background: #FFF3E0; border-color: var(--thai-gold); color: var(--accent); }
+  .visit-opt.active { background: #fff5f5; border-color: #A31313; color: #A31313; }
   .submit-btn {
     width: 100%;
-    background: linear-gradient(135deg, var(--thai-red), var(--accent));
+    background: #A31313;
     color: #fff;
     border: none;
-    padding: 16px;
-    border-radius: 14px;
-    font-size: 16px;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Noto Sans JP', sans-serif;
-    box-shadow: 0 4px 16px rgba(200,60,30,0.3);
     transition: opacity 0.2s, transform 0.1s;
   }
   .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
@@ -657,16 +679,16 @@
     gap: 14px;
     padding: 16px;
     border-radius: 14px;
-    margin-bottom: 12px;
-    background: #FFF8F0;
-    border: 2px solid #FFD54F;
+    margin-bottom: 10px;
+    background: #fff;
+    border: 1px solid #f0f0f0;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .quiz-cat-btn:active { transform: scale(0.97); background: #FFECB3; }
-  .quiz-cat-icon { font-size: 32px; }
-  .quiz-cat-title { font-weight: 700; font-size: 16px; color: var(--thai-red); }
-  .quiz-cat-sub { font-size: 12px; color: var(--text-mid); margin-top: 2px; }
+  .quiz-cat-btn:active { transform: scale(0.97); background: #fff5f5; }
+  .quiz-cat-icon { font-size: 28px; flex-shrink: 0; }
+  .quiz-cat-title { font-weight: 900; font-size: 15px; color: #111; }
+  .quiz-cat-sub { font-size: 11px; color: #999; margin-top: 2px; }
 
   /* ===== TRIVIA TABS ===== */
   .trivia-tabs {
@@ -704,43 +726,70 @@
   .footer span { color: var(--thai-red); font-weight: 700; }
 
   /* ===== TRIVIA ===== */
+  .trivia-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .trivia-tab {
+    background: #f5f5f5;
+    border: 1.5px solid #eee;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.15s;
+    color: #999;
+  }
+  .trivia-tab.active { background: #A31313; border-color: #A31313; color: #fff; }
+  .trivia-tab.food.active { background: #2E5329; border-color: #2E5329; }
   .trivia-card {
-    background: linear-gradient(135deg, #1a237e, #283593);
+    background: #8B1010;
     color: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 14px;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 10px;
     position: relative;
     overflow: hidden;
   }
-  .trivia-card::before {
+  .trivia-card.food {
+    background: #2E5329;
+  }
+  .trivia-card::after {
     content: 'ไทย';
     position: absolute;
-    right: -4px; top: -4px;
-    font-size: 48px;
-    opacity: 0.1;
+    right: 10px;
+    top: 10px;
+    font-size: 52px;
     font-family: 'Sarabun', sans-serif;
+    color: rgba(255,255,255,0.08);
+    line-height: 1;
+    pointer-events: none;
   }
   .trivia-num {
-    font-size: 11px;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 8px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 8px;
   }
   .trivia-q {
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 900;
+    color: #fff;
     margin-bottom: 10px;
-    line-height: 1.6;
+    line-height: 1.5;
   }
   .trivia-a {
-    background: rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.2);
     border-radius: 10px;
     padding: 12px;
-    font-size: 14px;
-    line-height: 1.7;
-    color: rgba(255,255,255,0.92);
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.85);
   }
 
   /* Animations */
@@ -757,55 +806,86 @@
 </head>
 <body>
 
-<div class="hero">
-  <span class="hero-emoji">🌺</span>
-  <h1 id="hero-title">サワディーブロスへようこそ！</h1>
-  <p class="hero-sub" id="hero-sub">待ち時間も楽しんでね / ยินดีต้อนรับ / Welcome!</p>
-  <div class="lang-flags">
-    <button class="lang-btn active" onclick="setLang('ja')">日本語</button>
-    <button class="lang-btn" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('th')">ภาษาไทย</button>
+<div class="hero" style="position:relative;">
+  <!-- 中央テキスト -->
+  <div style="text-align:center;padding-bottom:8px;">
+    <div class="hero-kana">酒とタイ料理</div>
+    <img class="hero-logo"
+      src="https://static.wixstatic.com/media/6250d5_92f2a325d1ef44a0af92a5fc09376812~mv2.gif"
+      alt="サワディ兄弟"
+      style="margin:0 auto 8px;"
+      onerror="this.style.display='none';document.getElementById('hero-title').style.display='block'">
+    <h1 id="hero-title">サワディ兄弟</h1>
+    <p class="hero-sub" id="hero-sub">待ち時間も楽しんでね / ยินดีต้อนรับ / Welcome!</p>
+    <div class="lang-flags" style="justify-content:center;">
+      <button class="lang-btn active" onclick="setLang('ja')">日本語</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('th')">ภาษาไทย</button>
+    </div>
   </div>
+  <!-- 右下マスコット（左右反転） -->
+  <img src="https://static.wixstatic.com/media/6250d5_3c7a5adbcdee4e5ab05944d21bc4e11f~mv2.gif"
+    alt="マスコット"
+    style="position:absolute;bottom:0;right:0;height:88px;object-fit:contain;transform:scaleX(-1);"
+    onerror="this.style.display='none'">
 </div>
 
 <div class="nav-wrap">
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('menu')"><span class="tab-icon">🍽️</span><span data-i18n="tab_menu">こだわり</span></button>
-    <button class="nav-tab" onclick="showPage('trivia')"><span class="tab-icon">📚</span><span data-i18n="tab_trivia">クイズ＆豆知識</span></button>
-    <button class="nav-tab" onclick="showPage('shop')"><span class="tab-icon">🏮</span><span data-i18n="tab_shop">店内</span></button>
-    <button class="nav-tab" onclick="showPage('thailand')"><span class="tab-icon">🌆</span><span data-i18n="tab_thailand">タイ街角</span></button>
-    <button class="nav-tab" onclick="showPage('tabimap')"><span class="tab-icon">📍</span><span data-i18n="tab_tabimap">旅マップ</span></button>
-    <button class="nav-tab" onclick="showPage('tsunagaro')"><span class="tab-icon">📣</span><span data-i18n="tab_tsunagaro">つながろう</span></button>
+    <button class="nav-tab active" onclick="showPage('menu')">
+      <span class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></span>
+      <span data-i18n="tab_menu">こだわり</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('trivia')">
+      <span class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span>
+      <span data-i18n="tab_trivia">豆知識</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('shop')">
+      <span class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+      <span data-i18n="tab_shop">店内</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('thailand')">
+      <span class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+      <span data-i18n="tab_thailand">街角</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('tabimap')">
+      <span class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      <span data-i18n="tab_tabimap">旅マップ</span>
+    </button>
+    <button class="nav-tab" onclick="showPage('tsunagaro')">
+      <span class="tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span>
+      <span data-i18n="tab_tsunagaro">つながろう</span>
+    </button>
   </div>
 </div>
 
-<!-- ===== クイズ＆豆知識 ===== -->
+<!-- ===== 豆知識 ===== -->
 <div id="page-trivia" class="page">
 
   <!-- メインサブタブ -->
   <div style="display:flex;gap:8px;padding:0 0 14px;">
     <button id="main-tab-trivia" onclick="setMainTab('trivia')" style="
-      flex:1;padding:10px;border-radius:12px;border:2px solid var(--thai-red);
-      background:var(--thai-red);color:#fff;font-weight:700;font-size:14px;
+      flex:1;padding:10px;border-radius:12px;border:2px solid #A31313;
+      background:#A31313;color:#fff;font-weight:700;font-size:13px;
       cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;">
-      📚 豆知識
+      豆知識
     </button>
     <button id="main-tab-quiz" onclick="setMainTab('quiz')" style="
       flex:1;padding:10px;border-radius:12px;border:2px solid #eee;
-      background:#fff;color:#666;font-weight:700;font-size:14px;
+      background:#fff;color:#999;font-weight:700;font-size:13px;
       cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;">
-      🧠 クイズ
+      クイズ
     </button>
   </div>
 
-  <!-- 豆知識セクション（デフォルト表示） -->
+  <!-- 豆知識セクション -->
   <div id="section-trivia">
-    <div class="card">
-      <div class="card-title">📚 <span data-i18n="trivia_title">タイ文化・豆知識</span></div>
+    <div style="background:#fff;border-radius:16px;padding:20px;border:1px solid #f0f0f0;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:14px;">TRIVIA</div>
       <div class="trivia-tabs">
         <button class="trivia-tab active" onclick="setTriviaTab('all', this)" data-i18n="ttab_all">すべて</button>
-        <button class="trivia-tab" onclick="setTriviaTab('food', this)" data-i18n="ttab_food">🍜 料理のルーツ</button>
-        <button class="trivia-tab" onclick="setTriviaTab('culture', this)" data-i18n="ttab_culture">🎭 文化・マナー</button>
+        <button class="trivia-tab food" onclick="setTriviaTab('food', this)" data-i18n="ttab_food">料理のルーツ</button>
+        <button class="trivia-tab" onclick="setTriviaTab('culture', this)" data-i18n="ttab_culture">文化・マナー</button>
       </div>
       <div id="trivia-list"></div>
     </div>
@@ -813,25 +893,25 @@
 
   <!-- クイズセクション（デフォルト非表示） -->
   <div id="section-quiz" style="display:none;">
-    <div class="card" id="quiz-card">
+    <div style="background:#fff;border-radius:16px;padding:20px;border:1px solid #f0f0f0;" id="quiz-card">
       <div id="quiz-select">
-        <div class="card-title">🧠 <span data-i18n="quiz_title">クイズ</span></div>
-        <p style="font-size:13px;color:var(--text-mid);margin-bottom:20px;line-height:1.7;" data-i18n="quiz_select_desc">カテゴリを選んでスタート！毎回ランダム10問出題されます。</p>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:6px;">QUIZ</div>
+        <p style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.7;" data-i18n="quiz_select_desc">カテゴリを選んでスタート！毎回ランダム10問出題されます。</p>
         <div class="quiz-cat-btn" onclick="startQuiz('thai')">
           <div class="quiz-cat-icon">🗣️</div>
           <div>
             <div class="quiz-cat-title" data-i18n="qcat_thai">タイ語クイズ</div>
             <div class="quiz-cat-sub" data-i18n="qcat_thai_sub">タイ語の単語・フレーズ 10問</div>
           </div>
-          <span style="margin-left:auto;font-size:20px;">→</span>
+          <span style="margin-left:auto;font-size:20px;color:#ccc;">›</span>
         </div>
         <div class="quiz-cat-btn" onclick="startQuiz('culture')">
-          <div class="quiz-cat-icon">🇹🇭</div>
+          <div class="quiz-cat-icon">🌏</div>
           <div>
             <div class="quiz-cat-title" data-i18n="qcat_culture">タイ文化クイズ</div>
             <div class="quiz-cat-sub" data-i18n="qcat_culture_sub">タイの文化・歴史・料理 10問</div>
           </div>
-          <span style="margin-left:auto;font-size:20px;">→</span>
+          <span style="margin-left:auto;font-size:20px;color:#ccc;">›</span>
         </div>
       </div>
       <div id="quiz-area" style="display:none;">
@@ -859,8 +939,8 @@
         <div class="quiz-score-num" id="quiz-score-num"></div>
         <div style="font-size:14px;margin-top:6px;opacity:0.88;" data-i18n="quiz_score_label">点 / 100点</div>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
-          <button class="lesson-btn" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);" onclick="restartQuiz()" data-i18n="retry_btn">もう一度</button>
-          <button class="lesson-btn" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);" onclick="backToSelect()" data-i18n="change_cat">カテゴリ変更</button>
+          <button class="lesson-btn" onclick="restartQuiz()" data-i18n="retry_btn">もう一度</button>
+          <button class="lesson-btn secondary" onclick="backToSelect()" data-i18n="change_cat">カテゴリ変更</button>
         </div>
       </div>
     </div>
@@ -872,64 +952,91 @@
 <div id="page-menu" class="page active">
 
   <!-- ごあいさつ -->
-  <div class="card">
-    <div class="card-title">🙏 <span data-i18n="menu_title">ごあいさつ</span></div>
-    <div class="staff-card">
-      <div class="staff-avatar">👨‍🍳</div>
-      <div class="staff-name">タクヤ</div>
-      <div class="staff-role">オーナー / シェフ</div>
-      <div class="staff-msg" data-i18n="staff1_msg"></div>
-      <div class="staff-thai">ขอบคุณที่มาเยี่ยมชม！</div>
-    </div>
+  <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:14px;">GREETING</div>
+    
+    <div style="font-size:13px;color:#555;line-height:1.9;border-left:3px solid #A31313;padding-left:12px;" data-i18n="staff1_msg"></div>
+    <div style="margin-top:12px;font-size:13px;color:#A31313;font-family:'Sarabun',sans-serif;letter-spacing:1px;">ขอบคุณที่มาเยี่ยมชม 🙏</div>
   </div>
 
-  <!-- こだわり -->
-  <div class="card">
-    <div class="card-title">🍽️ <span data-i18n="kodawari_title">シェフのこだわり</span></div>
+  <!-- フィロソフィー -->
+  <div style="background:#A31313;border-radius:16px;padding:20px;margin-bottom:12px;color:#fff;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.6);margin-bottom:12px;">OUR PHILOSOPHY</div>
+    <div style="font-size:18px;font-weight:900;line-height:1.4;margin-bottom:12px;">タイへの愛と<br>リスペクト</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.9;" data-i18n="philosophy"></div>
+  </div>
 
-    <!-- フィロソフィーブロック -->
-    <div style="background:linear-gradient(135deg,#C0392B,#E85D04);border-radius:14px;padding:18px;margin-bottom:16px;color:#fff;">
-      <div style="font-family:'Fredoka One',cursive;font-size:18px;margin-bottom:10px;letter-spacing:0.5px;">タイへの愛とリスペクト</div>
-      <div style="font-size:13px;line-height:1.85;opacity:0.95;" data-i18n="philosophy"></div>
-    </div>
+  <!-- こだわりの一皿 -->
+  <div style="background:#fff;border-radius:16px;padding:20px;border:1px solid #f0f0f0;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:16px;">OUR DISHES</div>
+    <div style="display:flex;flex-direction:column;">
 
-    <div class="dish-card">
-      <div class="dish-emoji">🌶️</div>
-      <div>
-        <div class="dish-name">ガパオライス</div>
-        <div class="dish-name-sub">ข้าวผัดกะเพรา</div>
-        <div class="dish-desc" data-i18n="dish1_desc">バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。ふつうのバジルとは全然違う、スパイシーでパンチのある風味が自慢です。</div>
-        <span class="dish-tag">シェフおすすめ</span>
-        <span class="dish-tag gold">人気No.1</span>
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;">
+        <img src="https://images.unsplash.com/photo-1562802378-063ec186a863?w=120&q=80"
+          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
+          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🌶️</div>'">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
+            <span style="font-size:15px;font-weight:900;color:#111;">ガパオライス</span>
+            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">ข้าวผัดกะเพรา</span>
+          </div>
+          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish1_desc">バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <span style="font-size:10px;font-weight:700;color:#A31313;background:#fff5f5;border:1px solid #fdd;padding:2px 8px;border-radius:20px;">シェフおすすめ</span>
+            <span style="font-size:10px;font-weight:700;color:#B8860B;background:#fffbf0;border:1px solid #fde68a;padding:2px 8px;border-radius:20px;">人気No.1</span>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="dish-card">
-      <div class="dish-emoji">🍜</div>
-      <div>
-        <div class="dish-name">トムヤムクン</div>
-        <div class="dish-name-sub">ต้มยำกุ้ง</div>
-        <div class="dish-desc" data-i18n="dish2_desc">レモングラス・カー（タイしょうが）・マクルートの葉を丸ごと使ったスープ。酸味・辛味・旨味のバランスが命です。</div>
-        <span class="dish-tag">本格派</span>
-        <span class="dish-tag green">無添加</span>
+
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;">
+        <img src="https://images.unsplash.com/photo-1559314809-0d155014e29e?w=120&q=80"
+          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
+          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🍜</div>'">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
+            <span style="font-size:15px;font-weight:900;color:#111;">トムヤムクン</span>
+            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">ต้มยำกุ้ง</span>
+          </div>
+          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish2_desc">レモングラス・カー・マクルートの葉を丸ごと使ったスープ。</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <span style="font-size:10px;font-weight:700;color:#A31313;background:#fff5f5;border:1px solid #fdd;padding:2px 8px;border-radius:20px;">本格派</span>
+            <span style="font-size:10px;font-weight:700;color:#1a7a3a;background:#f0faf4;border:1px solid #bbf7d0;padding:2px 8px;border-radius:20px;">無添加</span>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="dish-card">
-      <div class="dish-emoji">🍹</div>
-      <div>
-        <div class="dish-name">チャンビール</div>
-        <div class="dish-name-sub">เบียร์ช้าง</div>
-        <div class="dish-desc" data-i18n="dish3_desc">象（チャン）がトレードマークのタイを代表するビール。甘みが少なくスッキリとした飲み口で、タイ料理との相性バツグン！</div>
-        <span class="dish-tag gold" style="color:#333;">タイ直輸入</span>
+
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;">
+        <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?w=120&q=80"
+          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
+          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🍺</div>'">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
+            <span style="font-size:15px;font-weight:900;color:#111;">チャンビール</span>
+            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">เบียร์ช้าง</span>
+          </div>
+          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish3_desc">象がトレードマークのタイを代表するビール。タイ料理との相性バツグン！</div>
+          <div style="display:flex;gap:5px;">
+            <span style="font-size:10px;font-weight:700;color:#B8860B;background:#fffbf0;border:1px solid #fde68a;padding:2px 8px;border-radius:20px;">タイ直輸入</span>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="dish-card">
-      <div class="dish-emoji">🥜</div>
-      <div>
-        <div class="dish-name">パッタイ</div>
-        <div class="dish-name-sub">ผัดไทย</div>
-        <div class="dish-desc" data-i18n="dish4_desc">タマリンドのタレで炒めたタイ風焼きそば。ナンプラー・砂糖・チリを絶妙なバランスで合わせた秘伝のソースが決め手。</div>
-        <span class="dish-tag">定番</span>
+
+      <div style="display:flex;gap:14px;padding:14px 0;">
+        <img src="https://images.unsplash.com/photo-1637806931049-67c6e35b2a3c?w=120&q=80"
+          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
+          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🥜</div>'">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
+            <span style="font-size:15px;font-weight:900;color:#111;">パッタイ</span>
+            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">ผัดไทย</span>
+          </div>
+          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish4_desc">タマリンドのタレで炒めたタイ風焼きそば。秘伝のソースが決め手。</div>
+          <div style="display:flex;gap:5px;">
+            <span style="font-size:10px;font-weight:700;color:#A31313;background:#fff5f5;border:1px solid #fdd;padding:2px 8px;border-radius:20px;">定番</span>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -937,73 +1044,50 @@
 
 <!-- ===== 店内紹介 ===== -->
 <div id="page-shop" class="page">
-  <div class="card">
-    <div class="card-title">🏮 <span data-i18n="shop_title">店内紹介</span></div>
-    <p style="font-size:13px;color:var(--text-mid);margin-bottom:16px;line-height:1.7;" data-i18n="shop_desc">民家を店主自ら改装。土壁と木造の落ち着く空間に、タイから直輸入した装飾が120％！タイ人が「タイの古い家みたい！」と驚くお店です。</p>
 
-    <div class="shop-grid">
-      <div class="shop-item">
-        <img src="https://static.wixstatic.com/media/6250d5_fa832f7db97a4a82b1ddca98143a23d6~mv2.jpg/v1/fill/w_465,h_300,al_c,q_80,enc_avif,quality_auto/6250d5_fa832f7db97a4a82b1ddca98143a23d6~mv2.jpg" alt="テーブル席" loading="lazy">
-        <div class="shop-caption">
-          <div class="shop-caption-title" data-i18n="shop1_title">4名様テーブル席</div>
-          <div class="shop-caption-desc" data-i18n="shop1_desc">レトロ感漂うコカコーラの看板がお出迎え</div>
-        </div>
-      </div>
-      <div class="shop-item">
-        <img src="https://static.wixstatic.com/media/6250d5_51facc057d8f44b5b614ab39b4a9fd0f~mv2.jpg/v1/fill/w_465,h_300,al_c,q_80,enc_avif,quality_auto/6250d5_51facc057d8f44b5b614ab39b4a9fd0f~mv2.jpg" alt="座敷席" loading="lazy">
-        <div class="shop-caption">
-          <div class="shop-caption-title" data-i18n="shop2_title">小あがり座敷席</div>
-          <div class="shop-caption-desc" data-i18n="shop2_desc">半個室感のある落ち着く空間。お子様連れにも◎</div>
-        </div>
-      </div>
-      <div class="shop-item">
-        <img src="https://static.wixstatic.com/media/6250d5_2a9af37d9401436faea29e1382784008~mv2.jpg/v1/fill/w_465,h_300,al_c,q_80,enc_avif,quality_auto/6250d5_2a9af37d9401436faea29e1382784008~mv2.jpg" alt="テーブル席2" loading="lazy">
-        <div class="shop-caption">
-          <div class="shop-caption-title" data-i18n="shop3_title">2〜4名様テーブル席</div>
-          <div class="shop-caption-desc" data-i18n="shop3_desc">タイのレコードやポスターが壁を彩る</div>
-        </div>
-      </div>
-      <div class="shop-item">
-        <img src="https://static.wixstatic.com/media/6250d5_fe498751c2e942d3890939c8baaa41e2~mv2.jpg/v1/fill/w_465,h_300,al_c,q_80,enc_avif,quality_auto/6250d5_fe498751c2e942d3890939c8baaa41e2~mv2.jpg" alt="カウンター席" loading="lazy">
-        <div class="shop-caption">
-          <div class="shop-caption-title" data-i18n="shop4_title">カウンター席</div>
-          <div class="shop-caption-desc" data-i18n="shop4_desc">一人飲み大歓迎！タイ料理屋でひとり酒、最高です</div>
-        </div>
-      </div>
-      <div class="shop-item shop-item-highlight">
-        <img src="https://static.wixstatic.com/media/6250d5_44fbae9270b34c4e8e40a5f4d33612f7~mv2.jpg/v1/fill/w_465,h_300,al_c,q_80,enc_avif,quality_auto/6250d5_44fbae9270b34c4e8e40a5f4d33612f7~mv2.jpg" alt="スーファミ" loading="lazy">
-        <div class="shop-caption">
-          <div class="shop-caption-title">🎮 <span data-i18n="shop5_title">スーパーファミコンあります</span></div>
-          <div class="shop-caption-desc" data-i18n="shop5_desc">タイ料理を食べながらファミコンができる店、日本でここだけかも？</div>
-        </div>
-      </div>
-      <div class="shop-item">
-        <img src="https://static.wixstatic.com/media/6250d5_6e7fd632e1c04c2fb9bbc837f0b54e43~mv2.jpg/v1/fill/w_465,h_300,al_c,q_80,enc_avif,quality_auto/6250d5_6e7fd632e1c04c2fb9bbc837f0b54e43~mv2.jpg" alt="大テーブル席" loading="lazy">
-        <div class="shop-caption">
-          <div class="shop-caption-title" data-i18n="shop6_title">6名様テーブル席</div>
-          <div class="shop-caption-desc" data-i18n="shop6_desc">宴会・女子会・貸し切りもご相談ください</div>
-        </div>
-      </div>
+  <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:10px;">INTERIOR</div>
+    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="shop_desc">民家を店主自ら改装。土壁と木造の落ち着く空間に、タイから直輸入した装飾が120％！タイ人が「タイの古い家みたい！」と驚くお店です。</p>
+  </div>
+
+  <!-- コラージュエリア -->
+  <div id="shop-collage" style="background:#faf8f4;border-radius:16px;padding:12px;position:relative;min-height:460px;overflow:hidden;border:1px solid #f0ece4;">
+    <div style="text-align:center;margin-bottom:4px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#bbb;">INTERIOR DETAILS · タップして詳しく見る</div>
     </div>
+    <div id="shop-items-container" style="position:relative;height:420px;"></div>
+  </div>
+
+</div>
+
+<!-- 店内ライトボックス -->
+<div id="shop-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;flex-direction:column;align-items:center;justify-content:center;" onclick="closeShopLb()">
+  <button onclick="closeShopLb()" style="position:absolute;top:18px;right:20px;color:#fff;font-size:28px;background:none;border:none;cursor:pointer;line-height:1;z-index:2;">×</button>
+  <img id="shop-lb-img" src="" style="max-width:72vw;max-height:55vh;object-fit:contain;">
+  <div style="margin-top:16px;text-align:center;padding:0 28px;">
+    <div id="shop-lb-title" style="color:#fff;font-size:16px;font-weight:900;margin-bottom:6px;"></div>
+    <div id="shop-lb-desc" style="color:rgba(255,255,255,0.75);font-size:13px;line-height:1.7;"></div>
   </div>
 </div>
 
-<!-- ===== タイ街角写真集 ===== -->
+<!-- ===== タイ街角 ===== -->
 <div id="page-thailand" class="page">
-  <div class="card">
-    <div class="card-title">🌆 <span data-i18n="thailand_title">タイ街角スナップ</span></div>
-    <p style="font-size:13px;color:var(--text-mid);margin-bottom:16px;line-height:1.7;" data-i18n="thailand_desc">店主がタイで出会った景色・食・人々。サワディ兄弟の世界観のルーツです。</p>
 
-    <div class="film-insta">
-      <div class="film-insta-header">
-        <div>
-          <div class="film-username">sawatdee_bros</div>
-          <div style="color:#888;font-size:10px;">Thailand memories</div>
-        </div>
+  <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:10px;">PHOTOS</div>
+    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="thailand_desc">店主がタイで出会った景色・食・人々。サワディ兄弟の世界観のルーツです。</p>
+  </div>
+
+  <div class="film-insta">
+    <div class="film-insta-header">
+      <div>
+        <div class="film-username">sawatdee_bros</div>
+        <div style="color:#888;font-size:10px;">Thailand memories</div>
       </div>
+    </div>
 
-      <div class="film-scroll">
-        <div class="film-grid">
+    <div class="film-scroll">
+      <div class="film-grid">
         <!-- 行1: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
           <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&q=80" alt="バンコクの夜" loading="lazy">
@@ -1104,22 +1188,21 @@
         </div>
         </div><!-- /film-grid -->
       </div><!-- /film-scroll -->
-    </div>
+    </div><!-- /film-insta -->
 
-    <p style="font-size:11px;color:#aaa;text-align:center;margin-top:12px;" data-i18n="photo_credit">※写真は順次、実際のタイ訪問写真に差し替え予定</p>
-  </div>
+  <p style="font-size:11px;color:#aaa;text-align:center;margin-top:12px;" data-i18n="photo_credit">※写真は順次、実際のタイ訪問写真に差し替え予定</p>
 </div>
 
 <!-- ===== タイ旅マップ ===== -->
-<!-- ===== タイ旅マップ ===== -->
 <div id="page-tabimap" class="page">
-  <div class="card" style="padding:14px 16px 10px;">
-    <div class="card-title" style="margin-bottom:4px;">📍 <span data-i18n="tabimap_title">タイ旅おすすめマップ</span></div>
-    <p style="font-size:12px;color:var(--text-mid);margin-bottom:0;line-height:1.6;" data-i18n="tabimap_desc">ピンをタップで詳細表示。カードをタップでピンに飛ぶよ！</p>
+
+  <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:10px;">MAP</div>
+    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="tabimap_desc">タクヤのおすすめスポット。カードをタップでその場所にジャンプ！</p>
   </div>
 
   <!-- 地図 -->
-  <div style="margin:0 0 12px;border-top:2px solid var(--thai-gold);border-bottom:2px solid var(--thai-gold);height:280px;background:#e8e8e8;position:relative;">
+  <div style="margin:0 0 12px;border-radius:16px;overflow:hidden;height:280px;background:#e8e8e8;">
     <iframe id="map-iframe"
       src="https://www.google.com/maps/d/embed?mid=1HglLv5A3BU5bcAacDiHH_Hw_RuACh0Pz&ehbc=2E312F"
       style="width:100%;height:100%;border:none;display:block;"
@@ -1127,59 +1210,59 @@
   </div>
 
   <!-- スポットカード一覧 -->
-  <div id="spot-list" style="padding:0 16px;"></div>
+  <div id="spot-list"></div>
 
   <!-- 投稿フォーム -->
-  <div style="margin:4px 16px 16px;background:linear-gradient(135deg,#1a237e,#283593);border-radius:14px;padding:16px;color:#fff;text-align:center;">
-    <div style="font-size:15px;font-weight:700;margin-bottom:6px;">✈️ あなたのおすすめも教えて！</div>
-    <div style="font-size:12px;opacity:0.88;margin-bottom:12px;" data-i18n="tabimap_ugc_desc">タイに行ったことある方、おすすめスポットをぜひ教えてください。採用されたらマップに追加します！</div>
+  <div style="background:#A31313;border-radius:16px;padding:20px;margin-bottom:4px;color:#fff;text-align:center;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.6);margin-bottom:8px;">YOUR SPOT</div>
+    <div style="font-size:15px;font-weight:900;margin-bottom:6px;">あなたのおすすめも教えて！</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:14px;" data-i18n="tabimap_ugc_desc">タイに行ったことある方、おすすめスポットをぜひ教えてください。採用されたらマップに追加します！</div>
     <div id="spot-form">
-      <input id="spot-name" type="text" placeholder="スポット名（例：カオサン通り）" style="width:100%;padding:10px;border-radius:8px;border:none;font-size:14px;margin-bottom:8px;box-sizing:border-box;font-family:'Noto Sans JP',sans-serif;">
-      <input id="spot-comment" type="text" placeholder="ひとことコメント（例：夜が最高！）" style="width:100%;padding:10px;border-radius:8px;border:none;font-size:14px;margin-bottom:10px;box-sizing:border-box;font-family:'Noto Sans JP',sans-serif;">
-      <button onclick="submitSpot()" style="background:var(--thai-gold);color:#333;border:none;padding:11px 28px;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">送信する 🙏</button>
+      <input id="spot-name" type="text" placeholder="スポット名（例：カオサン通り）" style="width:100%;padding:10px;border-radius:8px;border:none;font-size:13px;margin-bottom:8px;box-sizing:border-box;font-family:'Noto Sans JP',sans-serif;">
+      <input id="spot-comment" type="text" placeholder="ひとことコメント（例：夜が最高！）" style="width:100%;padding:10px;border-radius:8px;border:none;font-size:13px;margin-bottom:12px;box-sizing:border-box;font-family:'Noto Sans JP',sans-serif;">
+      <button onclick="submitSpot()" style="background:#fff;color:#A31313;border:none;padding:10px 28px;border-radius:24px;font-size:13px;font-weight:900;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">送信する 🙏</button>
     </div>
     <div id="spot-thanks" style="display:none;font-size:14px;padding:8px 0;">ありがとうございます！確認後に追加します 🌺</div>
   </div>
+
 </div>
 
 <!-- ===== つながろう ===== -->
 <div id="page-tsunagaro" class="page">
 
-  <!-- ① Instagram特典 -->
-  <div class="card" style="padding:0;overflow:hidden;">
-    <div style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:16px 20px 12px;">
-      <div style="color:#fff;font-weight:700;font-size:16px;">📸 Instagram フォロー特典</div>
-      <div style="color:rgba(255,255,255,0.88);font-size:12px;margin-top:2px;" data-i18n="ig_sub">@sawatdee_bros をフォロー！料理写真・日常をシェア</div>
+  <!-- Instagram -->
+  <div style="background:#fff;border-radius:16px;overflow:hidden;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:14px 20px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);margin-bottom:4px;">INSTAGRAM</div>
+      <div style="color:#fff;font-weight:900;font-size:15px;">フォロー特典</div>
     </div>
     <div style="padding:16px 20px;">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-        <div style="background:#FFF0F0;border-radius:12px;padding:12px 16px;flex:1;text-align:center;">
-          <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--thai-red);" data-i18n="coupon1_title">ドリンク1杯サービス！</div>
-          <div style="font-size:11px;color:var(--text-mid);margin-top:4px;" data-i18n="coupon1_desc">フォロー＆この画面をスタッフに見せるだけ</div>
-        </div>
+      <div style="border-left:3px solid #e6683c;padding-left:12px;margin-bottom:14px;">
+        <div style="font-size:16px;font-weight:900;color:#111;" data-i18n="coupon1_title">ドリンク1杯サービス！</div>
+        <div style="font-size:12px;color:#888;margin-top:3px;" data-i18n="coupon1_desc">フォロー＆この画面をスタッフに見せるだけ</div>
       </div>
-      <a href="https://instagram.com/sawatdee_bros" target="_blank" class="sns-btn instagram" style="margin-bottom:8px;">
+      <a href="https://instagram.com/sawatdee_bros" target="_blank" class="sns-btn instagram" style="margin-bottom:10px;">
         <span class="sns-icon">📸</span>
         <div class="sns-text"><div class="sns-label">Instagramを開く</div></div>
         <span>→</span>
       </a>
-      <div style="background:#FFF8F0;border-radius:10px;padding:10px 14px;border:2px solid #FFD54F;">
-        <div style="font-weight:700;font-size:13px;margin-bottom:4px;">📷 <span data-i18n="hashtag_title">投稿するときはこのタグで！</span></div>
-        <div style="font-size:14px;color:var(--thai-red);font-weight:700;">#サワディーブロス　#sawatdeebros　#タイ料理川崎</div>
+      <div style="background:#f9f9f9;border-radius:10px;padding:10px 14px;border:1px solid #f0f0f0;">
+        <div style="font-size:10px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:5px;" data-i18n="hashtag_title">投稿するときはこのタグで！</div>
+        <div style="font-size:13px;color:#A31313;font-weight:700;">#サワディーブロス　#sawatdeebros　#タイ料理川崎</div>
       </div>
     </div>
   </div>
 
-  <!-- ② Googleクチコミ特典 -->
-  <div class="card" style="padding:0;overflow:hidden;">
-    <div style="background:linear-gradient(135deg,#4285F4,#34A853);padding:16px 20px 12px;">
-      <div style="color:#fff;font-weight:700;font-size:16px;">⭐ Google クチコミ特典</div>
-      <div style="color:rgba(255,255,255,0.88);font-size:12px;margin-top:2px;" data-i18n="google_sub">クチコミを書いてデザートをゲット！</div>
+  <!-- Google -->
+  <div style="background:#fff;border-radius:16px;overflow:hidden;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="background:#1A5C8A;padding:14px 20px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);margin-bottom:4px;">GOOGLE</div>
+      <div style="color:#fff;font-weight:900;font-size:15px;">クチコミ特典</div>
     </div>
     <div style="padding:16px 20px;">
-      <div style="background:#F0FFF4;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:14px;">
-        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:#27AE60;" data-i18n="coupon2_title">デザートプレゼント🍮</div>
-        <div style="font-size:11px;color:var(--text-mid);margin-top:4px;" data-i18n="coupon2_desc">クチコミ投稿後にこの画面をスタッフへ</div>
+      <div style="border-left:3px solid #1A5C8A;padding-left:12px;margin-bottom:14px;">
+        <div style="font-size:16px;font-weight:900;color:#111;" data-i18n="coupon2_title">デザートプレゼント 🍮</div>
+        <div style="font-size:12px;color:#888;margin-top:3px;" data-i18n="coupon2_desc">クチコミ投稿後にこの画面をスタッフへ</div>
       </div>
       <a href="https://g.page/r/sawatdee-bros/review" target="_blank" class="sns-btn google">
         <span class="sns-icon">⭐</span>
@@ -1189,13 +1272,17 @@
     </div>
   </div>
 
-  <!-- ③ LINE -->
-  <div class="card" style="padding:0;overflow:hidden;">
-    <div style="background:#06C755;padding:16px 20px 12px;">
-      <div style="color:#fff;font-weight:700;font-size:16px;">💬 LINE 公式</div>
-      <div style="color:rgba(255,255,255,0.88);font-size:12px;margin-top:2px;" data-i18n="line_sub">予約・お問い合わせはLINEが便利！</div>
+  <!-- LINE -->
+  <div style="background:#fff;border-radius:16px;overflow:hidden;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="background:#06C755;padding:14px 20px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);margin-bottom:4px;">LINE</div>
+      <div style="color:#fff;font-weight:900;font-size:15px;">公式アカウント</div>
     </div>
     <div style="padding:16px 20px;">
+      <div style="border-left:3px solid #06C755;padding-left:12px;margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:900;color:#111;" data-i18n="line_sub">予約・お問い合わせはLINEが便利！</div>
+        <div style="font-size:12px;color:#888;margin-top:3px;">お気軽にメッセージを送ってください</div>
+      </div>
       <a href="https://lin.ee/sawatdee" target="_blank" class="sns-btn line">
         <span class="sns-icon">💬</span>
         <div class="sns-text"><div class="sns-label">LINE公式を追加する</div></div>
@@ -1204,9 +1291,9 @@
     </div>
   </div>
 
-  <!-- ④ 感想フォーム -->
-  <div class="card">
-    <div class="card-title">💬 <span data-i18n="survey_title">ご感想をお聞かせください</span></div>
+  <!-- 感想フォーム -->
+  <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:14px;">FEEDBACK</div>
     <div id="survey-form">
       <div class="survey-label" data-i18n="s_overall">今日の料理はいかがでしたか？</div>
       <div class="star-row" id="star-row">
@@ -1231,7 +1318,7 @@
       <div class="survey-thanks-emoji">🙏</div>
       <h3 data-i18n="thanks_title">ありがとうございます！</h3>
       <p data-i18n="thanks_msg">ご感想をお聞かせいただき、ありがとうございました。またのご来店をお待ちしております。</p>
-      <div style="margin-top:16px;font-family:'Sarabun',sans-serif;font-size:20px;color:var(--thai-gold);font-weight:700;">ขอบคุณมากนะคะ 🌺</div>
+      <div style="margin-top:16px;font-family:'Sarabun',sans-serif;font-size:20px;color:#A31313;font-weight:700;">ขอบคุณมากนะคะ 🌺</div>
     </div>
   </div>
 
@@ -1271,9 +1358,9 @@ const db = firebase.database();
 // ===== 多言語 =====
 const I18N = {
   ja: {
-    hero_title: "サワディーブロスへようこそ！",
+    hero_title: "サワディ兄弟",
     hero_sub: "待ち時間も楽しんでね / ยินดีต้อนรับ / Welcome!",
-    tab_quiz:"クイズ",tab_trivia:"クイズ＆豆知識",tab_menu:"こだわり",
+    tab_quiz:"クイズ",tab_trivia:"豆知識",tab_menu:"こだわり",
     tab_shop:"店内",tab_thailand:"タイ街角",
     tab_coupon:"特典",tab_sns:"SNS",tab_survey:"感想",
     tab_tabimap:"旅マップ",
@@ -1327,8 +1414,8 @@ const I18N = {
     thanks_title:"ありがとうございます！",thanks_msg:"ご感想をお聞かせいただき、ありがとうございました。またのご来店をお待ちしております。",
   },
   en: {
-    hero_title:"Welcome to Sawatdee Bros!",hero_sub:"Enjoy your time here! / ยินดีต้อนรับ",
-    tab_lesson:"Thai",tab_quiz:"Quiz",tab_trivia:"Quiz & Facts",tab_menu:"Our Food",
+    hero_title:"Sawatdee Bros",hero_sub:"Enjoy your time here! / ยินดีต้อนรับ",
+    tab_lesson:"Thai",tab_quiz:"Quiz",tab_trivia:"豆知識",tab_menu:"Our Food",
     tab_staff:"Staff",tab_coupon:"Offers",tab_sns:"SNS",tab_survey:"Feedback",
     lesson_title:"Today's Thai Phrase",lesson_desc:"Tap the card to reveal the meaning!",
     tap_hint:"Tap to reveal 👆",next_btn:"Next →",
@@ -1371,7 +1458,7 @@ const I18N = {
   },
   th: {
     hero_title:"ยินดีต้อนรับสู่ Sawatdee Bros!",hero_sub:"สนุกกันนะ / お楽しみください / Enjoy!",
-    tab_lesson:"ภาษาไทย",tab_quiz:"ทายปัญหา",tab_trivia:"ทายปัญหา & ความรู้",tab_menu:"เมนู",
+    tab_lesson:"ภาษาไทย",tab_quiz:"ทายปัญหา",tab_trivia:"ความรู้",tab_menu:"เมนู",
     tab_shop:"ในร้าน",tab_thailand:"ถนนไทย",
     tab_coupon:"สิทธิพิเศษ",tab_sns:"SNS",tab_survey:"ความคิดเห็น",
     lesson_title:"ประโยคไทยวันนี้",lesson_desc:"แตะการ์ดเพื่อดูความหมาย!",
@@ -1886,7 +1973,78 @@ function restartQuiz() {
 }
 
 
-// ===== 旅マップ =====
+// ===== 店内コラージュ =====
+// ★ 写真が揃ったらimgのURLをPNGに差し替えるだけ！
+const SHOP_ITEMS = [
+  { emoji:'🛺', img:'', title:'トゥクトゥクの置物',
+    desc:'バンコクで見かけた本物そっくりのミニチュア。タイの街角の喧騒を思い出します。',
+    x:8, y:20, rot:-6, size:90 },
+  { emoji:'🧿', img:'', title:'タイのお守り',
+    desc:'チェンマイのワット・ドイ・ステープで買ったお守り。お店と来てくれるお客さんを守ってくれています。',
+    x:62, y:10, rot:5, size:76 },
+  { emoji:'🎮', img:'', title:'スーパーファミコン',
+    desc:'タイ料理を食べながらスーファミができる店、日本でここだけかも？お好きなカセットをどうぞ！',
+    x:32, y:110, rot:2, size:100 },
+  { emoji:'🍺', img:'', title:'タイ語グラス',
+    desc:'タイ語が書かれたガラスコップ。チャンビールを注いで飲むのが最高です。',
+    x:4, y:230, rot:-4, size:82 },
+  { emoji:'🛕', img:'', title:'ご本尊・仏像',
+    desc:'タイから持ち帰った仏像。店内を見守ってくれています。むやみに触らないでね笑',
+    x:64, y:210, rot:4, size:86 },
+  { emoji:'🌺', img:'', title:'タイの造花',
+    desc:'タイの寺院でよく見かける造花。本物と見間違えるくらい精巧に作られています。',
+    x:10, y:345, rot:-3, size:78 },
+  { emoji:'💿', img:'', title:'タイのレコード',
+    desc:'タイのポップスのレコード。店内BGMはタイ音楽が中心です。知ってる曲があったら教えてください！',
+    x:62, y:340, rot:7, size:80 },
+  { emoji:'🥢', img:'', title:'タイの箸置き',
+    desc:'タイの象が描かれた陶器の箸置き。チェンマイの市場で見つけた一点もの。',
+    x:36, y:265, rot:-2, size:70 },
+];
+
+function renderShopGrid() {
+  const container = document.getElementById('shop-items-container');
+  if (!container) return;
+  container.innerHTML = SHOP_ITEMS.map((item, i) => {
+    const content = item.img
+      ? `<img src="${item.img}" style="width:${item.size}px;height:${item.size}px;object-fit:contain;filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.18));">`
+      : `<div style="font-size:${item.size * 0.55}px;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.15));line-height:1;">${item.emoji}</div>`;
+    return `
+      <div onclick="openShopLb(${i})" style="
+        position:absolute;
+        left:${item.x}%;
+        top:${item.y}px;
+        transform:rotate(${item.rot}deg);
+        cursor:pointer;
+        text-align:center;
+        transition:transform 0.2s;
+        width:${item.size}px;
+      "
+      onmouseover="this.style.transform='rotate(${item.rot}deg) scale(1.12)'"
+      onmouseout="this.style.transform='rotate(${item.rot}deg) scale(1)'">
+        ${content}
+        <div style="font-size:9px;font-weight:700;color:#666;margin-top:4px;white-space:nowrap;">${item.title}</div>
+      </div>`;
+  }).join('');
+}
+
+function openShopLb(i) {
+  const item = SHOP_ITEMS[i];
+  const lb = document.getElementById('shop-lightbox');
+  document.getElementById('shop-lb-img').src = item.img || '';
+  document.getElementById('shop-lb-img').style.display = item.img ? 'block' : 'none';
+  document.getElementById('shop-lb-title').textContent = (item.img ? '' : item.emoji + ' ') + item.title;
+  document.getElementById('shop-lb-desc').textContent = item.desc;
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeShopLb() {
+  document.getElementById('shop-lightbox').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+
 const SPOTS = [
   { id:'watpho',    emoji:'🛕', cat:'寺院',   city:'バンコク',
     name:{ja:'ワット・ポー',en:'Wat Pho',th:'วัดโพธิ์'},
@@ -1918,7 +2076,7 @@ const SPOTS = [
     lat:13.5202, lng:99.9586 },
 ];
 
-const catColors = {'寺院':'#C0392B','観光':'#2980B9','市場':'#27AE60','夜遊び':'#8E44AD','カフェ':'#E67E22'};
+const catColors = {'寺院':'#A31313','観光':'#1A5C8A','市場':'#2E5329','夜遊び':'#6B3FA0','カフェ':'#B5601A'};
 let activeSpotId = null;
 
 function renderSpotList() {
@@ -1927,24 +2085,23 @@ function renderSpotList() {
   if (!container) return;
   container.innerHTML = SPOTS.map(s => {
     const isActive = s.id === activeSpotId;
-    const color = catColors[s.cat] || '#666';
+    const color = catColors[s.cat] || '#A31313';
     return `<div id="spot-card-${s.id}" onclick="selectSpotFromCard('${s.id}')" style="
-      display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
+      display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
       border-radius:12px;margin-bottom:8px;cursor:pointer;
-      background:${isActive ? '#FFF3E0' : '#fff'};
-      border:2px solid ${isActive ? 'var(--thai-gold)' : '#eee'};
-      box-shadow:${isActive ? '0 2px 12px rgba(240,165,0,0.2)' : '0 1px 4px rgba(0,0,0,0.06)'};
+      background:#fff;
+      border:${isActive ? `2px solid ${color}` : '1px solid #f0f0f0'};
       transition:all 0.2s;">
-      <div style="width:40px;height:40px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${s.emoji}</div>
+      <div style="width:38px;height:38px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${s.emoji}</div>
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-          <span style="font-weight:700;font-size:14px;">${s.name[t]||s.name.ja}</span>
-          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;color:#fff;background:${color}">${s.cat}</span>
-          <span style="font-size:10px;color:#aaa;">${s.city}</span>
+          <span style="font-weight:900;font-size:14px;color:#111;">${s.name[t]||s.name.ja}</span>
+          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;color:#fff;background:${color}">${s.cat}</span>
+          <span style="font-size:10px;color:#bbb;">${s.city}</span>
         </div>
-        <div style="font-size:12px;color:var(--text-mid);line-height:1.6;">${s.comment[t]||s.comment.ja}</div>
+        <div style="font-size:12px;color:#777;line-height:1.7;">${s.comment[t]||s.comment.ja}</div>
       </div>
-      <div style="font-size:18px;flex-shrink:0;color:${isActive ? 'var(--thai-gold)' : '#ddd'};">📍</div>
+      <div style="font-size:16px;flex-shrink:0;color:${isActive ? color : '#ddd'};">📍</div>
     </div>`;
   }).join('');
 }
@@ -2075,13 +2232,9 @@ function renderTrivia() {
   const container = document.getElementById('trivia-list');
   container.innerHTML = filtered.map(tr => {
     const isFood = tr.cat === 'food';
-    const bg = isFood
-      ? 'background:linear-gradient(135deg,#1B5E20,#2E7D32)'
-      : 'background:linear-gradient(135deg,#1a237e,#283593)';
-    const tagColor = isFood ? '#A5D6A7' : 'rgba(255,255,255,0.6)';
     return `
-    <div class="trivia-card" style="${bg}">
-      <div class="trivia-num" style="color:${tagColor};">${tr.tag[t]||tr.tag.ja}</div>
+    <div class="trivia-card${isFood ? ' food' : ''}">
+      <div class="trivia-num">${tr.tag[t]||tr.tag.ja}</div>
       <div class="trivia-q">${tr.q[t]||tr.q.ja}</div>
       <div class="trivia-a">${tr.a[t]||tr.a.ja}</div>
     </div>`;
@@ -2197,6 +2350,7 @@ document.getElementById('film-lightbox').addEventListener('touchend', e => {
 
 renderTrivia();
 renderSpotList();
+renderShopGrid();
 applyI18n();
 </script>
 </body>
