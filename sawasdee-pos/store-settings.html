@@ -54,17 +54,45 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 /* 時刻セレクト */
 .hour-select { background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; padding: 8px 12px; font-size: 14px; font-family: inherit; cursor: pointer; }
 .hour-select:focus { outline: none; border-color: #166534; }
+
+/* 離脱確認モーダル */
+.leave-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
+.leave-modal.open { display: flex; }
+.leave-box { background: #1e293b; border-radius: 16px; border: 1px solid #334155; width: 100%; max-width: 320px; overflow: hidden; }
+.leave-box-title { padding: 20px 20px 8px; font-size: 16px; font-weight: 700; color: #f1f5f9; }
+.leave-box-body { padding: 0 20px 20px; font-size: 13px; color: #94a3b8; line-height: 1.6; }
+.leave-box-btns { display: flex; flex-direction: column; gap: 8px; padding: 0 16px 16px; }
+.leave-btn { padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; width: 100%; }
+.leave-btn.save { background: #166534; color: white; }
+.leave-btn.save:hover { background: #14532d; }
+.leave-btn.discard { background: #7f1d1d; color: #fca5a5; }
+.leave-btn.discard:hover { background: #6b1717; }
+.leave-btn.cancel { background: transparent; border: 1px solid #334155; color: #64748b; }
+.leave-btn.cancel:hover { background: #334155; }
 </style>
 </head>
 <body>
 
 <header>
-  <a class="back-btn" href="#" onclick="window.parent.postMessage({type:'setMode',mode:'all'},'*');return false;" title="戻る">←</a>
+  <a class="back-btn" href="#" onclick="window.handleBack();return false;" title="戻る">←</a>
   <h1>🏪 店舗設定</h1>
   <button class="save-all-btn" id="save-btn" onclick="saveAll()">保存する</button>
 </header>
 
 <div class="saved-toast" id="toast">✓ 保存しました</div>
+
+<!-- 離脱確認モーダル -->
+<div class="leave-modal" id="leave-modal">
+  <div class="leave-box">
+    <div class="leave-box-title">⚠️ 未保存の変更があります</div>
+    <div class="leave-box-body">変更を保存せずに戻りますか？</div>
+    <div class="leave-box-btns">
+      <button class="leave-btn save" onclick="window.leaveAction('save')">保存して戻る</button>
+      <button class="leave-btn discard" onclick="window.leaveAction('discard')">破棄して戻る</button>
+      <button class="leave-btn cancel" onclick="window.leaveAction('cancel')">キャンセル</button>
+    </div>
+  </div>
+</div>
 <div class="loading" id="loading">読み込み中...</div>
 <div id="main" style="display:none">
 
@@ -214,6 +242,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     </div>
   </div>
 
+  <div class="section">
+    <div class="section-title">外部連携</div>
+    <div class="card">
+      <div class="field-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div class="field-label">
+          <div class="field-label-main">Apps Script URL</div>
+          <div class="field-label-sub">スプレッドシートへのバックアップ用。デプロイ後のウェブアプリURLを貼り付け</div>
+        </div>
+        <input class="field-input wide" type="url" id="apps_script_url" placeholder="https://script.google.com/macros/s/..." style="width:100%;font-size:12px;">
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script type="module">
@@ -275,8 +316,11 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('has_call_button').checked = !!cfg.has_call_button;
   document.getElementById('show_set_on_customer').checked = !!cfg.show_set_on_customer;
   document.getElementById('day_start_hour').value = cfg.day_start_hour !== undefined ? cfg.day_start_hour : 8;
+  document.getElementById('apps_script_url').value = cfg.apps_script_url || '';
   document.getElementById('loading').style.display = 'none';
   document.getElementById('main').style.display = 'block';
+  // 読み込み完了後に初期状態を記録
+  setTimeout(function() { originalState = getFormState(); }, 100);
 }).catch(function(e) {
   document.getElementById('loading').textContent = '読み込みに失敗しました: ' + e.message;
 });
@@ -285,6 +329,51 @@ window.updateChargeMode = function(mode) {
   document.querySelectorAll('input[name="charge_mode"]').forEach(function(r) { r.checked = r.value === mode; });
   var opts = document.getElementById('charge-conditional-opts');
   if (opts) opts.classList.toggle('show', mode === 'conditional');
+};
+
+// ── 変更検知 ──────────────────────────────────────────────
+var originalState = null;
+
+function getFormState() {
+  var modeEl = document.querySelector('input[name="charge_mode"]:checked');
+  return JSON.stringify({
+    store_name: document.getElementById('store_name').value,
+    tax_rate: document.getElementById('tax_rate').value,
+    charge_per_person: document.getElementById('charge_per_person').value,
+    charge_free_drink_count: document.getElementById('charge_free_drink_count').value,
+    charge_mode: modeEl ? modeEl.value : '',
+    table_count: document.getElementById('table_count').value,
+    nomi_table_count: document.getElementById('nomi_table_count').value,
+    has_ohiya: document.getElementById('has_ohiya').checked,
+    has_nomi_hodai: document.getElementById('has_nomi_hodai').checked,
+    has_call_button: document.getElementById('has_call_button').checked,
+    show_set_on_customer: document.getElementById('show_set_on_customer').checked,
+    day_start_hour: document.getElementById('day_start_hour').value,
+    apps_script_url: document.getElementById('apps_script_url').value,
+  });
+}
+
+function isDirty() {
+  return originalState !== null && getFormState() !== originalState;
+}
+
+window.handleBack = function() {
+  if (isDirty()) {
+    document.getElementById('leave-modal').classList.add('open');
+  } else {
+    window.parent.postMessage({ type: 'setMode', mode: 'all' }, '*');
+  }
+};
+
+window.leaveAction = async function(action) {
+  document.getElementById('leave-modal').classList.remove('open');
+  if (action === 'save') {
+    await window.saveAll();
+    window.parent.postMessage({ type: 'setMode', mode: 'all' }, '*');
+  } else if (action === 'discard') {
+    window.parent.postMessage({ type: 'setMode', mode: 'all' }, '*');
+  }
+  // cancel: 何もしない
 };
 
 window.saveAll = async function() {
@@ -303,11 +392,15 @@ window.saveAll = async function() {
     has_nomi_hodai: document.getElementById('has_nomi_hodai').checked,
     has_call_button: document.getElementById('has_call_button').checked,
     show_set_on_customer: document.getElementById('show_set_on_customer').checked,
-    day_start_hour: parseInt(document.getElementById('day_start_hour').value)
+    day_start_hour: parseInt(document.getElementById('day_start_hour').value),
+    apps_script_url: document.getElementById('apps_script_url').value.trim() || null
   };
+  // nullのキーは除去（Firebaseに不要な値を残さない）
+  Object.keys(cfg).forEach(function(k){ if (cfg[k] === null) delete cfg[k]; });
   try {
     await set(ref(db, 'store_config'), cfg);
     var toast = document.getElementById('toast');
+    originalState = getFormState(); // 保存後は現在の状態をoriginalに更新
     toast.classList.add('show');
     setTimeout(function() { toast.classList.remove('show'); }, 2000);
   } catch(e) {
