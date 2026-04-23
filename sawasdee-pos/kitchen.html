@@ -745,41 +745,50 @@ window.toggleItem = async function(id, idx) {
 
 window.groupDoneMulti = async function(idStr, type) {
   const ids = idStr.split(',').filter(Boolean);
-  // 飲み放題の場合はラストオーダー時刻をセット（初回のみ）
-  const isNomiGroup = ids.some(id => orders[id] && orders[id].source === 'nomi');
-  if (isNomiGroup && type === 'drink') {
-    const tbl = orders[ids[0]].table;
-    const loSnap = await get(ref(db, 'nomi_lo/' + tbl));
-    if (!loSnap.val()) {
-      await update(ref(db, '/'), { ['nomi_lo/' + tbl]: Date.now() });
+
+  // 戻す用に事前にスナップショットを保存
+  const prevSnapshots = {};
+  ids.forEach(id => {
+    if (orders[id]) {
+      prevSnapshots[id] = {
+        itemsDone: JSON.parse(JSON.stringify(orders[id].itemsDone || {})),
+        status: orders[id].status
+      };
     }
-  }
+  });
+
   for (const id of ids) {
-    await window.groupDone(id, type);
+    await window.groupDone(id, type, true); // skipSaveRecentDone=true
   }
+
+  // グループ全体で1回だけsaveRecentDoneを呼ぶ
+  ids.forEach(id => {
+    if (prevSnapshots[id]) {
+      saveRecentDone(id, type, prevSnapshots[id].itemsDone, prevSnapshots[id].status);
+    }
+  });
 };
 
-window.groupDone = async function(id, type) {
+window.groupDone = async function(id, type, skipSaveRecentDone) {
   if (!orders[id]) return;
   if (!orders[id].itemsDone) orders[id].itemsDone = {};
   const prev = JSON.parse(JSON.stringify(orders[id].itemsDone));
   const prevStatus = orders[id].status;
   (orders[id].items||[]).forEach((i,idx) => {
-    const isDrink = DRINKS.some(function(d){return i.name===d||i.name.startsWith(d+'（');});
-    if ((type==='drink'&&isDrink)||(type==='food'&&!isDrink)) orders[id].itemsDone[idx] = true;
+    if ((type==='drink'&&isDrinkItem(i.name))||(type==='food'&&!isDrinkItem(i.name))||(type==='food'&&orders[id].source==='set')) orders[id].itemsDone[idx] = true;
   });
   const allDone = orders[id].items.every((_,i) => orders[id].itemsDone[i]);
   if (allDone) {
     orders[id].status = 'done';
     _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone, status: 'done' });
-    saveRecentDone(id, type, prev, prevStatus);
+    if (!skipSaveRecentDone) saveRecentDone(id, type, prev, prevStatus);
     const doneItemsDone = JSON.parse(JSON.stringify(orders[id].itemsDone));
     renderOrders(); _syncOrderToBills(id, doneItemsDone);
   } else {
     _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone });
-    saveRecentDone(id, type, prev, prevStatus);
+    if (!skipSaveRecentDone) saveRecentDone(id, type, prev, prevStatus);
     renderOrders(); _syncOrderToBills(id);
   }
 };
