@@ -75,17 +75,6 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
 .icon-btn:hover { background: #334155; color: #f1f5f9; }
 /* 戻すボタン */
-.restore-fab { position: fixed; bottom: 64px; left: 12px; display: none; padding: 8px 14px; background: #1e293b; border: 1px solid #fbbf24; border-radius: 10px; color: #fbbf24; font-size: 12px; font-weight: 600; cursor: pointer; z-index: 200; }
-.restore-fab.show { display: block; }
-.restore-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 600; display: none; align-items: center; justify-content: center; }
-.restore-modal.show { display: flex; }
-.restore-box { background: #1e293b; border-radius: 14px; border: 1px solid #334155; padding: 20px; min-width: 300px; max-width: 90vw; max-height: 80vh; overflow-y: auto; }
-.restore-title { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; }
-.restore-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; gap: 10px; }
-.restore-info { font-size: 13px; color: #cbd5e1; }
-.restore-time { font-size: 11px; color: #64748b; margin-top: 2px; }
-.restore-do-btn { padding: 5px 14px; background: #fbbf24; color: #1a1200; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-.restore-close { width: 100%; padding: 10px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; margin-top: 8px; }
 
 /* === 伝票CSS === */
 
@@ -205,13 +194,6 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
 <div class="call-banner" id="call-banner"></div>
 <div id="bell" class="bell">🔔 新しい注文！</div>
-<div class="restore-modal" id="restore-modal">
-  <div class="restore-box">
-    <div class="restore-title">↩ 提供済みを戻す（3分以内）</div>
-    <div id="restore-list"></div>
-    <button class="restore-close" onclick="window.closeRestoreModal()">閉じる</button>
-  </div>
-</div>
 <!-- 全て表示（2列） -->
 <div class="orders-grid" id="view-all">
   <div class="col-panel">
@@ -317,7 +299,6 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   <button class="tab-item" id="tab-bills" onclick="window.setMode('bills')"><span class="tab-icon">🧾</span>伝票</button>
 
 </nav>
-<button class="restore-fab" id="restore-btn" onclick="window.showRestoreList()">↩ 直前の提供を戻す</button>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -507,93 +488,10 @@ window.dismissOhiya = async function(tableNum) {
 };
 let ignoreNext = false;
 const _selfWriteIds = new Set(); // 自分が書き込んだorderID（新着通知スキップ用）
-const recentDone = [];
-const RESTORE_LIMIT = 3 * 60 * 1000;
 
 function fmt(ts) {
   const d = new Date(ts);
   return ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2);
-}
-
-function updateRestoreBtn() {
-  const now = Date.now();
-  const valid = recentDone.filter(r => now - r.doneAt < RESTORE_LIMIT);
-  const btn = document.getElementById('restore-btn');
-  if (valid.length > 0) {
-    btn.classList.add('show');
-  } else {
-    btn.classList.remove('show');
-  }
-}
-setInterval(updateRestoreBtn, 10000);
-
-window.showRestoreList = function() {
-  const now = Date.now();
-  const valid = recentDone.filter(r => now - r.doneAt < RESTORE_LIMIT);
-  if (valid.length === 0) { updateRestoreBtn(); return; }
-  const list = document.getElementById('restore-list');
-  list.innerHTML = valid.map((r, i) => {
-    const ago = Math.floor((now - r.doneAt) / 1000);
-    const agoStr = ago < 60 ? ago + '秒前' : Math.floor(ago/60) + '分' + (ago%60) + '秒前';
-    const items = r.order.items || [];
-    let displayItems;
-    if (r.type === 'drink') displayItems = items.filter(it => DRINKS.includes(it.name));
-    else if (r.type === 'food') displayItems = items.filter(it => !DRINKS.includes(it.name));
-    else displayItems = items;
-    const itemNames = displayItems.map(it => { const base = it.name.replace(/（.*?）$/, ''); const opt = it.name.match(/（.*?）$/); return (KITCHEN_NAMES[base] || base) + (opt ? opt[0] : ''); }).join('・');
-    const typeLabel = r.type === 'drink' ? '🥤' : '🍽';
-    return `<div class="restore-item">
-      <div><div class="restore-info">${typeLabel} テーブル${r.order.table} ${itemNames}</div>
-      <div class="restore-time">${agoStr}に提供完了</div></div>
-      <button class="restore-do-btn" onclick="window.doRestore(${i})">戻す</button>
-    </div>`;
-  }).join('');
-  document.getElementById('restore-modal').classList.add('show');
-};
-
-window.doRestore = async function(i) {
-  const now = Date.now();
-  const valid = recentDone.filter(r => now - r.doneAt < RESTORE_LIMIT);
-  const r = valid[i];
-  if (!r) return;
-  const restored = JSON.parse(JSON.stringify(r.order));
-  // 現在のitemsDoneをベースに（他typeは現状維持）
-  const currentItemsDone = JSON.parse(JSON.stringify(orders[r.id] ? orders[r.id].itemsDone || {} : {}));
-  // typeに対応するアイテムだけ「未提供」に戻す（delete = 未提供）
-  (restored.items || []).forEach((item, idx) => {
-    const isDrink = isDrinkItem(item.name);
-    const isMyType = (r.type === 'food' && !isDrink) || (r.type === 'drink' && isDrink);
-    if (isMyType) {
-      delete currentItemsDone[idx]; // 未提供に戻す
-    }
-    // 他typeはそのまま
-  });
-  // 未提供アイテムが残っていればnew
-  const anyNotDone = (restored.items || []).some((_, idx) => !currentItemsDone[idx]);
-  restored.status = anyNotDone ? 'new' : 'done';
-  restored.itemsDone = currentItemsDone;
-  orders[r.id] = restored;
-  _selfWriteIds.add(r.id);
-  await update(ref(db, 'orders/'+r.id), { status: restored.status, itemsDone: restored.itemsDone });
-  const idx = recentDone.indexOf(r);
-  if (idx > -1) recentDone.splice(idx, 1);
-  updateRestoreBtn();
-  renderOrders();
-  closeRestoreModal();
-};
-
-window.closeRestoreModal = function() {
-  document.getElementById('restore-modal').classList.remove('show');
-};
-
-function saveRecentDone(id, type, prev, prevStatus) {
-  recentDone.unshift({
-    id, type, prev, prevStatus,
-    order: JSON.parse(JSON.stringify(orders[id])),
-    doneAt: Date.now()
-  });
-  if (recentDone.length > 10) recentDone.pop();
-  updateRestoreBtn();
 }
 
 function calcTotalMap() {
@@ -746,7 +644,6 @@ window.toggleItem = async function(id, idx) {
       orders[id].status = 'done';
       _selfWriteIds.add(id);
       await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone, status: 'done' });
-      saveRecentDone(id, 'all', prev, prevStatus);
       renderOrders(); _syncOrderToBills(id);
     } else {
       _selfWriteIds.add(id);
@@ -758,40 +655,14 @@ window.toggleItem = async function(id, idx) {
 
 window.groupDoneMulti = async function(idStr, type) {
   const ids = idStr.split(',').filter(Boolean);
-
-  // 戻す用に事前にスナップショットを保存（typeごとに対象itemsのみ）
-  const prevSnapshots = {};
-  ids.forEach(id => {
-    if (orders[id]) {
-      prevSnapshots[id] = {
-        itemsDone: JSON.parse(JSON.stringify(orders[id].itemsDone || {})),
-        status: orders[id].status
-      };
-    }
-  });
-
   for (const id of ids) {
-    await window.groupDone(id, type, true); // skipSaveRecentDone=true
+    await window.groupDone(id, type);
   }
-
-  // 押されたtypeのアイテムを持つorderのみsaveRecentDone（1エントリだけ保存）
-  ids.forEach(id => {
-    if (!prevSnapshots[id]) return;
-    const itemsArr = orders[id] ? (orders[id].items || []) : [];
-    const hasMyType = itemsArr.some(i =>
-      type === 'food' ? !isDrinkItem(i.name) : isDrinkItem(i.name)
-    );
-    if (hasMyType) {
-      saveRecentDone(id, type, prevSnapshots[id].itemsDone, prevSnapshots[id].status);
-    }
-  });
 };
 
-window.groupDone = async function(id, type, skipSaveRecentDone) {
+window.groupDone = async function(id, type) {
   if (!orders[id]) return;
   if (!orders[id].itemsDone) orders[id].itemsDone = {};
-  const prev = JSON.parse(JSON.stringify(orders[id].itemsDone));
-  const prevStatus = orders[id].status;
   (orders[id].items||[]).forEach((i,idx) => {
     if ((type==='drink'&&isDrinkItem(i.name))||(type==='food'&&!isDrinkItem(i.name))||(type==='food'&&orders[id].source==='set')) orders[id].itemsDone[idx] = true;
   });
@@ -800,13 +671,11 @@ window.groupDone = async function(id, type, skipSaveRecentDone) {
     orders[id].status = 'done';
     _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone, status: 'done' });
-    if (!skipSaveRecentDone) saveRecentDone(id, type, prev, prevStatus);
     const doneItemsDone = JSON.parse(JSON.stringify(orders[id].itemsDone));
     renderOrders(); _syncOrderToBills(id, doneItemsDone);
   } else {
     _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone });
-    if (!skipSaveRecentDone) saveRecentDone(id, type, prev, prevStatus);
     renderOrders(); _syncOrderToBills(id);
   }
 };
