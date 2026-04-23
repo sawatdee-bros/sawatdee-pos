@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サワディーブロス | お楽しみページ</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Sarabun:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --thai-red: #C0392B;
+    --thai-gold: #F0A500;
+    --thai-green: #27AE60;
+    --thai-blue: #2980B9;
+    --warm-bg: #FFF8F0;
+    --card-bg: #FFFFFF;
+    --text-dark: #2C2C2C;
+    --text-mid: #666;
+    --accent: #E85D04;
+    --shadow: 0 4px 20px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--warm-bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ===== HEADER ===== */
+  .hero {
+    background: linear-gradient(135deg, #C0392B 0%, #E85D04 50%, #F0A500 100%);
+    text-align: center;
+    padding: 36px 20px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30px; left: -30px; right: -30px; bottom: -30px;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 1;
+  }
+  .hero-emoji { font-size: 52px; display: block; margin-bottom: 8px; animation: bounce 2s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .hero h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: #fff;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  .hero-sub {
+    color: rgba(255,255,255,0.88);
+    font-size: 13px;
+    margin-top: 6px;
+    position: relative;
+    font-family: 'Sarabun', sans-serif;
+  }
+  .lang-flags {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    position: relative;
+  }
+  .lang-btn {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.5);
+    color: #fff;
+    font-size: 13px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.2s;
+  }
+  .lang-btn.active, .lang-btn:hover {
+    background: rgba(255,255,255,0.95);
+    color: var(--thai-red);
+    border-color: #fff;
+    font-weight: 700;
+  }
+
+  /* ===== NAV TABS ===== */
+  .nav-wrap {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 100;
+    border-bottom: 3px solid var(--thai-gold);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--text-mid);
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .nav-tab .tab-icon { display: block; font-size: 20px; margin-bottom: 2px; text-align: center; }
+  .nav-tab.active {
+    color: var(--thai-red);
+    border-bottom-color: var(--thai-red);
+  }
+
+  /* ===== CONTENT ===== */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1.5px solid rgba(0,0,0,0.05);
+  }
+  .card-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: var(--thai-red);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ===== THAI LESSON ===== */
+  .phrase-card {
+    background: linear-gradient(135deg, #FFF3E0, #FFECB3);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 2px solid #FFD54F;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .phrase-card:active { transform: scale(0.97); }
+  .phrase-card.flipped .phrase-front { display: none; }
+  .phrase-card:not(.flipped) .phrase-back { display: none; }
+  .phrase-thai {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #C0392B;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .phrase-kana {
+    font-size: 16px;
+    color: #E85D04;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .phrase-ja {
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+  }
+  .phrase-en {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .phrase-tap-hint {
+    font-size: 11px;
+    color: #aaa;
+    text-align: right;
+    margin-top: 4px;
+  }
+  .phrase-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--thai-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+  }
+  .lesson-progress {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-mid);
+    margin-bottom: 12px;
+  }
+  .lesson-nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .lesson-btn {
+    background: var(--thai-red);
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: background 0.15s;
+  }
+  .lesson-btn:hover { background: #A93226; }
+  .lesson-btn.secondary { background: #eee; color: #666; }
+
+  /* ===== QUIZ ===== */
+  .quiz-question {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .quiz-sub {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-mid);
+    margin-bottom: 20px;
+  }
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .quiz-opt {
+    background: #f5f5f5;
+    border: 2.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 14px 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .quiz-opt:hover { border-color: var(--thai-gold); background: #FFF8E1; }
+  .quiz-opt.correct { background: #E8F5E9; border-color: var(--thai-green); color: var(--thai-green); }
+  .quiz-opt.wrong { background: #FFEBEE; border-color: var(--thai-red); color: var(--thai-red); }
+  .quiz-result {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .quiz-score {
+    background: linear-gradient(135deg, var(--thai-gold), var(--accent));
+    color: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    display: none;
+  }
+  .quiz-score.show { display: block; }
+  .quiz-score-num { font-family: 'Fredoka One', cursive; font-size: 48px; }
+
+  /* ===== MENU PRIDE ===== */
+  .dish-card {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px;
+    background: #FFF8F0;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--thai-gold);
+  }
+  .dish-emoji { font-size: 36px; flex-shrink: 0; }
+  .dish-name { font-weight: 700; font-size: 16px; color: var(--thai-red); }
+  .dish-name-sub { font-size: 11px; color: #888; font-family: 'Sarabun', sans-serif; margin-top: 2px; }
+  .dish-desc { font-size: 13px; color: var(--text-mid); margin-top: 6px; line-height: 1.6; }
+  .dish-tag {
+    display: inline-block;
+    background: var(--thai-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-top: 6px;
+    margin-right: 4px;
+  }
+  .dish-tag.green { background: var(--thai-green); }
+  .dish-tag.gold { background: var(--thai-gold); color: #333; }
+
+  /* ===== STAFF ===== */
+  .staff-card {
+    text-align: center;
+    padding: 20px 16px;
+    background: linear-gradient(135deg, #FFF3E0, #FFF8F0);
+    border-radius: 16px;
+    margin-bottom: 14px;
+    border: 2px solid #FFD54F;
+  }
+  .staff-avatar { font-size: 56px; margin-bottom: 8px; }
+  .staff-name { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--thai-red); }
+  .staff-role { font-size: 13px; color: var(--text-mid); margin-top: 2px; }
+  .staff-msg { font-size: 13px; margin-top: 10px; line-height: 1.7; color: var(--text-dark); }
+  .staff-thai { font-family: 'Sarabun', sans-serif; font-size: 15px; color: var(--thai-gold); margin-top: 6px; font-weight: 600; }
+
+  /* ===== SNS ===== */
+  .sns-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  }
+  .sns-btn:active { transform: scale(0.97); }
+  .sns-btn.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+  .sns-btn.google { background: linear-gradient(135deg, #4285F4, #34A853); }
+  .sns-btn.line { background: #06C755; }
+  .sns-icon { font-size: 28px; }
+  .sns-text { flex: 1; }
+  .sns-label { font-size: 14px; }
+  .sns-sub { font-size: 11px; font-weight: 400; opacity: 0.88; }
+
+  /* ===== COUPON ===== */
+  .coupon {
+    background: #fff;
+    border: 3px dashed var(--thai-gold);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .coupon::before, .coupon::after {
+    content: '';
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px;
+    background: var(--warm-bg);
+    border-radius: 50%;
+    border: 3px solid var(--thai-gold);
+  }
+  .coupon::before { left: -14px; }
+  .coupon::after { right: -14px; }
+  .coupon-label {
+    background: var(--thai-red);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .coupon-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 26px;
+    color: var(--thai-red);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .coupon-desc { font-size: 12px; color: var(--text-mid); margin-bottom: 12px; line-height: 1.6; }
+  .coupon-code {
+    background: #FFF8E1;
+    border: 2px solid var(--thai-gold);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .coupon-code:hover { background: #FFECB3; }
+  .coupon-note { font-size: 11px; color: #aaa; margin-top: 8px; }
+
+  /* ===== SURVEY ===== */
+  .survey-label {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+  }
+  .star-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .star {
+    font-size: 32px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    filter: grayscale(1);
+    opacity: 0.4;
+  }
+  .star.on { filter: none; opacity: 1; transform: scale(1.15); }
+  .survey-textarea {
+    width: 100%;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+  .survey-textarea:focus { border-color: var(--thai-gold); }
+  .survey-visit {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .visit-opt {
+    background: #f0f0f0;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.15s;
+    font-weight: 700;
+  }
+  .visit-opt.active { background: #FFF3E0; border-color: var(--thai-gold); color: var(--accent); }
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--thai-red), var(--accent));
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    box-shadow: 0 4px 16px rgba(200,60,30,0.3);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .survey-thanks {
+    text-align: center;
+    padding: 30px 20px;
+    display: none;
+  }
+  .survey-thanks.show { display: block; }
+  .survey-thanks-emoji { font-size: 56px; margin-bottom: 12px; }
+  .survey-thanks h3 { font-family: 'Fredoka One', cursive; font-size: 24px; color: var(--thai-red); }
+  .survey-thanks p { font-size: 14px; color: var(--text-mid); margin-top: 8px; line-height: 1.7; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 24px 16px 8px;
+    font-size: 12px;
+    color: #bbb;
+  }
+  .footer span { color: var(--thai-red); font-weight: 700; }
+
+  /* ===== TRIVIA ===== */
+  .trivia-card {
+    background: linear-gradient(135deg, #1a237e, #283593);
+    color: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .trivia-card::before {
+    content: '🇹🇭';
+    position: absolute;
+    right: -10px; top: -10px;
+    font-size: 80px;
+    opacity: 0.12;
+  }
+  .trivia-num {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .trivia-q {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  .trivia-a {
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+  }
+
+  /* Animations */
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page.active .card, .page.active .phrase-card, .page.active .trivia-card {
+    animation: fadeSlideIn 0.35s ease both;
+  }
+  .page.active .card:nth-child(2) { animation-delay: 0.05s; }
+  .page.active .card:nth-child(3) { animation-delay: 0.10s; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="hero-emoji">🌺</span>
+  <h1 id="hero-title">サワディーブロスへようこそ！</h1>
+  <p class="hero-sub" id="hero-sub">待ち時間も楽しんでね / ยินดีต้อนรับ / Welcome!</p>
+  <div class="lang-flags">
+    <button class="lang-btn active" onclick="setLang('ja')">🇯🇵 日本語</button>
+    <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+    <button class="lang-btn" onclick="setLang('th')">🇹🇭 ไทย</button>
+  </div>
+</div>
+
+<div class="nav-wrap">
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('lesson')"><span class="tab-icon">🗣️</span><span data-i18n="tab_lesson">タイ語</span></button>
+    <button class="nav-tab" onclick="showPage('quiz')"><span class="tab-icon">🧠</span><span data-i18n="tab_quiz">クイズ</span></button>
+    <button class="nav-tab" onclick="showPage('trivia')"><span class="tab-icon">🇹🇭</span><span data-i18n="tab_trivia">豆知識</span></button>
+    <button class="nav-tab" onclick="showPage('menu')"><span class="tab-icon">🍽️</span><span data-i18n="tab_menu">こだわり</span></button>
+    <button class="nav-tab" onclick="showPage('staff')"><span class="tab-icon">👨‍🍳</span><span data-i18n="tab_staff">スタッフ</span></button>
+    <button class="nav-tab" onclick="showPage('coupon')"><span class="tab-icon">🎁</span><span data-i18n="tab_coupon">特典</span></button>
+    <button class="nav-tab" onclick="showPage('sns')"><span class="tab-icon">📸</span><span data-i18n="tab_sns">SNS</span></button>
+    <button class="nav-tab" onclick="showPage('survey')"><span class="tab-icon">💬</span><span data-i18n="tab_survey">感想</span></button>
+  </div>
+</div>
+
+<!-- ===== タイ語講座 ===== -->
+<div id="page-lesson" class="page active">
+  <div class="card">
+    <div class="card-title">🗣️ <span data-i18n="lesson_title">今日のタイ語</span></div>
+    <p style="font-size:13px;color:var(--text-mid);margin-bottom:14px;" data-i18n="lesson_desc">カードをタップして日本語訳を確認！</p>
+    <div class="lesson-progress" id="lesson-progress">1 / 8</div>
+    <div id="phrase-card" class="phrase-card" onclick="flipCard()">
+      <div class="phrase-front">
+        <div class="phrase-badge" id="phrase-badge">定番</div>
+        <div class="phrase-thai" id="phrase-thai">สวัสดี</div>
+        <div class="phrase-kana" id="phrase-kana">サワディー</div>
+        <div class="phrase-tap-hint" data-i18n="tap_hint">タップして意味を見る 👆</div>
+      </div>
+      <div class="phrase-back">
+        <div class="phrase-thai" id="phrase-thai-b">สวัสดี</div>
+        <div class="phrase-kana" id="phrase-kana-b">サワディー</div>
+        <div class="phrase-ja" id="phrase-ja">こんにちは / こんばんは</div>
+        <div class="phrase-en" id="phrase-en">Hello / Good evening</div>
+      </div>
+    </div>
+    <div class="lesson-nav">
+      <button class="lesson-btn secondary" onclick="prevPhrase()">← 前へ</button>
+      <button class="lesson-btn" onclick="nextPhrase()" data-i18n="next_btn">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== クイズ ===== -->
+<div id="page-quiz" class="page">
+  <div class="card" id="quiz-card">
+    <div class="card-title">🧠 <span data-i18n="quiz_title">タイ文化クイズ</span></div>
+    <div id="quiz-area">
+      <div class="quiz-question" id="quiz-q"></div>
+      <div class="quiz-sub" id="quiz-sub"></div>
+      <div class="quiz-options" id="quiz-opts"></div>
+      <div class="quiz-result" id="quiz-result"></div>
+      <div style="text-align:center;">
+        <button class="lesson-btn" id="quiz-next-btn" onclick="nextQuestion()" style="display:none;" data-i18n="next_btn">次へ →</button>
+      </div>
+    </div>
+    <div class="quiz-score" id="quiz-score">
+      <div style="font-size:32px;margin-bottom:8px;">🎉</div>
+      <div style="font-size:16px;margin-bottom:6px;font-weight:700;" data-i18n="quiz_fin">全問クリア！</div>
+      <div class="quiz-score-num" id="quiz-score-num"></div>
+      <div style="font-size:14px;margin-top:6px;opacity:0.88;" data-i18n="quiz_score_label">点 / 100点</div>
+      <button class="lesson-btn" style="margin-top:16px;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);" onclick="restartQuiz()" data-i18n="retry_btn">もう一度</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== タイ豆知識 ===== -->
+<div id="page-trivia" class="page">
+  <div class="card">
+    <div class="card-title">🇹🇭 <span data-i18n="trivia_title">タイ文化・豆知識</span></div>
+    <div id="trivia-list"></div>
+  </div>
+</div>
+
+<!-- ===== メニューこだわり ===== -->
+<div id="page-menu" class="page">
+  <div class="card">
+    <div class="card-title">🍽️ <span data-i18n="menu_title">シェフのこだわり</span></div>
+    <div class="dish-card">
+      <div class="dish-emoji">🌶️</div>
+      <div>
+        <div class="dish-name">ガパオライス</div>
+        <div class="dish-name-sub">ข้าวผัดกะเพรา</div>
+        <div class="dish-desc" data-i18n="dish1_desc">バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。ふつうのバジルとは全然違う、スパイシーでパンチのある風味が自慢です。</div>
+        <span class="dish-tag">シェフおすすめ</span>
+        <span class="dish-tag gold">人気No.1</span>
+      </div>
+    </div>
+    <div class="dish-card">
+      <div class="dish-emoji">🍜</div>
+      <div>
+        <div class="dish-name">トムヤムクン</div>
+        <div class="dish-name-sub">ต้มยำกุ้ง</div>
+        <div class="dish-desc" data-i18n="dish2_desc">レモングラス・カー（タイしょうが）・マクルートの葉を丸ごと使ったスープ。酸味・辛味・旨味のバランスが命です。</div>
+        <span class="dish-tag">本格派</span>
+        <span class="dish-tag green">無添加</span>
+      </div>
+    </div>
+    <div class="dish-card">
+      <div class="dish-emoji">🍹</div>
+      <div>
+        <div class="dish-name">チャンビール</div>
+        <div class="dish-name-sub">เบียร์ช้าง</div>
+        <div class="dish-desc" data-i18n="dish3_desc">象（チャン）がトレードマークのタイを代表するビール。甘みが少なくスッキリとした飲み口で、タイ料理との相性バツグン！</div>
+        <span class="dish-tag gold" style="color:#333;">タイ直輸入</span>
+      </div>
+    </div>
+    <div class="dish-card">
+      <div class="dish-emoji">🥜</div>
+      <div>
+        <div class="dish-name">パッタイ</div>
+        <div class="dish-name-sub">ผัดไทย</div>
+        <div class="dish-desc" data-i18n="dish4_desc">タマリンドのタレで炒めたタイ風焼きそば。ナンプラー・砂糖・チリを絶妙なバランスで合わせた秘伝のソースが決め手。</div>
+        <span class="dish-tag">定番</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== スタッフ紹介 ===== -->
+<div id="page-staff" class="page">
+  <div class="card">
+    <div class="card-title">👨‍🍳 <span data-i18n="staff_title">スタッフ紹介</span></div>
+    <div class="staff-card">
+      <div class="staff-avatar">👨‍🍳</div>
+      <div class="staff-name">タクヤ</div>
+      <div class="staff-role">オーナー / シェフ</div>
+      <div class="staff-msg" data-i18n="staff1_msg">タイに恋して始めたお店です。本場のタイ料理をそのままお届けしたくて、食材にはとことんこだわっています。みなさんに「また来たい！」と思ってもらえると嬉しいです。</div>
+      <div class="staff-thai">ขอบคุณที่มาเยี่ยมชม！</div>
+    </div>
+    <div class="staff-card">
+      <div class="staff-avatar">👩‍🍳</div>
+      <div class="staff-name">ナム</div>
+      <div class="staff-role">タイ料理シェフ</div>
+      <div class="staff-msg" data-i18n="staff2_msg">タイ・チェンマイ出身です！お母さんから教わったレシピをベースに、日本のお客様に合わせた味にアレンジしています。辛さはお気軽に調整しますよ。</div>
+      <div class="staff-thai">อร่อยนะคะ！</div>
+    </div>
+    <div class="staff-card">
+      <div class="staff-avatar">🧑‍💼</div>
+      <div class="staff-name">ケンジ</div>
+      <div class="staff-role">ホールスタッフ</div>
+      <div class="staff-msg" data-i18n="staff3_msg">料理の説明はなんでも聞いてください！辛さや食べ方のコツもお伝えできます。楽しいひとときになるようサポートします！</div>
+      <div class="staff-thai">สนุกกันนะ！</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== クーポン・特典 ===== -->
+<div id="page-coupon" class="page">
+  <div class="card">
+    <div class="card-title">🎁 <span data-i18n="coupon_title">お客様特典</span></div>
+    <div class="coupon">
+      <div class="coupon-label">SNSフォロー特典</div>
+      <div class="coupon-title" data-i18n="coupon1_title">ドリンク1杯<br>サービス！</div>
+      <div class="coupon-desc" data-i18n="coupon1_desc">インスタをフォロー＆スタッフに見せるだけ！<br>（おひとり様1回・初回来店時限定）</div>
+      <div class="coupon-code" onclick="copyCode('SAWATDEE')" id="coupon-code-1">📋 SAWATDEE</div>
+      <div class="coupon-note" data-i18n="coupon_note">※スタッフにこの画面を見せてください</div>
+    </div>
+    <div class="coupon">
+      <div class="coupon-label">Googleクチコミ特典</div>
+      <div class="coupon-title" data-i18n="coupon2_title">デザート<br>プレゼント🍮</div>
+      <div class="coupon-desc" data-i18n="coupon2_desc">Googleにクチコミを書いてスタッフに見せると<br>タイスイーツを1品サービス！</div>
+      <div class="coupon-code" onclick="copyCode('GOOGLE5')" id="coupon-code-2">📋 GOOGLE5</div>
+      <div class="coupon-note" data-i18n="coupon_note">※スタッフにこの画面を見せてください</div>
+    </div>
+    <div class="coupon">
+      <div class="coupon-label">お誕生日特典</div>
+      <div class="coupon-title" data-i18n="coupon3_title">バースデー<br>🎂 サプライズ！</div>
+      <div class="coupon-desc" data-i18n="coupon3_desc">誕生日月にご来店のお客様に<br>シェフ特製デザートをプレゼント！<br>ご予約時にお申し付けください。</div>
+      <div class="coupon-note" data-i18n="coupon_note">※スタッフにこの画面を見せてください</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SNS ===== -->
+<div id="page-sns" class="page">
+  <div class="card">
+    <div class="card-title">📸 <span data-i18n="sns_title">フォロー・シェア</span></div>
+    <p style="font-size:13px;color:var(--text-mid);margin-bottom:16px;line-height:1.7;" data-i18n="sns_desc">お料理の写真を撮ったらぜひシェアしてください！タグ付けで特典あり🎁</p>
+
+    <a href="https://instagram.com/sawatdee_bros" target="_blank" class="sns-btn instagram">
+      <span class="sns-icon">📸</span>
+      <div class="sns-text">
+        <div class="sns-label">Instagram</div>
+        <div class="sns-sub" data-i18n="ig_sub">@sawatdee_bros をフォロー！料理写真・日常をシェア</div>
+      </div>
+      <span>→</span>
+    </a>
+
+    <a href="https://g.page/r/sawatdee-bros/review" target="_blank" class="sns-btn google">
+      <span class="sns-icon">⭐</span>
+      <div class="sns-text">
+        <div class="sns-label">Googleクチコミ</div>
+        <div class="sns-sub" data-i18n="google_sub">クチコミを書いてデザートをゲット！</div>
+      </div>
+      <span>→</span>
+    </a>
+
+    <a href="https://lin.ee/sawatdee" target="_blank" class="sns-btn line">
+      <span class="sns-icon">💬</span>
+      <div class="sns-text">
+        <div class="sns-label">LINE公式</div>
+        <div class="sns-sub" data-i18n="line_sub">予約・お問い合わせはLINEが便利！</div>
+      </div>
+      <span>→</span>
+    </a>
+
+    <div style="background:#FFF8F0;border-radius:12px;padding:14px;margin-top:4px;border:2px solid #FFD54F;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:6px;">📷 <span data-i18n="hashtag_title">ハッシュタグ</span></div>
+      <div style="font-size:15px;color:var(--thai-red);font-weight:700;letter-spacing:0.5px;">#サワディーブロス<br>#sawatdeebros<br>#タイ料理横浜</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 感想フォーム ===== -->
+<div id="page-survey" class="page">
+  <div class="card">
+    <div class="card-title">💬 <span data-i18n="survey_title">ご感想をお聞かせください</span></div>
+    <div id="survey-form">
+      <div class="survey-label" data-i18n="s_overall">今日の料理はいかがでしたか？</div>
+      <div class="star-row" id="star-row">
+        <span class="star" data-v="1" onclick="setStar(1)">⭐</span>
+        <span class="star" data-v="2" onclick="setStar(2)">⭐</span>
+        <span class="star" data-v="3" onclick="setStar(3)">⭐</span>
+        <span class="star" data-v="4" onclick="setStar(4)">⭐</span>
+        <span class="star" data-v="5" onclick="setStar(5)">⭐</span>
+      </div>
+
+      <div class="survey-label" data-i18n="s_visit">来店回数は？</div>
+      <div class="survey-visit" id="visit-opts">
+        <button class="visit-opt" onclick="setVisit(this,'初めて')" data-i18n="v1">初めて</button>
+        <button class="visit-opt" onclick="setVisit(this,'2〜3回')" data-i18n="v2">2〜3回</button>
+        <button class="visit-opt" onclick="setVisit(this,'4回以上')" data-i18n="v3">4回以上</button>
+        <button class="visit-opt" onclick="setVisit(this,'常連')" data-i18n="v4">常連です！</button>
+      </div>
+
+      <div class="survey-label" data-i18n="s_comment">ひとことコメント（任意）</div>
+      <textarea class="survey-textarea" id="survey-comment" rows="3" placeholder="おいしかった！また来ます etc..." data-i18n-placeholder="comment_placeholder"></textarea>
+
+      <button class="submit-btn" onclick="submitSurvey()" data-i18n="submit_btn">送信する 🙏</button>
+    </div>
+    <div class="survey-thanks" id="survey-thanks">
+      <div class="survey-thanks-emoji">🙏</div>
+      <h3 data-i18n="thanks_title">ありがとうございます！</h3>
+      <p data-i18n="thanks_msg">ご感想をお聞かせいただき、ありがとうございました。またのご来店をお待ちしております。</p>
+      <div style="margin-top:16px;font-family:'Sarabun',sans-serif;font-size:20px;color:var(--thai-gold);font-weight:700;">ขอบคุณมากนะคะ 🌺</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>サワディーブロス</span> &copy; 2025 | <span>สวัสดีบรอส</span>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ",
+  authDomain: "sawatdee-bros.firebaseapp.com",
+  databaseURL: "https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sawatdee-bros",
+  appId: "1:1026345346676:web:3fc5dc6cf3f0628a8e1321"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ===== 多言語 =====
+const I18N = {
+  ja: {
+    hero_title: "サワディーブロスへようこそ！",
+    hero_sub: "待ち時間も楽しんでね / ยินดีต้อนรับ / Welcome!",
+    tab_lesson:"タイ語",tab_quiz:"クイズ",tab_trivia:"豆知識",tab_menu:"こだわり",
+    tab_staff:"スタッフ",tab_coupon:"特典",tab_sns:"SNS",tab_survey:"感想",
+    lesson_title:"今日のタイ語",lesson_desc:"カードをタップして日本語訳を確認！",
+    tap_hint:"タップして意味を見る 👆",next_btn:"次へ →",
+    quiz_title:"タイ文化クイズ",quiz_fin:"全問クリア！",quiz_score_label:"点 / 100点",retry_btn:"もう一度",
+    trivia_title:"タイ文化・豆知識",
+    menu_title:"シェフのこだわり",
+    dish1_desc:"バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。ふつうのバジルとは全然違う、スパイシーでパンチのある風味が自慢です。",
+    dish2_desc:"レモングラス・カー（タイしょうが）・マクルートの葉を丸ごと使ったスープ。酸味・辛味・旨味のバランスが命です。",
+    dish3_desc:"象（チャン）がトレードマークのタイを代表するビール。甘みが少なくスッキリとした飲み口で、タイ料理との相性バツグン！",
+    dish4_desc:"タマリンドのタレで炒めたタイ風焼きそば。ナンプラー・砂糖・チリを絶妙なバランスで合わせた秘伝のソースが決め手。",
+    staff_title:"スタッフ紹介",
+    staff1_msg:"タイに恋して始めたお店です。本場のタイ料理をそのままお届けしたくて、食材にはとことんこだわっています。みなさんに「また来たい！」と思ってもらえると嬉しいです。",
+    staff2_msg:"タイ・チェンマイ出身です！お母さんから教わったレシピをベースに、日本のお客様に合わせた味にアレンジしています。辛さはお気軽に調整しますよ。",
+    staff3_msg:"料理の説明はなんでも聞いてください！辛さや食べ方のコツもお伝えできます。楽しいひとときになるようサポートします！",
+    coupon_title:"お客様特典",coupon1_title:"ドリンク1杯\nサービス！",
+    coupon1_desc:"インスタをフォロー＆スタッフに見せるだけ！\n（おひとり様1回・初回来店時限定）",
+    coupon2_title:"デザート\nプレゼント🍮",
+    coupon2_desc:"Googleにクチコミを書いてスタッフに見せると\nタイスイーツを1品サービス！",
+    coupon3_title:"バースデー\n🎂 サプライズ！",
+    coupon3_desc:"誕生日月にご来店のお客様に\nシェフ特製デザートをプレゼント！\nご予約時にお申し付けください。",
+    coupon_note:"※スタッフにこの画面を見せてください",
+    sns_title:"フォロー・シェア",sns_desc:"お料理の写真を撮ったらぜひシェアしてください！タグ付けで特典あり🎁",
+    ig_sub:"@sawatdee_bros をフォロー！料理写真・日常をシェア",
+    google_sub:"クチコミを書いてデザートをゲット！",line_sub:"予約・お問い合わせはLINEが便利！",
+    hashtag_title:"ハッシュタグ",
+    survey_title:"ご感想をお聞かせください",
+    s_overall:"今日の料理はいかがでしたか？",s_visit:"来店回数は？",s_comment:"ひとことコメント（任意）",
+    v1:"初めて",v2:"2〜3回",v3:"4回以上",v4:"常連です！",
+    comment_placeholder:"おいしかった！また来ます etc...",submit_btn:"送信する 🙏",
+    thanks_title:"ありがとうございます！",thanks_msg:"ご感想をお聞かせいただき、ありがとうございました。またのご来店をお待ちしております。",
+  },
+  en: {
+    hero_title:"Welcome to Sawatdee Bros!",hero_sub:"Enjoy your time here! / ยินดีต้อนรับ",
+    tab_lesson:"Thai",tab_quiz:"Quiz",tab_trivia:"Culture",tab_menu:"Our Food",
+    tab_staff:"Staff",tab_coupon:"Offers",tab_sns:"SNS",tab_survey:"Feedback",
+    lesson_title:"Today's Thai Phrase",lesson_desc:"Tap the card to reveal the meaning!",
+    tap_hint:"Tap to reveal 👆",next_btn:"Next →",
+    quiz_title:"Thai Culture Quiz",quiz_fin:"Completed!",quiz_score_label:"pts / 100",retry_btn:"Try Again",
+    trivia_title:"Thai Culture Facts",menu_title:"Chef's Pride",
+    dish1_desc:"We use Holy Basil (Krapao) imported directly from Thailand. The spicy, punchy flavor is totally different from regular basil!",
+    dish2_desc:"Made with whole lemongrass, galangal, and kaffir lime leaves. The balance of sour, spicy, and savory is everything.",
+    dish3_desc:"Chang Beer — Thailand's iconic brew with its elephant logo. Light and refreshing, a perfect match for Thai food!",
+    dish4_desc:"Thai stir-fried noodles in tamarind sauce. The secret is our house blend of fish sauce, sugar, and chili.",
+    staff_title:"Meet the Team",
+    staff1_msg:"I fell in love with Thailand and opened this place. We put all our heart into sourcing authentic ingredients. Hope you want to come back!",
+    staff2_msg:"I'm from Chiang Mai, Thailand! I base my recipes on my mother's cooking, adapted for Japanese tastes. Feel free to adjust the spice level!",
+    staff3_msg:"Ask me anything about the dishes! I can explain spice levels and how to eat everything. Let's make your visit unforgettable!",
+    coupon_title:"Special Offers",coupon1_title:"Free Drink!",coupon1_desc:"Follow us on Instagram & show staff!\n(One per person, first visit only)",
+    coupon2_title:"Free Dessert 🍮",coupon2_desc:"Write a Google review & show staff\nto receive a Thai sweet!",
+    coupon3_title:"Birthday 🎂 Surprise!",coupon3_desc:"Visit during your birthday month\nfor a chef's special dessert!\nPlease mention when booking.",
+    coupon_note:"※ Please show this screen to staff",
+    sns_title:"Follow & Share",sns_desc:"Share your food photos and tag us for special perks! 🎁",
+    ig_sub:"Follow @sawatdee_bros on Instagram!",google_sub:"Write a review and get a free dessert!",
+    line_sub:"Contact us via LINE for reservations!",hashtag_title:"Hashtags",
+    survey_title:"Share Your Feedback",s_overall:"How was today's food?",s_visit:"How many times have you visited?",
+    s_comment:"Leave a comment (optional)",v1:"First time",v2:"2–3 times",v3:"4+ times",v4:"Regular!",
+    comment_placeholder:"It was delicious! Coming back soon...",submit_btn:"Submit 🙏",
+    thanks_title:"Thank you!",thanks_msg:"We appreciate your feedback. Hope to see you again soon!",
+  },
+  th: {
+    hero_title:"ยินดีต้อนรับสู่ Sawatdee Bros!",hero_sub:"สนุกกันนะ / お楽しみください / Enjoy!",
+    tab_lesson:"ภาษาไทย",tab_quiz:"ทายปัญหา",tab_trivia:"ความรู้",tab_menu:"เมนู",
+    tab_staff:"ทีมงาน",tab_coupon:"สิทธิพิเศษ",tab_sns:"SNS",tab_survey:"ความคิดเห็น",
+    lesson_title:"ประโยคไทยวันนี้",lesson_desc:"แตะการ์ดเพื่อดูความหมาย!",
+    tap_hint:"แตะเพื่อดู 👆",next_btn:"ต่อไป →",
+    quiz_title:"ทายปัญหาวัฒนธรรมไทย",quiz_fin:"เสร็จแล้ว!",quiz_score_label:"คะแนน / 100",retry_btn:"ลองอีกครั้ง",
+    trivia_title:"วัฒนธรรมไทย",menu_title:"ความภาคภูมิใจของเชฟ",
+    dish1_desc:"ใช้ใบกะเพราแท้จากประเทศไทย กลิ่นหอมเผ็ดร้อน แตกต่างจากโหระพาทั่วไปมาก!",
+    dish2_desc:"ใช้ตะไคร้ ข่า และใบมะกรูดสดทั้งใบ สมดุลของรสเปรี้ยว เผ็ด และอูมามิ คือหัวใจ",
+    dish3_desc:"เบียร์ช้าง สัญลักษณ์ของไทย ดื่มง่าย ไม่หวาน เข้ากันดีกับอาหารไทย!",
+    dish4_desc:"ผัดไทยซอสมะขาม รสน้ำปลา น้ำตาล พริก ผสมกันอย่างลงตัว",
+    staff_title:"พบทีมงาน",
+    staff1_msg:"ผมหลงรักประเทศไทยจึงเปิดร้านนี้ ตั้งใจหาวัตถุดิบแท้เพื่อให้ทุกคนได้รสชาติจริงๆ",
+    staff2_msg:"มาจากเชียงใหม่ค่ะ! ทำตามสูตรแม่ ปรับให้เหมาะกับคนญี่ปุ่น ปรับความเผ็ดได้เลยนะคะ",
+    staff3_msg:"ถามได้เลยเรื่องอาหาร! จะบอกระดับความเผ็ดและวิธีกิน ขอให้สนุกนะครับ!",
+    coupon_title:"สิทธิพิเศษ",coupon1_title:"ดื่มฟรี 1 แก้ว!",coupon1_desc:"ฟอลโล่ Instagram แล้วแสดงให้พนักงานดู!\n(1 สิทธิ์ต่อคน ครั้งแรกเท่านั้น)",
+    coupon2_title:"ของหวานฟรี 🍮",coupon2_desc:"รีวิว Google แล้วแสดงพนักงาน\nรับขนมไทย 1 อย่าง!",
+    coupon3_title:"เซอร์ไพรส์วันเกิด 🎂",coupon3_desc:"มาในเดือนเกิด\nรับขนมพิเศษจากเชฟ!\nแจ้งตอนจอง",
+    coupon_note:"※ กรุณาแสดงหน้าจอนี้ให้พนักงาน",
+    sns_title:"ติดตาม & แชร์",sns_desc:"ถ่ายรูปอาหารแล้วแชร์ได้เลย! มีสิทธิพิเศษรอ 🎁",
+    ig_sub:"ติดตาม @sawatdee_bros บน Instagram!",google_sub:"รีวิว Google รับของหวานฟรี!",
+    line_sub:"ติดต่อจองผ่าน LINE!",hashtag_title:"แฮชแท็ก",
+    survey_title:"แสดงความคิดเห็น",s_overall:"อาหารวันนี้เป็นอย่างไรบ้าง?",s_visit:"มากี่ครั้งแล้ว?",
+    s_comment:"ความคิดเห็น (ไม่บังคับ)",v1:"ครั้งแรก",v2:"2–3 ครั้ง",v3:"4 ครั้งขึ้นไป",v4:"ขาประจำ!",
+    comment_placeholder:"อร่อยมาก! จะมาอีก...",submit_btn:"ส่ง 🙏",
+    thanks_title:"ขอบคุณมากนะคะ!",thanks_msg:"ขอบคุณสำหรับความคิดเห็น หวังว่าจะได้พบกันอีกนะคะ!",
+  }
+};
+
+let currentLang = 'ja';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  applyI18n();
+  renderPhraseCard();
+  renderQuiz();
+  renderTrivia();
+}
+
+function applyI18n() {
+  const t = I18N[currentLang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key]) el.placeholder = t[key];
+  });
+  document.getElementById('hero-title').textContent = t.hero_title;
+  document.getElementById('hero-sub').textContent = t.hero_sub;
+}
+
+// ===== タイ語フレーズ =====
+const PHRASES = [
+  { thai:"สวัสดี", kana:"サワディー", badge:{ja:"定番",en:"Classic",th:"พื้นฐาน"}, ja:"こんにちは / こんばんは", en:"Hello / Good evening", th:"สวัสดี (ทักทาย)" },
+  { thai:"อร่อย", kana:"アロイ", badge:{ja:"食事",en:"Food",th:"อาหาร"}, ja:"おいしい！", en:"Delicious!", th:"อร่อย!" },
+  { thai:"ขอบคุณ", kana:"コップクン", badge:{ja:"感謝",en:"Thanks",th:"ขอบคุณ"}, ja:"ありがとう", en:"Thank you", th:"ขอบคุณ" },
+  { thai:"เผ็ด", kana:"ペット", badge:{ja:"辛さ",en:"Spice",th:"ความเผ็ด"}, ja:"辛い", en:"Spicy", th:"รสเผ็ด" },
+  { thai:"ไม่เผ็ด", kana:"マイペット", badge:{ja:"注文",en:"Order",th:"สั่ง"}, ja:"辛くして！…じゃなくて「辛くしないで」", en:"Not spicy please", th:"ไม่เผ็ดนะ" },
+  { thai:"เบียร์", kana:"ビア", badge:{ja:"ドリンク",en:"Drink",th:"เครื่องดื่ม"}, ja:"ビール", en:"Beer", th:"เบียร์" },
+  { thai:"เช็คบิล", kana:"チェックビン", badge:{ja:"会計",en:"Bill",th:"เช็คบิล"}, ja:"お会計をお願いします", en:"Bill please", th:"ขอเช็คบิลด้วย" },
+  { thai:"สบายดีไหม", kana:"サバーイディーマイ", badge:{ja:"挨拶",en:"Greeting",th:"ทักทาย"}, ja:"元気ですか？", en:"How are you?", th:"เป็นยังไงบ้าง?" },
+];
+
+let currentPhrase = 0;
+let isFlipped = false;
+
+function renderPhraseCard() {
+  const p = PHRASES[currentPhrase];
+  const card = document.getElementById('phrase-card');
+  card.classList.remove('flipped');
+  isFlipped = false;
+  document.getElementById('phrase-thai').textContent = p.thai;
+  document.getElementById('phrase-kana').textContent = p.kana;
+  document.getElementById('phrase-thai-b').textContent = p.thai;
+  document.getElementById('phrase-kana-b').textContent = p.kana;
+  document.getElementById('phrase-ja').textContent = p.ja;
+  document.getElementById('phrase-en').textContent = p.en;
+  document.getElementById('phrase-badge').textContent = p.badge[currentLang] || p.badge.ja;
+  document.getElementById('lesson-progress').textContent = `${currentPhrase+1} / ${PHRASES.length}`;
+}
+
+function flipCard() {
+  const card = document.getElementById('phrase-card');
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+function nextPhrase() { currentPhrase = (currentPhrase + 1) % PHRASES.length; renderPhraseCard(); }
+function prevPhrase() { currentPhrase = (currentPhrase - 1 + PHRASES.length) % PHRASES.length; renderPhraseCard(); }
+
+// ===== クイズ =====
+const QUIZ_DATA = [
+  { ja:"タイの首都はどこ？", en:"What is the capital of Thailand?", th:"เมืองหลวงของไทยคืออะไร?",
+    sub:{ja:"タイの政治の中心地",en:"Thailand's political center",th:"ศูนย์กลางการปกครองของไทย"},
+    opts:["バンコク","チェンマイ","プーケット","パタヤ"], optsEn:["Bangkok","Chiang Mai","Phuket","Pattaya"], optsTh:["กรุงเทพฯ","เชียงใหม่","ภูเก็ต","พัทยา"], ans:0 },
+  { ja:"タイの国花は？", en:"What is Thailand's national flower?", th:"ดอกไม้ประจำชาติไทยคืออะไร?",
+    sub:{ja:"美しい熱帯の花",en:"A beautiful tropical flower",th:"ดอกไม้เขตร้อนที่สวยงาม"},
+    opts:["ラン（胡蝶蘭）","ハイビスカス","バラ","ジャスミン"], optsEn:["Orchid","Hibiscus","Rose","Jasmine"], optsTh:["กล้วยไม้","ชบา","กุหลาบ","มะลิ"], ans:0 },
+  { ja:"ガパオの「ガパオ」とは何の意味？", en:"What does 'Krapao' in Pad Krapao mean?", th:"'กะเพรา' ในชื่อ 'ผัดกะเพรา' แปลว่าอะไร?",
+    sub:{ja:"あの有名なタイ料理",en:"That famous Thai dish",th:"อาหารไทยชื่อดัง"},
+    opts:["ホーリーバジル","レモングラス","パクチー","唐辛子"], optsEn:["Holy Basil","Lemongrass","Coriander","Chili"], optsTh:["กะเพรา","ตะไคร้","ผักชี","พริก"], ans:0 },
+  { ja:"タイの通貨単位は？", en:"What is Thailand's currency?", th:"หน่วยเงินตราของไทยคืออะไร?",
+    sub:{ja:"お買い物するときに使います",en:"Used for shopping",th:"ใช้ซื้อของ"},
+    opts:["バーツ","リンギット","ルピア","ペソ"], optsEn:["Baht","Ringgit","Rupiah","Peso"], optsTh:["บาท","ริงกิต","รูเปียห์","เปโซ"], ans:0 },
+  { ja:"「サワディー」の意味は？", en:"What does 'Sawasdee' mean?", th:"'สวัสดี' แปลว่าอะไร?",
+    sub:{ja:"お店の名前にもなってますよ😊",en:"It's in our shop name too 😊",th:"เป็นชื่อร้านด้วยนะ 😊"},
+    opts:["こんにちは/ありがとう","さようなら","いただきます","おやすみ"],
+    optsEn:["Hello/Thank you","Goodbye","Let's eat","Goodnight"],
+    optsTh:["สวัสดี/ขอบคุณ","ลาก่อน","กินข้าวกันเถอะ","ราตรีสวัสดิ์"], ans:0 },
+];
+
+let quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+function renderQuiz() {
+  if (quizIdx >= QUIZ_DATA.length) { showQuizScore(); return; }
+  const q = QUIZ_DATA[quizIdx];
+  const t = currentLang;
+  document.getElementById('quiz-q').textContent = q[t] || q.ja;
+  document.getElementById('quiz-sub').textContent = q.sub[t] || q.sub.ja;
+  const opts = t==='en'?q.optsEn:t==='th'?q.optsTh:q.opts;
+  const container = document.getElementById('quiz-opts');
+  container.innerHTML = '';
+  opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => answerQuiz(i, q.ans, btn);
+    container.appendChild(btn);
+  });
+  document.getElementById('quiz-result').textContent = '';
+  document.getElementById('quiz-result').style.background = '';
+  document.getElementById('quiz-next-btn').style.display = 'none';
+  document.getElementById('quiz-score').classList.remove('show');
+  document.getElementById('quiz-area').style.display = '';
+  quizAnswered = false;
+}
+
+function answerQuiz(chosen, correct, btn) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const btns = document.querySelectorAll('.quiz-opt');
+  btns.forEach((b, i) => {
+    if (i === correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('wrong');
+    b.style.cursor = 'default';
+  });
+  const result = document.getElementById('quiz-result');
+  if (chosen === correct) {
+    quizScore++;
+    result.textContent = '⭕ ' + ({ja:"正解！",en:"Correct!",th:"ถูกต้อง!"}[currentLang]);
+    result.style.background = '#E8F5E9';
+  } else {
+    result.textContent = '❌ ' + ({ja:"残念！",en:"Not quite!",th:"ยังไม่ถูก!"}[currentLang]);
+    result.style.background = '#FFEBEE';
+  }
+  document.getElementById('quiz-next-btn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  quizIdx++;
+  renderQuiz();
+}
+
+function showQuizScore() {
+  document.getElementById('quiz-area').style.display = 'none';
+  const score = Math.round(quizScore / QUIZ_DATA.length * 100);
+  document.getElementById('quiz-score-num').textContent = score;
+  document.getElementById('quiz-score').classList.add('show');
+}
+
+function restartQuiz() {
+  quizIdx = 0; quizScore = 0; quizAnswered = false;
+  renderQuiz();
+}
+
+// ===== 豆知識 =====
+const TRIVIA = [
+  { num:"01", q:{ja:"タイで頭は触ってはいけない！",en:"Never touch someone's head in Thailand!",th:"ในไทยห้ามจับหัวคนอื่น!"},
+    a:{ja:"タイでは頭は神聖な部位とされており、子どもであっても他人の頭を触るのは大変失礼にあたります。",en:"In Thai culture, the head is considered the most sacred part of the body. Touching anyone's head, even a child's, is considered very rude.",th:"ในวัฒนธรรมไทย ศีรษะถือเป็นส่วนที่ศักดิ์สิทธิ์ที่สุด การจับศีรษะผู้อื่นแม้แต่เด็กถือว่าเป็นการเสียมารยาทอย่างมาก"} },
+  { num:"02", q:{ja:"足を向けるのはNG！",en:"Don't point your feet at people!",th:"อย่าชี้เท้าใส่คน!"},
+    a:{ja:"足は身体の中で最も「低い」部位とされます。足を人や仏像に向けるのは非常に失礼な行為です。",en:"Feet are considered the lowest, least sacred part of the body. Pointing your feet at people or Buddha images is very disrespectful.",th:"เท้าถือเป็นส่วนที่ต่ำที่สุดของร่างกาย การชี้เท้าไปที่คนอื่นหรือพระพุทธรูปถือว่าไม่เหมาะสมมาก"} },
+  { num:"03", q:{ja:"タイには「微笑みの国」という別名がある",en:"Thailand is known as 'The Land of Smiles'",th:"ไทยมีชื่อว่า 'ดินแดนแห่งรอยยิ้ม'"},
+    a:{ja:"タイ人は13種類以上の微笑みを使い分けるとも言われています。喜び・照れ・感謝・悲しみ…それぞれに意味があります。",en:"Thai people are said to use over 13 different types of smiles, each with its own meaning — joy, embarrassment, gratitude, sadness, and more.",th:"คนไทยมีรอยยิ้มมากกว่า 13 แบบ แต่ละแบบมีความหมายต่างกัน ทั้งยินดี อาย ขอบคุณ เศร้า ฯลฯ"} },
+  { num:"04", q:{ja:"ソンクラーン（水かけ祭り）は4月！",en:"Songkran (Water Festival) is in April!",th:"สงกรานต์อยู่เดือนเมษายน!"},
+    a:{ja:"タイの旧正月を祝うお祭り。水をかけ合うことで穢れを流し、新年の幸福を祈ります。バンコクでは街中が大水合戦になります！",en:"Thailand's traditional New Year festival. Water is splashed to wash away bad luck and wish for good fortune. Bangkok turns into a city-wide water fight!",th:"ประเพณีปีใหม่ไทย การสาดน้ำเพื่อชำล้างสิ่งไม่ดีและอวยพรปีใหม่ กรุงเทพฯ กลายเป็นสงครามน้ำทั้งเมือง!"} },
+  { num:"05", q:{ja:"パクチー（コリアンダー）はタイ語で「パクチー」",en:"Coriander is called 'Phak Chi' in Thai",th:"ผักชีในภาษาไทยคือ 'ผักชี'"},
+    a:{ja:"そのまま日本語になっています！タイ料理ではトッピングとして非常によく使われます。苦手な方はご注文時にお申し付けください。",en:"The Japanese word is borrowed directly from Thai! Coriander is widely used as a topping in Thai cuisine. Let us know if you'd like it left out!",th:"คำว่า 'ปะกุชิ' ในภาษาญี่ปุ่นมาจากภาษาไทยโดยตรง! ผักชีใช้มากในอาหารไทย บอกได้ถ้าไม่ต้องการ"} },
+];
+
+function renderTrivia() {
+  const t = currentLang;
+  const container = document.getElementById('trivia-list');
+  container.innerHTML = TRIVIA.map(tr => `
+    <div class="trivia-card">
+      <div class="trivia-num">TRIVIA ${tr.num}</div>
+      <div class="trivia-q">${tr.q[t]||tr.q.ja}</div>
+      <div class="trivia-a">${tr.a[t]||tr.a.ja}</div>
+    </div>
+  `).join('');
+}
+
+// ===== ページ切替 =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+// ===== コピー =====
+function copyCode(code) {
+  navigator.clipboard.writeText(code).catch(()=>{});
+  const btn = event.currentTarget;
+  const orig = btn.textContent;
+  btn.textContent = '✅ コピーしました！';
+  setTimeout(() => btn.textContent = orig, 1500);
+}
+
+// ===== アンケート =====
+let starVal = 0, visitVal = '';
+
+function setStar(v) {
+  starVal = v;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('on', i < v);
+  });
+}
+
+function setVisit(el, val) {
+  visitVal = val;
+  document.querySelectorAll('.visit-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function submitSurvey() {
+  const comment = document.getElementById('survey-comment').value.trim();
+  const payload = {
+    stars: starVal,
+    visit: visitVal,
+    comment: comment,
+    lang: currentLang,
+    ts: Date.now()
+  };
+  db.ref('fun_survey').push(payload).then(() => {
+    document.getElementById('survey-form').style.display = 'none';
+    document.getElementById('survey-thanks').classList.add('show');
+  }).catch(() => {
+    document.getElementById('survey-form').style.display = 'none';
+    document.getElementById('survey-thanks').classList.add('show');
+  });
+}
+
+// ===== 初期化 =====
+renderPhraseCard();
+renderQuiz();
+renderTrivia();
+applyI18n();
+</script>
+</body>
+</html>
