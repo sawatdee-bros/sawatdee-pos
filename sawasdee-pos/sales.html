@@ -85,6 +85,15 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .rank-tab { flex: 1; padding: 7px 0; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; background: #1e293b; border: none; }
 .rank-tab.active { background: #0f2a40; color: #38bdf8; font-weight: 600; }
 
+
+/* ── ランキング横並び ── */
+.rank-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rank-col-title { font-size: 12px; font-weight: 700; color: #94a3b8; padding: 8px 14px 6px; border-bottom: 1px solid #334155; }
+.rank-item-sm { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid #334155; }
+.rank-item-sm:last-child { border-bottom: none; }
+.rank-name-sm { flex: 1; font-size: 11px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-qty-sm { font-size: 10px; color: #64748b; flex-shrink: 0; }
+
 /* ── テーブル別 ── */
 .table-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .table-card { background: #1e293b; border-radius: 10px; padding: 10px 12px; border: 1px solid #334155; text-align: center; }
@@ -99,6 +108,36 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .ratio-legend { display: flex; flex-wrap: wrap; gap: 8px; }
 .ratio-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .ratio-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #94a3b8; }
+
+
+
+/* ── 月めくりカレンダー ── */
+.nav-cal-wrap { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
+.nav-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.nav-cal-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+.nav-cal-arrow { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.nav-cal-arrow:hover { background: #334155; color: #f1f5f9; }
+.nav-cal-arrow:disabled { opacity: 0.3; cursor: default; }
+.nav-cal-summary { font-size: 12px; color: #64748b; text-align: center; margin-bottom: 10px; }
+.nav-cal-summary span { color: #22c55e; font-weight: 700; }
+
+/* ── 月カレンダー ── */
+.month-cal-wrap { background: #1e293b; border-radius: 12px; padding: 14px; border: 1px solid #334155; }
+.month-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.month-cal-dow { text-align: center; font-size: 10px; color: #475569; padding: 4px 0 6px; font-weight: 600; }
+.month-cal-dow.sun { color: #ef4444; }
+.month-cal-dow.sat { color: #60a5fa; }
+.month-cal-cell { border-radius: 6px; padding: 5px 4px; min-height: 52px; background: #0f172a; border: 1px solid #1e3a5f; display: flex; flex-direction: column; gap: 2px; cursor: default; }
+.month-cal-cell.empty { background: transparent; border-color: transparent; }
+.month-cal-cell.has-sales { background: #0c2a1a; border-color: #166534; }
+.month-cal-cell.is-today { border-color: #22c55e; background: #052e16; }
+.month-cal-cell.is-sunday .month-cal-date { color: #ef4444; }
+.month-cal-cell.is-saturday .month-cal-date { color: #60a5fa; }
+.month-cal-date { font-size: 11px; color: #64748b; font-weight: 600; }
+.month-cal-cell.is-today .month-cal-date { color: #22c55e; }
+.month-cal-sales { font-size: 10px; font-weight: 700; color: #4ade80; line-height: 1.2; }
+.month-cal-cnt { font-size: 9px; color: #475569; }
+.month-cal-cell.zero { background: #0f172a; border-color: #1e293b; opacity: 0.4; }
 
 /* ── pax分析 ── */
 .pax-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -163,15 +202,21 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .csv-dl-btn:hover { background: #14532d; }
 .csv-cancel-btn { padding: 10px 16px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; }
 
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #e2e8f0; padding: 10px 20px; border-radius: 10px; font-size: 13px; border: 1px solid #334155; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; }
+.toast.success { border-color: #16a34a; color: #4ade80; }
+.toast.error { border-color: #dc2626; color: #f87171; }
 .no-data { text-align: center; color: #475569; font-size: 13px; padding: 30px; }
 .loading-spinner { text-align: center; color: #64748b; font-size: 13px; padding: 40px; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <header>
   <a class="back-btn" href="#" onclick="window.parent.postMessage({type:'setMode',mode:'all'},'*');return false;">&#8592;</a>
   <h1>&#128202; 売上管理</h1>
   <button class="csv-btn" onclick="window.openCsvModal()">&#128190; CSV出力</button>
+  <button class="csv-btn" id="gs-btn" onclick="window.syncToSheets()" style="background:#166534;border-color:#16a34a;">&#128202; スプレッドシートに保存</button>
 </header>
 <div class="period-bar">
   <button class="period-btn active" onclick="setPeriod('today',this)">今日</button>
@@ -212,10 +257,12 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     <div class="csv-field">
       <label>出力単位</label>
       <select id="csv-unit" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:13px;">
-        <option value="session">セッション別（伝票1枚ずつ）</option>
+        <option value="session">伝票別（伝票1枚ずつ）</option>
         <option value="day">日別集計</option>
         <option value="month">月別集計</option>
         <option value="item">商品別集計</option>
+        <option value="raw">全データ（伝票明細）</option>
+        <option value="excel">━━ 全シート一括（Excel）━━</option>
       </select>
     </div>
     <div class="csv-actions">
@@ -255,6 +302,8 @@ var drinkKeySet = null;    // Firebaseから構築したドリンク名セット
 var itemOverrides = {};    // store_config/item_category_overrides（Firebase保存済み分類）
 var currentPeriod = 'today';
 var rankMode = 'qty';    // 'qty' | 'sales'
+var navCalYear = null;   // 月めくりカレンダーの表示年
+var navCalMonth = null;  // 月めくりカレンダーの表示月（0-11）
 var DOW = ['日','月','火','水','木','金','土'];
 var TABLE_NAMES = {
   '1':'テーブル1','2':'テーブル2','3':'テーブル3','4':'テーブル4',
@@ -519,6 +568,21 @@ function render() {
       sessions.forEach(function(s){ if (new Date(s.ts).getDate()===d) v += s.sales; });
       barData.push({ label: d%5===0?String(d):'', val: v, isNow: now.getDate()===d });
     }
+  } else if (currentPeriod === 'all') {
+    // 曜日別の「平均売上」（累計合計 ÷ その曜日の営業日数）
+    var dowTotals = [0,0,0,0,0,0,0]; // 日〜土
+    var dowDays   = [{},{},{},{},{},{},{}]; // 曜日ごとの営業日セット
+    sessions.forEach(function(s) {
+      var dw = new Date(s.ts).getDay();
+      var ds = toDayStr(s.ts); // 日付文字列でユニーク日数を数える
+      dowTotals[dw] += s.sales;
+      dowDays[dw][ds] = true;
+    });
+    for (var d = 0; d < 7; d++) {
+      var days = Object.keys(dowDays[d]).length;
+      var avg = days > 0 ? Math.round(dowTotals[d] / days) : 0;
+      barData.push({ label: DOW[d], val: avg, isNow: now.getDay()===d, count: days });
+    }
   }
   var maxBar = barData.reduce(function(m,b){ return Math.max(m, b.val); }, 1);
 
@@ -559,17 +623,81 @@ function render() {
 
   // 棒グラフ
   if (barData.length > 0) {
-    h += '<div class="chart-wrap"><div class="section-title">'
-      + (currentPeriod==='today'?'時間帯別':currentPeriod==='week'?'曜日別':'日別')+'売上</div>'
-      + '<div class="bar-chart">';
-    barData.forEach(function(b) {
-      var pct = Math.round(b.val / maxBar * 100);
-      h += '<div class="bar-col">'
-        + (b.val>0 ? '<div class="bar-val">'+(b.val>=10000?Math.round(b.val/1000)+'k':'')+'</div>' : '')
-        + '<div class="bar'+(b.isNow?' today':'')+'" style="height:'+pct+'%"></div>'
-        + '<div class="bar-label">'+b.label+'</div></div>';
-    });
-    h += '</div></div>';
+    if (currentPeriod === 'month') {
+      // カレンダー表示
+      var calNow = new Date();
+      var calYear = calNow.getFullYear();
+      var calMonth = calNow.getMonth();
+      var firstDow = new Date(calYear, calMonth, 1).getDay(); // 0=日
+      // 月曜始まりに変換（0=月 … 6=日）
+      var startOffset = (firstDow === 0) ? 6 : firstDow - 1;
+      var dim = new Date(calYear, calMonth+1, 0).getDate();
+      var todayD = calNow.getDate();
+      var DOW_CAL = ['月','火','水','木','金','土','日'];
+      h += '<div class="month-cal-wrap"><div class="section-title">日別売上</div>';
+      h += '<div class="month-cal-grid">';
+      // 曜日ヘッダー
+      DOW_CAL.forEach(function(d, i) {
+        var cls = i === 5 ? ' sat' : i === 6 ? ' sun' : '';
+        h += '<div class="month-cal-dow' + cls + '">' + d + '</div>';
+      });
+      // 空白セル
+      for (var i = 0; i < startOffset; i++) {
+        h += '<div class="month-cal-cell empty"></div>';
+      }
+      // 日付セル
+      for (var d = 1; d <= dim; d++) {
+        var dow = (new Date(calYear, calMonth, d).getDay()); // 0=日
+        var dowMon = (dow === 0) ? 6 : dow - 1; // 月曜基準
+        var isToday = d === todayD;
+        var isSat = dowMon === 5;
+        var isSun = dowMon === 6;
+        var barEntry = barData[d - 1];
+        var val = barEntry ? barEntry.val : 0;
+        var cnt = 0;
+        sessions.forEach(function(s){ if (new Date(s.ts).getDate() === d) cnt++; });
+        var cellCls = 'month-cal-cell';
+        if (isToday) cellCls += ' is-today';
+        if (isSat) cellCls += ' is-saturday';
+        if (isSun) cellCls += ' is-sunday';
+        if (val > 0) cellCls += ' has-sales';
+        else cellCls += ' zero';
+        h += '<div class="' + cellCls + '">'
+          + '<div class="month-cal-date">' + d + '</div>';
+        if (val > 0) {
+          var dispVal = val >= 10000 ? Math.round(val/1000) + 'k' : val.toLocaleString();
+          h += '<div class="month-cal-sales">￥' + dispVal + '</div>';
+          if (cnt > 0) h += '<div class="month-cal-cnt">' + cnt + '件</div>';
+        }
+        h += '</div>';
+      }
+      h += '</div></div>';
+    } else {
+      // 今日・今週・累計は棒グラフ
+      var chartTitle = currentPeriod==='today' ? '時間帯別売上'
+                     : currentPeriod==='all'   ? '曜日別平均売上（累計）'
+                     : '曜日別売上';
+      h += '<div class="chart-wrap"><div class="section-title">' + chartTitle + '</div>'
+        + '<div class="bar-chart">';
+      barData.forEach(function(b) {
+        var pct = Math.round(b.val / maxBar * 100);
+        var valLabel = b.val >= 10000 ? Math.round(b.val/1000)+'k' : '';
+        h += '<div class="bar-col">'
+          + (b.val>0 ? '<div class="bar-val">'+valLabel+'</div>' : '')
+          + '<div class="bar'+(b.isNow?' today':'')+'" style="height:'+pct+'%"></div>'
+          + '<div class="bar-label">'+b.label+'</div>'
+          + (currentPeriod==='all' && b.count>0 ? '<div class="bar-label" style="color:#475569;">'+b.count+'回</div>' : '')
+          + '</div>';
+      });
+      h += '</div></div>';
+    }
+  }
+
+  // 累計タブ：曜日別グラフの直下に月めくりカレンダー
+  if (currentPeriod === 'all') {
+    var now2 = new Date();
+    if (navCalYear === null) { navCalYear = now2.getFullYear(); navCalMonth = now2.getMonth(); }
+    h += renderNavCal(navCalYear, navCalMonth);
   }
 
   // カテゴリ比率（Firebaseメニューデータから算出）
@@ -586,29 +714,50 @@ function render() {
   });
   h += '</div></div>';
 
-  // ランキング（数量 / 売上 切替タブ付き）
-  var top = Math.min(ranking.length, 10);
+  // ランキング（フード / ドリンク 横並び）
+  var foodRanking = ranking.filter(function(it){ return it.cat === 'フード' || it.cat === 'セット'; });
+  var drinkRanking = ranking.filter(function(it){ return it.cat === 'ドリンク'; });
+  if (rankMode === 'qty') {
+    foodRanking.sort(function(a,b){ return b.qty - a.qty; });
+    drinkRanking.sort(function(a,b){ return b.qty - a.qty; });
+  } else {
+    foodRanking.sort(function(a,b){ return b.sales - a.sales; });
+    drinkRanking.sort(function(a,b){ return b.sales - a.sales; });
+  }
+
+  function buildRankCol(list, title, color) {
+    var topN = currentPeriod === 'all' ? list.length : Math.min(list.length, 8);
+    var scrollStyle = currentPeriod === 'all' ? 'max-height:320px;overflow-y:auto;' : '';
+    var maxVal = list.length > 0 ? (rankMode==='qty' ? list[0].qty : list[0].sales) : 1;
+    var s = '<div class="rank-list" style="'+scrollStyle+'">'
+      + '<div class="rank-col-title" style="color:'+color+'">'+title+'</div>';
+    for (var i = 0; i < topN; i++) {
+      var it = list[i];
+      var nc = i===0?'rank-num gold':i===1?'rank-num silver':i===2?'rank-num bronze':'rank-num';
+      var val = rankMode==='qty' ? it.qty : it.sales;
+      var pct = Math.round(val / maxVal * 100);
+      s += '<div class="rank-item-sm">'
+        + '<span class="'+nc+'" style="min-width:16px;font-size:11px">'+(i+1)+'</span>'
+        + '<span class="rank-name-sm">'+it.name+'</span>'
+        + '<span class="rank-qty-sm">'+(rankMode==='qty' ? it.qty+'個' : '&#165;'+(Math.round(it.sales/1000))+'k')+'</span>'
+        + '</div>';
+    }
+    if (topN === 0) s += '<div style="padding:12px;font-size:11px;color:#475569;text-align:center">データなし</div>';
+    s += '</div>';
+    return s;
+  }
+
   h += '<div>'
-    + '<div class="section-title">メニュー別ランキング</div>'
-    + '<div class="rank-tab-bar">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
+    + '<div class="section-title" style="margin-bottom:0">メニュー別ランキング</div>'
+    + '<div class="rank-tab-bar" style="margin-bottom:0">'
     + '<button class="rank-tab'+(rankMode==='qty'?' active':'')+'" onclick="window.setRankMode(\'qty\')">数量順</button>'
     + '<button class="rank-tab'+(rankMode==='sales'?' active':'')+'" onclick="window.setRankMode(\'sales\')">売上順</button>'
-    + '</div>'
-    + '<div class="rank-list">';
-  for (var i = 0; i < top; i++) {
-    var it = ranking[i];
-    var nc = i===0?'rank-num gold':i===1?'rank-num silver':i===2?'rank-num bronze':'rank-num';
-    var pct = rankMode==='qty'
-      ? Math.round(it.qty/maxRankQty*100)
-      : Math.round(it.sales/maxRankSales*100);
-    var catDot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+(CAT_COLORS[it.cat]||'#64748b')+';margin-right:4px;flex-shrink:0;"></span>';
-    h += '<div class="rank-item"><span class="'+nc+'">'+(i+1)+'</span>'
-      + catDot + '<span class="rank-name">'+it.name+'</span>'
-      + '<span class="rank-qty">'+it.qty+'個</span>'
-      + '<div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:'+pct+'%"></div></div>'
-      + '<span class="rank-sales">&#165;'+it.sales.toLocaleString()+'</span></div>';
-  }
-  h += '</div></div>';
+    + '</div></div>'
+    + '<div class="rank-cols">'
+    + buildRankCol(foodRanking, '🍽 フード・セット', '#fb923c')
+    + buildRankCol(drinkRanking, '🍺 ドリンク', '#38bdf8')
+    + '</div></div>';
 
   // テーブル別
   var tnums = Object.keys(tableMap).sort(function(a,b){ return Number(a)-Number(b); });
@@ -630,6 +779,109 @@ function render() {
   }
 
   cont.innerHTML = h;
+}
+
+// ─────────────────────────────────────────────
+//  月めくりカレンダー（累計タブ用）
+// ─────────────────────────────────────────────
+window.navCalPrev = function() {
+  navCalMonth--;
+  if (navCalMonth < 0) { navCalMonth = 11; navCalYear--; }
+  render();
+};
+window.navCalNext = function() {
+  var now = new Date();
+  navCalMonth++;
+  if (navCalMonth > 11) { navCalMonth = 0; navCalYear++; }
+  render();
+};
+
+function renderNavCal(year, month) {
+  var now = new Date();
+  var isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
+  var isFirstMonth = false;
+  // 最初の注文の月より前には戻れない
+  var allTs = Object.values(allOrders)
+    .filter(function(o){ return o.status==='paid'||o.status==='done'; })
+    .map(function(o){ return o.timestamp; });
+  var minTs = allTs.length > 0 ? Math.min.apply(null, allTs) : Date.now();
+  var minDate = new Date(minTs - DAY_START * 3600000);
+  var minYear = minDate.getFullYear(), minMon = minDate.getMonth();
+  isFirstMonth = (year < minYear || (year === minYear && month <= minMon));
+
+  // この月のセッション集計
+  var fromTs = new Date(year, month, 1, DAY_START, 0, 0).getTime();
+  var toTs   = new Date(year, month+1, 1, DAY_START, 0, 0).getTime();
+  var monthOrders = Object.values(allOrders).filter(function(o) {
+    return (o.status==='paid'||o.status==='done') && o.timestamp>=fromTs && o.timestamp<toTs;
+  });
+  var monthSess = buildSessionMap(monthOrders);
+
+  // 日別売上マップ
+  var dayMap = {};
+  Object.values(monthSess).forEach(function(s) {
+    var ds = toDayStr(s.ts);
+    if (!dayMap[ds]) dayMap[ds] = { sales: 0, sessions: 0 };
+    dayMap[ds].sales += s.sales;
+    dayMap[ds].sessions++;
+  });
+
+  var monthTotal = Object.values(dayMap).reduce(function(s,d){ return s+d.sales; }, 0);
+  var monthSessions = Object.values(monthSess).length;
+
+  // カレンダー描画
+  var dim = new Date(year, month+1, 0).getDate();
+  var firstDow = new Date(year, month, 1).getDay();
+  var startOffset = (firstDow === 0) ? 6 : firstDow - 1;
+  var todayD = isCurrentMonth ? now.getDate() : -1;
+  var MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var DOW_CAL = ['月','火','水','木','金','土','日'];
+  var pad = function(n){ return ('0'+n).slice(-2); };
+
+  var h = '<div class="nav-cal-wrap">'
+    + '<div class="nav-cal-header">'
+    + '<button class="nav-cal-arrow" onclick="window.navCalPrev()" '+(isFirstMonth?'disabled':'')+'>&#8249;</button>'
+    + '<div>'
+    + '<div class="nav-cal-title">'+year+'年 '+MONTHS[month]+'</div>'
+    + '</div>'
+    + '<button class="nav-cal-arrow" onclick="window.navCalNext()" '+(isCurrentMonth?'disabled':'')+'>&#8250;</button>'
+    + '</div>'
+    + '<div class="nav-cal-summary">'
+    + (monthTotal > 0
+        ? '売上合計 <span>&#165;'+monthTotal.toLocaleString()+'</span>　会計 <span>'+monthSessions+'件</span>'
+        : '<span style="color:#475569">売上データなし</span>')
+    + '</div>';
+
+  h += '<div class="month-cal-grid">';
+  DOW_CAL.forEach(function(d, i) {
+    var cls = i===5?' sat':i===6?' sun':'';
+    h += '<div class="month-cal-dow'+cls+'">'+d+'</div>';
+  });
+  for (var i = 0; i < startOffset; i++) h += '<div class="month-cal-cell empty"></div>';
+  for (var d = 1; d <= dim; d++) {
+    var dow = new Date(year, month, d).getDay();
+    var dowMon = (dow===0) ? 6 : dow-1;
+    var isToday = (d === todayD);
+    var ds = year+'-'+pad(month+1)+'-'+pad(d);
+    var dayData = dayMap[ds];
+    var val = dayData ? dayData.sales : 0;
+    var cnt = dayData ? dayData.sessions : 0;
+    var cellCls = 'month-cal-cell';
+    if (isToday) cellCls += ' is-today';
+    if (dowMon===5) cellCls += ' is-saturday';
+    if (dowMon===6) cellCls += ' is-sunday';
+    if (val > 0) cellCls += ' has-sales'; else cellCls += ' zero';
+    h += '<div class="'+cellCls+'">'
+      + '<div class="month-cal-date">'+d+'</div>';
+    if (val > 0) {
+      var dispVal = val >= 10000 ? Math.round(val/1000)+'k' : val.toLocaleString();
+      h += '<div class="month-cal-sales">￥'+dispVal+'</div>';
+      if (cnt > 0) h += '<div class="month-cal-cnt">'+cnt+'件</div>';
+    }
+    h += '</div>';
+  }
+  h += '</div></div>';
+  return h;
 }
 
 // ─────────────────────────────────────────────
@@ -868,6 +1120,127 @@ window.openCsvModal = function() {
   document.getElementById('csv-from').value = y+'-'+pad(m)+'-01';
   document.getElementById('csv-modal').classList.add('open');
 };
+window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
+  var wb = XLSX.utils.book_new();
+  var taxRate = storeConfig.tax_rate || 10;
+  var chargePerPerson = storeConfig.charge_per_person || 250;
+  var pad = function(n){ return ('0'+n).slice(-2); };
+
+  // ── ① 伝票別 ──
+  var sessMap1 = buildSessionMap(filtered);
+  var rows1 = [['日付','時刻','曜日','テーブル','人数','税抜小計','チャージ','消費税','税込合計']];
+  Object.values(sessMap1).sort(function(a,b){return a.ts-b.ts;}).forEach(function(s) {
+    var dt = new Date(s.ts); var ds = toDayStr(s.ts);
+    var timeStr = pad(dt.getHours())+':'+pad(dt.getMinutes());
+    rows1.push([ds, timeStr, DOW[dt.getDay()],
+      TABLE_NAMES[String(s.table)]||'T'+s.table,
+      s.pax > 0 ? s.pax : '',
+      s.ex, s.charge, s.sales - Math.round(s.ex + s.charge), s.sales]);
+  });
+  // 合計行
+  var t1 = rows1.slice(1).reduce(function(a,r){return{ex:a.ex+r[5],ch:a.ch+r[6],tax:a.tax+(typeof r[7]==='number'?r[7]:0),tot:a.tot+r[8]};},{ex:0,ch:0,tax:0,tot:0});
+  rows1.push(['合計','','','','',t1.ex,t1.ch,t1.tax,t1.tot]);
+  var ws1 = XLSX.utils.aoa_to_sheet(rows1);
+  ws1['!cols'] = [{wch:12},{wch:7},{wch:5},{wch:16},{wch:6},{wch:11},{wch:10},{wch:10},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws1, '①伝票別');
+
+  // ── ② 日別 ──
+  var dayMap2 = {};
+  var sessMap2 = buildSessionMap(filtered);
+  Object.values(sessMap2).forEach(function(s){
+    var ds=toDayStr(s.ts);
+    if(!dayMap2[ds])dayMap2[ds]={ds:ds,dow:DOW[new Date(s.ts).getDay()],cnt:0,sales:0};
+    dayMap2[ds].cnt++; dayMap2[ds].sales+=s.sales;
+  });
+  var rows2 = [['日付','曜日','会計件数','税込売上']];
+  Object.values(dayMap2).sort(function(a,b){return a.ds.localeCompare(b.ds);}).forEach(function(d){
+    rows2.push([d.ds, d.dow, d.cnt, d.sales]);
+  });
+  var t2 = rows2.slice(1).reduce(function(a,r){return{cnt:a.cnt+r[2],s:a.s+r[3]};},{cnt:0,s:0});
+  rows2.push(['合計','',t2.cnt,t2.s]);
+  var ws2 = XLSX.utils.aoa_to_sheet(rows2);
+  ws2['!cols'] = [{wch:12},{wch:6},{wch:10},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws2, '②日別集計');
+
+  // ── ③ 月別 ──
+  var monthMap3 = {};
+  var sessMap3 = buildSessionMap(filtered);
+  Object.values(sessMap3).forEach(function(s){
+    var d=new Date(s.ts-DAY_START*3600000);
+    var ym=d.getFullYear()+'-'+pad(d.getMonth()+1);
+    if(!monthMap3[ym])monthMap3[ym]={ym:ym,cnt:0,sales:0};
+    monthMap3[ym].cnt++; monthMap3[ym].sales+=s.sales;
+  });
+  var rows3 = [['年月','会計件数','税込売上']];
+  Object.values(monthMap3).sort(function(a,b){return a.ym.localeCompare(b.ym);}).forEach(function(m){
+    rows3.push([m.ym, m.cnt, m.sales]);
+  });
+  var t3 = rows3.slice(1).reduce(function(a,r){return{cnt:a.cnt+r[1],s:a.s+r[2]};},{cnt:0,s:0});
+  rows3.push(['合計',t3.cnt,t3.s]);
+  var ws3 = XLSX.utils.aoa_to_sheet(rows3);
+  ws3['!cols'] = [{wch:12},{wch:10},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws3, '③月別集計');
+
+  // ── ④ 商品別 ──
+  var itemMap4 = {};
+  filtered.forEach(function(o){
+    (o.items||[]).forEach(function(it){
+      if(!itemMap4[it.name])itemMap4[it.name]={name:it.name,cat:getItemCategory(it.name),qty:0,sales:0};
+      itemMap4[it.name].qty+=it.qty; itemMap4[it.name].sales+=it.price*it.qty;
+    });
+  });
+  var sorted4 = Object.values(itemMap4).sort(function(a,b){return b.sales-a.sales;});
+  var totalS4 = sorted4.reduce(function(a,i){return a+i.sales;},0);
+  var rows4 = [['順位','商品名','カテゴリ','数量','税抜売上','構成比']];
+  sorted4.forEach(function(it,i){
+    rows4.push([i+1, it.name, it.cat, it.qty, it.sales,
+      totalS4>0 ? Math.round(it.sales/totalS4*1000)/10+'%' : '0%']);
+  });
+  var t4 = sorted4.reduce(function(a,i){return{qty:a.qty+i.qty,s:a.s+i.sales};},{qty:0,s:0});
+  rows4.push(['','合計','',t4.qty,t4.s,'100.0%']);
+  var ws4 = XLSX.utils.aoa_to_sheet(rows4);
+  ws4['!cols'] = [{wch:6},{wch:28},{wch:9},{wch:8},{wch:14},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws4, '④商品別集計');
+
+  // ── ⑤ 全データ（伝票明細）──
+  var rows5 = [['日付','時刻','曜日','テーブル','伝票ID','人数','商品名','カテゴリ','数量','単価(税抜)','小計(税抜)','チャージ','消費税','税込合計']];
+  var sessMap5 = buildSessionMap(filtered);
+  Object.values(sessMap5).sort(function(a,b){return a.ts-b.ts;}).forEach(function(sess) {
+    var dt=new Date(sess.ts); var ds=toDayStr(sess.ts);
+    var timeStr=pad(dt.getHours())+':'+pad(dt.getMinutes());
+    var dow=DOW[dt.getDay()];
+    var tblName=TABLE_NAMES[String(sess.table)]||'T'+sess.table;
+    var billId=String(sess.orders[0].paidAt||sess.ts);
+    var chargeEx=calcCharge(sess.drinkQty,sess.pax,sess.hasChargeExempt);
+    var taxAmt=sess.sales-Math.round(sess.ex+chargeEx);
+    var sortedItems=Object.values(sess.items).sort(function(a,b){
+      var aD=isDrinkItem(a.name),bD=isDrinkItem(b.name);
+      return aD===bD?0:aD?-1:1;
+    });
+    sortedItems.forEach(function(it,idx){
+      rows5.push([
+        idx===0?ds:'', idx===0?timeStr:'', idx===0?dow:'',
+        idx===0?tblName:'', idx===0?billId:'',
+        idx===0&&sess.pax>0?sess.pax:'',
+        it.name, getItemCategory(it.name), it.qty, it.price, it.price*it.qty,
+        idx===0?chargeEx:'', idx===0?taxAmt:'', idx===0?sess.sales:''
+      ]);
+    });
+  });
+  var t5ex=0,t5ch=0,t5tax=0,t5tot=0;
+  rows5.slice(1).forEach(function(r){
+    t5ex+=r[10]; if(r[11]!=='')t5ch+=r[11]; if(r[12]!=='')t5tax+=r[12]; if(r[13]!=='')t5tot+=r[13];
+  });
+  rows5.push(['','','','','','','合計','','','',t5ex,t5ch,t5tax,t5tot]);
+  var ws5 = XLSX.utils.aoa_to_sheet(rows5);
+  ws5['!cols'] = [{wch:12},{wch:7},{wch:5},{wch:16},{wch:16},{wch:6},{wch:26},{wch:9},{wch:6},{wch:11},{wch:11},{wch:10},{wch:10},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws5, '⑤全データ（伝票明細）');
+
+  // 出力
+  XLSX.writeFile(wb, 'sawatdee_sales_' + fromStr + '_' + toStr + '_全シート.xlsx');
+  window.closeCsvModal();
+};
+
 window.closeCsvModal = function() {
   document.getElementById('csv-modal').classList.remove('open');
 };
@@ -943,14 +1316,90 @@ window.downloadCsv = function() {
     Object.values(itemMap).sort(function(a,b){ return b.sales-a.sales; }).forEach(function(it) {
       csv += ['"'+it.name+'"', it.cat, it.qty, it.sales].join(',') + '\n';
     });
+  } else if (unit === 'raw') {
+    csv = BOM + '日付,時刻,曜日,テーブル,伝票ID,人数,商品名,カテゴリ,数量,単価(税抜),小計(税抜),チャージ,消費税,税込合計\n';
+    var rawSessMap = buildSessionMap(filtered);
+    var rawSessions = Object.values(rawSessMap).sort(function(a,b){ return a.ts-b.ts; });
+    rawSessions.forEach(function(sess) {
+      var dt = new Date(sess.ts);
+      var ds = toDayStr(sess.ts);
+      var timeStr = ('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
+      var dow = DOW[dt.getDay()];
+      var tblName = TABLE_NAMES[String(sess.table)] || 'T'+sess.table;
+      var billId = String(sess.orders[0].paidAt || sess.ts);
+      var chargeEx = calcCharge(sess.drinkQty, sess.pax, sess.hasChargeExempt);
+      var taxAmt = sess.sales - Math.round(sess.ex + chargeEx);
+      // ドリンク→フードの順でソート
+      var sortedItems = Object.values(sess.items).sort(function(a,b){
+        var aD=isDrinkItem(a.name), bD=isDrinkItem(b.name);
+        return aD===bD?0:aD?-1:1;
+      });
+      sortedItems.forEach(function(it, idx) {
+        csv += [
+          idx===0 ? ds : '',
+          idx===0 ? timeStr : '',
+          idx===0 ? dow : '',
+          idx===0 ? '"'+tblName+'"' : '',
+          idx===0 ? billId : '',
+          idx===0 && sess.pax>0 ? sess.pax : '',
+          '"'+it.name+'"',
+          getItemCategory(it.name),
+          it.qty,
+          it.price,
+          it.price * it.qty,
+          idx===0 ? chargeEx : '',
+          idx===0 ? taxAmt : '',
+          idx===0 ? sess.sales : ''
+        ].join(',') + '\n';
+      });
+    });
   }
 
+  if (unit === 'excel') {
+    window.downloadExcel(fromStr, toStr, fromTs, toTs, filtered);
+    return;
+  }
+  var unitLabel = unit==='session'?'伝票別':unit==='day'?'日別':unit==='month'?'月別':unit==='item'?'商品別':'全データ';
   var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
-  a.href = url; a.download = 'sawatdee_sales_' + fromStr + '_' + toStr + '_' + unit + '.csv';
+  a.href = url; a.download = 'sawatdee_sales_' + fromStr + '_' + toStr + '_' + unitLabel + '.csv';
   a.click(); URL.revokeObjectURL(url);
   window.closeCsvModal();
+};
+
+// ─────────────────────────────────────────────
+//  スプレッドシート連携
+// ─────────────────────────────────────────────
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3500);
+}
+
+window.syncToSheets = function() {
+  var scriptUrl = storeConfig.apps_script_url;
+  if (!scriptUrl) {
+    showToast('⚠️ Apps Script URLが設定されていません。店舗設定で設定してください。', 'error');
+    return;
+  }
+  var btn = document.getElementById('gs-btn');
+  btn.textContent = '⏳ 保存中...';
+  btn.disabled = true;
+  fetch(scriptUrl, { method: 'GET', mode: 'no-cors' })
+    .then(function() {
+      showToast('✅ スプレッドシートへの保存を開始しました（完了まで数秒かかります）', 'success');
+    })
+    .catch(function(e) {
+      showToast('❌ 保存に失敗しました: ' + e.message, 'error');
+    })
+    .finally(function() {
+      btn.textContent = '📊 スプレッドシートに保存';
+      btn.disabled = false;
+    });
 };
 
 // ─────────────────────────────────────────────
