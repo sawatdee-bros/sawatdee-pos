@@ -557,24 +557,18 @@ window.doRestore = async function(i) {
   const r = valid[i];
   if (!r) return;
   const restored = JSON.parse(JSON.stringify(r.order));
-  // 現在のitemsDoneを取得（他typeのアイテムは現状維持するため）
+  // 現在のitemsDoneをベースに（他typeは現状維持）
   const currentItemsDone = JSON.parse(JSON.stringify(orders[r.id] ? orders[r.id].itemsDone || {} : {}));
-  const prevItemsDone = r.prev || {};
-  // typeに対応するアイテムのみprevの状態に戻す
+  // typeに対応するアイテムだけ「未提供」に戻す（delete = 未提供）
   (restored.items || []).forEach((item, idx) => {
     const isDrink = isDrinkItem(item.name);
     const isMyType = (r.type === 'food' && !isDrink) || (r.type === 'drink' && isDrink);
     if (isMyType) {
-      // prevでfalse/undefinedだったアイテムはitemsDoneから削除（未提供に戻す）
-      if (prevItemsDone[idx]) {
-        currentItemsDone[idx] = true;
-      } else {
-        delete currentItemsDone[idx];
-      }
+      delete currentItemsDone[idx]; // 未提供に戻す
     }
-    // 他typeのアイテムは手を触れない
+    // 他typeはそのまま
   });
-  // まだ未提供アイテムが残っていればnew、全部済みならdone
+  // 未提供アイテムが残っていればnew
   const anyNotDone = (restored.items || []).some((_, idx) => !currentItemsDone[idx]);
   restored.status = anyNotDone ? 'new' : 'done';
   restored.itemsDone = currentItemsDone;
@@ -780,24 +774,15 @@ window.groupDoneMulti = async function(idStr, type) {
     await window.groupDone(id, type, true); // skipSaveRecentDone=true
   }
 
-  // typeに関係するアイテムが1つでもあるorderのみsaveRecentDone
-  // 同じorderIDでフード・ドリンク両方ある場合も両方saveRecentDoneに保存
+  // 押されたtypeのアイテムを持つorderのみsaveRecentDone（1エントリだけ保存）
   ids.forEach(id => {
-    if (!prevSnapshots[id] || !orders[id]) return;
-    const hasFoodItem = (orders[id].items || []).some(i => !isDrinkItem(i.name));
-    const hasDrinkItem = (orders[id].items || []).some(i => isDrinkItem(i.name));
-    if (type === 'food' && hasFoodItem) {
-      saveRecentDone(id, 'food', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
-    }
-    if (type === 'drink' && hasDrinkItem) {
-      saveRecentDone(id, 'drink', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
-    }
-    // フード・ドリンク両方含むorderの場合、両方のtypeでsaveRecentDoneを呼ぶ
-    if (type === 'food' && hasDrinkItem) {
-      saveRecentDone(id, 'drink', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
-    }
-    if (type === 'drink' && hasFoodItem) {
-      saveRecentDone(id, 'food', prevSnapshots[id].itemsDone, prevSnapshots[id].status);
+    if (!prevSnapshots[id]) return;
+    const itemsArr = orders[id] ? (orders[id].items || []) : [];
+    const hasMyType = itemsArr.some(i =>
+      type === 'food' ? !isDrinkItem(i.name) : isDrinkItem(i.name)
+    );
+    if (hasMyType) {
+      saveRecentDone(id, type, prevSnapshots[id].itemsDone, prevSnapshots[id].status);
     }
   });
 };
