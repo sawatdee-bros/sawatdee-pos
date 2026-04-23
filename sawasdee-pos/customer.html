@@ -586,9 +586,7 @@ function renderHistoryModal() {
   } else {
     var isFree = _historyPax > 0 && drinkCount >= _historyPax * _CHARGE_FREE_DRINK_COUNT;
     chargeTotal = isFree ? 0 : chargeBase;
-    chargeLabel = isFree
-      ? 'チャージ料（免除：ドリンク' + drinkCount + '杯 / ' + _historyPax + '名 × ' + _CHARGE_FREE_DRINK_COUNT + '杯）'
-      : 'チャージ料（¥' + _CHARGE_PER_PERSON.toLocaleString() + ' × ' + _historyPax + '名）';
+    chargeLabel = 'チャージ料（お一人様' + _CHARGE_FREE_DRINK_COUNT + '杯以上のドリンクで無料）';
   }
   // 消費税・合計計算（小計税抜＋チャージ税抜に対して消費税）
   var finalEx = totalEx + chargeTotal;
