@@ -609,25 +609,46 @@
   #film-lightbox.show { display: flex; }
   #film-lightbox img {
     max-width: 94vw;
-    max-height: 80vh;
+    max-height: 78vh;
     object-fit: contain;
     border-radius: 4px;
     filter: sepia(0.15) contrast(1.1);
+    transition: opacity 0.18s;
   }
+  #film-lightbox img.fading { opacity: 0; }
   #film-lightbox-caption {
     color: #fff;
     font-size: 13px;
     font-weight: 700;
-    margin-top: 14px;
+    margin-top: 12px;
     letter-spacing: 0.5px;
+  }
+  #film-lightbox-counter {
+    color: #888;
+    font-size: 11px;
+    margin-top: 5px;
+    letter-spacing: 1px;
   }
   #film-lightbox-close {
     position: absolute;
-    top: 20px; right: 20px;
+    top: 18px; right: 20px;
     color: #fff; font-size: 28px;
     cursor: pointer; line-height: 1;
     background: none; border: none;
+    z-index: 2;
   }
+  .lb-arrow {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    color: #fff; font-size: 48px; line-height: 1;
+    background: none; border: none;
+    cursor: pointer; padding: 0 16px;
+    opacity: 0.7; transition: opacity 0.15s;
+    z-index: 2; user-select: none;
+  }
+  .lb-arrow:hover { opacity: 1; }
+  .lb-prev { left: 0; }
+  .lb-next { right: 0; }
 
   /* ===== QUIZ CATEGORY ===== */
   .quiz-cat-btn {
@@ -693,11 +714,12 @@
     overflow: hidden;
   }
   .trivia-card::before {
-    content: '🇹🇭';
+    content: 'ไทย';
     position: absolute;
-    right: -10px; top: -10px;
-    font-size: 80px;
-    opacity: 0.12;
+    right: -4px; top: -4px;
+    font-size: 48px;
+    opacity: 0.1;
+    font-family: 'Sarabun', sans-serif;
   }
   .trivia-num {
     font-size: 11px;
@@ -748,9 +770,8 @@
 
 <div class="nav-wrap">
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('quiz')"><span class="tab-icon">🧠</span><span data-i18n="tab_quiz">クイズ</span></button>
-    <button class="nav-tab" onclick="showPage('trivia')"><span class="tab-icon">📚</span><span data-i18n="tab_trivia">豆知識</span></button>
-    <button class="nav-tab" onclick="showPage('menu')"><span class="tab-icon">🍽️</span><span data-i18n="tab_menu">こだわり</span></button>
+    <button class="nav-tab active" onclick="showPage('menu')"><span class="tab-icon">🍽️</span><span data-i18n="tab_menu">こだわり</span></button>
+    <button class="nav-tab" onclick="showPage('trivia')"><span class="tab-icon">📚</span><span data-i18n="tab_trivia">クイズ＆豆知識</span></button>
     <button class="nav-tab" onclick="showPage('shop')"><span class="tab-icon">🏮</span><span data-i18n="tab_shop">店内</span></button>
     <button class="nav-tab" onclick="showPage('thailand')"><span class="tab-icon">🌆</span><span data-i18n="tab_thailand">タイ街角</span></button>
     <button class="nav-tab" onclick="showPage('tabimap')"><span class="tab-icon">📍</span><span data-i18n="tab_tabimap">旅マップ</span></button>
@@ -758,95 +779,118 @@
   </div>
 </div>
 
-<!-- ===== クイズ ===== -->
-<div id="page-quiz" class="page active">
-  <div class="card" id="quiz-card">
-
-    <!-- カテゴリ選択画面 -->
-    <div id="quiz-select">
-      <div class="card-title">🧠 <span data-i18n="quiz_title">クイズ</span></div>
-      <p style="font-size:13px;color:var(--text-mid);margin-bottom:20px;line-height:1.7;" data-i18n="quiz_select_desc">カテゴリを選んでスタート！毎回ランダム10問出題されます。</p>
-      <div class="quiz-cat-btn" onclick="startQuiz('thai')">
-        <div class="quiz-cat-icon">🗣️</div>
-        <div>
-          <div class="quiz-cat-title" data-i18n="qcat_thai">タイ語クイズ</div>
-          <div class="quiz-cat-sub" data-i18n="qcat_thai_sub">タイ語の単語・フレーズ 10問</div>
-        </div>
-        <span style="margin-left:auto;font-size:20px;">→</span>
-      </div>
-      <div class="quiz-cat-btn" onclick="startQuiz('culture')">
-        <div class="quiz-cat-icon">🇹🇭</div>
-        <div>
-          <div class="quiz-cat-title" data-i18n="qcat_culture">タイ文化クイズ</div>
-          <div class="quiz-cat-sub" data-i18n="qcat_culture_sub">タイの文化・歴史・料理 10問</div>
-        </div>
-        <span style="margin-left:auto;font-size:20px;">→</span>
-      </div>
-    </div>
-
-    <!-- 出題画面 -->
-    <div id="quiz-area" style="display:none;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-        <button onclick="backToSelect()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-mid);">←</button>
-        <div style="flex:1;">
-          <div id="quiz-cat-label" style="font-size:11px;font-weight:700;color:var(--text-mid);letter-spacing:1px;"></div>
-          <div id="quiz-progress-bar-wrap" style="background:#eee;border-radius:4px;height:6px;margin-top:4px;">
-            <div id="quiz-progress-bar" style="background:var(--thai-red);height:6px;border-radius:4px;transition:width 0.3s;width:10%;"></div>
-          </div>
-        </div>
-        <div id="quiz-progress-text" style="font-size:12px;font-weight:700;color:var(--text-mid);">1/10</div>
-      </div>
-      <div class="quiz-question" id="quiz-q"></div>
-      <div class="quiz-sub" id="quiz-sub" style="margin-bottom:16px;"></div>
-      <div class="quiz-options" id="quiz-opts"></div>
-      <div class="quiz-result" id="quiz-result"></div>
-      <div style="text-align:center;">
-        <button class="lesson-btn" id="quiz-next-btn" onclick="nextQuestion()" style="display:none;" data-i18n="next_btn">次へ →</button>
-      </div>
-    </div>
-
-    <!-- 結果画面 -->
-    <div class="quiz-score" id="quiz-score">
-      <div style="font-size:40px;margin-bottom:8px;" id="quiz-score-emoji">🎉</div>
-      <div style="font-size:16px;margin-bottom:6px;font-weight:700;" id="quiz-score-msg" data-i18n="quiz_fin">全問クリア！</div>
-      <div class="quiz-score-num" id="quiz-score-num"></div>
-      <div style="font-size:14px;margin-top:6px;opacity:0.88;" data-i18n="quiz_score_label">点 / 100点</div>
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
-        <button class="lesson-btn" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);" onclick="restartQuiz()" data-i18n="retry_btn">もう一度</button>
-        <button class="lesson-btn" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);" onclick="backToSelect()" data-i18n="change_cat">カテゴリ変更</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===== タイ豆知識 ===== -->
+<!-- ===== クイズ＆豆知識 ===== -->
 <div id="page-trivia" class="page">
-  <div class="card">
-    <div class="card-title">🇹🇭 <span data-i18n="trivia_title">タイ文化・豆知識</span></div>
-    <div class="trivia-tabs">
-      <button class="trivia-tab active" onclick="setTriviaTab('all', this)" data-i18n="ttab_all">すべて</button>
-      <button class="trivia-tab" onclick="setTriviaTab('food', this)" data-i18n="ttab_food">🍜 料理のルーツ</button>
-      <button class="trivia-tab" onclick="setTriviaTab('culture', this)" data-i18n="ttab_culture">🎭 文化・マナー</button>
-    </div>
-    <div id="trivia-list"></div>
+
+  <!-- メインサブタブ -->
+  <div style="display:flex;gap:8px;padding:0 0 14px;">
+    <button id="main-tab-trivia" onclick="setMainTab('trivia')" style="
+      flex:1;padding:10px;border-radius:12px;border:2px solid var(--thai-red);
+      background:var(--thai-red);color:#fff;font-weight:700;font-size:14px;
+      cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;">
+      📚 豆知識
+    </button>
+    <button id="main-tab-quiz" onclick="setMainTab('quiz')" style="
+      flex:1;padding:10px;border-radius:12px;border:2px solid #eee;
+      background:#fff;color:#666;font-weight:700;font-size:14px;
+      cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.15s;">
+      🧠 クイズ
+    </button>
   </div>
+
+  <!-- 豆知識セクション（デフォルト表示） -->
+  <div id="section-trivia">
+    <div class="card">
+      <div class="card-title">📚 <span data-i18n="trivia_title">タイ文化・豆知識</span></div>
+      <div class="trivia-tabs">
+        <button class="trivia-tab active" onclick="setTriviaTab('all', this)" data-i18n="ttab_all">すべて</button>
+        <button class="trivia-tab" onclick="setTriviaTab('food', this)" data-i18n="ttab_food">🍜 料理のルーツ</button>
+        <button class="trivia-tab" onclick="setTriviaTab('culture', this)" data-i18n="ttab_culture">🎭 文化・マナー</button>
+      </div>
+      <div id="trivia-list"></div>
+    </div>
+  </div>
+
+  <!-- クイズセクション（デフォルト非表示） -->
+  <div id="section-quiz" style="display:none;">
+    <div class="card" id="quiz-card">
+      <div id="quiz-select">
+        <div class="card-title">🧠 <span data-i18n="quiz_title">クイズ</span></div>
+        <p style="font-size:13px;color:var(--text-mid);margin-bottom:20px;line-height:1.7;" data-i18n="quiz_select_desc">カテゴリを選んでスタート！毎回ランダム10問出題されます。</p>
+        <div class="quiz-cat-btn" onclick="startQuiz('thai')">
+          <div class="quiz-cat-icon">🗣️</div>
+          <div>
+            <div class="quiz-cat-title" data-i18n="qcat_thai">タイ語クイズ</div>
+            <div class="quiz-cat-sub" data-i18n="qcat_thai_sub">タイ語の単語・フレーズ 10問</div>
+          </div>
+          <span style="margin-left:auto;font-size:20px;">→</span>
+        </div>
+        <div class="quiz-cat-btn" onclick="startQuiz('culture')">
+          <div class="quiz-cat-icon">🇹🇭</div>
+          <div>
+            <div class="quiz-cat-title" data-i18n="qcat_culture">タイ文化クイズ</div>
+            <div class="quiz-cat-sub" data-i18n="qcat_culture_sub">タイの文化・歴史・料理 10問</div>
+          </div>
+          <span style="margin-left:auto;font-size:20px;">→</span>
+        </div>
+      </div>
+      <div id="quiz-area" style="display:none;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <button onclick="backToSelect()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-mid);">←</button>
+          <div style="flex:1;">
+            <div id="quiz-cat-label" style="font-size:11px;font-weight:700;color:var(--text-mid);letter-spacing:1px;"></div>
+            <div id="quiz-progress-bar-wrap" style="background:#eee;border-radius:4px;height:6px;margin-top:4px;">
+              <div id="quiz-progress-bar" style="background:var(--thai-red);height:6px;border-radius:4px;transition:width 0.3s;width:10%;"></div>
+            </div>
+          </div>
+          <div id="quiz-progress-text" style="font-size:12px;font-weight:700;color:var(--text-mid);">1/10</div>
+        </div>
+        <div class="quiz-question" id="quiz-q"></div>
+        <div class="quiz-sub" id="quiz-sub" style="margin-bottom:16px;"></div>
+        <div class="quiz-options" id="quiz-opts"></div>
+        <div class="quiz-result" id="quiz-result"></div>
+        <div style="text-align:center;">
+          <button class="lesson-btn" id="quiz-next-btn" onclick="nextQuestion()" style="display:none;" data-i18n="next_btn">次へ →</button>
+        </div>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <div style="font-size:40px;margin-bottom:8px;" id="quiz-score-emoji">🎉</div>
+        <div style="font-size:16px;margin-bottom:6px;font-weight:700;" id="quiz-score-msg" data-i18n="quiz_fin">お疲れさまでした！</div>
+        <div class="quiz-score-num" id="quiz-score-num"></div>
+        <div style="font-size:14px;margin-top:6px;opacity:0.88;" data-i18n="quiz_score_label">点 / 100点</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+          <button class="lesson-btn" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);" onclick="restartQuiz()" data-i18n="retry_btn">もう一度</button>
+          <button class="lesson-btn" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);" onclick="backToSelect()" data-i18n="change_cat">カテゴリ変更</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ===== メニューこだわり ===== -->
-<div id="page-menu" class="page">
+<div id="page-menu" class="page active">
+
+  <!-- ごあいさつ -->
   <div class="card">
-    <div class="card-title">🍽️ <span data-i18n="menu_title">シェフのこだわり</span></div>
+    <div class="card-title">🙏 <span data-i18n="menu_title">ごあいさつ</span></div>
+    <div class="staff-card">
+      <div class="staff-avatar">👨‍🍳</div>
+      <div class="staff-name">タクヤ</div>
+      <div class="staff-role">オーナー / シェフ</div>
+      <div class="staff-msg" data-i18n="staff1_msg"></div>
+      <div class="staff-thai">ขอบคุณที่มาเยี่ยมชม！</div>
+    </div>
+  </div>
+
+  <!-- こだわり -->
+  <div class="card">
+    <div class="card-title">🍽️ <span data-i18n="kodawari_title">シェフのこだわり</span></div>
 
     <!-- フィロソフィーブロック -->
     <div style="background:linear-gradient(135deg,#C0392B,#E85D04);border-radius:14px;padding:18px;margin-bottom:16px;color:#fff;">
-      <div style="font-family:'Fredoka One',cursive;font-size:18px;margin-bottom:10px;letter-spacing:0.5px;">🇹🇭 タイへの愛とリスペクト</div>
-      <div style="font-size:13px;line-height:1.85;opacity:0.95;" data-i18n="philosophy">
-        「日本人向けにアレンジしました」——この言葉を使いたくない。<br>
-        タイ人が食べても「本物だ」と感じる料理を、日本人の料理人として追求しています。<br><br>
-        タイ料理をもっと身近に。会社の飲み会にも、家族の団欒にも、ふらっと一人飲みにも。<br>
-        焼き鳥屋に寄るみたいに気軽に来てもらえる、そんな大衆酒場でありたい。
-      </div>
+      <div style="font-family:'Fredoka One',cursive;font-size:18px;margin-bottom:10px;letter-spacing:0.5px;">タイへの愛とリスペクト</div>
+      <div style="font-size:13px;line-height:1.85;opacity:0.95;" data-i18n="philosophy"></div>
     </div>
 
     <div class="dish-card">
@@ -887,18 +931,8 @@
         <span class="dish-tag">定番</span>
       </div>
     </div>
-
-    <!-- オーナー紹介 -->
-    <div style="margin-top:8px;border-top:2px dashed #FFD54F;padding-top:16px;">
-      <div class="staff-card">
-        <div class="staff-avatar">👨‍🍳</div>
-        <div class="staff-name">タクヤ</div>
-        <div class="staff-role">オーナー / シェフ</div>
-        <div class="staff-msg" data-i18n="staff1_msg">タイへの愛とリスペクト——それがこの店の全てです。「日本人向けにアレンジした料理」じゃなく、タイ人が食べても「これ本物だね」と言ってくれる料理を出したい。でも、タイ料理が初めての人にも「おいしい！また来たい！」と思ってほしい。その両立を諦めずに追いかけています。仕事帰りに焼き鳥屋へふらっと寄るみたいに、サワディ兄弟がみなさんの日常に溶け込んだら最高です。</div>
-        <div class="staff-thai">ขอบคุณที่มาเยี่ยมชม！</div>
-      </div>
-    </div>
   </div>
+
 </div>
 
 <!-- ===== 店内紹介 ===== -->
@@ -1205,10 +1239,13 @@
 
 
 <!-- ライトボックス -->
-<div id="film-lightbox" onclick="closeLightbox()">
+<div id="film-lightbox">
   <button id="film-lightbox-close" onclick="closeLightbox()">×</button>
+  <button class="lb-arrow lb-prev" onclick="lbMove(-1)">‹</button>
   <img id="film-lightbox-img" src="" alt="">
+  <button class="lb-arrow lb-next" onclick="lbMove(1)">›</button>
   <div id="film-lightbox-caption"></div>
+  <div id="film-lightbox-counter"></div>
 </div>
 
 <div class="footer">
@@ -1236,7 +1273,7 @@ const I18N = {
   ja: {
     hero_title: "サワディーブロスへようこそ！",
     hero_sub: "待ち時間も楽しんでね / ยินดีต้อนรับ / Welcome!",
-    tab_quiz:"クイズ",tab_trivia:"豆知識",tab_menu:"こだわり",
+    tab_quiz:"クイズ",tab_trivia:"クイズ＆豆知識",tab_menu:"こだわり",
     tab_shop:"店内",tab_thailand:"タイ街角",
     tab_coupon:"特典",tab_sns:"SNS",tab_survey:"感想",
     tab_tabimap:"旅マップ",
@@ -1251,7 +1288,7 @@ const I18N = {
     next_btn:"次へ →",quiz_fin:"お疲れさまでした！",quiz_score_label:"点 / 100点",retry_btn:"もう一度",change_cat:"カテゴリ変更",
     trivia_title:"タイ文化・豆知識",
     ttab_all:"すべて",ttab_food:"🍜 料理のルーツ",ttab_culture:"🎭 文化・マナー",
-    menu_title:"シェフのこだわり",
+    menu_title:"ごあいさつ",kodawari_title:"シェフのこだわり",
     dish1_desc:"バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。ふつうのバジルとは全然違う、スパイシーでパンチのある風味が自慢です。",
     dish2_desc:"レモングラス・カー（タイしょうが）・マクルートの葉を丸ごと使ったスープ。酸味・辛味・旨味のバランスが命です。",
     dish3_desc:"象（チャン）がトレードマークのタイを代表するビール。甘みが少なくスッキリとした飲み口で、タイ料理との相性バツグン！",
@@ -1291,7 +1328,7 @@ const I18N = {
   },
   en: {
     hero_title:"Welcome to Sawatdee Bros!",hero_sub:"Enjoy your time here! / ยินดีต้อนรับ",
-    tab_lesson:"Thai",tab_quiz:"Quiz",tab_trivia:"Culture",tab_menu:"Our Food",
+    tab_lesson:"Thai",tab_quiz:"Quiz",tab_trivia:"Quiz & Facts",tab_menu:"Our Food",
     tab_staff:"Staff",tab_coupon:"Offers",tab_sns:"SNS",tab_survey:"Feedback",
     lesson_title:"Today's Thai Phrase",lesson_desc:"Tap the card to reveal the meaning!",
     tap_hint:"Tap to reveal 👆",next_btn:"Next →",
@@ -1334,7 +1371,7 @@ const I18N = {
   },
   th: {
     hero_title:"ยินดีต้อนรับสู่ Sawatdee Bros!",hero_sub:"สนุกกันนะ / お楽しみください / Enjoy!",
-    tab_lesson:"ภาษาไทย",tab_quiz:"ทายปัญหา",tab_trivia:"ความรู้",tab_menu:"เมนู",
+    tab_lesson:"ภาษาไทย",tab_quiz:"ทายปัญหา",tab_trivia:"ทายปัญหา & ความรู้",tab_menu:"เมนู",
     tab_shop:"ในร้าน",tab_thailand:"ถนนไทย",
     tab_coupon:"สิทธิพิเศษ",tab_sns:"SNS",tab_survey:"ความคิดเห็น",
     lesson_title:"ประโยคไทยวันนี้",lesson_desc:"แตะการ์ดเพื่อดูความหมาย!",
@@ -1391,9 +1428,13 @@ function setLang(lang) {
 
 function applyI18n() {
   const t = I18N[currentLang];
+  // HTMLタグを含む可能性があるキー
+  const htmlKeys = new Set(['philosophy','staff1_msg','staff2_msg','staff3_msg']);
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (t[key]) el.textContent = t[key];
+    if (!t[key]) return;
+    if (htmlKeys.has(key)) el.innerHTML = t[key];
+    else el.textContent = t[key];
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
@@ -1403,7 +1444,22 @@ function applyI18n() {
   document.getElementById('hero-sub').textContent = t.hero_sub;
 }
 
-// ===== クイズデータ =====
+// ===== メインサブタブ切り替え =====
+function setMainTab(tab) {
+  const isTrivia = tab === 'trivia';
+  document.getElementById('section-trivia').style.display = isTrivia ? 'block' : 'none';
+  document.getElementById('section-quiz').style.display = isTrivia ? 'none' : 'block';
+  const tBtn = document.getElementById('main-tab-trivia');
+  const qBtn = document.getElementById('main-tab-quiz');
+  tBtn.style.background = isTrivia ? 'var(--thai-red)' : '#fff';
+  tBtn.style.color = isTrivia ? '#fff' : '#666';
+  tBtn.style.borderColor = isTrivia ? 'var(--thai-red)' : '#eee';
+  qBtn.style.background = isTrivia ? '#fff' : 'var(--thai-red)';
+  qBtn.style.color = isTrivia ? '#666' : '#fff';
+  qBtn.style.borderColor = isTrivia ? '#eee' : 'var(--thai-red)';
+}
+
+
 
 // タイ語クイズ（10問）
 const QUIZ_THAI = [
@@ -1738,7 +1794,7 @@ function startQuiz(cat) {
   document.getElementById('quiz-select').style.display = 'none';
   document.getElementById('quiz-score').classList.remove('show');
   document.getElementById('quiz-area').style.display = 'block';
-  const labels = {thai:{ja:'🗣️ タイ語クイズ',en:'🗣️ Thai Language Quiz',th:'🗣️ ทายคำไทย'}, culture:{ja:'🇹🇭 タイ文化クイズ',en:'🇹🇭 Thai Culture Quiz',th:'🇹🇭 ทายวัฒนธรรม'}};
+  const labels = {thai:{ja:'🗣️ タイ語クイズ',en:'🗣️ Thai Language Quiz',th:'🗣️ ทายคำไทย'}, culture:{ja:'📚 タイ文化クイズ',en:'📚 Thai Culture Quiz',th:'📚 ทายวัฒนธรรม'}};
   document.getElementById('quiz-cat-label').textContent = labels[cat][currentLang]||labels[cat].ja;
   renderQuiz();
 }
@@ -2076,20 +2132,67 @@ function submitSurvey() {
 }
 
 // ===== ライトボックス =====
+let lbPhotos = [];
+let lbIndex = 0;
+let lbTouchStartX = 0;
+
+function buildLbPhotos() {
+  lbPhotos = Array.from(document.querySelectorAll('.film-cell')).map(cell => ({
+    src: cell.querySelector('img').src.replace(/w=\d+/, 'w=1200'),
+    caption: (cell.querySelector('.film-cell-label') || {}).textContent || ''
+  }));
+}
+
 function openLightbox(cell) {
-  const img = cell.querySelector('img');
-  const label = cell.querySelector('.film-cell-label');
-  const lb = document.getElementById('film-lightbox');
-  document.getElementById('film-lightbox-img').src = img.src.replace(/w=\d+/, 'w=1200');
-  document.getElementById('film-lightbox-caption').textContent = label ? label.textContent : '';
-  lb.classList.add('show');
+  if (!lbPhotos.length) buildLbPhotos();
+  const cells = Array.from(document.querySelectorAll('.film-cell'));
+  lbIndex = cells.indexOf(cell);
+  lbShow();
   document.body.style.overflow = 'hidden';
 }
+
+function lbShow() {
+  const lb = document.getElementById('film-lightbox');
+  const img = document.getElementById('film-lightbox-img');
+  const caption = document.getElementById('film-lightbox-caption');
+  const counter = document.getElementById('film-lightbox-counter');
+  lb.classList.add('show');
+  img.classList.add('fading');
+  setTimeout(() => {
+    img.src = lbPhotos[lbIndex].src;
+    caption.textContent = lbPhotos[lbIndex].caption;
+    counter.textContent = `${lbIndex + 1} / ${lbPhotos.length}`;
+    img.classList.remove('fading');
+  }, 150);
+}
+
+function lbMove(dir) {
+  lbIndex = (lbIndex + dir + lbPhotos.length) % lbPhotos.length;
+  lbShow();
+}
+
 function closeLightbox() {
   document.getElementById('film-lightbox').classList.remove('show');
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// キーボード操作
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('film-lightbox').classList.contains('show')) return;
+  if (e.key === 'ArrowRight') lbMove(1);
+  else if (e.key === 'ArrowLeft') lbMove(-1);
+  else if (e.key === 'Escape') closeLightbox();
+});
+
+// スワイプ操作
+document.getElementById('film-lightbox').addEventListener('touchstart', e => {
+  lbTouchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.getElementById('film-lightbox').addEventListener('touchend', e => {
+  const diff = lbTouchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 40) lbMove(diff > 0 ? 1 : -1);
+  else if (Math.abs(diff) < 8) closeLightbox(); // タップで閉じる
+});
 
 
 renderTrivia();
