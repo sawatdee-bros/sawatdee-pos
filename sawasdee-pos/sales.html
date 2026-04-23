@@ -987,7 +987,7 @@ function renderCalendar() {
   // 週グループ（水曜始まり）
   var weeks = [], curWeek = null;
   days.forEach(function(day) {
-    if (day.dow === 3 || curWeek === null) { curWeek = {days:[],total:0,sessions:0}; weeks.push(curWeek); }
+    if (day.dow === 1 || curWeek === null) { curWeek = {days:[],total:0,sessions:0}; weeks.push(curWeek); }
     curWeek.days.push(day);
     if (dayMap[day.ds]) { curWeek.total += dayMap[day.ds].sales; curWeek.sessions += dayMap[day.ds].sessions; }
   });
