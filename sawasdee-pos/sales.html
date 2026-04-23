@@ -1052,8 +1052,8 @@ function renderUnclassifiedBanner() {
   if (existing) {
     existing.outerHTML = html;
   } else {
-    var periodBar = document.querySelector('.period-bar');
-    periodBar.insertAdjacentHTML('afterend', html);
+    var cont = document.getElementById('container');
+    cont.insertAdjacentHTML('afterbegin', html);
   }
 }
 
