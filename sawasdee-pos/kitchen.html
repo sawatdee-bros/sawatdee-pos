@@ -557,26 +557,30 @@ window.doRestore = async function(i) {
   const r = valid[i];
   if (!r) return;
   const restored = JSON.parse(JSON.stringify(r.order));
-  restored.status = 'new';
-  // typeに対応するアイテムのみprevに戻す（他typeのitemsDoneは現状維持）
+  // 現在のitemsDoneを取得（他typeのアイテムは現状維持するため）
   const currentItemsDone = JSON.parse(JSON.stringify(orders[r.id] ? orders[r.id].itemsDone || {} : {}));
   const prevItemsDone = r.prev || {};
+  // typeに対応するアイテムのみprevの状態に戻す
   (restored.items || []).forEach((item, idx) => {
     const isDrink = isDrinkItem(item.name);
-    if ((r.type === 'food' && !isDrink) || (r.type === 'drink' && isDrink)) {
-      // このtypeのアイテムはprevに戻す
-      if (prevItemsDone[idx] !== undefined) {
-        currentItemsDone[idx] = prevItemsDone[idx];
+    const isMyType = (r.type === 'food' && !isDrink) || (r.type === 'drink' && isDrink);
+    if (isMyType) {
+      // prevでfalse/undefinedだったアイテムはitemsDoneから削除（未提供に戻す）
+      if (prevItemsDone[idx]) {
+        currentItemsDone[idx] = true;
       } else {
         delete currentItemsDone[idx];
       }
     }
-    // 他typeのアイテムは現状維持
+    // 他typeのアイテムは手を触れない
   });
+  // まだ未提供アイテムが残っていればnew、全部済みならdone
+  const anyNotDone = (restored.items || []).some((_, idx) => !currentItemsDone[idx]);
+  restored.status = anyNotDone ? 'new' : 'done';
   restored.itemsDone = currentItemsDone;
   orders[r.id] = restored;
   _selfWriteIds.add(r.id);
-  await update(ref(db, 'orders/'+r.id), { status: 'new', itemsDone: restored.itemsDone });
+  await update(ref(db, 'orders/'+r.id), { status: restored.status, itemsDone: restored.itemsDone });
   const idx = recentDone.indexOf(r);
   if (idx > -1) recentDone.splice(idx, 1);
   updateRestoreBtn();
