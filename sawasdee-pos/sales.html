@@ -983,6 +983,10 @@ onValue(ref(db, 'menu'), function(snap) {
 onValue(ref(db, 'store_config'), function(snap) {
   storeConfig = snap.val() || {};
   if (storeConfig.day_start_hour != null) DAY_START = storeConfig.day_start_hour;
+  // tax_rate の正規化：Firebaseに0.1で入っている場合は10（%）に変換
+  if (storeConfig.tax_rate != null && storeConfig.tax_rate < 1) {
+    storeConfig.tax_rate = Math.round(storeConfig.tax_rate * 100);
+  }
   // item_category_overrides を同期（Firebase保存済み分類）
   itemOverrides = storeConfig.item_category_overrides || {};
   dataReady.config = true;
