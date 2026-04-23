@@ -1029,17 +1029,19 @@ function renderUnclassifiedBanner() {
     + '<span style="font-size:11px;color:#92400e;margin-left:auto;">カテゴリを選んで保存するとグラフに反映されます</span>'
     + '</div>';
 
-  items.forEach(function(entry) {
+  // バナーアイテムをwindowに保持（data属性からアクセス用）
+  window.__bannerItems = items.map(function(e){ return e[0]; });
+
+  items.forEach(function(entry, idx) {
     var name = entry[0], info = entry[1];
-    var escapedName = name.replace(/'/g, "\'");
     html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #292000;">'
       + '<span style="flex:1;font-size:12px;color:#e2e8f0;">' + name + '</span>'
-      + '<span style="font-size:11px;color:#92400e;min-width:60px;text-align:right;">¥' + info.sales.toLocaleString() + '</span>'
+      + '<span style="font-size:11px;color:#92400e;min-width:60px;text-align:right;">&#165;' + info.sales.toLocaleString() + '</span>'
       + '<div style="display:flex;gap:4px;flex-shrink:0;">'
-      + ['ドリンク','フード','セット'].map(function(cat) {
-          var colors = { 'ドリンク':'#0369a1:#38bdf8', 'フード':'#9a3412:#fb923c', 'セット':'#5b21b6:#a78bfa' };
+      + ['\u30c9\u30ea\u30f3\u30af','\u30d5\u30fc\u30c9','\u30bb\u30c3\u30c8'].map(function(cat) {
+          var colors = { '\u30c9\u30ea\u30f3\u30af':'#0369a1:#38bdf8', '\u30d5\u30fc\u30c9':'#9a3412:#fb923c', '\u30bb\u30c3\u30c8':'#5b21b6:#a78bfa' };
           var c = colors[cat].split(':');
-          return '<button onclick="window.saveOverride('' + escapedName + '','' + cat + '')" '
+          return '<button data-bidx="' + idx + '" data-bcat="' + cat + '" '
             + 'style="padding:3px 8px;border-radius:6px;border:1px solid ' + c[0] + ';background:' + c[0] + '33;'
             + 'color:' + c[1] + ';font-size:11px;cursor:pointer;white-space:nowrap;">'
             + cat + '</button>';
@@ -1054,6 +1056,18 @@ function renderUnclassifiedBanner() {
   } else {
     var cont = document.getElementById('container');
     cont.insertAdjacentHTML('afterbegin', html);
+  }
+  // data属性ボタンにイベントを付与
+  var banner = document.getElementById('unclassified-banner');
+  if (banner) {
+    banner.addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-bidx]');
+      if (!btn) return;
+      var idx = parseInt(btn.getAttribute('data-bidx'), 10);
+      var cat = btn.getAttribute('data-bcat');
+      var name = window.__bannerItems && window.__bannerItems[idx];
+      if (name && cat) window.saveOverride(name, cat);
+    });
   }
 }
 
