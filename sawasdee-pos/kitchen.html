@@ -558,10 +558,25 @@ window.doRestore = async function(i) {
   if (!r) return;
   const restored = JSON.parse(JSON.stringify(r.order));
   restored.status = 'new';
-  restored.itemsDone = r.prev || {};
+  // typeに対応するアイテムのみprevに戻す（他typeのitemsDoneは現状維持）
+  const currentItemsDone = JSON.parse(JSON.stringify(orders[r.id] ? orders[r.id].itemsDone || {} : {}));
+  const prevItemsDone = r.prev || {};
+  (restored.items || []).forEach((item, idx) => {
+    const isDrink = isDrinkItem(item.name);
+    if ((r.type === 'food' && !isDrink) || (r.type === 'drink' && isDrink)) {
+      // このtypeのアイテムはprevに戻す
+      if (prevItemsDone[idx] !== undefined) {
+        currentItemsDone[idx] = prevItemsDone[idx];
+      } else {
+        delete currentItemsDone[idx];
+      }
+    }
+    // 他typeのアイテムは現状維持
+  });
+  restored.itemsDone = currentItemsDone;
   orders[r.id] = restored;
   _selfWriteIds.add(r.id);
-  await update(ref(db, 'orders/'+r.id), { status: 'new', itemsDone: restored.itemsDone || {} });
+  await update(ref(db, 'orders/'+r.id), { status: 'new', itemsDone: restored.itemsDone });
   const idx = recentDone.indexOf(r);
   if (idx > -1) recentDone.splice(idx, 1);
   updateRestoreBtn();
@@ -746,7 +761,7 @@ window.toggleItem = async function(id, idx) {
 window.groupDoneMulti = async function(idStr, type) {
   const ids = idStr.split(',').filter(Boolean);
 
-  // 戻す用に事前にスナップショットを保存
+  // 戻す用に事前にスナップショットを保存（typeごとに対象itemsのみ）
   const prevSnapshots = {};
   ids.forEach(id => {
     if (orders[id]) {
@@ -761,9 +776,13 @@ window.groupDoneMulti = async function(idStr, type) {
     await window.groupDone(id, type, true); // skipSaveRecentDone=true
   }
 
-  // グループ全体で1回だけsaveRecentDoneを呼ぶ
+  // typeに関係するアイテムが1つでもあるorderのみsaveRecentDone
   ids.forEach(id => {
-    if (prevSnapshots[id]) {
+    if (!prevSnapshots[id] || !orders[id]) return;
+    const hasRelevantItem = (orders[id].items || []).some(i => {
+      return type === 'food' ? !isDrinkItem(i.name) : isDrinkItem(i.name);
+    });
+    if (hasRelevantItem) {
       saveRecentDone(id, type, prevSnapshots[id].itemsDone, prevSnapshots[id].status);
     }
   });
