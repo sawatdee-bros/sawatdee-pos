@@ -109,8 +109,8 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
         <div class="field-label">
           <div class="field-label-main">消費税率</div>
         </div>
-        <input class="field-input" type="number" id="tax_rate" step="0.01" min="0" max="1">
-        <span class="field-unit">（例: 0.1 = 10%）</span>
+        <input class="field-input" type="number" id="tax_rate" step="1" min="0" max="100">
+        <span class="field-unit">%</span>
       </div>
     </div>
   </div>
@@ -250,7 +250,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
           <div class="field-label-main">Apps Script URL</div>
           <div class="field-label-sub">スプレッドシートへのバックアップ用。デプロイ後のウェブアプリURLを貼り付け</div>
         </div>
-        <input class="field-input wide" type="url" id="apps_script_url" placeholder="https://script.google.com/macros/s/..." style="width:100%;font-size:12px;">
+        <input class="field-input wide" type="url" id="apps_script_url" placeholder="https://script.google.com/macros/s/..." style="width:100%;font-size:12px;overflow:hidden;text-overflow:ellipsis;">
       </div>
     </div>
   </div>
@@ -303,7 +303,8 @@ var DEFAULTS = {
 get(ref(db, 'store_config')).then(function(snap) {
   var cfg = Object.assign({}, DEFAULTS, snap.val() || {});
   document.getElementById('store_name').value = cfg.store_name || '';
-  document.getElementById('tax_rate').value = cfg.tax_rate;
+  var displayTax = cfg.tax_rate < 1 ? Math.round(cfg.tax_rate * 100) : cfg.tax_rate;
+  document.getElementById('tax_rate').value = displayTax;
   document.getElementById('charge_per_person').value = cfg.charge_per_person;
   document.getElementById('charge_free_drink_count').value = cfg.charge_free_drink_count;
   var mode = cfg.charge_mode || 'conditional';
@@ -382,7 +383,7 @@ window.saveAll = async function() {
   btn.textContent = '保存中...';
   var cfg = {
     store_name: document.getElementById('store_name').value,
-    tax_rate: parseFloat(document.getElementById('tax_rate').value) || 0.1,
+    tax_rate: parseInt(document.getElementById('tax_rate').value) || 10,
     charge_per_person: parseInt(document.getElementById('charge_per_person').value) || 0,
     charge_free_drink_count: parseInt(document.getElementById('charge_free_drink_count').value) || 2,
     charge_mode: document.querySelector('input[name="charge_mode"]:checked').value || 'conditional',
