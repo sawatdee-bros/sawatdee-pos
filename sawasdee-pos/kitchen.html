@@ -986,7 +986,10 @@ function _updateBillsData(allData) {
   var rangeStart = start.getTime();
   _bOrders = {};
   Object.keys(allData).forEach(function(id) {
-    if ((allData[id].timestamp||0) >= rangeStart) _bOrders[id] = allData[id];
+    var o = allData[id];
+    // 未会計orderは時間フィルターに関係なく常に表示
+    var isUnpaid = o.status !== 'paid';
+    if (isUnpaid || (o.timestamp||0) >= rangeStart) _bOrders[id] = o;
   });
   if (currentMode === 'bills') _billsRenderWrap();
 }
