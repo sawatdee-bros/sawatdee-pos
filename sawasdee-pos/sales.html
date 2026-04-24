@@ -558,14 +558,14 @@ function render() {
   } else if (currentPeriod === 'week') {
     for (var d = 0; d < 7; d++) {
       var v = 0;
-      sessions.forEach(function(s){ if (new Date(s.ts).getDay()===d) v += s.sales; });
+      sessions.forEach(function(s){ if (new Date(s.ts - DAY_START*3600000).getDay()===d) v += s.sales; });
       barData.push({ label: DOW[d], val: v, isNow: now.getDay()===d });
     }
   } else if (currentPeriod === 'month') {
     var dim = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
     for (var d = 1; d <= dim; d++) {
       var v = 0;
-      sessions.forEach(function(s){ if (new Date(s.ts).getDate()===d) v += s.sales; });
+      sessions.forEach(function(s){ if (new Date(s.ts - DAY_START*3600000).getDate()===d) v += s.sales; });
       barData.push({ label: d%5===0?String(d):'', val: v, isNow: now.getDate()===d });
     }
   } else if (currentPeriod === 'all') {
@@ -573,7 +573,7 @@ function render() {
     var dowTotals = [0,0,0,0,0,0,0]; // 日〜土
     var dowDays   = [{},{},{},{},{},{},{}]; // 曜日ごとの営業日セット
     sessions.forEach(function(s) {
-      var dw = new Date(s.ts).getDay();
+      var dw = new Date(s.ts - DAY_START*3600000).getDay();
       var ds = toDayStr(s.ts); // 日付文字列でユニーク日数を数える
       dowTotals[dw] += s.sales;
       dowDays[dw][ds] = true;
