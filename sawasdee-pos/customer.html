@@ -226,6 +226,8 @@ const ITEM_OPTIONS = {
   }
 };
 const taxIn = p => Math.floor(p * (1 + TAX));
+// price_type:'inclusive'対応版：税込価格はそのまま、税抜価格はtaxIn変換
+const taxInItem = item => item.price_type === 'inclusive' ? item.price : taxIn(item.price);
 const fmtY = p => '\uffe5' + p.toLocaleString();
 
 let soldout = {};
@@ -317,8 +319,8 @@ function renderMenu() {
   var items = ((MENU_DATA[currentCat] || {})[currentSubcat] || []).filter(function(i) { return i.active && !i.hidden; });
   var html = items.map(function(item, idx) {
     var isSoldout = soldout[item.name] === true;
-    var priceEx = item.price;
-    var priceIn = taxIn(item.price);
+    var priceEx = item.price_type === 'inclusive' ? Math.floor(item.price / 1.1) : item.price;
+    var priceIn = item.price_type === 'inclusive' ? item.price : taxIn(item.price);
     var cartKey = currentCat + '__' + currentSubcat + '__' + idx;
     var cartQty = cart[cartKey] ? cart[cartKey].qty : 0;
     var qtyRow = cartQty > 0
@@ -368,8 +370,8 @@ function renderCart() {
     var key = entry[0], c = entry[1];
     var extraPrice = c.extras ? c.extras.reduce(function(s, e) { return s + e.price; }, 0) : 0;
     var totalPrice = c.item.price + extraPrice;
-    totalEx += totalPrice * c.qty;
-    totalIn += taxIn(totalPrice) * c.qty;
+    totalEx += (c.item.price_type === 'inclusive' ? Math.floor(c.item.price / 1.1) : c.item.price) * c.qty + extraPrice * c.qty;
+    totalIn += (c.item.price_type === 'inclusive' ? c.item.price : taxIn(c.item.price)) * c.qty + taxIn(extraPrice) * c.qty;
     count += c.qty;
     previewHTML += '<div class="cart-item-row">'
       + '<button class="cart-item-qty-btn" onclick="window.changeQty(\'' + key + '\',-1)">−</button>'
@@ -459,7 +461,7 @@ function addItemToCart(cat, sub, idx, item, optLabel, extras) {
   var optKey = optLabel || extras.map(function(e) { return e.label; }).join(',');
   var key = cat + '__' + sub + '__' + idx + (optKey ? '__' + optKey : '');
   var displayName = item.name + (optLabel ? '（' + optLabel + '）' : '');
-  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price, charge_exempt: !!item.charge_exempt }, qty: 0, extras: extras };
+  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null }, qty: 0, extras: extras };
   cart[key].qty++;
   renderMenu(); renderCart();
 }
@@ -545,7 +547,7 @@ window.showHistory = async function() {
         });
       }
       var isDrink = baseName !== 'お冷' && drinkNames.some(function(d) { return baseName === d || baseName.startsWith(d + '（'); });
-      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink, charge_exempt: !!item.charge_exempt };
+      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null };
       itemMap[key].qty += item.qty;
     });
   });
@@ -563,7 +565,7 @@ function renderHistoryModal() {
   }
   var totalEx = 0;
   var itemsHTML = _historyItems.map(function(it) {
-    var linePrice = it.price * it.qty;
+    var linePrice = it.price_type === 'inclusive' ? Math.floor(it.price / 1.1) * it.qty : it.price * it.qty;
     totalEx += linePrice;
     return '<div class="history-item"><span>' + it.name + '</span><div style="display:flex;gap:10px;align-items:center"><span class="history-qty">×' + it.qty + '</span><span class="history-price">' + fmtY(linePrice) + '</span></div></div>';
   }).join('');
@@ -588,10 +590,12 @@ function renderHistoryModal() {
     chargeTotal = isFree ? 0 : chargeBase;
     chargeLabel = 'チャージ料（お一人様' + _CHARGE_FREE_DRINK_COUNT + '杯以上のドリンクで無料）';
   }
-  // 消費税・合計計算（小計税抜＋チャージ税抜に対して消費税）
-  var finalEx = totalEx + chargeTotal;
-  var finalIn = Math.floor(finalEx * 1.1 / 10) * 10;
-  var finalTax = finalIn - finalEx;
+  // 消費税・合計計算（inclusive商品は税込そのまま、exclusive商品は×1.1）
+  var inclusiveTotal = _historyItems.reduce(function(s, it) { return s + (it.price_type === 'inclusive' ? it.price * it.qty : 0); }, 0);
+  var exclusiveEx = totalEx - _historyItems.reduce(function(s, it) { return s + (it.price_type === 'inclusive' ? Math.floor(it.price / 1.1) * it.qty : 0); }, 0);
+  var finalEx = exclusiveEx + chargeTotal;
+  var finalIn = Math.floor((Math.floor(finalEx * 1.1) + inclusiveTotal) / 10) * 10;
+  var finalTax = finalIn - exclusiveEx - chargeTotal - inclusiveTotal;
   var paxHTML = _CHARGE_MODE === 'none' ? '' :
     '<div class="history-pax-row">'
     + '<span class="history-pax-label">人数（チャージ計算用）</span>'
@@ -631,14 +635,16 @@ window.placeOrder = async function() {
   Object.values(cart).forEach(function(c) {
     var item = { name: c.item.name, qty: c.qty, price: c.item.price };
     if (c.item.charge_exempt) item.charge_exempt = true;
+    if (c.item.price_type) item.price_type = c.item.price_type;
     if (c.extras && c.extras.length > 0) {
       item.extrasStr = c.extras.map(function(e) { return e.label; }).join('・');
       item.price = c.item.price + c.extras.reduce(function(s, e) { return s + e.price; }, 0);
+      delete item.price_type; // extrasがある場合は税抜として扱う
     }
     items.push(item);
   });
   if (items.length === 0) return;
-  var total = Math.floor(items.reduce(function(s, i) { return s + taxIn(i.price) * i.qty; }, 0) / 10) * 10;
+  var total = Math.floor(items.reduce(function(s, i) { return s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty; }, 0) / 10) * 10;
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
   var orderData = { table: tableNum, items: items, total: total, status: 'new', timestamp: Date.now() };
