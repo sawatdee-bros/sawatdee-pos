@@ -1059,7 +1059,7 @@ window.openCheckout = function(tableNum, idStr) {
     if (!o) return;
     total += Math.round((o.total||0) / 10) * 10;
     (o.items||[]).forEach(function(it) {
-      if (!itemMap[it.name]) itemMap[it.name] = {name:it.name, price:it.price, qty:0};
+      if (!itemMap[it.name]) itemMap[it.name] = {name:it.name, price:it.price, qty:0, price_type:it.price_type||null};
       itemMap[it.name].qty += it.qty;
     });
   });
@@ -1478,7 +1478,7 @@ function _billsRender() {
       for (var k=0;k<items.length;k++) {
         var item=items[k];
         var map=isDrinkItem(item.name)?drinkMap:foodMap;
-        if (!map[item.name]) map[item.name]={name:item.name,qty:0,price:item.price,pending:false};
+        if (!map[item.name]) map[item.name]={name:item.name,qty:0,price:item.price,pending:false,price_type:item.price_type||null};
         map[item.name].qty+=item.qty;
         if (!itemsDone[k]) map[item.name].pending=true;
       }
