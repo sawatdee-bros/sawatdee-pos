@@ -1089,8 +1089,8 @@ window.renderDiscountArea = function() {
     '<div class="checkout-discount-manual">' +
     '<input class="checkout-discount-input" id="discount-input" type="number" min="0" placeholder="金額">' +
     '<div class="checkout-discount-toggle">' +
-    '<button id="toggle-amount" class="' + (_discountType === 'amount' ? 'active' : '') + '" onclick="window.setDiscountType('amount')">円</button>' +
-    '<button id="toggle-percent" class="' + (_discountType === 'percent' ? 'active' : '') + '" onclick="window.setDiscountType('percent')">%</button>' +
+    '<button id="toggle-amount" class="' + (_discountType === 'amount' ? 'active' : '') + '" onclick="window.setDiscountType(&quot;amount&quot;)">円</button>' +
+    '<button id="toggle-percent" class="' + (_discountType === 'percent' ? 'active' : '') + '" onclick="window.setDiscountType(&quot;percent&quot;)">%</button>' +
     '</div>' +
     '<button class="checkout-discount-apply" onclick="window.applyManualDiscount()">適用</button>' +
     '</div>' +
