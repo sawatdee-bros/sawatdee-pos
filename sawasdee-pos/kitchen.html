@@ -1081,7 +1081,7 @@ window.renderDiscountArea = function() {
       var isActive = _discountAmount > 0 &&
         ((p.type === 'percent' && _discountType === 'percent' && Math.round(_checkoutGrandTotal * p.value / 100 / 10) * 10 === _discountAmount) ||
          (p.type === 'amount' && _discountType === 'amount' && p.value === _discountAmount));
-      presetHTML += '<button class="checkout-discount-preset-btn' + (isActive ? ' active' : '') + '" onclick="window.applyPreset(' + JSON.stringify(p) + ')">' + label + '</button>';
+      presetHTML += '<button class="checkout-discount-preset-btn' + (isActive ? ' active' : '') + '" data-preset-idx="' + _DISCOUNT_PRESETS.indexOf(p) + '">' + label + '</button>';
     });
     presetHTML += '</div>';
   }
@@ -1101,6 +1101,16 @@ window.renderDiscountArea = function() {
   var finalAmount = Math.max(0, _checkoutGrandTotal - _discountAmount);
   var finalEl = document.getElementById('checkout-final-amount');
   if (finalEl) finalEl.textContent = '¥' + finalAmount.toLocaleString();
+  // プリセットボタンのイベント設定
+  var area = document.getElementById('checkout-discount-area');
+  if (area) {
+    area.querySelectorAll('[data-preset-idx]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-preset-idx'));
+        if (!isNaN(idx) && _DISCOUNT_PRESETS[idx]) window.applyPreset(_DISCOUNT_PRESETS[idx]);
+      });
+    });
+  }
 };
 
 window.setDiscountType = function(type) {
