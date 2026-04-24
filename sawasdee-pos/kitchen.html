@@ -128,6 +128,20 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .checkout-grand { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #166534; }
 .checkout-grand-label { font-size: 14px; font-weight: 700; color: #dcfce7; font-family: -apple-system, sans-serif; }
 .checkout-grand-amount { font-size: 28px; font-weight: 900; color: white; font-family: -apple-system, sans-serif; }
+.checkout-grand-before { background: #374151; }
+.checkout-discount-area { padding: 10px 12px; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+.checkout-discount-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.checkout-discount-preset-btn { padding: 5px 10px; background: #fff; border: 1px solid #94a3b8; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: -apple-system, sans-serif; color: #1e293b; }
+.checkout-discount-preset-btn:hover { background: #f1f5f9; }
+.checkout-discount-preset-btn.active { background: #dcfce7; border-color: #166534; color: #166534; font-weight: 700; }
+.checkout-discount-manual { display: flex; gap: 6px; align-items: center; }
+.checkout-discount-input { width: 80px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; font-family: -apple-system, sans-serif; text-align: right; }
+.checkout-discount-toggle { display: flex; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; }
+.checkout-discount-toggle button { padding: 6px 10px; border: none; background: #fff; font-size: 12px; cursor: pointer; font-family: -apple-system, sans-serif; color: #64748b; }
+.checkout-discount-toggle button.active { background: #166534; color: white; font-weight: 700; }
+.checkout-discount-apply { padding: 6px 12px; background: #166534; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: -apple-system, sans-serif; }
+.checkout-discount-line { display: flex; justify-content: space-between; font-size: 13px; color: #dc2626; padding: 4px 0; font-family: -apple-system, sans-serif; }
+.checkout-discount-clear { font-size: 11px; color: #64748b; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font-family: -apple-system, sans-serif; }
 .checkout-btns { display: flex; gap: 8px; padding: 12px; background: #f8fafc; }
 .checkout-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; color: #64748b; font-size: 13px; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-confirm { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; }
@@ -232,9 +246,14 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <div class="checkout-modal" id="checkout-modal">
   <div class="checkout-box">
     <div class="checkout-body" id="checkout-body"></div>
-    <div class="checkout-grand">
-      <span class="checkout-grand-label">お会計</span>
+    <div class="checkout-grand" id="checkout-grand-before">
+      <span class="checkout-grand-label">小計</span>
       <span class="checkout-grand-amount" id="checkout-grand-amount"></span>
+    </div>
+    <div class="checkout-discount-area" id="checkout-discount-area"></div>
+    <div class="checkout-grand">
+      <span class="checkout-grand-label">割引後お会計</span>
+      <span class="checkout-grand-amount" id="checkout-final-amount"></span>
     </div>
     <div class="checkout-btns">
       <button class="checkout-cancel" onclick="window.closeCheckout()">キャンセル</button>
@@ -321,12 +340,14 @@ let DAY_START = 8;
 let _CHARGE_PER_PERSON = 250;
 let _CHARGE_MODE = 'conditional'; // none / conditional / always
 let _CHARGE_FREE_DRINK_COUNT = 2;
+let _DISCOUNT_PRESETS = [];
 get(ref(db, 'store_config')).then(function(snap) {
   var cfg = snap.val() || {};
   if (cfg.day_start_hour !== null && cfg.day_start_hour !== undefined) DAY_START = cfg.day_start_hour;
   if (cfg.charge_per_person !== undefined) _CHARGE_PER_PERSON = cfg.charge_per_person;
   if (cfg.charge_mode) _CHARGE_MODE = cfg.charge_mode;
   if (cfg.charge_free_drink_count !== undefined) _CHARGE_FREE_DRINK_COUNT = cfg.charge_free_drink_count;
+  if (Array.isArray(cfg.discount_presets)) _DISCOUNT_PRESETS = cfg.discount_presets;
 });
 
 const KITCHEN_NAMES = {"生ビール 中ジョッキ": "生ジョッキ", "瓶ビール 大びん": "赤星　大びん", "ノンアルビール 小びん": "ノンアルビール", "シンハー": "シンハー", "チャーン": "チャーン", "リオ": "リオ", "マンゴービア": "マンゴービア", "グアバビア": "グアバビア", "メガ角ハイボール": "メガ角ハイボール", "角ハイボール": "角ハイボール", "ジンジャー角ハイボール": "ジンジャー角ハイボール", "コーク角ハイボール": "コーク角ハイボール", "メコンハイボール": "メコンハイボール", "メコンジンジャー": "メコンジンジャー", "メコンコーク": "メコンコーク", "タイサワー": "タイサワー", "パクチーレモンサワー": "パクチーレモンサワー", "タイ式漢方サワー": "漢方サワー", "レモンサワー": "レモンサワー", "クエン酸サワー": "クエンサンサワー", "バイス(梅しそ)サワー": "バイスサワー", "チューハイ": "チューハイ", "ウーロンハイ": "ウーロンハイ", "ジャスミンハイ": "ジャスミンハイ", "ホッピー": "ホッピー", "ホッピー中": "ホッピー中", "ホッピー外": "ホッピー外", "マンゴーハイ": "マンゴーハイ", "グアバハイ": "グアバハイ", "タイ紅茶ハイ": "タイ紅茶ハイ", "マンゴーミルクハイ": "マンゴーミルクハイ", "グアバミルクハイ": "グアバミルクハイ", "カシスソーダ": "カシスソーダ", "カシスウーロン": "カシスウーロン", "カシスマンゴー": "カシスマンゴー", "テキーラコーク": "テキーラコーク", "テキーラグアバ": "テキーラグアバ", "テキーラショット": "テキーラショット", "泡盛(久米仙)": "泡盛　久米仙", "ジャスミン焼酎(茉莉花)": "ジャスミン焼酎", "梅酒": "梅酒", "グラスワイン 赤": "グラスワイン赤", "グラスワイン 白": "グラスワイン白", "デキャンタ 赤": "デキャンタ赤", "デキャンタ 白": "デキャンタ白", "ボトルワイン 赤": "ボトルワイン赤", "ボトルワイン 白": "ボトルワイン白", "マンゴージュース": "マンゴージュース", "グアバジュース": "グアバジュース", "タイ紅茶(タイ式ミルクティー)": "タイ紅茶", "炭酸水(カットレモン入り)": "炭酸水", "コカコーラ": "コカコーラ", "ジンジャーエール(辛口)": "ジンジャーエール", "ウーロン茶": "ウーロン茶", "ジャスミン茶": "ジャスミン茶", "ノンアル★タイサワー": "ノンアル★タイサワー", "ノンアル★マンゴーミルク": "ノンアル★マンゴーミルク", "お冷": "お冷", "キャベツ": "キャベツ", "セロリ": "セロリ", "タイの海老せん": "海老せん", "ピリ辛枝豆": "枝豆", "タイの漬物缶詰": "漬物缶詰", "おつまみキュウリ": "きゅうり", "カリカリ厚揚げ": "厚揚げ", "パク乗せ冷奴": "冷奴", "コリコリ豚耳": "豚耳", "アジのトマト煮": "アジ", "タイ式生ソーセージ(ネーム)": "ネーム", "青パパイヤのサラダ": "ソムタム", "青パパイヤのサラダ（激辛バージョン）": "ソムタム ラオ", "青パパイヤのサラダ（豚グリル入り）": "ソムタム ムーヤーン", "温かい春雨サラダ": "ヤム ウンセン", "揚げ目玉焼きのサラダ": "ヤム カイダオ", "茹で鶏のサラダ": "ヤム ガイ", "海老とレモングラスのサラダ": "ヤム クン", "鶏もも肉のタイ式グリル": "ガイヤーン", "豚肉のタイ式グリル": "ムーヤーン", "タイ式海老のグリル": "クン パオ", "タイ式豚グリルのハーブ和え": "ナムトック ムー", "タイ式ヌードル香味野菜和え": "ヤム マーマー", "キャベツの海老味噌醤炒め": "ガピキャベツ", "蒸し鶏 生姜ソース": "蒸し鶏", "鶏ひき肉のハーブ和え": "ラープ ガイ", "スパイシー鶏唐揚げ": "ガイトード", "タイ式揚げ春巻き(パクチー入)": "ポッピア トード", "揚げ海老のニンニク炒め": "クンガティアム", "ポテトフライ 2種のソース": "ポテト", "タイ式揚げオムレツ": "カイジャオ", "タイ式揚げオムレツ(ソーセージ入)": "カイジャオネーム", "海老とハーブの酸っぱ辛いスープ": "トムヤムクン", "鶏肉のココナッツミルクスープ": "トムカーガイ", "鶏もも肉のガパオ炒め": "ガパオ", "豚肉のカレー炒め": "ムーパッポンカリー", "海老のカレー炒め": "クンパッポンカリー", "鶏肉とセロリの生姜炒め": "ガイパッキン", "豚肉のガーリック炒め": "ムー ガティアム", "季節の青菜炒め": "パックブン", "厚揚げともやしの炒め": "パット トゥアンゴーク", "茄子と豚肉のバジル炒め": "パット マクワ", "春雨の旨辛ソース炒め": "スッキー ヘーン", "春雨のオイスター炒め": "パット ウンセン", "タイ式焼きそば": "パッタイ", "旨辛バジル炒め麺": "パッキーマオ", "タイ式まぜそば": "ヘーン（まぜそば）", "タイ式汁そば": "ナーム（汁そば）", "トムヤムクンヌードル": "トムヤムヌードル", "グリーンカレー": "ゲーンキャオワーン", "蒸し鶏ご飯": "カオマンガイ", "タイ式焼き飯": "カオパッ", "ライス": "ライス", "目玉焼き": "目玉焼き", "ココナッツアイスサンド": "ココナッツアイスサンド", "ココナッツアイス": "ココナッツアイス"};
@@ -1042,6 +1063,75 @@ window.changePax = function(t, d) {
 
 var _checkoutTable = null;
 var _checkoutIds = null;
+var _checkoutGrandTotal = 0;
+var _discountAmount = 0;
+var _discountType = 'amount'; // 'amount' or 'percent'
+
+window.renderDiscountArea = function() {
+  var area = document.getElementById('checkout-discount-area');
+  if (!area) return;
+  var presetHTML = '';
+  if (_DISCOUNT_PRESETS.length > 0) {
+    presetHTML += '<div class="checkout-discount-presets">';
+    _DISCOUNT_PRESETS.forEach(function(p) {
+      var label = p.type === 'percent' ? p.label || (p.value + '%引き') : p.label || ('¥' + p.value.toLocaleString() + '引き');
+      var isActive = _discountAmount > 0 &&
+        ((p.type === 'percent' && _discountType === 'percent' && Math.round(_checkoutGrandTotal * p.value / 100 / 10) * 10 === _discountAmount) ||
+         (p.type === 'amount' && _discountType === 'amount' && p.value === _discountAmount));
+      presetHTML += '<button class="checkout-discount-preset-btn' + (isActive ? ' active' : '') + '" onclick="window.applyPreset(' + JSON.stringify(p) + ')">' + label + '</button>';
+    });
+    presetHTML += '</div>';
+  }
+  var discountLabel = _discountAmount > 0
+    ? '<div class="checkout-discount-line"><span>割引</span><span>-¥' + _discountAmount.toLocaleString() + '</span> <button class="checkout-discount-clear" onclick="window.clearDiscount()">クリア</button></div>'
+    : '';
+  area.innerHTML = presetHTML +
+    '<div class="checkout-discount-manual">' +
+    '<input class="checkout-discount-input" id="discount-input" type="number" min="0" placeholder="金額">' +
+    '<div class="checkout-discount-toggle">' +
+    '<button id="toggle-amount" class="' + (_discountType === 'amount' ? 'active' : '') + '" onclick="window.setDiscountType('amount')">円</button>' +
+    '<button id="toggle-percent" class="' + (_discountType === 'percent' ? 'active' : '') + '" onclick="window.setDiscountType('percent')">%</button>' +
+    '</div>' +
+    '<button class="checkout-discount-apply" onclick="window.applyManualDiscount()">適用</button>' +
+    '</div>' +
+    discountLabel;
+  var finalAmount = Math.max(0, _checkoutGrandTotal - _discountAmount);
+  var finalEl = document.getElementById('checkout-final-amount');
+  if (finalEl) finalEl.textContent = '¥' + finalAmount.toLocaleString();
+};
+
+window.setDiscountType = function(type) {
+  _discountType = type;
+  window.renderDiscountArea();
+};
+
+window.applyPreset = function(p) {
+  if (p.type === 'percent') {
+    _discountAmount = Math.round(_checkoutGrandTotal * p.value / 100 / 10) * 10;
+    _discountType = 'percent';
+  } else {
+    _discountAmount = p.value;
+    _discountType = 'amount';
+  }
+  window.renderDiscountArea();
+};
+
+window.applyManualDiscount = function() {
+  var val = parseInt(document.getElementById('discount-input').value) || 0;
+  if (val <= 0) return;
+  if (_discountType === 'percent') {
+    _discountAmount = Math.round(_checkoutGrandTotal * val / 100 / 10) * 10;
+  } else {
+    _discountAmount = val;
+  }
+  _discountAmount = Math.min(_discountAmount, _checkoutGrandTotal);
+  window.renderDiscountArea();
+};
+
+window.clearDiscount = function() {
+  _discountAmount = 0;
+  window.renderDiscountArea();
+};
 
 window.openCheckout = function(tableNum, idStr) {
   var pax = _bPax[tableNum] !== undefined ? _bPax[tableNum] : 0;
@@ -1121,6 +1211,10 @@ window.openCheckout = function(tableNum, idStr) {
   itemsHTML += '<div class="receipt-subtotal"><span>消費税（10%）</span><span>¥' + grandTax.toLocaleString() + '</span></div>';
   document.getElementById('checkout-body').innerHTML = itemsHTML;
   document.getElementById('checkout-grand-amount').textContent = '¥' + grandTotal.toLocaleString();
+  _checkoutGrandTotal = grandTotal;
+  _discountAmount = 0;
+  _discountType = 'amount';
+  window.renderDiscountArea();
   document.getElementById('checkout-modal').classList.add('open');
 };
 
@@ -1133,20 +1227,23 @@ window.closeCheckout = function() {
 window.confirmCheckout = function() {
   if (!_checkoutTable || !_checkoutIds) return;
   document.getElementById('checkout-modal').classList.remove('open');
-  window.markPaid(_checkoutTable, _checkoutIds);
+  window.markPaid(_checkoutTable, _checkoutIds, _discountAmount > 0 ? _discountAmount : null);
   _checkoutTable = null;
   _checkoutIds = null;
+  _discountAmount = 0;
 };
 
-window.markPaid = function(tableNum, idStr) {
+window.markPaid = function(tableNum, idStr, discountAmount) {
   var pax = _bPax[tableNum] !== undefined ? _bPax[tableNum] : 0;
   if (pax < 1) { alert('客数を1名以上入力してから会計済みにしてください。'); return; }
   var keys = idStr.split(',');
   var paidAt = Date.now();
   for (var i=0;i<keys.length;i++) {
     if (keys[i]) {
+      var updateData = {status:'paid', paidAt:paidAt, pax:pax};
+      if (discountAmount) updateData.discount = discountAmount;
       if (_bOrders[keys[i]]) { _bOrders[keys[i]].status = 'paid'; _bOrders[keys[i]].pax = pax; }
-      update(ref(db,'orders/'+keys[i]), {status:'paid', paidAt:paidAt, pax:pax});
+      update(ref(db,'orders/'+keys[i]), updateData);
     }
   }
   _billsRender();
