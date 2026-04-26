@@ -1664,7 +1664,7 @@ function _billsRender() {
       for (var k=0;k<items.length;k++) {
         var item=items[k];
         var map=isDrinkItem(item.name)?drinkMap:foodMap;
-        if (!map[item.name]) map[item.name]={name:item.name,qty:0,price:item.price,pending:false,price_type:item.price_type||null};
+        if (!map[item.name]) map[item.name]={name:item.name,qty:0,price:item.price,pending:false,price_type:item.price_type||null,...(item.drink_count!==undefined?{drink_count:item.drink_count}:{})};
         map[item.name].qty+=item.qty;
         if (!itemsDone[k]) map[item.name].pending=true;
       }
