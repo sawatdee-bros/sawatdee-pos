@@ -1236,7 +1236,7 @@ window.openCheckout = function(tableNum, idStr) {
     if (!o) return;
     total += Math.round((o.total||0) / 10) * 10;
     (o.items||[]).forEach(function(it) {
-      if (!itemMap[it.name]) itemMap[it.name] = {name:it.name, price:it.price, qty:0, price_type:it.price_type||null};
+      if (!itemMap[it.name]) itemMap[it.name] = {name:it.name, price:it.price, qty:0, price_type:it.price_type||null, ...(it.drink_count!==undefined?{drink_count:it.drink_count}:{})};
       itemMap[it.name].qty += it.qty;
     });
   });
