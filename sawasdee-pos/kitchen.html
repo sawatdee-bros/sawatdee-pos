@@ -355,6 +355,58 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (Array.isArray(cfg.discount_presets)) _DISCOUNT_PRESETS = cfg.discount_presets;
 });
 
+// サブカテゴリ名からアイコンを返す
+function subcatIcon(catKey, subcat) {
+  if (catKey === 'drink') {
+    if (subcat.includes('ビール') || subcat.includes('HB') || subcat.includes('ハイボール')) return '🍺';
+    if (subcat.includes('サワー') || subcat.includes('カクテル') || subcat.includes('おすすめ')) return '🍹';
+    if (subcat.includes('ワイン')) return '🍷';
+    if (subcat.includes('焼酎')) return '🍶';
+    if (subcat.includes('ソフト')) return '🥤';
+    return '🍹';
+  }
+  if (subcat.includes('つまみ')) return '🍡';
+  if (subcat.includes('サラダ') || subcat.includes('和え')) return '🥗';
+  if (subcat.includes('一品')) return '🍖';
+  if (subcat.includes('揚')) return '🍤';
+  if (subcat.includes('スープ')) return '🍲';
+  if (subcat.includes('炒め')) return '🥘';
+  if (subcat.includes('麺') || subcat.includes('ご飯')) return '🍜';
+  if (subcat.includes('デザート')) return '🍨';
+  return '🍽';
+}
+
+// Firebaseからメニューを読み込んで_bMENU_BY_CATを動的生成
+get(ref(db, 'menu')).then(function(snap) {
+  var menuData = snap.val() || {};
+  // menu_overridesもマージ
+  get(ref(db, 'menu_overrides')).then(function(ovSnap) {
+    var overrides = ovSnap.val() || {};
+    var cats = [];
+    ['drink', 'food', 'set'].forEach(function(catKey) {
+      if (!menuData[catKey]) return;
+      Object.keys(menuData[catKey]).forEach(function(subcat) {
+        var items = menuData[catKey][subcat];
+        if (!Array.isArray(items)) return;
+        var catItems = items
+          .filter(function(it) { return it.active && !it.hidden; })
+          .map(function(it) {
+            var merged = Object.assign({}, it, overrides[it.id] || {});
+            var entry = { name: merged.name, price: merged.price };
+            if (merged.price_type) entry.price_type = merged.price_type;
+            if (merged.drink_count !== undefined) entry.drink_count = merged.drink_count;
+            if (merged.charge_exempt) entry.charge_exempt = true;
+            return entry;
+          });
+        if (catItems.length > 0) {
+          cats.push({ cat: subcatIcon(catKey, subcat) + ' ' + subcat, items: catItems });
+        }
+      });
+    });
+    _bMENU_BY_CAT = cats;
+  });
+});
+
 const KITCHEN_NAMES = {"生ビール 中ジョッキ": "生ジョッキ", "瓶ビール 大びん": "赤星　大びん", "ノンアルビール 小びん": "ノンアルビール", "シンハー": "シンハー", "チャーン": "チャーン", "リオ": "リオ", "マンゴービア": "マンゴービア", "グアバビア": "グアバビア", "メガ角ハイボール": "メガ角ハイボール", "角ハイボール": "角ハイボール", "ジンジャー角ハイボール": "ジンジャー角ハイボール", "コーク角ハイボール": "コーク角ハイボール", "メコンハイボール": "メコンハイボール", "メコンジンジャー": "メコンジンジャー", "メコンコーク": "メコンコーク", "タイサワー": "タイサワー", "パクチーレモンサワー": "パクチーレモンサワー", "タイ式漢方サワー": "漢方サワー", "レモンサワー": "レモンサワー", "クエン酸サワー": "クエンサンサワー", "バイス(梅しそ)サワー": "バイスサワー", "チューハイ": "チューハイ", "ウーロンハイ": "ウーロンハイ", "ジャスミンハイ": "ジャスミンハイ", "ホッピー": "ホッピー", "ホッピー中": "ホッピー中", "ホッピー外": "ホッピー外", "マンゴーハイ": "マンゴーハイ", "グアバハイ": "グアバハイ", "タイ紅茶ハイ": "タイ紅茶ハイ", "マンゴーミルクハイ": "マンゴーミルクハイ", "グアバミルクハイ": "グアバミルクハイ", "カシスソーダ": "カシスソーダ", "カシスウーロン": "カシスウーロン", "カシスマンゴー": "カシスマンゴー", "テキーラコーク": "テキーラコーク", "テキーラグアバ": "テキーラグアバ", "テキーラショット": "テキーラショット", "泡盛(久米仙)": "泡盛　久米仙", "ジャスミン焼酎(茉莉花)": "ジャスミン焼酎", "梅酒": "梅酒", "グラスワイン 赤": "グラスワイン赤", "グラスワイン 白": "グラスワイン白", "デキャンタ 赤": "デキャンタ赤", "デキャンタ 白": "デキャンタ白", "ボトルワイン 赤": "ボトルワイン赤", "ボトルワイン 白": "ボトルワイン白", "マンゴージュース": "マンゴージュース", "グアバジュース": "グアバジュース", "タイ紅茶(タイ式ミルクティー)": "タイ紅茶", "炭酸水(カットレモン入り)": "炭酸水", "コカコーラ": "コカコーラ", "ジンジャーエール(辛口)": "ジンジャーエール", "ウーロン茶": "ウーロン茶", "ジャスミン茶": "ジャスミン茶", "ノンアル★タイサワー": "ノンアル★タイサワー", "ノンアル★マンゴーミルク": "ノンアル★マンゴーミルク", "お冷": "お冷", "キャベツ": "キャベツ", "セロリ": "セロリ", "タイの海老せん": "海老せん", "ピリ辛枝豆": "枝豆", "タイの漬物缶詰": "漬物缶詰", "おつまみキュウリ": "きゅうり", "カリカリ厚揚げ": "厚揚げ", "パク乗せ冷奴": "冷奴", "コリコリ豚耳": "豚耳", "アジのトマト煮": "アジ", "タイ式生ソーセージ(ネーム)": "ネーム", "青パパイヤのサラダ": "ソムタム", "青パパイヤのサラダ（激辛バージョン）": "ソムタム ラオ", "青パパイヤのサラダ（豚グリル入り）": "ソムタム ムーヤーン", "温かい春雨サラダ": "ヤム ウンセン", "揚げ目玉焼きのサラダ": "ヤム カイダオ", "茹で鶏のサラダ": "ヤム ガイ", "海老とレモングラスのサラダ": "ヤム クン", "鶏もも肉のタイ式グリル": "ガイヤーン", "豚肉のタイ式グリル": "ムーヤーン", "タイ式海老のグリル": "クン パオ", "タイ式豚グリルのハーブ和え": "ナムトック ムー", "タイ式ヌードル香味野菜和え": "ヤム マーマー", "キャベツの海老味噌醤炒め": "ガピキャベツ", "蒸し鶏 生姜ソース": "蒸し鶏", "鶏ひき肉のハーブ和え": "ラープ ガイ", "スパイシー鶏唐揚げ": "ガイトード", "タイ式揚げ春巻き(パクチー入)": "ポッピア トード", "揚げ海老のニンニク炒め": "クンガティアム", "ポテトフライ 2種のソース": "ポテト", "タイ式揚げオムレツ": "カイジャオ", "タイ式揚げオムレツ(ソーセージ入)": "カイジャオネーム", "海老とハーブの酸っぱ辛いスープ": "トムヤムクン", "鶏肉のココナッツミルクスープ": "トムカーガイ", "鶏もも肉のガパオ炒め": "ガパオ", "豚肉のカレー炒め": "ムーパッポンカリー", "海老のカレー炒め": "クンパッポンカリー", "鶏肉とセロリの生姜炒め": "ガイパッキン", "豚肉のガーリック炒め": "ムー ガティアム", "季節の青菜炒め": "パックブン", "厚揚げともやしの炒め": "パット トゥアンゴーク", "茄子と豚肉のバジル炒め": "パット マクワ", "春雨の旨辛ソース炒め": "スッキー ヘーン", "春雨のオイスター炒め": "パット ウンセン", "タイ式焼きそば": "パッタイ", "旨辛バジル炒め麺": "パッキーマオ", "タイ式まぜそば": "ヘーン（まぜそば）", "タイ式汁そば": "ナーム（汁そば）", "トムヤムクンヌードル": "トムヤムヌードル", "グリーンカレー": "ゲーンキャオワーン", "蒸し鶏ご飯": "カオマンガイ", "タイ式焼き飯": "カオパッ", "ライス": "ライス", "目玉焼き": "目玉焼き", "ココナッツアイスサンド": "ココナッツアイスサンド", "ココナッツアイス": "ココナッツアイス"};
 
 const TABLE_NAMES = {
@@ -1042,26 +1094,7 @@ function _billsRenderWrap() { _billsRender(); }
 
 
 
-var _bMENU_BY_CAT = [
-  {cat:"🍺 ビール", items:[{name:"生ビール ジョッキ（アサヒ　スーパードライ）",price:490}, {name:"瓶ビール 大びん（サッポロ　赤星）",price:740}, {name:"ノンアルビール 小びん",price:420}]},
-  {cat:"🍺 タイビール", items:[{name:"シンハー",price:570}, {name:"チャーン",price:570}, {name:"リオ",price:570}]},
-  {cat:"🍺 ビアカクテル", items:[{name:"マンゴービア",price:590}, {name:"グアバビア",price:590}]},
-  {cat:"🥃 ハイボール", items:[{name:"メガハイボール",price:680}, {name:"角ハイボール",price:380}, {name:"ジンジャーハイボール",price:440}, {name:"コークハイボール",price:440}, {name:"メコンハイボール",price:490}, {name:"メコンジンジャー",price:540}, {name:"メコンコーク",price:540}]},
-  {cat:"⭐ おすすめ", items:[{name:"タイサワー",price:650}, {name:"パクチーレモンサワー",price:580}, {name:"タイ式漢方サワー",price:580}]},
-  {cat:"🍹 サワー・お茶割り", items:[{name:"レモンサワー",price:420}, {name:"クエン酸サワー",price:420}, {name:"バイス(梅しそ)サワー",price:420}, {name:"チューハイ",price:420}, {name:"ウーロンハイ",price:380}, {name:"ジャスミンハイ",price:380}, {name:"ホッピー",price:480}]},
-  {cat:"🍹 トロピカルハイ・カクテル", items:[{name:"マンゴーハイ",price:550}, {name:"グアバハイ",price:550}, {name:"タイ紅茶ハイ",price:550}, {name:"マンゴーミルクハイ",price:550}, {name:"グアバミルクハイ",price:550}, {name:"カシスソーダ",price:550}, {name:"カシスウーロン",price:550}, {name:"カシスマンゴー",price:580}, {name:"テキーラコーク",price:550}, {name:"テキーラグアバ",price:550}, {name:"テキーラショット",price:400}]},
-  {cat:"🍶 焼酎・その他", items:[{name:"泡盛(久米仙)",price:480}, {name:"ジャスミン焼酎(茉莉花)",price:480}, {name:"梅酒",price:480}]},
-  {cat:"🍷 ワイン", items:[{name:"グラスワイン 赤",price:380}, {name:"グラスワイン 白",price:380}, {name:"デキャンタ 赤",price:1600}, {name:"デキャンタ 白",price:1600}, {name:"ボトルワイン 赤",price:2200}, {name:"ボトルワイン 白",price:2200}]},
-  {cat:"🥤 ソフトドリンク", items:[{name:"マンゴージュース",price:480}, {name:"グアバジュース",price:480}, {name:"タイ紅茶(タイ式ミルクティー)",price:480}, {name:"炭酸水(カットレモン入り)",price:480}, {name:"コカコーラ",price:480}, {name:"ジンジャーエール(辛口)",price:480}, {name:"ウーロン茶",price:440}, {name:"ジャスミン茶",price:440}, {name:"ノンアル★タイサワー",price:650}, {name:"ノンアル★マンゴーミルク",price:550}]},
-  {cat:"🍡 つまみ", items:[{name:"キャベツ",price:120}, {name:"セロリ",price:220}, {name:"タイの海老せん",price:280}, {name:"ピリ辛枝豆",price:280}, {name:"タイの漬物缶詰",price:280}, {name:"おつまみキュウリ",price:280}, {name:"カリカリ厚揚げ",price:280}, {name:"パク乗せ冷奴",price:280}, {name:"コリコリ豚耳",price:280}, {name:"アジのトマト煮",price:420}, {name:"タイ式生ソーセージ(ネーム)",price:440}]},
-  {cat:"🥗 サラダ・和え物", items:[{name:"青パパイヤのサラダ",price:780}, {name:"青パパイヤのサラダ（激辛バージョン）",price:880}, {name:"青パパイヤのサラダ（豚グリル入り）",price:880}, {name:"温かい春雨サラダ",price:780}, {name:"揚げ目玉焼きのサラダ",price:680}, {name:"茹で鶏のサラダ",price:680}, {name:"海老とレモングラスのサラダ",price:880}]},
-  {cat:"🍖 一品", items:[{name:"鶏もも肉のタイ式グリル",price:580}, {name:"豚肉のタイ式グリル",price:580}, {name:"タイ式海老のグリル",price:980}, {name:"タイ式豚グリルのハーブ和え",price:880}, {name:"タイ式ヌードル香味野菜和え",price:720}, {name:"キャベツの海老味噌醤炒め",price:440}, {name:"蒸し鶏 生姜ソース",price:440}, {name:"鶏ひき肉のハーブ和え",price:780}]},
-  {cat:"🍤 揚げ物", items:[{name:"スパイシー鶏唐揚げ",price:580}, {name:"タイ式揚げ春巻き(パクチー入)",price:620}, {name:"揚げ海老のニンニク炒め",price:1020}, {name:"ポテトフライ 2種のソース",price:380}, {name:"タイ式揚げオムレツ",price:580}, {name:"タイ式揚げオムレツ(ソーセージ入)",price:680}]},
-  {cat:"🍲 スープ", items:[{name:"海老とハーブの酸っぱ辛いスープ",price:980}, {name:"鶏肉のココナッツミルクスープ",price:880}]},
-  {cat:"🥘 炒め物", items:[{name:"鶏もも肉のガパオ炒め",price:680}, {name:"豚肉のカレー炒め",price:780}, {name:"海老のカレー炒め",price:880}, {name:"鶏肉とセロリの生姜炒め",price:780}, {name:"豚肉のガーリック炒め",price:680}, {name:"季節の青菜炒め",price:680}, {name:"厚揚げともやしの炒め",price:620}, {name:"茄子と豚肉のバジル炒め",price:680}, {name:"春雨の旨辛ソース炒め",price:780}, {name:"春雨のオイスター炒め",price:780}]},
-  {cat:"🍜 麺・ご飯", items:[{name:"タイ式焼きそば",price:780}, {name:"旨辛バジル炒め麺",price:780}, {name:"タイ式まぜそば",price:680}, {name:"タイ式汁そば",price:680}, {name:"トムヤムクンヌードル",price:980}, {name:"グリーンカレー",price:880}, {name:"蒸し鶏ご飯",price:780}, {name:"タイ式焼き飯",price:780}, {name:"ライス",price:300}, {name:"目玉焼き",price:120}]},
-  {cat:"🍨 デザート", items:[{name:"ココナッツアイスサンド",price:440}, {name:"ココナッツアイス",price:280}]},
-];
+var _bMENU_BY_CAT = []; // Firebaseから動的に読み込む（上記get(ref(db,'menu')).then参照）
 
 
 
@@ -1378,7 +1411,7 @@ function renderEditModal() {
       mhtml += '<div class="edit-add-row">'
         +'<span class="edit-add-name">'+mitem.name+'</span>'
         +'<span class="edit-add-price">\xa5'+mitem.price.toLocaleString()+'</span>'
-        +'<button class="edit-add-btn" onclick="window.addEditItem(\''+mitem.name+'\','+mitem.price+')">追加</button>'
+        +'<button class="edit-add-btn" onclick="window.addEditItem(\''+mitem.name+'\','+mitem.price+','+(mitem.drink_count!==undefined?mitem.drink_count:'undefined')+')">追加</button>'
         +'</div>';
     }
     mhtml += '</div>';
@@ -1433,8 +1466,10 @@ window.changeEditQty = function(key, entryId, itemIdx, delta) {
   renderEditModal();
 };
 
-window.addEditItem = function(name, price) {
-  _bEdit.addItems.push({name:name, price:price});
+window.addEditItem = function(name, price, drink_count) {
+  var item = {name:name, price:price};
+  if (drink_count !== undefined) item.drink_count = drink_count;
+  _bEdit.addItems.push(item);
   renderEditModal();
 };
 
@@ -1465,7 +1500,7 @@ window.saveEdit = async function() {
 
   // 追加処理（即提供済み）
   if (_bEdit.addItems.length > 0) {
-    var addList = _bEdit.addItems.map(function(it){return {name:it.name,qty:1,price:it.price, ...(it.price_type ? {price_type:it.price_type} : {})};});
+    var addList = _bEdit.addItems.map(function(it){return Object.assign({name:it.name,qty:1,price:it.price}, it.price_type?{price_type:it.price_type}:{}, it.drink_count!==undefined?{drink_count:it.drink_count}:{});});
     var addTotal = Math.floor(addList.reduce(function(s,it){return s+(it.price_type==='inclusive'?it.price:it.price*1.1)*it.qty;},0)/10)*10;
     var itemsDone = {};
     for (var x=0;x<addList.length;x++) itemsDone[x]=true;

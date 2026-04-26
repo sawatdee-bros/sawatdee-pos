@@ -650,6 +650,7 @@ window.placeOrder = async function() {
     var item = { name: c.item.name, qty: c.qty, price: c.item.price };
     if (c.item.charge_exempt) item.charge_exempt = true;
     if (c.item.price_type) item.price_type = c.item.price_type;
+    if (c.item.drink_count !== undefined) item.drink_count = c.item.drink_count;
     if (c.extras && c.extras.length > 0) {
       item.extrasStr = c.extras.map(function(e) { return e.label; }).join('・');
       item.price = c.item.price + c.extras.reduce(function(s, e) { return s + e.price; }, 0);
