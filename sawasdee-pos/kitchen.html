@@ -53,8 +53,8 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .done-btn:hover { background: #15803d; }
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: #475569; text-align: center; }
 .bell { position: fixed; top: 60px; right: 20px; background: #fbbf24; color: #1a1200; padding: 8px 16px; border-radius: 50px; font-size: 14px; font-weight: 600; display: none; z-index: 100; }
-.call-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 300; }
-.call-item { display: flex; align-items: center; justify-content: space-between; background: #dc2626; color: white; padding: 10px 16px; font-size: 14px; font-weight: 700; border-bottom: 1px solid #b91c1c; animation: callSlide 0.3s ease; }
+.call-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 300; pointer-events: none; }
+.call-item { display: flex; align-items: center; justify-content: space-between; background: #dc2626; color: white; padding: 10px 16px; font-size: 14px; font-weight: 700; border-bottom: 1px solid #b91c1c; animation: callSlide 0.3s ease; pointer-events: auto; }
 @keyframes callSlide { from{transform:translateY(-100%)} to{transform:translateY(0)} }
 .bell.show { display: block; animation: bounceIn 0.4s ease; }
 @keyframes bounceIn { 0%{transform:scale(0.5);opacity:0} 80%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
