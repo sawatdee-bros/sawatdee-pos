@@ -1041,8 +1041,8 @@ window.setFilter = function(f) {
   _billsRender();
 };
 
-// フィルターバーのイベント委譲（onclickのthis問題をAndroidで回避）
-document.addEventListener('DOMContentLoaded', function() {
+// フィルターバーのイベント委譲（type=moduleではDOMContentLoadedは使えないため直接登録）
+(function() {
   var filterBar = document.getElementById('bills-filter-bar');
   if (filterBar) {
     filterBar.addEventListener('click', function(e) {
@@ -1050,7 +1050,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (btn) window.setFilter(btn.dataset.filter);
     });
   }
-});
+})();
 
 window.changePax = function(t, d) {
   if (!_bPax[t]) _bPax[t] = 0;
