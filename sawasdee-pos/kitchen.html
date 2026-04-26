@@ -1216,7 +1216,7 @@ window.openCheckout = function(tableNum, idStr) {
   // チャージ計算
   var totalDrinks = 0;
   sorted.forEach(function(it) {
-    if (isDrinkItem(it.name) && it.name !== 'お冷') totalDrinks += it.qty;
+    if (isDrinkItem(it.name) && it.name !== 'お冷') totalDrinks += it.qty * (it.drink_count !== undefined ? it.drink_count : 1);
   });
   // 伝票と完全に同じ計算式
   var totalEx = 0;
@@ -1559,7 +1559,7 @@ function _billsRender() {
       var items=s.entries[j].o.items||[];
       for (var k=0;k<items.length;k++) {
         sessionEx+=items[k].price*items[k].qty;
-        if (isDrinkItem(items[k].name)&&items[k].name!=='お冷') totalDrinks+=items[k].qty;
+        if (isDrinkItem(items[k].name)&&items[k].name!=='お冷') totalDrinks+=items[k].qty*(items[k].drink_count!==undefined?items[k].drink_count:1);
       }
     }
     var hasExempt2=s.entries.some(function(e){return (e.o.items||[]).some(function(it){return it.charge_exempt;});});
@@ -1659,7 +1659,7 @@ function _billsRender() {
     if (!pax) pax = _bPax[tableNum] !== undefined ? _bPax[tableNum] : 0;
     var totalDrinks=0;
     for (var j=0;j<drinkList.length;j++) {
-      if (isDrinkItem(drinkList[j].name) && drinkList[j].name !== 'お冷') totalDrinks+=drinkList[j].qty;
+      if (isDrinkItem(drinkList[j].name) && drinkList[j].name !== 'お冷') totalDrinks+=drinkList[j].qty*(drinkList[j].drink_count!==undefined?drinkList[j].drink_count:1);
     }
     var hasExempt3=entries.some(function(e){return (e.o.items||[]).some(function(it){return it.charge_exempt;});});
     var chargeResult=calcCharge(pax,totalDrinks,hasExempt3);

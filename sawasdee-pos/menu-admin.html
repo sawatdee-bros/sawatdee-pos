@@ -106,35 +106,19 @@ let localEdits = {}; // ローカル編集中のデータ
 let currentFilter = 'all';
 let openCards = new Set();
 
-// 営業日切り替え時刻のUnixタイムスタンプを返す
-function getTodayResetTime() {
-  const now = new Date();
-  const d = new Date(now);
-  if (now.getHours() < DAY_START) d.setDate(d.getDate() - 1);
-  d.setHours(DAY_START, 0, 0, 0);
-  return d.getTime();
-}
-
-// 売り切れ自動リセット（Firebaseのタイムスタンプで管理）
-function checkAutoReset(lastResetTs) {
-  const todayResetTime = getTodayResetTime();
-  if (!lastResetTs || lastResetTs < todayResetTime) {
-    set(ref(db, 'soldout'), { _reset_at: Date.now() });
-  }
-}
-
-// ページを開きっぱなしでも切り替わりを検知するための定期チェック
-let _lastKnownResetTs = null;
-function startAutoResetTimer() {
-  setInterval(function() {
-    const todayResetTime = getTodayResetTime();
-    if (_lastKnownResetTs !== null && _lastKnownResetTs < todayResetTime) {
+// 朝6時に売り切れ自動リセット（Firebaseのタイムスタンプで管理）
+  function checkAutoReset(lastResetTs) {
+    const now = new Date();
+    const todayReset = new Date(now);
+    if (now.getHours() < DAY_START) todayReset.setDate(todayReset.getDate() - 1);
+    todayReset.setHours(DAY_START, 0, 0, 0);
+    if (!lastResetTs || lastResetTs < todayReset.getTime()) {
       set(ref(db, 'soldout'), { _reset_at: Date.now() });
     }
-  }, 60 * 1000); // 1分ごとにチェック
-}
+  }
 
 // Firebase: soldout読み込み
+let _resetChecked = false;
 // 初期化：Firebaseからメニューを読み込む
 async function init() {
   // store_configを先に読んでDAY_STARTを確定
@@ -167,16 +151,17 @@ async function init() {
     return '<button class="filter-btn' + (currentFilter===f.key?' active':'') + '" onclick="setFilter(\'' + f.key + '\')">' + f.label + '</button>';
   }).join('');
   startSoldoutWatch();
-  startAutoResetTimer();
 }
 
 function startSoldoutWatch() {
   onValue(ref(db, 'soldout'), snap => {
-    const data = snap.val() || {};
-    _lastKnownResetTs = data._reset_at || null;
-    checkAutoReset(_lastKnownResetTs);
-    soldoutState = data;
-    renderList();
+  const data = snap.val() || {};
+  if (!_resetChecked) {
+    _resetChecked = true;
+    checkAutoReset(data._reset_at || null);
+  }
+  soldoutState = data;
+  renderList();
   });
 }
 
@@ -280,6 +265,15 @@ window.renderList = function() {
               ${['','人気料理','当店名物','おススメ'].map(v=>`<option value="${v}" ${(ed.popular||'')===v?'selected':''}>${v||'なし'}</option>`).join('')}
             </select>
           </div>
+          ${item.category==='drink' ? `<div class="spicy-select">
+            🍺 杯数カウント:
+            <select onchange="editField('${item.id}','drink_count',Number(this.value))">
+              <option value="0" ${(ed.drink_count===0)?'selected':''}>0（カウントしない）</option>
+              <option value="1" ${(ed.drink_count===undefined||ed.drink_count===1)?'selected':''}>1（通常）</option>
+              <option value="2" ${(ed.drink_count===2)?'selected':''}>2（ボトル等）</option>
+              <option value="3" ${(ed.drink_count===3)?'selected':''}>3</option>
+            </select>
+          </div>` : ''}
         </div>
         <button class="save-btn" onclick="saveItem('${item.id}')">💾 この商品を保存</button>
         <span class="saved-msg" id="saved-${item.id}">✓ 保存しました</span>
@@ -297,10 +291,8 @@ window.toggleCard = (id) => {
 window.toggleSoldout = async (name, checked) => {
   if (checked) soldoutState[name] = true;
   else delete soldoutState[name];
-  // 即時Firebase保存（_reset_atは必ず残す）
-  const toSave = Object.assign({}, soldoutState);
-  if (_lastKnownResetTs) toSave._reset_at = _lastKnownResetTs;
-  await set(ref(db, 'soldout'), toSave);
+  // 即時Firebase保存
+  await set(ref(db, 'soldout'), soldoutState);
   renderList();
 };
 

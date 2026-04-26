@@ -246,6 +246,20 @@ async function init() {
   try {
     const menuSnap = await get(ref(db, 'menu'));
     MENU_DATA = menuSnap.val() || {};
+    // menu_overridesをマージ（drink_count等の上書き項目を反映）
+    const overridesSnap = await get(ref(db, 'menu_overrides'));
+    const overrides = overridesSnap.val() || {};
+    if (Object.keys(overrides).length > 0) {
+      ['food','drink','set'].forEach(function(cat) {
+        if (!MENU_DATA[cat]) return;
+        Object.values(MENU_DATA[cat]).forEach(function(subcatItems) {
+          if (!Array.isArray(subcatItems)) return;
+          subcatItems.forEach(function(item) {
+            if (item.id && overrides[item.id]) Object.assign(item, overrides[item.id]);
+          });
+        });
+      });
+    }
     // 店舗設定：お冷ON/OFF
     const ohiyaSnap = await get(ref(db, 'store_config/has_ohiya'));
     hasOhiya = ohiyaSnap.val() === true;
@@ -461,7 +475,7 @@ function addItemToCart(cat, sub, idx, item, optLabel, extras) {
   var optKey = optLabel || extras.map(function(e) { return e.label; }).join(',');
   var key = cat + '__' + sub + '__' + idx + (optKey ? '__' + optKey : '');
   var displayName = item.name + (optLabel ? '（' + optLabel + '）' : '');
-  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null }, qty: 0, extras: extras };
+  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null, ...(item.drink_count !== undefined ? { drink_count: item.drink_count } : {}) }, qty: 0, extras: extras };
   cart[key].qty++;
   renderMenu(); renderCart();
 }
