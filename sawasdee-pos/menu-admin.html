@@ -106,19 +106,35 @@ let localEdits = {}; // ローカル編集中のデータ
 let currentFilter = 'all';
 let openCards = new Set();
 
-// 朝6時に売り切れ自動リセット（Firebaseのタイムスタンプで管理）
-  function checkAutoReset(lastResetTs) {
-    const now = new Date();
-    const todayReset = new Date(now);
-    if (now.getHours() < DAY_START) todayReset.setDate(todayReset.getDate() - 1);
-    todayReset.setHours(DAY_START, 0, 0, 0);
-    if (!lastResetTs || lastResetTs < todayReset.getTime()) {
+// 営業日切り替え時刻のUnixタイムスタンプを返す
+function getTodayResetTime() {
+  const now = new Date();
+  const d = new Date(now);
+  if (now.getHours() < DAY_START) d.setDate(d.getDate() - 1);
+  d.setHours(DAY_START, 0, 0, 0);
+  return d.getTime();
+}
+
+// 売り切れ自動リセット（Firebaseのタイムスタンプで管理）
+function checkAutoReset(lastResetTs) {
+  const todayResetTime = getTodayResetTime();
+  if (!lastResetTs || lastResetTs < todayResetTime) {
+    set(ref(db, 'soldout'), { _reset_at: Date.now() });
+  }
+}
+
+// ページを開きっぱなしでも切り替わりを検知するための定期チェック
+let _lastKnownResetTs = null;
+function startAutoResetTimer() {
+  setInterval(function() {
+    const todayResetTime = getTodayResetTime();
+    if (_lastKnownResetTs !== null && _lastKnownResetTs < todayResetTime) {
       set(ref(db, 'soldout'), { _reset_at: Date.now() });
     }
-  }
+  }, 60 * 1000); // 1分ごとにチェック
+}
 
 // Firebase: soldout読み込み
-let _resetChecked = false;
 // 初期化：Firebaseからメニューを読み込む
 async function init() {
   // store_configを先に読んでDAY_STARTを確定
@@ -151,17 +167,16 @@ async function init() {
     return '<button class="filter-btn' + (currentFilter===f.key?' active':'') + '" onclick="setFilter(\'' + f.key + '\')">' + f.label + '</button>';
   }).join('');
   startSoldoutWatch();
+  startAutoResetTimer();
 }
 
 function startSoldoutWatch() {
   onValue(ref(db, 'soldout'), snap => {
-  const data = snap.val() || {};
-  if (!_resetChecked) {
-    _resetChecked = true;
-    checkAutoReset(data._reset_at || null);
-  }
-  soldoutState = data;
-  renderList();
+    const data = snap.val() || {};
+    _lastKnownResetTs = data._reset_at || null;
+    checkAutoReset(_lastKnownResetTs);
+    soldoutState = data;
+    renderList();
   });
 }
 
@@ -282,8 +297,10 @@ window.toggleCard = (id) => {
 window.toggleSoldout = async (name, checked) => {
   if (checked) soldoutState[name] = true;
   else delete soldoutState[name];
-  // 即時Firebase保存
-  await set(ref(db, 'soldout'), soldoutState);
+  // 即時Firebase保存（_reset_atは必ず残す）
+  const toSave = Object.assign({}, soldoutState);
+  if (_lastKnownResetTs) toSave._reset_at = _lastKnownResetTs;
+  await set(ref(db, 'soldout'), toSave);
   renderList();
 };
 
