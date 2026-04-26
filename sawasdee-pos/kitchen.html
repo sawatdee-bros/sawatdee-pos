@@ -49,6 +49,11 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .item-done-btn:hover { background: #166534; border-color: #166534; color: white; }
 .item-done-btn.is-done { background: #334155; border-color: #475569; color: #64748b; }
 .item-done-btn.is-done:hover { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
+.item-done-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.item-undo-btn { padding: 3px 8px; border-radius: 20px; font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0; border: 1px solid #475569; background: transparent; color: #94a3b8; }
+.item-undo-btn:hover { background: #334155; color: #f1f5f9; }
+.item-remove-btn { padding: 3px 8px; border-radius: 20px; font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0; border: 1px solid #7f1d1d; background: transparent; color: #fca5a5; }
+.item-remove-btn:hover { background: #7f1d1d; color: white; }
 .done-btn { width: 100%; padding: 10px; background: #166534; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
 .done-btn:hover { background: #15803d; }
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: #475569; text-align: center; }
@@ -610,7 +615,12 @@ function makeGroupCard(g, items, type, totalMap, compact) {
     const showTot = !isDone && tot > i.qty;
     const opt = i.name.match(/（.*?）$/);
     const displayName = (KITCHEN_NAMES[base] || base) + (opt ? opt[0] : '');
-    const doneBtn = isFoodSingle ? '' : `<button class="item-done-btn${isDone?' is-done':''}" onclick="window.toggleItem('${id}',${idx})">${isDone ? '✓ 提供済' : '提供'}</button>`;
+    const doneBtn = isFoodSingle ? '' : isDone
+      ? `<div class="item-done-actions">
+          <button class="item-undo-btn" onclick="window.toggleItem('${id}',${idx})">戻す</button>
+          <button class="item-remove-btn" onclick="window.removeItem('${id}',${idx})">消去</button>
+        </div>`
+      : `<button class="item-done-btn" onclick="window.toggleItem('${id}',${idx})">提供</button>`;
     const isItemNew = _newIdTs.has(id) && Date.now() - _newIdTs.get(id) < 3 * 60 * 1000;
     return `<div class="order-item${isDone?' item-done':''}">
       <span class="item-name">${displayName}${i.extrasStr?`<span class="item-extras"> +${i.extrasStr}</span>`:``}</span>${i.qty > 1 ? `<span class="item-qty-badge">×${i.qty}</span>` : ''}${showTot?`<span class="item-total-badge">計${tot}個</span>`:''}${isItemNew ? `<span class="new-badge" style="margin-left:5px;">NEW</span>` : ''}
@@ -666,6 +676,39 @@ window.toggleItem = async function(id, idx) {
       renderOrders(); _syncOrderToBills(id);
     }
   }
+};
+
+window.removeItem = async function(id, idx) {
+  if (!orders[id]) return;
+  const arr = Array.isArray(orders[id].items) ? orders[id].items : Object.values(orders[id].items||{});
+  // idxを除いた新しいitems配列を作成
+  const newItems = arr.filter((_, i) => i !== idx);
+  // itemsDoneのキーを振り直す
+  const oldDone = orders[id].itemsDone || {};
+  const newDone = {};
+  let newIdx = 0;
+  for (let i = 0; i < arr.length; i++) {
+    if (i === idx) continue;
+    if (oldDone[i]) newDone[newIdx] = true;
+    newIdx++;
+  }
+  if (newItems.length === 0) {
+    // 全アイテム消去 → orderをdone扱いに
+    orders[id].items = [];
+    orders[id].itemsDone = {};
+    orders[id].status = 'done';
+    _selfWriteIds.add(id);
+    await update(ref(db, 'orders/'+id), { items: [], itemsDone: {}, status: 'done' });
+  } else {
+    orders[id].items = newItems;
+    orders[id].itemsDone = newDone;
+    const allDone = newItems.every((_, i) => newDone[i]);
+    if (allDone) orders[id].status = 'done';
+    _selfWriteIds.add(id);
+    await update(ref(db, 'orders/'+id), { items: newItems, itemsDone: newDone, status: allDone ? 'done' : orders[id].status });
+  }
+  renderOrders();
+  _syncOrderToBills(id);
 };
 
 window.groupDoneMulti = async function(idStr, type) {
