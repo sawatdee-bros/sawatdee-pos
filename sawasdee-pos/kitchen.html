@@ -265,20 +265,20 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <!-- 伝票ビュー -->
 <div id="view-bills" style="display:none;padding-bottom:56px;">
 
-<div class="filter-bar">
-  <button class="filter-btn active" onclick="window.setFilter('unpaid',this)">会計前</button>
-  <button class="filter-btn paid-tab" onclick="window.setFilter('paid',this)">会計済み</button>
-  <button class="filter-btn" onclick="window.setFilter('1',this)">T1</button>
-  <button class="filter-btn" onclick="window.setFilter('2',this)">T2</button>
-  <button class="filter-btn" onclick="window.setFilter('3',this)">T3</button>
-  <button class="filter-btn" onclick="window.setFilter('4',this)">T4</button>
-  <button class="filter-btn" onclick="window.setFilter('5',this)">T5</button>
-  <button class="filter-btn" onclick="window.setFilter('6',this)">T6</button>
-  <button class="filter-btn" onclick="window.setFilter('7',this)">T7</button>
-  <button class="filter-btn" onclick="window.setFilter('8',this)">T8</button>
-  <button class="filter-btn" onclick="window.setFilter('9',this)">T9</button>
-  <button class="filter-btn" onclick="window.setFilter('10',this)">T10</button>
-  <button class="filter-btn" onclick="window.setFilter('week',this)">過去7日</button>
+<div class="filter-bar" id="bills-filter-bar">
+  <button class="filter-btn active" data-filter="unpaid">会計前</button>
+  <button class="filter-btn paid-tab" data-filter="paid">会計済み</button>
+  <button class="filter-btn" data-filter="1">T1</button>
+  <button class="filter-btn" data-filter="2">T2</button>
+  <button class="filter-btn" data-filter="3">T3</button>
+  <button class="filter-btn" data-filter="4">T4</button>
+  <button class="filter-btn" data-filter="5">T5</button>
+  <button class="filter-btn" data-filter="6">T6</button>
+  <button class="filter-btn" data-filter="7">T7</button>
+  <button class="filter-btn" data-filter="8">T8</button>
+  <button class="filter-btn" data-filter="9">T9</button>
+  <button class="filter-btn" data-filter="10">T10</button>
+  <button class="filter-btn" data-filter="week">過去7日</button>
 </div>
 <div class="summary-bar">
   <div class="summary-card"><div class="summary-label">総注文数</div><div class="summary-value" id="sum-count">0</div></div>
@@ -491,16 +491,7 @@ window.dismissBillCall = async function(tableNum) {
 window.gotoBill = function(tableNum) {
   setMode('bills');
   setTimeout(function() {
-    // 該当テーブルのフィルタボタンを探してクリック
-    var filterBtns = document.querySelectorAll('.filter-btn');
-    for (var i = 0; i < filterBtns.length; i++) {
-      var btn = filterBtns[i];
-      if (btn.textContent.trim() === tableName(tableNum) || 
-          btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + tableNum + "'")) {
-        window.setFilter(tableNum, btn);
-        break;
-      }
-    }
+    window.setFilter(tableNum);
   }, 300);
 };
 
@@ -1037,25 +1028,29 @@ function fmtDate(ts) {
   return (d.getMonth()+1)+'/'+d.getDate()+' '+fmtTime(ts);
 }
 
-window.setFilter = function(f, btn) {
-  if (f === 'week') {
-    _bRange = 'week';
-    _bFilter = 'week';
-    _updateBillsData(window._allOrdersCache || {});
-  } else if (f === 'unpaid' || f === 'paid') {
-    _bRange = 'today';
-    _bFilter = f;
-    _updateBillsData(window._allOrdersCache || {});
-  } else {
-    _bRange = 'today';
-    _bFilter = f;
-    _updateBillsData(window._allOrdersCache || {});
+window.setFilter = function(f) {
+  _bRange = f === 'week' ? 'week' : 'today';
+  _bFilter = f;
+  _updateBillsData(window._allOrdersCache || {});
+  // data-filter属性でactiveを確実に反映
+  var bs = document.querySelectorAll('#bills-filter-bar .filter-btn');
+  for (var i=0;i<bs.length;i++) {
+    if (bs[i].dataset.filter === f) bs[i].classList.add('active');
+    else bs[i].classList.remove('active');
   }
-  var bs = document.querySelectorAll('.filter-btn');
-  for (var i=0;i<bs.length;i++) bs[i].classList.remove('active');
-  btn.classList.add('active');
   _billsRender();
 };
+
+// フィルターバーのイベント委譲（onclickのthis問題をAndroidで回避）
+document.addEventListener('DOMContentLoaded', function() {
+  var filterBar = document.getElementById('bills-filter-bar');
+  if (filterBar) {
+    filterBar.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-filter]');
+      if (btn) window.setFilter(btn.dataset.filter);
+    });
+  }
+});
 
 window.changePax = function(t, d) {
   if (!_bPax[t]) _bPax[t] = 0;
