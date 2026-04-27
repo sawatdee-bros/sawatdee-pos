@@ -691,11 +691,11 @@ function makeGroupCard(g, items, type, totalMap, compact) {
   const itemsHTML = items.map(e => {
     const {i, idx, id, done: isDone} = e;
     const base = i.name.replace(/（.*?）$/, '');
-    const kn = KITCHEN_NAMES[item.name] || KITCHEN_NAMES[base] || base;
+    const kn = KITCHEN_NAMES[i.name] || KITCHEN_NAMES[base] || base;
     const tot = totalMap[kn] || 0;
     const showTot = !isDone && tot > i.qty;
     const opt = i.name.match(/（.*?）$/);
-    const displayName = (KITCHEN_NAMES[item.name] || KITCHEN_NAMES[base] || base) + (opt ? opt[0] : '');
+    const displayName = (KITCHEN_NAMES[i.name] || KITCHEN_NAMES[base] || base) + (opt ? opt[0] : '');
     const doneBtn = isFoodSingle ? '' : isDone
       ? `<div class="item-done-actions">
           <button class="item-undo-btn" onclick="window.toggleItem('${id}',${idx})">戻す</button>
