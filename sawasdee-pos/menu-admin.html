@@ -330,7 +330,7 @@ window.saveItem = async (id) => {
 };
 
 // オプション表示
-window.renderItemOptList = function(id, opts) {
+function renderItemOptList(id, opts) {
   if (!opts || !opts.length) return '<div style="font-size:11px;color:#475569;">なし</div>';
   return opts.map(function(g, gi) {
     var choicesStr = (g.choices||[]).map(function(c){ return typeof c==='string'?c:c.label+(c.price?'(+¥'+c.price+')':''); }).join('、');

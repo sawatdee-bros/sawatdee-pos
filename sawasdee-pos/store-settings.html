@@ -350,6 +350,43 @@ var DEFAULTS = {
 };
 
 
+// Firebase読み込み
+get(ref(db, 'store_config')).then(function(snap) {
+  var cfg = Object.assign({}, DEFAULTS, snap.val() || {});
+  document.getElementById('store_name').value = cfg.store_name || '';
+  var displayTax = cfg.tax_rate < 1 ? Math.round(cfg.tax_rate * 100) : cfg.tax_rate;
+  document.getElementById('tax_rate').value = displayTax;
+  var roundingMode = cfg.rounding_mode || 'floor';
+  var roundingEl = document.querySelector('input[name="rounding_mode"][value="' + roundingMode + '"]');
+  if (roundingEl) roundingEl.checked = true;
+  var roundingUnit = String(cfg.rounding_unit || 10);
+  var roundingUnitEl = document.querySelector('input[name="rounding_unit"][value="' + roundingUnit + '"]');
+  if (roundingUnitEl) roundingUnitEl.checked = true;
+  document.getElementById('charge_per_person').value = cfg.charge_per_person;
+  document.getElementById('charge_free_drink_count').value = cfg.charge_free_drink_count;
+  var mode = cfg.charge_mode || 'conditional';
+  document.querySelector('input[name="charge_mode"][value="' + mode + '"]').checked = true;
+  window.updateChargeMode(mode);
+  document.getElementById('table_count').value = cfg.table_count;
+  document.getElementById('nomi_table_count').value = cfg.nomi_table_count;
+  window._loadedTableNames = cfg.table_names || {};
+  window._loadedTableNamesShort = cfg.table_names_short || {};
+  renderTableNamesEditor();
+  document.getElementById('has_ohiya').checked = !!cfg.has_ohiya;
+  document.getElementById('has_nomi_hodai').checked = !!cfg.has_nomi_hodai;
+  document.getElementById('has_call_button').checked = !!cfg.has_call_button;
+  document.getElementById('show_set_on_customer').checked = !!cfg.show_set_on_customer;
+  document.getElementById('day_start_hour').value = cfg.day_start_hour !== undefined ? cfg.day_start_hour : 8;
+  document.getElementById('apps_script_url').value = cfg.apps_script_url || '';
+  window._discountPresets = Array.isArray(cfg.discount_presets) ? cfg.discount_presets : [];
+  window.renderDiscountPresets();
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+  setTimeout(function() { originalState = getFormState(); }, 100);
+}).catch(function(e) {
+  document.getElementById('loading').textContent = '読み込みに失敗しました: ' + e.message;
+});
+
 window.renderTableNamesEditor = function() {
   var count = parseInt(document.getElementById('table_count').value) || 1;
   var names = window._loadedTableNames || {};
