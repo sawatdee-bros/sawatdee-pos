@@ -201,6 +201,13 @@ function renderCats() {
 }
 
 function fmtY(n) { return '¥' + n.toLocaleString(); }
+var _ROUNDING_MODE = 'floor';
+var _ROUNDING_UNIT = 10;
+function applyRounding(val) {
+  if (_ROUNDING_MODE === 'round') return Math.round(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  if (_ROUNDING_MODE === 'ceil') return Math.ceil(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  return Math.floor(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+}
 function taxIn(p) { return Math.floor(p * 1.1); }
 
 function renderMenu() {
@@ -267,7 +274,7 @@ window.tapItem = function(key, idx) {
 function renderCart() {
   const items = Object.values(cart);
   const count = items.reduce((s, i) => s + i.qty, 0);
-  const total = Math.floor(items.reduce((s, i) => s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty, 0) / 10) * 10;
+  const total = applyRounding(items.reduce((s, i) => s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty, 0));
   document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
   document.getElementById('cart-total').textContent = fmtY(total);
   document.getElementById('order-btn').disabled = count === 0 || !currentTable;
@@ -299,7 +306,7 @@ function renderConfirm() {
       '<span class="confirm-item-price">' + fmtY(ex) + '</span>' +
       '</div>';
   });
-  const totalIn = Math.floor(Object.values(cart).reduce((s, i) => s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty, 0) / 10) * 10;
+  const totalIn = applyRounding(Object.values(cart).reduce((s, i) => s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty, 0));
   const tax = totalIn - totalEx;
   html += '<div class="confirm-subtotal"><span>小計（税抜）</span><span>' + fmtY(totalEx) + '</span></div>';
   html += '<div class="confirm-subtotal"><span>消費税（10%）</span><span>' + fmtY(tax) + '</span></div>';
@@ -371,7 +378,7 @@ window.placeOrder = async function() {
   if (!items.length || !currentTable) return;
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
-  const total = Math.floor(items.filter(i => i.price > 0).reduce((s, i) => s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty, 0) / 10) * 10;
+  const total = applyRounding(items.filter(i => i.price > 0).reduce((s, i) => s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty, 0));
   const hasSetItems = Object.keys(cart).some(k => k.startsWith('set__'));
   const hasNonSetItems = Object.keys(cart).some(k => !k.startsWith('set__') && k !== 'ohiya');
   const orderData = {
@@ -394,6 +401,10 @@ window.placeOrder = async function() {
 // 初期化
 async function init() {
   try {
+    const cfgSnap = await get(ref(db, 'store_config'));
+    const cfg = cfgSnap.val() || {};
+    if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
+    if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
     const snap = await get(ref(db, 'handy_groups'));
     GROUPS_DATA = snap.val() || {};
     // menu/set をhandy_groups形式に変換して追加

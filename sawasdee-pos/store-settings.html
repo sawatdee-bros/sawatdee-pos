@@ -112,6 +112,40 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
         <input class="field-input" type="number" id="tax_rate" step="1" min="0" max="100">
         <span class="field-unit">%</span>
       </div>
+      <div style="margin-top:12px">
+        <div class="field-label-main" style="margin-bottom:8px">端数処理の方法</div>
+        <div class="radio-group">
+          <label class="radio-row">
+            <input class="radio-input" type="radio" name="rounding_mode" value="floor" id="rounding_floor">
+            <div class="field-label"><div class="radio-label">切り捨て（推奨）</div></div>
+          </label>
+          <label class="radio-row">
+            <input class="radio-input" type="radio" name="rounding_mode" value="round" id="rounding_round">
+            <div class="field-label"><div class="radio-label">四捨五入</div></div>
+          </label>
+          <label class="radio-row">
+            <input class="radio-input" type="radio" name="rounding_mode" value="ceil" id="rounding_ceil">
+            <div class="field-label"><div class="radio-label">切り上げ</div></div>
+          </label>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="field-label-main" style="margin-bottom:8px">丸め単位</div>
+        <div class="radio-group">
+          <label class="radio-row">
+            <input class="radio-input" type="radio" name="rounding_unit" value="1" id="rounding_unit_1">
+            <div class="field-label"><div class="radio-label">1円単位</div><div class="field-label-sub">例: ¥5,541</div></div>
+          </label>
+          <label class="radio-row">
+            <input class="radio-input" type="radio" name="rounding_unit" value="10" id="rounding_unit_10">
+            <div class="field-label"><div class="radio-label">10円単位（推奨）</div><div class="field-label-sub">例: ¥5,540</div></div>
+          </label>
+          <label class="radio-row">
+            <input class="radio-input" type="radio" name="rounding_unit" value="100" id="rounding_unit_100">
+            <div class="field-label"><div class="radio-label">100円単位</div><div class="field-label-sub">例: ¥5,500</div></div>
+          </label>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -315,6 +349,12 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('store_name').value = cfg.store_name || '';
   var displayTax = cfg.tax_rate < 1 ? Math.round(cfg.tax_rate * 100) : cfg.tax_rate;
   document.getElementById('tax_rate').value = displayTax;
+  var roundingMode = cfg.rounding_mode || 'floor';
+  var roundingEl = document.querySelector('input[name="rounding_mode"][value="' + roundingMode + '"]');
+  if (roundingEl) roundingEl.checked = true;
+  var roundingUnit = String(cfg.rounding_unit || 10);
+  var roundingUnitEl = document.querySelector('input[name="rounding_unit"][value="' + roundingUnit + '"]');
+  if (roundingUnitEl) roundingUnitEl.checked = true;
   document.getElementById('charge_per_person').value = cfg.charge_per_person;
   document.getElementById('charge_free_drink_count').value = cfg.charge_free_drink_count;
   var mode = cfg.charge_mode || 'conditional';
@@ -471,6 +511,8 @@ window.saveAll = async function() {
   var cfg = {
     store_name: document.getElementById('store_name').value,
     tax_rate: parseInt(document.getElementById('tax_rate').value) || 10,
+    rounding_mode: (document.querySelector('input[name="rounding_mode"]:checked') || {value:'floor'}).value,
+    rounding_unit: parseInt((document.querySelector('input[name="rounding_unit"]:checked') || {value:'10'}).value),
     charge_per_person: parseInt(document.getElementById('charge_per_person').value) || 0,
     charge_free_drink_count: parseInt(document.getElementById('charge_free_drink_count').value) || 2,
     charge_mode: document.querySelector('input[name="charge_mode"]:checked').value || 'conditional',

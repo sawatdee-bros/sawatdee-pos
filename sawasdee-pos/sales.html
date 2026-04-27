@@ -395,11 +395,20 @@ function calcCharge(drinkQty, pax, hasChargeExempt) {
   return hasFreeCharge ? 0 : chargePerPerson * pax;
 }
 
+// 端数処理関数（store_config.rounding_mode / rounding_unitで切り替え）
+function applyRounding(val) {
+  var mode = storeConfig.rounding_mode || 'floor';
+  var unit = storeConfig.rounding_unit || 10;
+  if (mode === 'round') return Math.round(val / unit) * unit;
+  if (mode === 'ceil') return Math.ceil(val / unit) * unit;
+  return Math.floor(val / unit) * unit;
+}
+
 // セッション単位の税込売上を計算
 function calcSessionSales(sessionEx, drinkQty, pax, hasChargeExempt) {
   var charge = calcCharge(drinkQty, pax, hasChargeExempt);
   var finalEx = sessionEx + charge;
-  return Math.round(Math.floor(finalEx * (1 + (storeConfig.tax_rate || 10) / 100)) / 10) * 10;
+  return applyRounding(finalEx * (1 + (storeConfig.tax_rate || 10) / 100));
 }
 
 // ─────────────────────────────────────────────

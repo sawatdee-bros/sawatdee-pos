@@ -353,7 +353,18 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (cfg.charge_mode) _CHARGE_MODE = cfg.charge_mode;
   if (cfg.charge_free_drink_count !== undefined) _CHARGE_FREE_DRINK_COUNT = cfg.charge_free_drink_count;
   if (Array.isArray(cfg.discount_presets)) _DISCOUNT_PRESETS = cfg.discount_presets;
+  if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
+  if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
 });
+
+// 端数処理関数（store_config.rounding_mode / rounding_unitで切り替え）
+let _ROUNDING_MODE = 'floor';
+let _ROUNDING_UNIT = 10;
+function applyRounding(val) {
+  if (_ROUNDING_MODE === 'round') return Math.round(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  if (_ROUNDING_MODE === 'ceil') return Math.ceil(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  return Math.floor(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+}
 
 // サブカテゴリ名からアイコンを返す
 function subcatIcon(catKey, subcat) {
@@ -1270,7 +1281,7 @@ window.openCheckout = function(tableNum, idStr) {
   var chargeEx = chargeResult.chargeEx;
   var hasFreeCharge = chargeResult.hasFreeCharge;
   var finalEx = totalEx + (chargeResult.isFree ? 0 : chargeEx);
-  var grandTotal = Math.floor((Math.floor(finalEx * 1.1) + inclusiveTotal) / 10) * 10;
+  var grandTotal = applyRounding(finalEx * 1.1) + inclusiveTotal;
   var grandTax = grandTotal - finalEx - (chargeResult.isFree ? 0 : chargeEx) - inclusiveTotal;
 
   // 伝票スタイルで組み立て
@@ -1494,14 +1505,14 @@ window.saveEdit = async function() {
       if (changes[i].newQty === 0) items.splice(changes[i].idx, 1);
       else items[changes[i].idx].qty = changes[i].newQty;
     }
-    var newTotal = Math.floor(items.reduce(function(s,it){ return s + (it.price_type === 'inclusive' ? it.price : it.price * 1.1) * it.qty; }, 0) / 10) * 10;
+    var newTotal = applyRounding(items.reduce(function(s,it){ return s + (it.price_type === 'inclusive' ? it.price : it.price * 1.1) * it.qty; }, 0));
     await update(ref(db,'orders/'+eid), {items:items, total:newTotal});
   }
 
   // 追加処理（即提供済み）
   if (_bEdit.addItems.length > 0) {
     var addList = _bEdit.addItems.map(function(it){return Object.assign({name:it.name,qty:1,price:it.price}, it.price_type?{price_type:it.price_type}:{}, it.drink_count!==undefined?{drink_count:it.drink_count}:{});});
-    var addTotal = Math.floor(addList.reduce(function(s,it){return s+(it.price_type==='inclusive'?it.price:it.price*1.1)*it.qty;},0)/10)*10;
+    var addTotal = applyRounding(addList.reduce(function(s,it){return s+(it.price_type==='inclusive'?it.price:it.price*1.1)*it.qty;},0));
     var itemsDone = {};
     for (var x=0;x<addList.length;x++) itemsDone[x]=true;
     await push(ref(db,'orders'), {
@@ -1602,7 +1613,7 @@ function _billsRender() {
     var hasFreeCharge=chargeResult.hasFreeCharge;
     var chargeEx=chargeResult.chargeEx;
     var finalEx=sessionEx+(chargeResult.isFree?0:chargeEx);
-    totalSales += Math.floor(Math.floor(finalEx*1.1)/10)*10;
+    totalSales += applyRounding(finalEx*1.1);
   }
   document.getElementById('sum-count').textContent = allKeys.length;
   document.getElementById('sum-active').textContent = activeCount;
@@ -1701,7 +1712,7 @@ function _billsRender() {
     var chargeEx=chargeResult.chargeEx;
     var hasFreeCharge=chargeResult.hasFreeCharge;
     var finalEx=totalEx+(chargeResult.isFree?0:chargeEx);
-    var finalIn=Math.floor((Math.floor(finalEx*1.1)+inclusiveTotal)/10)*10;
+    var finalIn=applyRounding(finalEx*1.1)+inclusiveTotal;
     var finalTax=finalIn-totalEx-(chargeResult.isFree?0:chargeEx)-inclusiveTotal;
 
     var firstTime=fmtDate(entries[0].o.timestamp);

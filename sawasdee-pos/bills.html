@@ -169,7 +169,19 @@ var FC = {
 var app = initializeApp(FC);
 var db = getDatabase(app);
 var DAY_START = 8;
-get(ref(db, 'store_config/day_start_hour')).then(function(snap) { if (snap.val() !== null) DAY_START = snap.val(); });
+var _ROUNDING_MODE = 'floor';
+var _ROUNDING_UNIT = 10;
+function applyRounding(val) {
+  if (_ROUNDING_MODE === 'round') return Math.round(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  if (_ROUNDING_MODE === 'ceil') return Math.ceil(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  return Math.floor(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+}
+get(ref(db, 'store_config')).then(function(snap) {
+  var cfg = snap.val() || {};
+  if (cfg.day_start_hour != null) DAY_START = cfg.day_start_hour;
+  if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
+  if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
+});
 var allOrders = {};
 var currentFilter = 'all';
 var paxStore = {};
@@ -363,14 +375,14 @@ window.saveEdit = async function() {
       if (changes[i].newQty === 0) items.splice(changes[i].idx, 1);
       else items[changes[i].idx].qty = changes[i].newQty;
     }
-    var newTotal = Math.round(Math.floor(items.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1)/10)*10;
+    var newTotal = applyRounding(items.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1);
     await update(ref(db,'orders/'+eid), {items:items, total:newTotal});
   }
 
   // 追加処理（即提供済み）
   if (editState.addItems.length > 0) {
     var addList = editState.addItems.map(function(it){return {name:it.name,qty:1,price:it.price};});
-    var addTotal = Math.round(Math.floor(addList.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1)/10)*10;
+    var addTotal = applyRounding(addList.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1);
     var itemsDone = {};
     for (var x=0;x<addList.length;x++) itemsDone[x]=true;
     await push(ref(db,'orders'), {
@@ -451,7 +463,7 @@ function render() {
       var items=s.entries[j].o.items||[];
       for (var k=0;k<items.length;k++) sessionEx+=items[k].price*items[k].qty;
     }
-    totalSales += Math.round(Math.floor(sessionEx*1.1)/10)*10;
+    totalSales += applyRounding(sessionEx*1.1);
   }
   document.getElementById('sum-count').textContent = allKeys.length;
   document.getElementById('sum-active').textContent = activeCount;
@@ -519,8 +531,7 @@ function render() {
     var chargeEx=CHARGE*pax;
     var hasFreeCharge=totalDrinks>=pax*2;
     var finalEx=totalEx+(hasFreeCharge?0:chargeEx);
-    var finalInRaw=Math.floor(finalEx*1.1);
-    var finalIn=Math.round(finalInRaw/10)*10;
+    var finalIn=applyRounding(finalEx*1.1);
     var finalTax=finalIn-finalEx;
 
     var firstTime=fmtDate(entries[0].o.timestamp);

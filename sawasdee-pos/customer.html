@@ -395,7 +395,7 @@ function renderCart() {
       + '<span class="cart-item-price">' + fmtY(totalPrice * c.qty) + '</span>'
       + '</div>';
   });
-  var totalInRounded = Math.floor(totalIn / 10) * 10;
+  var totalInRounded = applyRounding(totalIn);
   document.getElementById('cart-count').textContent = 'カート: ' + count + '品';
   document.getElementById('cart-total-ex').textContent = fmtY(totalEx);
   document.getElementById('cart-total').textContent = '税込 ' + fmtY(totalInRounded);
@@ -533,6 +533,13 @@ var _historyPax = 1;
 var _CHARGE_PER_PERSON = 250;
 var _CHARGE_MODE = 'conditional';
 var _CHARGE_FREE_DRINK_COUNT = 2;
+var _ROUNDING_MODE = 'floor';
+var _ROUNDING_UNIT = 10;
+function applyRounding(val) {
+  if (_ROUNDING_MODE === 'round') return Math.round(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  if (_ROUNDING_MODE === 'ceil') return Math.ceil(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+  return Math.floor(val / _ROUNDING_UNIT) * _ROUNDING_UNIT;
+}
 
 window.showHistory = async function() {
   var snap = await new Promise(function(resolve) { onValue(ref(db, 'orders'), resolve, { onlyOnce: true }); });
@@ -546,6 +553,8 @@ window.showHistory = async function() {
   _CHARGE_PER_PERSON = cfg.charge_per_person !== undefined ? cfg.charge_per_person : 250;
   _CHARGE_MODE = cfg.charge_mode || 'conditional';
   _CHARGE_FREE_DRINK_COUNT = cfg.charge_free_drink_count !== undefined ? cfg.charge_free_drink_count : 2;
+  if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
+  if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
   var itemMap = {};
   Object.values(data).forEach(function(order) {
     if (order.table != tableNum) return;
@@ -608,7 +617,7 @@ function renderHistoryModal() {
   var inclusiveTotal = _historyItems.reduce(function(s, it) { return s + (it.price_type === 'inclusive' ? it.price * it.qty : 0); }, 0);
   var exclusiveEx = totalEx - _historyItems.reduce(function(s, it) { return s + (it.price_type === 'inclusive' ? Math.floor(it.price / 1.1) * it.qty : 0); }, 0);
   var finalEx = exclusiveEx + chargeTotal;
-  var finalIn = Math.floor((Math.floor(finalEx * 1.1) + inclusiveTotal) / 10) * 10;
+  var finalIn = applyRounding(finalEx * 1.1) + inclusiveTotal;
   var finalTax = finalIn - exclusiveEx - chargeTotal - inclusiveTotal;
   var paxHTML = _CHARGE_MODE === 'none' ? '' :
     '<div class="history-pax-row">'
@@ -659,7 +668,7 @@ window.placeOrder = async function() {
     items.push(item);
   });
   if (items.length === 0) return;
-  var total = Math.floor(items.reduce(function(s, i) { return s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty; }, 0) / 10) * 10;
+  var total = applyRounding(items.reduce(function(s, i) { return s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty; }, 0));
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
   var orderData = { table: tableNum, items: items, total: total, status: 'new', timestamp: Date.now() };
