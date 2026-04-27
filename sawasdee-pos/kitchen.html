@@ -446,7 +446,7 @@ function tableName(t) { return TABLE_NAMES[String(t)] || 'テーブル ' + t; }
 let DRINKS = []; // Firebaseのmenu/drinkから動的生成（下記get(ref(db,'menu')).then参照）
 let orders = {};
 let firstLoad = true;
-startOrdersWatch(); // KITCHEN_NAMES・firstLoad等の宣言後に開始
+
 
 // 店員呼び出し・お冷監視
 function renderBanner() {
@@ -1024,7 +1024,7 @@ function showBell(hasDrink, hasFood) {
   }
 }
 
-function startOrdersWatch() { onValue(ref(db, 'orders'), (snap) => {
+onValue(ref(db, 'orders'), (snap) => {
   // _allOrdersCacheは常に最新に保つ
   window._allOrdersCache = snap.val() || {};
   const data = snap.val() || {};
@@ -1061,7 +1061,7 @@ function startOrdersWatch() { onValue(ref(db, 'orders'), (snap) => {
   if (firstLoad) applyAudioState();
   firstLoad = false;
   _updateBillsData(window._allOrdersCache);
-}); } // startOrdersWatch終端
+});
 
 // === 伝票機能 ===
 var _bOrders = {};
