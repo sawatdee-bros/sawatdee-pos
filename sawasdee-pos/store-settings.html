@@ -358,6 +358,57 @@ var DEFAULTS = {
   discount_presets: []
 };
 
+window.renderItemOptionsList = renderItemOptionsList;
+function renderItemOptionsList() {
+  var opts = window._itemOptions || {};
+  var list = document.getElementById('item-options-list');
+  if (!list) return;
+  list.innerHTML = Object.entries(opts).map(function(entry) {
+    var name = entry[0], def = entry[1];
+    var typeLabel = def.type === 'required' ? '必須選択' : '任意追加';
+    var choicesStr = Array.isArray(def.choices)
+      ? def.choices.map(function(c) { return typeof c === 'string' ? c : c.label + (c.price ? '(+¥'+c.price+')' : ''); }).join('、')
+      : '';
+    return '<div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #334155;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+      + '<span style="font-size:13px;font-weight:600;color:#f1f5f9;">' + name + '</span>'
+      + '<button onclick="window.removeItemOption('' + name.replace(/'/g,"\'") + '')" style="background:transparent;border:none;color:#ef4444;cursor:pointer;font-size:12px;">✕ 削除</button>'
+      + '</div>'
+      + '<div style="font-size:12px;color:#64748b;">種類: ' + typeLabel + '　ラベル: ' + (def.label||'') + '</div>'
+      + '<div style="font-size:12px;color:#64748b;margin-top:2px;">選択肢: ' + choicesStr + '</div>'
+      + '</div>';
+  }).join('') || '<div style="font-size:12px;color:#475569;">オプションはまだ設定されていません</div>';
+};
+
+window.addItemOption = function() {
+  var name = prompt('商品名を入力してください（例: 梅酒）');
+  if (!name || !name.trim()) return;
+  name = name.trim();
+  var type = confirm('選択を必須にしますか？
+OK = 必須選択　キャンセル = 任意追加') ? 'required' : 'optional';
+  var label = prompt('オプションのラベルを入力してください', type === 'required' ? '飲み方を選択してください' : 'サイドメニューを追加しますか？');
+  if (!label) return;
+  var choicesStr = prompt('選択肢をカンマ区切りで入力してください
+任意追加の場合、価格あり選択肢は「ライス:300」の形式で入力', 'ロック,ソーダ割,水割り');
+  if (!choicesStr) return;
+  var choices = choicesStr.split(',').map(function(c) {
+    c = c.trim();
+    var parts = c.split(':');
+    if (parts.length === 2 && !isNaN(parts[1])) return { label: parts[0].trim(), price: parseInt(parts[1]) };
+    return c;
+  });
+  if (!window._itemOptions) window._itemOptions = {};
+  window._itemOptions[name] = { type: type, label: label, choices: choices };
+  renderItemOptionsList();
+};
+
+window.removeItemOption = function(name) {
+  if (!confirm(name + ' のオプション設定を削除しますか？')) return;
+  delete window._itemOptions[name];
+  renderItemOptionsList();
+};
+
+
 // Firebase読み込み
 get(ref(db, 'store_config')).then(function(snap) {
   var cfg = Object.assign({}, DEFAULTS, snap.val() || {});
@@ -522,56 +573,6 @@ window.leaveAction = async function(action) {
     window.parent.postMessage({ type: 'setMode', mode: 'all' }, '*');
   }
   // cancel: 何もしない
-};
-
-window.renderItemOptionsList = renderItemOptionsList;
-function renderItemOptionsList() {
-  var opts = window._itemOptions || {};
-  var list = document.getElementById('item-options-list');
-  if (!list) return;
-  list.innerHTML = Object.entries(opts).map(function(entry) {
-    var name = entry[0], def = entry[1];
-    var typeLabel = def.type === 'required' ? '必須選択' : '任意追加';
-    var choicesStr = Array.isArray(def.choices)
-      ? def.choices.map(function(c) { return typeof c === 'string' ? c : c.label + (c.price ? '(+¥'+c.price+')' : ''); }).join('、')
-      : '';
-    return '<div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #334155;">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-      + '<span style="font-size:13px;font-weight:600;color:#f1f5f9;">' + name + '</span>'
-      + '<button onclick="window.removeItemOption('' + name.replace(/'/g,"\'") + '')" style="background:transparent;border:none;color:#ef4444;cursor:pointer;font-size:12px;">✕ 削除</button>'
-      + '</div>'
-      + '<div style="font-size:12px;color:#64748b;">種類: ' + typeLabel + '　ラベル: ' + (def.label||'') + '</div>'
-      + '<div style="font-size:12px;color:#64748b;margin-top:2px;">選択肢: ' + choicesStr + '</div>'
-      + '</div>';
-  }).join('') || '<div style="font-size:12px;color:#475569;">オプションはまだ設定されていません</div>';
-};
-
-window.addItemOption = function() {
-  var name = prompt('商品名を入力してください（例: 梅酒）');
-  if (!name || !name.trim()) return;
-  name = name.trim();
-  var type = confirm('選択を必須にしますか？
-OK = 必須選択　キャンセル = 任意追加') ? 'required' : 'optional';
-  var label = prompt('オプションのラベルを入力してください', type === 'required' ? '飲み方を選択してください' : 'サイドメニューを追加しますか？');
-  if (!label) return;
-  var choicesStr = prompt('選択肢をカンマ区切りで入力してください
-任意追加の場合、価格あり選択肢は「ライス:300」の形式で入力', 'ロック,ソーダ割,水割り');
-  if (!choicesStr) return;
-  var choices = choicesStr.split(',').map(function(c) {
-    c = c.trim();
-    var parts = c.split(':');
-    if (parts.length === 2 && !isNaN(parts[1])) return { label: parts[0].trim(), price: parseInt(parts[1]) };
-    return c;
-  });
-  if (!window._itemOptions) window._itemOptions = {};
-  window._itemOptions[name] = { type: type, label: label, choices: choices };
-  renderItemOptionsList();
-};
-
-window.removeItemOption = function(name) {
-  if (!confirm(name + ' のオプション設定を削除しますか？')) return;
-  delete window._itemOptions[name];
-  renderItemOptionsList();
 };
 
 window.renderTableNamesEditor = function() {
