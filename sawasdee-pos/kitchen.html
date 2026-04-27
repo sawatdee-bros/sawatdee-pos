@@ -439,9 +439,6 @@ get(ref(db, 'menu')).then(function(snap) {
   });
 });
 
-// orders監視はKITCHEN_NAMESと独立して即時開始
-startOrdersWatch();
-
 let KITCHEN_NAMES = {}; // Firebaseのmenu/kitchen_nameから動的生成
 
 let TABLE_NAMES = {}; // store_config/table_namesから動的読み込み
@@ -449,6 +446,7 @@ function tableName(t) { return TABLE_NAMES[String(t)] || 'テーブル ' + t; }
 let DRINKS = []; // Firebaseのmenu/drinkから動的生成（下記get(ref(db,'menu')).then参照）
 let orders = {};
 let firstLoad = true;
+startOrdersWatch(); // KITCHEN_NAMES・firstLoad等の宣言後に開始
 
 // 店員呼び出し・お冷監視
 function renderBanner() {
