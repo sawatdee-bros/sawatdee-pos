@@ -636,7 +636,7 @@ function renderOrders() {
       const done = o.itemsDone || {};
       const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
       arr.forEach((i, idx) => {
-        if (!DRINKS.some(d => i.name===d || i.name.startsWith(d+'（'))) {
+        if (!isDrinkItem(i.name, i)) {
           foodItems.push({i, idx, id, done: !!done[idx]});
         }
       });
@@ -653,7 +653,7 @@ function renderOrders() {
       const done = o.itemsDone || {};
       const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
       arr.forEach((i, idx) => {
-        if (DRINKS.some(d => i.name===d || i.name.startsWith(d+'（'))) {
+        if (isDrinkItem(i.name, i)) {
           drinkItems.push({i, idx, id, done: !!done[idx]});
         }
       });
@@ -1036,7 +1036,7 @@ onValue(ref(db, 'orders'), (snap) => {
     newIds.forEach(id => {
       const items = data[id].items || [];
       items.forEach(item => {
-        if (DRINKS.some(d => item.name === d || item.name.startsWith(d + '（'))) hasDrink = true;
+        if (isDrinkItem(item.name, item)) hasDrink = true;
         else hasFood = true;
       });
     });
