@@ -127,16 +127,24 @@ async function init() {
 
   const menuSnap = await get(ref(db, 'menu'));
   const menuData = menuSnap.val() || {};
+  const overridesSnap = await get(ref(db, 'menu_overrides'));
+  const overrides = overridesSnap.val() || {};
   ALL_ITEMS = [];
   var foodSubcats = [];
   var drinkSubcats = [];
   for (const [subcat, items] of Object.entries(menuData.food || {})) {
     foodSubcats.push(subcat);
-    items.forEach(function(item) { ALL_ITEMS.push(Object.assign({}, item, {category:'food', subcat:subcat})); });
+    items.forEach(function(item) {
+      var merged = Object.assign({}, item, overrides[item.id] || {}, {category:'food', subcat:subcat});
+      ALL_ITEMS.push(merged);
+    });
   }
   for (const [subcat, items] of Object.entries(menuData.drink || {})) {
     drinkSubcats.push(subcat);
-    items.forEach(function(item) { ALL_ITEMS.push(Object.assign({}, item, {category:'drink', subcat:subcat})); });
+    items.forEach(function(item) {
+      var merged = Object.assign({}, item, overrides[item.id] || {}, {category:'drink', subcat:subcat});
+      ALL_ITEMS.push(merged);
+    });
   }
   // フィルターバー生成（ALL_ITEMS読み込み後）
   var FILTERS = [
