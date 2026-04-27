@@ -226,6 +226,12 @@ window.renderList = function() {
         </div>
         <div class="detail-row">
           <div class="detail-field">
+            <label>キッチン表示名</label>
+            <input type="text" value="${ed.kitchen_name||''}" placeholder="${ed.name}" onchange="editField('${item.id}','kitchen_name',this.value)">
+          </div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-field">
             <label>カタカナタイ語</label>
             <input type="text" value="${ed.kata||''}" onchange="editField('${item.id}','kata',this.value)">
           </div>
