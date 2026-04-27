@@ -434,6 +434,8 @@ get(ref(db, 'menu')).then(function(snap) {
     Object.values(overrides).forEach(function(ov) {
       if (ov.name && ov.kitchen_name) KITCHEN_NAMES[ov.name] = ov.kitchen_name;
     });
+    // KITCHEN_NAMES生成完了後にorders監視を開始
+    startOrdersWatch();
   });
 });
 
@@ -1021,7 +1023,7 @@ function showBell(hasDrink, hasFood) {
   }
 }
 
-onValue(ref(db, 'orders'), (snap) => {
+function startOrdersWatch() { onValue(ref(db, 'orders'), (snap) => {
   // _allOrdersCacheは常に最新に保つ
   window._allOrdersCache = snap.val() || {};
   const data = snap.val() || {};
@@ -1058,7 +1060,7 @@ onValue(ref(db, 'orders'), (snap) => {
   if (firstLoad) applyAudioState();
   firstLoad = false;
   _updateBillsData(window._allOrdersCache);
-});
+}); } // startOrdersWatch終端
 
 // === 伝票機能 ===
 var _bOrders = {};
