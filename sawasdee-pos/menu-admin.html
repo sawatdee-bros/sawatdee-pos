@@ -318,7 +318,6 @@ window.editField = (id, field, value) => {
 window.saveItem = async (id) => {
   const orig = ALL_ITEMS.find(i => i.id === id);
   const ed = localEdits[id] || {};
-  alert('localEdits['+id+']: ' + JSON.stringify(Object.keys(ed)));
   if (Object.keys(ed).length === 0) return;
   // Firebaseのmenu_overridesに保存
   await update(ref(db, 'menu_overrides/' + id), ed);
@@ -392,7 +391,7 @@ window.addItemOpt = function(id) {
     + (choicesSuggestions.length ? '<select id="aio-choices-sel" onchange="document.getElementById(&quot;aio-choices&quot;).value=this.value" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:7px 10px;font-size:13px;margin-bottom:4px;"><option value="">-- 既存から選択 --</option>'+choicesOpts+'</select>' : '')
     + '<input id="aio-choices" type="text" placeholder="ロック,ソーダ割,水割り" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:7px 10px;font-size:13px;"></div>'
     + '<div style="display:flex;gap:8px;">'
-    + '<button onclick="window.confirmAddItemOpt(&quot;'+id+'&quot;)" style="flex:1;padding:9px;background:#166534;border:none;border-radius:8px;color:white;font-size:13px;font-weight:600;cursor:pointer;">追加</button>'
+    + '<button onclick="window.confirmAddItemOpt(\'' + id + '\')" style="flex:1;padding:9px;background:#166534;border:none;border-radius:8px;color:white;font-size:13px;font-weight:600;cursor:pointer;">追加</button>'
     + '<button onclick="document.getElementById(&quot;add-item-opt-modal&quot;).remove()" style="padding:9px 16px;background:transparent;border:1px solid #334155;border-radius:8px;color:#64748b;font-size:13px;cursor:pointer;">キャンセル</button>'
     + '</div></div>';
   document.body.appendChild(modal);
