@@ -317,8 +317,8 @@ window.editField = (id, field, value) => {
 
 window.saveItem = async (id) => {
   const orig = ALL_ITEMS.find(i => i.id === id);
-  const ed = localEdits[id];
-  if (!ed) return;
+  const ed = localEdits[id] || {};
+  if (Object.keys(ed).length === 0) return;
   // Firebaseのmenu_overridesに保存
   await update(ref(db, 'menu_overrides/' + id), ed);
   const msg = document.getElementById('saved-' + id);
