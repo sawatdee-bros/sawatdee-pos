@@ -384,12 +384,10 @@ window.addItemOption = function() {
   var name = prompt('商品名を入力してください（例: 梅酒）');
   if (!name || !name.trim()) return;
   name = name.trim();
-  var type = confirm('選択を必須にしますか？
-OK = 必須選択　キャンセル = 任意追加') ? 'required' : 'optional';
+  var type = confirm('選択を必須にしますか？\nOK = 必須選択　キャンセル = 任意追加') ? 'required' : 'optional';
   var label = prompt('オプションのラベルを入力してください', type === 'required' ? '飲み方を選択してください' : 'サイドメニューを追加しますか？');
   if (!label) return;
-  var choicesStr = prompt('選択肢をカンマ区切りで入力してください
-任意追加の場合、価格あり選択肢は「ライス:300」の形式で入力', 'ロック,ソーダ割,水割り');
+  var choicesStr = prompt('選択肢をカンマ区切りで入力してください\n任意追加の場合、価格あり選択肢は「ライス:300」の形式で入力', 'ロック,ソーダ割,水割り');
   if (!choicesStr) return;
   var choices = choicesStr.split(',').map(function(c) {
     c = c.trim();
