@@ -391,6 +391,8 @@ window.selectSubcat = function(sub) { currentSubcat = sub; renderSubcatTabs(); r
 var pendingOpt = null;
 var selectedOpt = {};
 
+// オプション処理（複数グループ対応）
+// pendingOpt: { cat, sub, idx, item, groups: [{type,label,choices},...], groupIdx, optLabel, extras }
 window.addToCart = function(cat, sub, idx) {
   var item = (MENU_DATA[cat] || {})[sub];
   if (!item) return;
@@ -399,32 +401,42 @@ window.addToCart = function(cat, sub, idx) {
   if (item.warning) { if (!confirm(item.warning)) return; }
   var optDef = ITEM_OPTIONS[item.name];
   if (optDef) {
-    pendingOpt = { cat: cat, sub: sub, idx: idx, item: item, optDef: optDef };
+    // 単オブジェクト→配列に正規化
+    var groups = Array.isArray(optDef) ? optDef : [optDef];
+    pendingOpt = { cat: cat, sub: sub, idx: idx, item: item, groups: groups, groupIdx: 0, optLabel: '', extras: [] };
     selectedOpt = {};
-    document.getElementById('opt-item-name').textContent = item.name;
-    document.getElementById('opt-label').textContent = optDef.label;
-    var confirmBtn = document.getElementById('opt-confirm');
-    confirmBtn.disabled = optDef.type === 'required';
-    var html = optDef.choices.map(function(c, i) {
-      var label = typeof c === 'string' ? c : c.label;
-      var price = typeof c === 'object' ? c.price : null;
-      var isCheck = optDef.type === 'optional';
-      return '<div class="opt-choice" id="opt-c-' + i + '" onclick="window.selectOpt(' + i + ')">'
-        + '<span class="' + (isCheck ? 'opt-choice-check' : 'opt-choice-radio') + '"></span>'
-        + '<span>' + label + '</span>'
-        + (price ? '<span class="opt-price">+￥' + price.toLocaleString() + '</span>' : '')
-        + '</div>';
-    }).join('');
-    document.getElementById('opt-choices').innerHTML = html;
+    showOptGroup(0);
     document.getElementById('opt-modal').classList.add('open');
     return;
   }
   addItemToCart(cat, sub, idx, item, null, []);
 };
 
+function showOptGroup(gIdx) {
+  var groups = pendingOpt.groups;
+  var g = groups[gIdx];
+  selectedOpt = {};
+  document.getElementById('opt-item-name').textContent = pendingOpt.item.name;
+  document.getElementById('opt-label').textContent = g.label + (groups.length > 1 ? ' (' + (gIdx+1) + '/' + groups.length + ')' : '');
+  var confirmBtn = document.getElementById('opt-confirm');
+  confirmBtn.disabled = g.type === 'required';
+  confirmBtn.textContent = gIdx < groups.length - 1 ? '次へ' : '追加する';
+  var html = g.choices.map(function(c, i) {
+    var label = typeof c === 'string' ? c : c.label;
+    var price = typeof c === 'object' && c.price ? c.price : null;
+    var isCheck = g.type === 'optional';
+    return '<div class="opt-choice" id="opt-c-' + i + '" onclick="window.selectOpt(' + i + ')">'
+      + '<span class="' + (isCheck ? 'opt-choice-check' : 'opt-choice-radio') + '"></span>'
+      + '<span>' + label + '</span>'
+      + (price ? '<span class="opt-price">+￥' + price.toLocaleString() + '</span>' : '')
+      + '</div>';
+  }).join('');
+  document.getElementById('opt-choices').innerHTML = html;
+}
+
 window.selectOpt = function(i) {
-  var optDef = pendingOpt.optDef;
-  if (optDef.type === 'required') {
+  var g = pendingOpt.groups[pendingOpt.groupIdx];
+  if (g.type === 'required') {
     selectedOpt = { choice: i };
     document.querySelectorAll('.opt-choice').forEach(function(el, j) { el.classList.toggle('selected', j === i); });
     document.getElementById('opt-confirm').disabled = false;
@@ -436,17 +448,24 @@ window.selectOpt = function(i) {
 
 window.confirmOpt = function() {
   if (!pendingOpt) return;
-  var cat = pendingOpt.cat, sub = pendingOpt.sub, idx = pendingOpt.idx, item = pendingOpt.item, optDef = pendingOpt.optDef;
-  var optLabel = '', extras = [];
-  if (optDef.type === 'required') {
-    optLabel = optDef.choices[selectedOpt.choice];
+  var g = pendingOpt.groups[pendingOpt.groupIdx];
+  if (g.type === 'required') {
+    var chosen = g.choices[selectedOpt.choice];
+    var label = typeof chosen === 'string' ? chosen : chosen.label;
+    pendingOpt.optLabel = pendingOpt.optLabel ? pendingOpt.optLabel + '・' + label : label;
   } else {
-    optDef.choices.forEach(function(c, i) {
-      if (selectedOpt[i]) extras.push({ label: c.label, price: c.price });
+    g.choices.forEach(function(c, i) {
+      if (selectedOpt[i]) pendingOpt.extras.push({ label: c.label, price: c.price });
     });
   }
-  addItemToCart(cat, sub, idx, item, optLabel, extras);
-  window.closeOpt();
+  var nextIdx = pendingOpt.groupIdx + 1;
+  if (nextIdx < pendingOpt.groups.length) {
+    pendingOpt.groupIdx = nextIdx;
+    showOptGroup(nextIdx);
+  } else {
+    addItemToCart(pendingOpt.cat, pendingOpt.sub, pendingOpt.idx, pendingOpt.item, pendingOpt.optLabel, pendingOpt.extras);
+    window.closeOpt();
+  }
 };
 
 window.closeOpt = function() { document.getElementById('opt-modal').classList.remove('open'); pendingOpt = null; };
