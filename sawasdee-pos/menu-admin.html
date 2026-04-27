@@ -335,10 +335,10 @@ function renderItemOptList(id, opts) {
   if (!opts || !opts.length) return '<div style="font-size:11px;color:#475569;">なし</div>';
   return opts.map(function(g, gi) {
     var choicesStr = (g.choices||[]).map(function(c){ return typeof c==='string'?c:c.label+(c.price?'(+¥'+c.price+')':''); }).join('、');
-    return '<div style="background:#0f172a;border-radius:6px;padding:8px;margin-bottom:4px;font-size:11px;">'
+    return '<div style="background:#0f172a;border-radius:6px;padding:8px;margin-bottom:4px;font-size:11px;cursor:pointer;" onclick="window.editItemOpt(\''+id+'\','+gi+')">'
       + '<div style="display:flex;justify-content:space-between;">'
       + '<span style="color:#94a3b8;">' + (g.type==='required'?'必須':'任意') + ' / ' + (g.label||'') + '</span>'
-      + '<button onclick="removeItemOpt(&quot;'+id+'&quot;,'+gi+')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:11px;">✕</button>'
+      + '<button onclick="event.stopPropagation();window.removeItemOpt(\''+id+'\','+gi+')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:11px;">✕</button>'
       + '</div>'
       + '<div style="color:#64748b;margin-top:2px;">' + choicesStr + '</div>'
       + '</div>';
@@ -409,6 +409,57 @@ window.confirmAddItemOpt = function(id) {
     return (p.length===2 && !isNaN(p[1])) ? {label:p[0].trim(), price:parseInt(p[1])} : c;
   });
   localEdits[id].item_options.push({type:type, label:label, choices:choices});
+  var el = document.getElementById('opt-list-'+id);
+  if (el) el.innerHTML = renderItemOptList(id, localEdits[id].item_options);
+  document.getElementById('add-item-opt-modal').remove();
+};
+
+window.editItemOpt = function(id, gi) {
+  var orig = ALL_ITEMS.find(function(i){ return i.id===id; });
+  if (!localEdits[id]) localEdits[id] = Object.assign({}, orig);
+  if (!localEdits[id].item_options) localEdits[id].item_options = Array.isArray(orig.item_options) ? JSON.parse(JSON.stringify(orig.item_options)) : [];
+  var g = localEdits[id].item_options[gi];
+  if (!g) return;
+
+  var existing = document.getElementById('add-item-opt-modal');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'add-item-opt-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var choicesStr = (g.choices||[]).map(function(c){ return typeof c==='string'?c:c.label+(c.price?':'+c.price:''); }).join(',');
+
+  modal.innerHTML = '<div style="background:#1e293b;border-radius:14px;border:1px solid #334155;width:440px;max-width:95vw;padding:20px;">'
+    + '<h3 style="font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:14px;">オプションを編集</h3>'
+    + '<div style="margin-bottom:10px;">'
+    + '<label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px;">種類</label>'
+    + '<select id="aio-type" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:7px 10px;font-size:13px;">'
+    + '<option value="required"' + (g.type==='required'?' selected':'') + '>必須選択（飲み方など）</option>'
+    + '<option value="optional"' + (g.type==='optional'?' selected':'') + '>任意追加（サイドなど）</option>'
+    + '</select></div>'
+    + '<div style="margin-bottom:10px;">'
+    + '<label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px;">ラベル</label>'
+    + '<input id="aio-label" type="text" value="' + (g.label||'') + '" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:7px 10px;font-size:13px;"></div>'
+    + '<div style="margin-bottom:14px;">'
+    + '<label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px;">選択肢（カンマ区切り。価格あり: ライス:300）</label>'
+    + '<input id="aio-choices" type="text" value="' + choicesStr + '" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:7px 10px;font-size:13px;"></div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button onclick="window.confirmEditItemOpt(\''+id+'\','+gi+')" style="flex:1;padding:9px;background:#166534;border:none;border-radius:8px;color:white;font-size:13px;font-weight:600;cursor:pointer;">保存</button>'
+    + '<button onclick="document.getElementById(&quot;add-item-opt-modal&quot;).remove()" style="padding:9px 16px;background:transparent;border:1px solid #334155;border-radius:8px;color:#64748b;font-size:13px;cursor:pointer;">キャンセル</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+};
+
+window.confirmEditItemOpt = function(id, gi) {
+  var type = document.getElementById('aio-type').value;
+  var label = document.getElementById('aio-label').value.trim();
+  var choicesStr = document.getElementById('aio-choices').value.trim();
+  if (!label || !choicesStr) { alert('ラベルと選択肢を入力してください'); return; }
+  var choices = choicesStr.split(',').map(function(c){
+    c = c.trim();
+    var p = c.split(':');
+    return (p.length===2 && !isNaN(p[1])) ? {label:p[0].trim(), price:parseInt(p[1])} : c;
+  });
+  localEdits[id].item_options[gi] = {type:type, label:label, choices:choices};
   var el = document.getElementById('opt-list-'+id);
   if (el) el.innerHTML = renderItemOptList(id, localEdits[id].item_options);
   document.getElementById('add-item-opt-modal').remove();
