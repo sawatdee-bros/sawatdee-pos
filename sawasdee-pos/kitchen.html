@@ -434,10 +434,13 @@ get(ref(db, 'menu')).then(function(snap) {
     Object.values(overrides).forEach(function(ov) {
       if (ov.name && ov.kitchen_name) KITCHEN_NAMES[ov.name] = ov.kitchen_name;
     });
-    // KITCHEN_NAMES生成完了後にorders監視を開始
-    startOrdersWatch();
+    // KITCHEN_NAMES生成完了後にrenderOrdersを再実行して表示を更新
+    renderOrders();
   });
 });
+
+// orders監視はKITCHEN_NAMESと独立して即時開始
+startOrdersWatch();
 
 let KITCHEN_NAMES = {}; // Firebaseのmenu/kitchen_nameから動的生成
 
