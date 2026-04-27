@@ -695,7 +695,7 @@ function makeGroupCard(g, items, type, totalMap, compact) {
     const tot = totalMap[kn] || 0;
     const showTot = !isDone && tot > i.qty;
     const opt = i.name.match(/（.*?）$/);
-    const displayName = (KITCHEN_NAMES[i.name] || KITCHEN_NAMES[base] || base) + (opt ? opt[0] : '');
+    const displayName = KITCHEN_NAMES[i.name] ? KITCHEN_NAMES[i.name] : (KITCHEN_NAMES[base] || base) + (opt ? opt[0] : '');
     const doneBtn = isFoodSingle ? '' : isDone
       ? `<div class="item-done-actions">
           <button class="item-undo-btn" onclick="window.toggleItem('${id}',${idx})">戻す</button>
@@ -714,7 +714,7 @@ function makeGroupCard(g, items, type, totalMap, compact) {
 
   const doneBlock = isFoodSingle
     ? `<div class="order-item" style="border:none;padding:4px 0;display:flex;align-items:center;">
-        <span class="item-name" style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(()=>{const it=items[0].i;const base=it.name.replace(/（.*?）$/,'');const opt=it.name.match(/（.*?）$/);return (KITCHEN_NAMES[it.name]||KITCHEN_NAMES[base]||base)+(opt?opt[0]:'');})()}${items[0].i.qty>1?`<span class="item-qty-badge">×${items[0].i.qty}</span>`:''}</span>
+        <span class="item-name" style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(()=>{const it=items[0].i;const base=it.name.replace(/（.*?）$/,'');const opt=it.name.match(/（.*?）$/);return KITCHEN_NAMES[it.name] ? KITCHEN_NAMES[it.name] : (KITCHEN_NAMES[base]||base)+(opt?opt[0]:'');})()}${items[0].i.qty>1?`<span class="item-qty-badge">×${items[0].i.qty}</span>`:''}</span>
         <button class="done-btn" style="margin:0;width:45%;min-width:100px;padding:10px;font-size:14px;flex-shrink:0;margin-left:8px;" onclick="window.groupDoneMulti('${allIds}','${type}')">✓ 提供完了</button>
       </div>`
     : `<div class="${itemsClass}">${itemsHTML}</div><button class="done-btn" onclick="window.groupDoneMulti('${allIds}','${type}')">提供完了</button>`;
