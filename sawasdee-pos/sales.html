@@ -773,7 +773,7 @@ function render() {
     tnums.forEach(function(t) {
       var tbl = tableMap[t];
       h += '<div class="table-card">'
-        + '<div class="table-card-label">'+(TABLE_NAMES[String(t)]||'T'+t)+'</div>'
+        + '<div class="table-card-label">'+(TABLE_NAMES[String(t)]||'テーブル '+t)+'</div>'
         + '<div class="table-card-val">&#165;'+tbl.sales.toLocaleString()+'</div>'
         + '<div class="table-card-cnt">'+tbl.sessions+'回転</div></div>';
     });
@@ -1084,7 +1084,7 @@ window.showDayBills = function(ds) {
   sessions.forEach(function(sess) {
     var t = new Date(sess.ts);
     var timeStr = ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
-    var tblName = TABLE_NAMES[String(sess.table)] || 'T'+sess.table;
+    var tblName = TABLE_NAMES[String(sess.table)] || 'テーブル '+sess.table;
     var isPaid = sess.orders.some(function(o){ return o.status==='paid'; });
     html += '<div class="bills-receipt">'
       + '<div class="bills-receipt-header">'
@@ -1140,7 +1140,7 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
     var dt = new Date(s.ts); var ds = toDayStr(s.ts);
     var timeStr = pad(dt.getHours())+':'+pad(dt.getMinutes());
     rows1.push([ds, timeStr, DOW[dt.getDay()],
-      TABLE_NAMES[String(s.table)]||'T'+s.table,
+      TABLE_NAMES[String(s.table)]||'テーブル '+s.table,
       s.pax > 0 ? s.pax : '',
       s.ex, s.charge, s.sales - Math.round(s.ex + s.charge), s.sales]);
   });
@@ -1216,7 +1216,7 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
     var dt=new Date(sess.ts); var ds=toDayStr(sess.ts);
     var timeStr=pad(dt.getHours())+':'+pad(dt.getMinutes());
     var dow=DOW[dt.getDay()];
-    var tblName=TABLE_NAMES[String(sess.table)]||'T'+sess.table;
+    var tblName=TABLE_NAMES[String(sess.table)]||'テーブル '+sess.table;
     var billId=String(sess.orders[0].paidAt||sess.ts);
     var chargeEx=calcCharge(sess.drinkQty,sess.pax,sess.hasChargeExempt);
     var taxAmt=sess.sales-Math.round(sess.ex+chargeEx);
@@ -1280,7 +1280,7 @@ window.downloadCsv = function() {
       var taxRate = storeConfig.tax_rate || 10;
       var exWithCharge = s.ex + chargeEx;
       var tax = s.sales - Math.round(exWithCharge);
-      csv += [ds, timeStr, TABLE_NAMES[String(s.table)]||'T'+s.table,
+      csv += [ds, timeStr, TABLE_NAMES[String(s.table)]||'テーブル '+s.table,
         s.pax, s.drinkQty, chargeEx,
         Math.round(exWithCharge), tax, s.sales].join(',') + '\n';
     });
@@ -1332,7 +1332,7 @@ window.downloadCsv = function() {
       var ds = toDayStr(sess.ts);
       var timeStr = ('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
       var dow = DOW[dt.getDay()];
-      var tblName = TABLE_NAMES[String(sess.table)] || 'T'+sess.table;
+      var tblName = TABLE_NAMES[String(sess.table)] || 'テーブル '+sess.table;
       var billId = String(sess.orders[0].paidAt || sess.ts);
       var chargeEx = calcCharge(sess.drinkQty, sess.pax, sess.hasChargeExempt);
       var taxAmt = sess.sales - Math.round(sess.ex + chargeEx);
