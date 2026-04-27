@@ -381,7 +381,6 @@ get(ref(db, 'store_config')).then(function(snap) {
   window._loadedTableNamesShort = cfg.table_names_short || {};
   renderTableNamesEditor();
   window._itemOptions = cfg.item_options ? JSON.parse(JSON.stringify(cfg.item_options)) : {};
-  renderItemOptionsList();
   document.getElementById('has_ohiya').checked = !!cfg.has_ohiya;
   document.getElementById('has_nomi_hodai').checked = !!cfg.has_nomi_hodai;
   document.getElementById('has_call_button').checked = !!cfg.has_call_button;
@@ -390,6 +389,7 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('apps_script_url').value = cfg.apps_script_url || '';
   window._discountPresets = Array.isArray(cfg.discount_presets) ? cfg.discount_presets : [];
   window.renderDiscountPresets();
+  renderItemOptionsList();
   document.getElementById('loading').style.display = 'none';
   document.getElementById('main').style.display = 'block';
   // 読み込み完了後に初期状態を記録
@@ -524,7 +524,8 @@ window.leaveAction = async function(action) {
   // cancel: 何もしない
 };
 
-window.renderItemOptionsList = function() {
+window.renderItemOptionsList = renderItemOptionsList;
+function renderItemOptionsList() {
   var opts = window._itemOptions || {};
   var list = document.getElementById('item-options-list');
   if (!list) return;
