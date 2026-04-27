@@ -475,7 +475,7 @@ function addItemToCart(cat, sub, idx, item, optLabel, extras) {
   var optKey = optLabel || extras.map(function(e) { return e.label; }).join(',');
   var key = cat + '__' + sub + '__' + idx + (optKey ? '__' + optKey : '');
   var displayName = item.name + (optLabel ? '（' + optLabel + '）' : '');
-  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null, ...(item.drink_count !== undefined ? { drink_count: item.drink_count } : {}) }, qty: 0, extras: extras };
+  if (!cart[key]) cart[key] = { item: { name: displayName, price: item.price, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null, category: cat, ...(item.drink_count !== undefined ? { drink_count: item.drink_count } : {}) }, qty: 0, extras: extras };
   cart[key].qty++;
   renderMenu(); renderCart();
 }
@@ -563,14 +563,21 @@ window.showHistory = async function() {
     (order.items || []).forEach(function(item) {
       var key = item.name + (item.extrasStr ? '__' + item.extrasStr : '');
       var baseName = item.name.replace(/（.*?）$/, '');
-      var drinkNames = [];
-      if (MENU_DATA['drink']) {
-        Object.values(MENU_DATA['drink']).forEach(function(subcatItems) {
-          (Array.isArray(subcatItems) ? subcatItems : Object.values(subcatItems)).forEach(function(i) { if (i.name) drinkNames.push(i.name); });
-        });
+      // 新形式: item.categoryがあればそちらを優先
+      var isDrink;
+      if (item.category !== undefined) {
+        isDrink = item.category === 'drink' && item.name !== 'お冷';
+      } else {
+        var drinkNames = [];
+        if (MENU_DATA['drink']) {
+          Object.values(MENU_DATA['drink']).forEach(function(subcatItems) {
+            (Array.isArray(subcatItems) ? subcatItems : Object.values(subcatItems)).forEach(function(i) { if (i.name) drinkNames.push(i.name); });
+          });
+        }
+        isDrink = baseName !== 'お冷' && drinkNames.some(function(d) { return baseName === d || baseName.startsWith(d + '（'); });
       }
-      var isDrink = baseName !== 'お冷' && drinkNames.some(function(d) { return baseName === d || baseName.startsWith(d + '（'); });
-      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null };
+      var drinkCount = isDrink ? (item.drink_count !== undefined ? item.drink_count : 1) : 0;
+      if (!itemMap[key]) itemMap[key] = { name: item.name + (item.extrasStr ? '（' + item.extrasStr + '）' : ''), qty: 0, price: item.price || 0, isDrink: isDrink, drinkCount: drinkCount, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null };
       itemMap[key].qty += item.qty;
     });
   });
@@ -596,7 +603,7 @@ function renderHistoryModal() {
   var drinkCount = 0;
   var hasExemptItem = false;
   _historyItems.forEach(function(it) {
-    if (it.isDrink) drinkCount += it.qty;
+    if (it.isDrink) drinkCount += it.qty * (it.drinkCount !== undefined ? it.drinkCount : 1);
     if (it.charge_exempt) hasExemptItem = true;
   });
   var chargeBase = _CHARGE_PER_PERSON * _historyPax;
@@ -660,6 +667,7 @@ window.placeOrder = async function() {
     if (c.item.charge_exempt) item.charge_exempt = true;
     if (c.item.price_type) item.price_type = c.item.price_type;
     if (c.item.drink_count !== undefined) item.drink_count = c.item.drink_count;
+    if (c.item.category) item.category = c.item.category;
     if (c.extras && c.extras.length > 0) {
       item.extrasStr = c.extras.map(function(e) { return e.label; }).join('・');
       item.price = c.item.price + c.extras.reduce(function(s, e) { return s + e.price; }, 0);

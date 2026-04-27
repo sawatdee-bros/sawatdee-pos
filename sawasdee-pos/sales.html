@@ -305,11 +305,7 @@ var rankMode = 'qty';    // 'qty' | 'sales'
 var navCalYear = null;   // 月めくりカレンダーの表示年
 var navCalMonth = null;  // 月めくりカレンダーの表示月（0-11）
 var DOW = ['日','月','火','水','木','金','土'];
-var TABLE_NAMES = {
-  '1':'テーブル1','2':'テーブル2','3':'テーブル3','4':'テーブル4',
-  '5':'コーラ卓','6':'座敷席','7':'カウンター1・2',
-  '8':'カウンター3・4','9':'カウンター5','10':'奥席'
-};
+var TABLE_NAMES = {}; // store_config/table_namesから動的読み込み
 window.TABLE_NAMES = TABLE_NAMES;
 
 // ─────────────────────────────────────────────
@@ -326,8 +322,10 @@ function buildDrinkKeySet() {
   drinkKeySet = s;
 }
 
-function isDrinkItem(name) {
-  // Firebase保存済み分類を最優先
+function isDrinkItem(name, item) {
+  // 新形式: itemにcategoryが入っていればそちらを最優先
+  if (item && item.category !== undefined) return item.category === 'drink';
+  // Firebase保存済み分類を次に優先
   if (itemOverrides[name] === 'ドリンク') return true;
   // 旧名マッピングでドリンクと判定されている場合も true
   if (LEGACY_ITEM_CAT[name] === 'ドリンク') return true;
@@ -429,7 +427,7 @@ function buildSessionMap(orders) {
     s.orders.push(o);
     (o.items||[]).forEach(function(it) {
       s.ex += it.price * it.qty;
-      if (isDrinkItem(it.name) && it.name !== 'お冷') s.drinkQty += it.qty;
+      if (isDrinkItem(it.name, it) && it.name !== 'お冷') s.drinkQty += it.qty * (it.drink_count !== undefined ? it.drink_count : 1);
       if (it.charge_exempt) s.hasChargeExempt = true;
       if (!s.items[it.name]) s.items[it.name] = { name: it.name, price: it.price, qty: 0 };
       s.items[it.name].qty += it.qty;
@@ -1096,7 +1094,7 @@ window.showDayBills = function(ds) {
       + '</div>';
 
     var sortedItems = Object.values(sess.items).sort(function(a,b) {
-      var aD = isDrinkItem(a.name), bD = isDrinkItem(b.name);
+      var aD = isDrinkItem(a.name,a), bD = isDrinkItem(b.name,b);
       return aD===bD ? 0 : aD ? -1 : 1;
     });
     sortedItems.forEach(function(it) {
@@ -1223,7 +1221,7 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
     var chargeEx=calcCharge(sess.drinkQty,sess.pax,sess.hasChargeExempt);
     var taxAmt=sess.sales-Math.round(sess.ex+chargeEx);
     var sortedItems=Object.values(sess.items).sort(function(a,b){
-      var aD=isDrinkItem(a.name),bD=isDrinkItem(b.name);
+      var aD=isDrinkItem(a.name,a),bD=isDrinkItem(b.name,b);
       return aD===bD?0:aD?-1:1;
     });
     sortedItems.forEach(function(it,idx){
@@ -1440,6 +1438,7 @@ onValue(ref(db, 'menu'), function(snap) {
 });
 onValue(ref(db, 'store_config'), function(snap) {
   storeConfig = snap.val() || {};
+  if (storeConfig.table_names) { TABLE_NAMES = storeConfig.table_names; window.TABLE_NAMES = TABLE_NAMES; }
   if (storeConfig.day_start_hour != null) DAY_START = storeConfig.day_start_hour;
   // tax_rate の正規化：Firebaseに0.1で入っている場合は10（%）に変換
   if (storeConfig.tax_rate != null && storeConfig.tax_rate < 1) {

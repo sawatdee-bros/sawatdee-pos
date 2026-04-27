@@ -169,6 +169,8 @@ var FC = {
 var app = initializeApp(FC);
 var db = getDatabase(app);
 var DAY_START = 8;
+var TABLE_NAMES = {}; // store_config/table_namesから動的読み込み
+function tableName(t) { return TABLE_NAMES[String(t)] || 'テーブル ' + t; }
 var _ROUNDING_MODE = 'floor';
 var _ROUNDING_UNIT = 10;
 function applyRounding(val) {
@@ -181,11 +183,23 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (cfg.day_start_hour != null) DAY_START = cfg.day_start_hour;
   if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
   if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
+  if (cfg.table_names) TABLE_NAMES = cfg.table_names;
+});
+get(ref(db, 'menu')).then(function(snap) {
+  var menuData = snap.val() || {};
+  DRINKS = [];
+  Object.values(menuData.drink || {}).forEach(function(items) {
+    if (Array.isArray(items)) items.forEach(function(it) { if (it.name && !DRINKS.includes(it.name)) DRINKS.push(it.name); });
+  });
 });
 var allOrders = {};
 var currentFilter = 'all';
 var paxStore = {};
-var DRINKS = ["生ビール ジョッキ（アサヒ　スーパードライ）", "瓶ビール 大びん（サッポロ　赤星）", "ノンアルビール 小びん", "シンハー", "チャーン", "リオ", "マンゴービア", "グアバビア", "メガハイボール", "角ハイボール", "ジンジャーハイボール", "コークハイボール", "メコンハイボール", "メコンジンジャー", "メコンコーク", "タイサワー", "パクチーレモンサワー", "タイ式漢方サワー", "レモンサワー", "クエン酸サワー", "バイス(梅しそ)サワー", "チューハイ", "ウーロンハイ", "ジャスミンハイ", "ホッピー", "マンゴーハイ", "グアバハイ", "タイ紅茶ハイ", "マンゴーミルクハイ", "グアバミルクハイ", "カシスソーダ", "カシスウーロン", "カシスマンゴー", "テキーラコーク", "テキーラグアバ", "テキーラショット", "泡盛(久米仙)", "ジャスミン焼酎(茉莉花)", "梅酒", "グラスワイン 赤", "グラスワイン 白", "デキャンタ 赤", "デキャンタ 白", "ボトルワイン 赤", "ボトルワイン 白", "マンゴージュース", "グアバジュース", "タイ紅茶(タイ式ミルクティー)", "炭酸水(カットレモン入り)", "コカコーラ", "ジンジャーエール(辛口)", "ウーロン茶", "ジャスミン茶", "ノンアル★タイサワー", "ノンアル★マンゴーミルク"];
+let DRINKS = []; // Firebaseのmenu/drinkから動的生成
+function isDrinkItem(name, item) {
+  if (item && item.category !== undefined) return item.category === 'drink';
+  return DRINKS.some(function(d) { return name === d || name.startsWith(d + '（'); });
+}
 var CHARGE = 250;
 var MENU_ALL = [
   {name:'パッタイ',price:1200},{name:'カオパット',price:900},
@@ -225,7 +239,7 @@ window.changePax = function(t, d) {
 window.markPaid = function(tableNum, idStr) {
   var pax = paxStore[tableNum] !== undefined ? paxStore[tableNum] : 0;
   if (pax < 1) { alert('客数を1名以上入力してから会計済みにしてください。'); return; }
-  if (!confirm('テーブル '+tableNum+' を会計済みにしますか？')) return;
+  if (!confirm(tableName(tableNum)+' を会計済みにしますか？')) return;
   var keys = idStr.split(',');
   var paidAt = Date.now();
   for (var i=0;i<keys.length;i++) {
@@ -241,7 +255,7 @@ window.openEdit = function(tableNum, idStr) {
     if (allOrders[ids[i]]) entries.push({id:ids[i], o:allOrders[ids[i]]});
   }
   editState = {tableNum:tableNum, entries:entries, cancelSet:{}, qtyMap:{}, addItems:[]};
-  document.getElementById('edit-modal-title').textContent = 'テーブル'+tableNum+' の伝票を編集';
+  document.getElementById('edit-modal-title').textContent = tableName(tableNum)+' の伝票を編集';
   renderEditModal();
   document.getElementById('edit-modal').classList.add('open');
 };
@@ -512,7 +526,7 @@ function render() {
       var items=o.items||[];
       for (var k=0;k<items.length;k++) {
         var item=items[k];
-        var map=DRINKS.indexOf(item.name)>=0?drinkMap:foodMap;
+        var map=isDrinkItem(item.name,item)?drinkMap:foodMap;
         if (!map[item.name]) map[item.name]={name:item.name,qty:0,price:item.price,pending:false};
         map[item.name].qty+=item.qty;
         if (!itemsDone[k]) map[item.name].pending=true;
@@ -570,7 +584,7 @@ function render() {
     html+='<div class="'+receiptCls+'">'
       +'<div class="receipt-top"></div>'
       +'<div class="receipt-inner">'
-      +'<div class="receipt-table">テーブル '+tableNum+'</div>'
+      +'<div class="receipt-table">'+tableName(tableNum)+'</div>'
       +'<div class="receipt-time">'+firstTime+' 〜 '+entries.length+'回注文</div>'
       +'<div class="receipt-status">'+pillHTML+'</div>'
       +'<hr class="receipt-divider">'

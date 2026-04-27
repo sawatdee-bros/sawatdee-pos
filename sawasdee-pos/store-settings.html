@@ -168,6 +168,12 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
         <input class="field-input" type="number" id="nomi_table_count" min="0" max="50">
         <span class="field-unit">卓</span>
       </div>
+      <div style="margin-top:16px;">
+        <div class="field-label-main" style="margin-bottom:4px;">テーブル名</div>
+        <div class="field-label-sub" style="margin-bottom:10px;">番号ごとに通常名と略称（ハンディ用）を設定できます</div>
+        <div id="table-names-editor"></div>
+        <button type="button" class="save-btn" style="margin-top:8px;" onclick="renderTableNamesEditor()">↺ テーブル数から再生成</button>
+      </div>
     </div>
   </div>
 
@@ -362,6 +368,9 @@ get(ref(db, 'store_config')).then(function(snap) {
   window.updateChargeMode(mode);
   document.getElementById('table_count').value = cfg.table_count;
   document.getElementById('nomi_table_count').value = cfg.nomi_table_count;
+  window._loadedTableNames = cfg.table_names || {};
+  window._loadedTableNamesShort = cfg.table_names_short || {};
+  renderTableNamesEditor();
   document.getElementById('has_ohiya').checked = !!cfg.has_ohiya;
   document.getElementById('has_nomi_hodai').checked = !!cfg.has_nomi_hodai;
   document.getElementById('has_call_button').checked = !!cfg.has_call_button;
@@ -504,6 +513,24 @@ window.leaveAction = async function(action) {
   // cancel: 何もしない
 };
 
+window.renderTableNamesEditor = function() {
+  var count = parseInt(document.getElementById('table_count').value) || 1;
+  var names = window._loadedTableNames || {};
+  var shorts = window._loadedTableNamesShort || {};
+  var html = '<div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:6px;align-items:center;font-size:12px;color:#64748b;margin-bottom:4px;">'
+    + '<div>番号</div><div>テーブル名</div><div>略称（ハンディ用）</div></div>';
+  for (var i = 1; i <= count; i++) {
+    var defaultName = 'テーブル' + i;
+    var defaultShort = 'T' + i;
+    html += '<div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:6px;align-items:center;margin-bottom:6px;">'
+      + '<div style="font-size:13px;color:#94a3b8;">T' + i + '</div>'
+      + '<input id="tname-' + i + '" type="text" placeholder="' + defaultName + '" value="' + (names[String(i)] || '') + '" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:6px 8px;font-size:13px;">'
+      + '<input id="tname-short-' + i + '" type="text" placeholder="' + defaultShort + '" value="' + (shorts[String(i)] || '') + '" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:6px 8px;font-size:13px;">'
+      + '</div>';
+  }
+  document.getElementById('table-names-editor').innerHTML = html;
+};
+
 window.saveAll = async function() {
   var btn = document.getElementById('save-btn');
   btn.disabled = true;
@@ -526,6 +553,17 @@ window.saveAll = async function() {
     apps_script_url: document.getElementById('apps_script_url').value.trim() || null,
     discount_presets: window._discountPresets && window._discountPresets.length > 0 ? window._discountPresets : null
   };
+  // テーブル名を収集
+  var tableNames = {}, tableNamesShort = {};
+  var count = parseInt(document.getElementById('table_count').value) || 1;
+  for (var i = 1; i <= count; i++) {
+    var nameEl = document.getElementById('tname-' + i);
+    var shortEl = document.getElementById('tname-short-' + i);
+    if (nameEl && nameEl.value.trim()) tableNames[String(i)] = nameEl.value.trim();
+    if (shortEl && shortEl.value.trim()) tableNamesShort[String(i)] = shortEl.value.trim();
+  }
+  if (Object.keys(tableNames).length > 0) cfg.table_names = tableNames;
+  if (Object.keys(tableNamesShort).length > 0) cfg.table_names_short = tableNamesShort;
   // nullのキーは除去（Firebaseに不要な値を残さない）
   Object.keys(cfg).forEach(function(k){ if (cfg[k] === null) delete cfg[k]; });
   try {

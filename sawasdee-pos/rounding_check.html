@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>丸め差異チェック - サワディーブロス</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; padding: 16px; }
+h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+.sub { font-size: 12px; color: #64748b; margin-bottom: 16px; }
+.summary { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.card { background: #1e293b; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 160px; }
+.card-label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
+.card-val { font-size: 20px; font-weight: 700; }
+.card-val.green { color: #22c55e; }
+.card-val.yellow { color: #fbbf24; }
+.card-val.red { color: #ef4444; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: #1e293b; padding: 8px 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #334155; position: sticky; top: 0; }
+td { padding: 7px 10px; border-bottom: 1px solid #1e293b; }
+tr:hover td { background: #1e293b; }
+tr.has-diff td { background: #1c1008; }
+tr.has-diff td.diff-cell { color: #fbbf24; font-weight: 700; }
+.loading { text-align: center; padding: 40px; color: #475569; }
+.filter-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+.filter-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 12px; cursor: pointer; }
+.filter-btn.active { background: #166534; border-color: #166534; color: white; }
+.filter-label { font-size: 12px; color: #64748b; }
+</style>
+</head>
+<body>
+<h1>🔍 丸め差異チェックツール</h1>
+<p class="sub">四捨五入（旧）と切り捨て（新）の売上差異を会計済みセッションごとに比較します</p>
+
+<div id="loading" class="loading">Firebaseからデータを読み込み中...</div>
+<div id="main" style="display:none">
+  <div class="summary" id="summary"></div>
+  <div class="filter-row">
+    <span class="filter-label">表示:</span>
+    <button class="filter-btn active" onclick="setView('all',this)">全件</button>
+    <button class="filter-btn" onclick="setView('diff',this)">差異あり</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>テーブル</th>
+        <th>人数</th>
+        <th>税抜小計</th>
+        <th>チャージ</th>
+        <th>四捨五入（旧）</th>
+        <th>切り捨て（新）</th>
+        <th>差異</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FC = {
+  apiKey: 'AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ',
+  authDomain: 'sawatdee-bros.firebaseapp.com',
+  databaseURL: 'https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'sawatdee-bros',
+  storageBucket: 'sawatdee-bros.firebasestorage.app',
+  messagingSenderId: '1026345346676',
+  appId: '1:1026345346676:web:98478c02d3dfbae3df310e'
+};
+const app = initializeApp(FC);
+const db = getDatabase(app);
+
+let allRows = [];
+let viewMode = 'all';
+
+function isDrinkItem(name, drinkNames) {
+  return drinkNames.some(d => name === d || name.startsWith(d + '（'));
+}
+
+function calcCharge(drinkQty, pax, hasChargeExempt, cfg) {
+  var mode = cfg.charge_mode || 'conditional';
+  var chargePerPerson = cfg.charge_per_person || 250;
+  var freeDrinkCount = cfg.charge_free_drink_count || 2;
+  if (hasChargeExempt || mode === 'none') return 0;
+  if (mode === 'always') return chargePerPerson * pax;
+  return (pax > 0 && drinkQty >= pax * freeDrinkCount) ? 0 : chargePerPerson * pax;
+}
+
+function roundOld(finalEx, taxRate, unit) {
+  // 旧: Math.round固定（変更前の状態を再現）
+  return Math.round((finalEx * (1 + taxRate / 100)) / unit) * unit;
+}
+
+function roundNew(finalEx, taxRate, cfg) {
+  var unit = cfg.rounding_unit || 10;
+  var mode = cfg.rounding_mode || 'floor';
+  var val = finalEx * (1 + taxRate / 100);
+  if (mode === 'round') return Math.round(val / unit) * unit;
+  if (mode === 'ceil') return Math.ceil(val / unit) * unit;
+  return Math.floor(val / unit) * unit;
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+function fmtDate(ts) {
+  var d = new Date(ts);
+  return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+
+async function init() {
+  const [cfgSnap, ordersSnap, menuSnap] = await Promise.all([
+    get(ref(db, 'store_config')),
+    get(ref(db, 'orders')),
+    get(ref(db, 'menu')),
+  ]);
+
+  const cfg = cfgSnap.val() || {};
+  const taxRate = cfg.tax_rate || 10;
+  const orders = ordersSnap.val() || {};
+  const menuData = menuSnap.val() || {};
+
+  // drinkNames収集
+  const drinkNames = [];
+  Object.values(menuData.drink || {}).forEach(function(items) {
+    if (Array.isArray(items)) items.forEach(function(it) { if (it.name) drinkNames.push(it.name); });
+  });
+
+  // 会計済みセッションのみ（table + paidAtでグループ）
+  const sessionMap = {};
+  Object.values(orders).forEach(function(o) {
+    if (o.status !== 'paid' || !o.paidAt) return;
+    var sk = (o.table||'?') + '__' + o.paidAt;
+    if (!sessionMap[sk]) sessionMap[sk] = { table: o.table||'?', paidAt: o.paidAt, ts: o.timestamp, pax: 0, ex: 0, drinkQty: 0, hasExempt: false };
+    var s = sessionMap[sk];
+    if (o.pax) s.pax = o.pax;
+    if (o.timestamp < s.ts) s.ts = o.timestamp;
+    (o.items||[]).forEach(function(it) {
+      s.ex += it.price * it.qty;
+      if (isDrinkItem(it.name, drinkNames) && it.name !== 'お冷') {
+        s.drinkQty += it.qty * (it.drink_count !== undefined ? it.drink_count : 1);
+      }
+      if (it.charge_exempt) s.hasExempt = true;
+    });
+  });
+
+  allRows = Object.values(sessionMap).sort(function(a,b){ return a.ts - b.ts; }).map(function(s) {
+    var charge = calcCharge(s.drinkQty, s.pax, s.hasExempt, cfg);
+    var finalEx = s.ex + charge;
+    var oldVal = roundOld(finalEx, taxRate, 10); // 旧は10円単位固定
+    var newVal = roundNew(finalEx, taxRate, cfg);
+    return { date: fmtDate(s.ts), table: s.table, pax: s.pax, ex: s.ex, charge: charge, oldVal: oldVal, newVal: newVal, diff: newVal - oldVal };
+  });
+
+  // サマリー
+  var totalOld = allRows.reduce(function(a,r){ return a+r.oldVal; }, 0);
+  var totalNew = allRows.reduce(function(a,r){ return a+r.newVal; }, 0);
+  var totalDiff = totalNew - totalOld;
+  var diffCount = allRows.filter(function(r){ return r.diff !== 0; }).length;
+
+  document.getElementById('summary').innerHTML = `
+    <div class="card"><div class="card-label">セッション数</div><div class="card-val">${allRows.length}</div></div>
+    <div class="card"><div class="card-label">四捨五入（旧）合計</div><div class="card-val green">¥${totalOld.toLocaleString()}</div></div>
+    <div class="card"><div class="card-label">切り捨て（新）合計</div><div class="card-val green">¥${totalNew.toLocaleString()}</div></div>
+    <div class="card"><div class="card-label">累計差異</div><div class="card-val ${totalDiff===0?'green':'yellow'}">¥${totalDiff.toLocaleString()}</div></div>
+    <div class="card"><div class="card-label">差異あり件数</div><div class="card-val ${diffCount===0?'green':'yellow'}">${diffCount}件</div></div>
+  `;
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+  renderTable();
+
+  window.setView = function(mode, btn) {
+    viewMode = mode;
+    document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderTable();
+  };
+}
+
+function renderTable() {
+  var rows = viewMode === 'diff' ? allRows.filter(function(r){ return r.diff !== 0; }) : allRows;
+  document.getElementById('tbody').innerHTML = rows.map(function(r) {
+    var hasDiff = r.diff !== 0;
+    return `<tr class="${hasDiff?'has-diff':''}">
+      <td>${r.date}</td>
+      <td>T${r.table}</td>
+      <td>${r.pax||'-'}</td>
+      <td>¥${r.ex.toLocaleString()}</td>
+      <td>¥${r.charge.toLocaleString()}</td>
+      <td>¥${r.oldVal.toLocaleString()}</td>
+      <td>¥${r.newVal.toLocaleString()}</td>
+      <td class="diff-cell">${hasDiff ? '¥'+r.diff.toLocaleString() : '-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+init().catch(function(e) {
+  document.getElementById('loading').textContent = 'エラー: ' + e.message;
+});
+</script>
+</body>
+</html>

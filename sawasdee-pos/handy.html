@@ -136,10 +136,7 @@ const app = initializeApp(FC);
 const db = getDatabase(app);
 
 const TABLE_COUNT = 10;
-const TABLE_NAMES = {
-  1: 'T1', 2: 'T2', 3: 'T3', 4: 'T4',
-  5: 'コ', 6: 'Z', 7: 'C1.2', 8: 'C3.4', 9: 'C5', 10: '奥'
-};
+let TABLE_NAMES = {}; // store_config/table_names_shortから動的読み込み
 function tableName(n) { return TABLE_NAMES[n] || 'T'+n; }
 let GROUPS_DATA = {};
 
@@ -265,7 +262,7 @@ window.tapOhiya = function() {
 window.tapItem = function(key, idx) {
   if (!currentTable) { alert('テーブルを選択してください'); return; }
   const item = GROUPS_DATA[currentCat][currentGroupIdx].items[idx];
-  if (!cart[key]) cart[key] = { name: item.name, price: item.price, qty: 0, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null };
+  if (!cart[key]) cart[key] = { name: item.name, price: item.price, qty: 0, charge_exempt: !!item.charge_exempt, price_type: item.price_type || null, category: currentCat };
   cart[key].qty += 1;
   renderMenu();
   renderCart();
@@ -373,7 +370,8 @@ window.placeOrder = async function() {
   const items = Object.values(cart).map(c => ({
     name: c.name, qty: c.qty, price: c.price,
     ...(c.charge_exempt ? { charge_exempt: true } : {}),
-    ...(c.price_type ? { price_type: c.price_type } : {})
+    ...(c.price_type ? { price_type: c.price_type } : {}),
+    ...(c.category ? { category: c.category } : {})
   }));
   if (!items.length || !currentTable) return;
   document.getElementById('order-btn').disabled = true;
@@ -405,6 +403,8 @@ async function init() {
     const cfg = cfgSnap.val() || {};
     if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
     if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
+    if (cfg.table_names_short) TABLE_NAMES = cfg.table_names_short;
+    else if (cfg.table_names) TABLE_NAMES = cfg.table_names;
     const snap = await get(ref(db, 'handy_groups'));
     GROUPS_DATA = snap.val() || {};
     // menu/set をhandy_groups形式に変換して追加
