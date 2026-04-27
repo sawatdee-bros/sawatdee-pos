@@ -203,28 +203,8 @@ let MENU_DATA = {};
 let hasOhiya = false; // store_config/has_ohiya
 let showSetOnCustomer = false; // store_config/show_set_on_customer
 
-// オプション定義
-const ITEM_OPTIONS = {
-  '泡盛(久米仙)': {
-    type: 'required', label: '飲み方を選択してください',
-    choices: ['ロック', 'ソーダ割', '水割り']
-  },
-  'ジャスミン焼酎(茉莉花)': {
-    type: 'required', label: '飲み方を選択してください',
-    choices: ['ロック', 'ソーダ割', '水割り', 'ジャスミン茶割']
-  },
-  '梅酒': {
-    type: 'required', label: '飲み方を選択してください',
-    choices: ['ロック', 'ソーダ割', '水割り']
-  },
-  '鶏もも肉のガパオ炒め': {
-    type: 'optional', label: 'サイドメニューを追加しますか？',
-    choices: [
-      { label: 'ライス', price: 300 },
-      { label: '目玉焼き', price: 120 }
-    ]
-  }
-};
+// オプション定義（store_config/item_optionsから動的読み込み）
+let ITEM_OPTIONS = {};
 const taxIn = p => Math.floor(p * (1 + TAX));
 // price_type:'inclusive'対応版：税込価格はそのまま、税抜価格はtaxIn変換
 const taxInItem = item => item.price_type === 'inclusive' ? item.price : taxIn(item.price);
@@ -555,6 +535,7 @@ window.showHistory = async function() {
   _CHARGE_FREE_DRINK_COUNT = cfg.charge_free_drink_count !== undefined ? cfg.charge_free_drink_count : 2;
   if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
   if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
+  if (cfg.item_options) ITEM_OPTIONS = cfg.item_options;
   var itemMap = {};
   Object.values(data).forEach(function(order) {
     if (order.table != tableNum) return;
