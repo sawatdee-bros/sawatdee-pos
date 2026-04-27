@@ -321,12 +321,13 @@ window.saveItem = async (id) => {
   if (Object.keys(ed).length === 0) return;
   // Firebaseのmenu_overridesに保存
   await update(ref(db, 'menu_overrides/' + id), ed);
-  const msg = document.getElementById('saved-' + id);
-  if (msg) { msg.style.display = 'inline'; setTimeout(() => { msg.style.display = 'none'; }, 2000); }
   // ALL_ITEMSも更新
   Object.assign(orig, ed);
   delete localEdits[id];
   renderList();
+  // renderList後に要素を取得して表示
+  const msg = document.getElementById('saved-' + id);
+  if (msg) { msg.style.display = 'inline'; setTimeout(() => { msg.style.display = 'none'; }, 2000); }
 };
 
 // オプション表示

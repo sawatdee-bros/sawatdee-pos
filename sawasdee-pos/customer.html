@@ -235,7 +235,13 @@ async function init() {
         Object.values(MENU_DATA[cat]).forEach(function(subcatItems) {
           if (!Array.isArray(subcatItems)) return;
           subcatItems.forEach(function(item) {
-            if (item.id && overrides[item.id]) Object.assign(item, overrides[item.id]);
+            if (item.id && overrides[item.id]) {
+              Object.assign(item, overrides[item.id]);
+              // menu_overridesのitem_optionsをITEM_OPTIONSに反映
+              if (overrides[item.id].item_options) {
+                ITEM_OPTIONS[item.name] = overrides[item.id].item_options;
+              }
+            }
           });
         });
       });
