@@ -426,12 +426,14 @@ function buildSessionMap(orders) {
     if (o.pax) s.pax = o.pax;
     s.orders.push(o);
     (o.items||[]).forEach(function(it) {
-      s.ex += it.price * it.qty;
+      var extrasTotal = (it.extras||[]).reduce(function(s,ex){ return s+(ex.price||0); }, 0);
+      var basePrice = it.price - extrasTotal; // extrasを除いた本体価格
+      s.ex += basePrice * it.qty;
       if (isDrinkItem(it.name, it) && it.name !== 'お冷') s.drinkQty += it.qty * (it.drink_count !== undefined ? it.drink_count : 1);
       if (it.charge_exempt) s.hasChargeExempt = true;
-      if (!s.items[it.name]) s.items[it.name] = { name: it.name, price: it.price, qty: 0 };
+      if (!s.items[it.name]) s.items[it.name] = { name: it.name, price: basePrice, qty: 0 };
       s.items[it.name].qty += it.qty;
-      // extrasを集計（価格あり選択肢）
+      // extrasを個別集計
       (it.extras||[]).forEach(function(ex) {
         if (!ex.price) return;
         s.ex += ex.price * it.qty;
@@ -533,10 +535,12 @@ function render() {
     (o.items||[]).forEach(function(it) {
       var cat = getItemCategory(it.name);
       catMap[cat] = (catMap[cat] || 0) + it.price * it.qty;
+      var extrasTotal2 = (it.extras||[]).reduce(function(s,ex){ return s+(ex.price||0); }, 0);
+      var basePrice2 = it.price - extrasTotal2;
       if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, qty:0, sales:0, cat:cat };
       itemMap[it.name].qty += it.qty;
-      itemMap[it.name].sales += it.price * it.qty;
-      // extrasを集計
+      itemMap[it.name].sales += basePrice2 * it.qty;
+      // extrasを個別集計
       (it.extras||[]).forEach(function(ex){
         if(!ex.price) return;
         var exCat = getItemCategory(ex.label);
@@ -1207,9 +1211,11 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
   var itemMap4 = {};
   filtered.forEach(function(o){
     (o.items||[]).forEach(function(it){
+      var extrasTotal3=(it.extras||[]).reduce(function(s,ex){return s+(ex.price||0);},0);
+      var basePrice3=it.price-extrasTotal3;
       if(!itemMap4[it.name])itemMap4[it.name]={name:it.name,cat:getItemCategory(it.name),qty:0,sales:0};
-      itemMap4[it.name].qty+=it.qty; itemMap4[it.name].sales+=it.price*it.qty;
-      // extrasを集計
+      itemMap4[it.name].qty+=it.qty; itemMap4[it.name].sales+=basePrice3*it.qty;
+      // extrasを個別集計
       (it.extras||[]).forEach(function(ex){
         if(!ex.price) return;
         if(!itemMap4[ex.label])itemMap4[ex.label]={name:ex.label,cat:getItemCategory(ex.label),qty:0,sales:0};

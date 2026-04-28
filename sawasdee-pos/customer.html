@@ -676,6 +676,7 @@ window.placeOrder = async function() {
     if (c.item.category) item.category = c.item.category;
     if (c.extras && c.extras.length > 0) {
       item.extrasStr = c.extras.map(function(e) { return e.label; }).join('・');
+      item.extras = c.extras; // 集計用にextras配列を保存
       item.price = c.item.price + c.extras.reduce(function(s, e) { return s + e.price; }, 0);
       delete item.price_type; // extrasがある場合は税抜として扱う
     }
