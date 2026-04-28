@@ -18,8 +18,16 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .saved-toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #166534; color: white; padding: 10px 24px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 200; white-space: nowrap; }
 .saved-toast.show { display: block; }
 
-.section { margin: 20px 16px 0; }
-.section-title { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.section { margin: 8px 16px 0; }
+.section-title { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0; }
+.accordion-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #1e293b; border-radius: 12px; cursor: pointer; border: 1px solid #334155; user-select: none; }
+.accordion-header:hover { background: #253347; }
+.accordion-header.open { border-radius: 12px 12px 0 0; border-bottom: 1px solid #334155; }
+.accordion-title { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+.accordion-arrow { color: #64748b; font-size: 12px; transition: transform 0.2s; }
+.accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+.accordion-body { display: none; background: #1e293b; border: 1px solid #334155; border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
+.accordion-body.open { display: block; }
 
 .card { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
 .field-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #1e293b; gap: 12px; }
@@ -97,12 +105,18 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <div id="main" style="display:none">
 
   <div class="section">
-    <div class="section-title">基本情報</div>
-    <div class="card">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">基本情報</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-row">
         <div class="field-label">
           <div class="field-label-main">店舗名</div>
-        </div>
+    </div>
+  </div>
         <input class="field-input wide" type="text" id="store_name">
       </div>
       <div class="field-row">
@@ -150,13 +164,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   </div>
 
   <div class="section">
-    <div class="section-title">席・テーブル</div>
-    <div class="card">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">席・テーブル</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-row">
         <div class="field-label">
           <div class="field-label-main">テーブル数</div>
           <div class="field-label-sub">通常席</div>
-        </div>
+    </div>
+  </div>
         <input class="field-input" type="number" id="table_count" min="1" max="50">
         <span class="field-unit">卓</span>
       </div>
@@ -178,12 +198,18 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   </div>
 
   <div class="section">
-    <div class="section-title">チャージ料</div>
-    <div class="card">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">チャージ料</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-row">
         <div class="field-label">
           <div class="field-label-main">チャージ料（1名あたり）</div>
-        </div>
+    </div>
+  </div>
         <input class="field-input" type="number" id="charge_per_person" min="0">
         <span class="field-unit">円</span>
       </div>
@@ -221,13 +247,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   </div>
 
   <div class="section">
-    <div class="section-title">営業設定</div>
-    <div class="card">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">営業設定</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-row">
         <div class="field-label">
           <div class="field-label-main">営業日の切り替え時刻</div>
           <div class="field-label-sub">この時刻に日付が切り替わる（売上・伝票）</div>
-        </div>
+    </div>
+  </div>
         <select class="hour-select" id="day_start_hour">
           <!-- JSで生成 -->
         </select>
@@ -237,13 +269,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   </div>
 
   <div class="section">
-    <div class="section-title">機能ON/OFF</div>
-    <div class="card">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">機能ON/OFF</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-row">
         <div class="field-label">
           <div class="field-label-main">お冷ボタン</div>
           <div class="field-label-sub">客席からお冷注文を受け付ける</div>
-        </div>
+    </div>
+  </div>
         <label class="toggle">
           <input type="checkbox" id="has_ohiya">
           <span class="toggle-slider"></span>
@@ -283,22 +321,67 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   </div>
 
   <div class="section">
-    <div class="section-title">割引プリセット</div>
-    <div class="card">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">割引プリセット</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-label-sub" style="margin-bottom:10px;">よく使う割引をプリセット登録できます。会計モーダルにボタンとして表示されます。</div>
       <div id="discount-presets-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
       <button onclick="window.addDiscountPreset()" style="width:100%;padding:8px;border:1px dashed #94a3b8;border-radius:8px;background:transparent;color:#64748b;font-size:13px;cursor:pointer;">＋ プリセットを追加</button>
     </div>
+    </div>
   </div>
 
   <div class="section">
-    <div class="section-title">外部連携</div>
-    <div class="card">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">QRコード設定</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
+      <div class="field-row">
+        <div class="field-label">
+          <div class="field-label-main">サイトURL</div>
+          <div class="field-label-sub">QRコードに埋め込むベースURL</div>
+    </div>
+  </div>
+        <input class="field-input wide" type="url" id="base_url" placeholder="https://your-site.pages.dev" style="width:100%;font-size:12px;">
+      </div>
+      <div class="field-row" style="margin-top:10px;">
+        <div class="field-label">
+          <div class="field-label-main">注記1</div>
+          <div class="field-label-sub">QRコード下の1行目</div>
+        </div>
+        <input class="field-input wide" type="text" id="qr_note1" placeholder="お支払いは現金のみとなります。" style="width:100%;font-size:12px;">
+      </div>
+      <div class="field-row" style="margin-top:10px;">
+        <div class="field-label">
+          <div class="field-label-main">注記2</div>
+          <div class="field-label-sub">QRコード下の2行目</div>
+        </div>
+        <input class="field-input wide" type="text" id="qr_note2" placeholder="混雑時はQRコードでのご注文にご協力ください" style="width:100%;font-size:12px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">外部連携</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-row" style="flex-direction:column;align-items:stretch;gap:8px;">
         <div class="field-label">
           <div class="field-label-main">Apps Script URL</div>
           <div class="field-label-sub">スプレッドシートへのバックアップ用。デプロイ後のウェブアプリURLを貼り付け</div>
-        </div>
+    </div>
+  </div>
         <input class="field-input wide" type="url" id="apps_script_url" placeholder="https://script.google.com/macros/s/..." style="width:100%;font-size:12px;overflow:hidden;text-overflow:ellipsis;">
       </div>
     </div>
@@ -378,6 +461,9 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('show_set_on_customer').checked = !!cfg.show_set_on_customer;
   document.getElementById('day_start_hour').value = cfg.day_start_hour !== undefined ? cfg.day_start_hour : 8;
   document.getElementById('apps_script_url').value = cfg.apps_script_url || '';
+  document.getElementById('base_url').value = cfg.base_url || '';
+  document.getElementById('qr_note1').value = cfg.qr_note1 || '';
+  document.getElementById('qr_note2').value = cfg.qr_note2 || '';
   window._discountPresets = Array.isArray(cfg.discount_presets) ? cfg.discount_presets : [];
   window.renderDiscountPresets();
   document.getElementById('loading').style.display = 'none';
@@ -403,6 +489,13 @@ window.renderTableNamesEditor = function() {
       + '</div>';
   }
   document.getElementById('table-names-editor').innerHTML = html;
+};
+
+window.toggleAccordion = function(header) {
+  var body = header.nextElementSibling;
+  var isOpen = header.classList.contains('open');
+  header.classList.toggle('open', !isOpen);
+  body.classList.toggle('open', !isOpen);
 };
 
 window.updateChargeMode = function(mode) {
@@ -546,6 +639,9 @@ window.saveAll = async function() {
     show_set_on_customer: document.getElementById('show_set_on_customer').checked,
     day_start_hour: parseInt(document.getElementById('day_start_hour').value),
     apps_script_url: document.getElementById('apps_script_url').value.trim() || null,
+    base_url: document.getElementById('base_url').value.trim() || null,
+    qr_note1: document.getElementById('qr_note1').value.trim() || null,
+    qr_note2: document.getElementById('qr_note2').value.trim() || null,
     discount_presets: window._discountPresets && window._discountPresets.length > 0 ? window._discountPresets : null
   };
   // テーブル名を収集

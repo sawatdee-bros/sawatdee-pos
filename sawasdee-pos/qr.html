@@ -109,6 +109,201 @@
 <!-- 飲み放題QR（2ページ目）: T1〜T5×2枚 = 10枚 -->
 <div class="print-sheet nomi-sheet" id="qr-nomi"></div>
 
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FC = {
+  apiKey: 'AIzaSyBVfIZ_pUXqNAUljPBdsNlmVxkPEjvtUZQ',
+  authDomain: 'sawatdee-bros.firebaseapp.com',
+  databaseURL: 'https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'sawatdee-bros',
+  storageBucket: 'sawatdee-bros.firebasestorage.app',
+  messagingSenderId: '1026345346676',
+  appId: '1:1026345346676:web:98478c02d3dfbae3df310e'
+};
+const app = initializeApp(FC);
+const db = getDatabase(app);
+
+// store_configからデフォルト値を読み込む
+let STORE = '';
+let NOTE1 = '';
+let NOTE2 = '';
+let TABLE_NAMES = {};
+let TABLE_COUNT = 10;
+let NOMI_TABLE_COUNT = 5;
+
+get(ref(db, 'store_config')).then(function(snap) {
+  var cfg = snap.val() || {};
+  STORE = cfg.store_name || '';
+  NOTE1 = cfg.qr_note1 || '';
+  NOTE2 = cfg.qr_note2 || '';
+  TABLE_NAMES = cfg.table_names || {};
+  TABLE_COUNT = cfg.table_count || 10;
+  NOMI_TABLE_COUNT = cfg.nomi_table_count || 5;
+  // base_urlが設定されていれば入力欄に反映
+  if (cfg.base_url) document.getElementById('base-url').value = cfg.base_url;
+  generateQR();
+}).catch(function() {
+  generateQR(); // 読み込み失敗時もデフォルト値で生成
+});
+
+window.generateQR = function generateQR() {
+  const base = document.getElementById('base-url').value.trim();
+  if (!base) { alert('URLを入力してください'); return; }
+
+  // 通常QR: table_count卓×1枚
+  const normalGrid = document.getElementById('qr-normal');
+  normalGrid.innerHTML = '<div class="sheet-title">🌿 通常注文 QRコード</div>';
+  for (let i = 1; i <= TABLE_COUNT; i++) {
+    const url = base + '/customer.html?table=' + i;
+    const uid = 'n' + i;
+    const tableName = TABLE_NAMES[String(i)] || 'テーブル ' + i;
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+    card.innerHTML =
+      '<h2>' + tableName + '</h2>' +
+      '<div id="' + uid + '"></div>' +
+      (STORE ? '<div class="qr-store">' + STORE + '</div>' : '') +
+      (NOTE1 ? '<div class="qr-note">' + NOTE1 + '</div>' : '') +
+      (NOTE2 ? '<div class="qr-note">' + NOTE2 + '</div>' : '');
+    normalGrid.appendChild(card);
+    new QRCode(document.getElementById(uid), {
+      text: url, width: 100, height: 100,
+      colorDark: '#166534', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+  }
+
+  // 飲み放題QR: nomi_table_count卓×2枚
+  const nomiGrid = document.getElementById('qr-nomi');
+  nomiGrid.innerHTML = '<div class="sheet-title">🍻 飲み放題専用 QRコード</div>';
+  for (let i = 1; i <= NOMI_TABLE_COUNT; i++) {
+    for (let c = 0; c < 2; c++) {
+      const url = base + '/nomi.html?table=' + i;
+      const uid = 'nomi' + i + '_' + c;
+      const tableName = TABLE_NAMES[String(i)] || 'テーブル ' + i;
+      const card = document.createElement('div');
+      card.className = 'qr-card nomi';
+      card.innerHTML =
+        '<h2>' + tableName + '</h2>' +
+        '<div id="' + uid + '"></div>' +
+        '<div class="qr-store nomi">🍻 飲み放題専用</div>' +
+        '<div class="qr-note">飲み放題のお客様専用です</div>';
+      nomiGrid.appendChild(card);
+      new QRCode(document.getElementById(uid), {
+        text: url, width: 100, height: 100,
+        colorDark: '#7c3aed', colorLight: '#faf5ff',
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+  }
+}
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, sans-serif; background: #f9fafb; padding: 20px; }
+  .screen-only { margin-bottom: 16px; }
+  h1 { font-size: 18px; font-weight: 600; color: #166534; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+  .url-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .url-row input { flex: 1; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; color: white; }
+  .btn-g { background: #166534; }
+  .btn-p { background: #1d4ed8; }
+
+  .print-sheet {
+    background: white;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    padding: 4px;
+    width: 210mm;
+    margin-bottom: 16px;
+  }
+  .sheet-title {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 0 2px;
+    color: #374151;
+  }
+  .qr-card {
+    border: 1px solid #ccc;
+    padding: 6px 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .qr-card.nomi { border-color: #7c3aed; background: #faf5ff; }
+  .qr-card h2 { font-size: 13px; font-weight: 900; margin-bottom: 4px; }
+  .qr-store { font-size: 9px; font-weight: 700; color: #166534; margin-top: 3px; }
+  .qr-store.nomi { color: #7c3aed; }
+  .qr-note { font-size: 7.5px; color: #555; margin-top: 2px; }
+
+  @media print {
+    @page { size: A4 portrait; margin: 6mm; }
+    body { background: white; padding: 0; }
+    .screen-only { display: none; }
+
+    /* 通常QR: 10卓×1枚 → 2列×5行 */
+    .print-sheet.normal-sheet {
+      width: 198mm;
+      height: 285mm;
+      gap: 0;
+      padding: 3mm;
+      margin-bottom: 0;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: auto repeat(5, 1fr);
+    }
+
+    /* 飲み放題QR: 5卓×2枚 → 2列×5行 */
+    .print-sheet.nomi-sheet {
+      width: 198mm;
+      height: 285mm;
+      gap: 0;
+      padding: 3mm;
+      margin-bottom: 0;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: auto repeat(5, 1fr);
+      page-break-before: always;
+    }
+
+    .qr-card {
+      border: 0.5px solid #bbb;
+      padding: 2mm;
+      justify-content: center;
+    }
+    .qr-card.nomi { border-color: #7c3aed; background: #faf5ff; }
+    .qr-card h2 { font-size: 12pt; margin-bottom: 1mm; }
+    .qr-store { font-size: 8pt; margin-top: 1.5mm; }
+    .qr-note { font-size: 6.5pt; margin-top: 1mm; }
+    .sheet-title { font-size: 11pt; padding: 3mm 0 2mm; }
+  }
+</style>
+</head>
+<body>
+<div class="screen-only">
+  <h1>🌿 テーブルQRコード</h1>
+  <p class="subtitle">通常（10卓×1枚）・飲み放題（T1〜T5×2枚）それぞれ1ページで印刷</p>
+  <div class="url-row">
+    <input type="text" id="base-url" value="https://sawatdee-pos.pages.dev" />
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-g" onclick="generateQR()">再生成</button>
+    <button class="btn btn-p" onclick="window.print()">📄 PDFで保存 / 印刷</button>
+  </div>
+</div>
+
+<!-- 通常QR（1ページ目）: 10卓×1枚 = 10枚 -->
+<div class="print-sheet normal-sheet" id="qr-normal"></div>
+
+<!-- 飲み放題QR（2ページ目）: T1〜T5×2枚 = 10枚 -->
+<div class="print-sheet nomi-sheet" id="qr-nomi"></div>
+
 <script>
 const STORE = 'サワディーブロス';
 const NOTE1 = 'お支払いは現金のみとなります。';
