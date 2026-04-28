@@ -431,6 +431,13 @@ function buildSessionMap(orders) {
       if (it.charge_exempt) s.hasChargeExempt = true;
       if (!s.items[it.name]) s.items[it.name] = { name: it.name, price: it.price, qty: 0 };
       s.items[it.name].qty += it.qty;
+      // extrasを集計（価格あり選択肢）
+      (it.extras||[]).forEach(function(ex) {
+        if (!ex.price) return;
+        s.ex += ex.price * it.qty;
+        if (!s.items[ex.label]) s.items[ex.label] = { name: ex.label, price: ex.price, qty: 0 };
+        s.items[ex.label].qty += it.qty;
+      });
     });
   });
   // pax解決
@@ -529,6 +536,14 @@ function render() {
       if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, qty:0, sales:0, cat:cat };
       itemMap[it.name].qty += it.qty;
       itemMap[it.name].sales += it.price * it.qty;
+      // extrasを集計
+      (it.extras||[]).forEach(function(ex){
+        if(!ex.price) return;
+        var exCat = getItemCategory(ex.label);
+        if (!itemMap[ex.label]) itemMap[ex.label] = { name:ex.label, qty:0, sales:0, cat:exCat };
+        itemMap[ex.label].qty += it.qty;
+        itemMap[ex.label].sales += ex.price * it.qty;
+      });
     });
   });
 
@@ -1194,6 +1209,12 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
     (o.items||[]).forEach(function(it){
       if(!itemMap4[it.name])itemMap4[it.name]={name:it.name,cat:getItemCategory(it.name),qty:0,sales:0};
       itemMap4[it.name].qty+=it.qty; itemMap4[it.name].sales+=it.price*it.qty;
+      // extrasを集計
+      (it.extras||[]).forEach(function(ex){
+        if(!ex.price) return;
+        if(!itemMap4[ex.label])itemMap4[ex.label]={name:ex.label,cat:getItemCategory(ex.label),qty:0,sales:0};
+        itemMap4[ex.label].qty+=it.qty; itemMap4[ex.label].sales+=ex.price*it.qty;
+      });
     });
   });
   var sorted4 = Object.values(itemMap4).sort(function(a,b){return b.sales-a.sales;});
