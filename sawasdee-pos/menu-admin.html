@@ -328,20 +328,32 @@ window.saveItem = async (id) => {
   const ed = localEdits[id] || {};
   if (Object.keys(ed).length === 0) return;
 
-  // 1. Firebaseのmenu_overridesに保存（item_options等を含む全フィールド）
-  await update(ref(db, 'menu_overrides/' + id), ed);
+  // スプレッドシートに同期するフィールドとmenu_overridesのみで管理するフィールドを分ける
+  const sheetFields = ['name','kitchen_name','kana','kata','thai','en','price','desc','pakchi','spicy','popular','sake','warning'];
+  const overridesOnly = {}; // item_options等スプレッドシートにないもの
+  const fieldsToSync = {}; // スプレッドシートに同期するもの
+  const nullifyInOverrides = {}; // スプレッドシート同期済みはoverridesから削除
+  Object.keys(ed).forEach(function(k) {
+    if (sheetFields.includes(k)) {
+      fieldsToSync[k] = ed[k];
+      nullifyInOverrides[k] = null; // Firebaseでnullはフィールド削除を意味する
+    } else {
+      overridesOnly[k] = ed[k];
+    }
+  });
+
+  // 1. menu_overridesにはスプレッドシート管理外のフィールドのみ保存
+  //    スプレッドシート管理フィールドはnullで削除（menuノードの値を使う）
+  const overridesUpdate = Object.assign({}, overridesOnly, nullifyInOverrides);
+  if (Object.keys(overridesUpdate).length > 0) {
+    await update(ref(db, 'menu_overrides/' + id), overridesUpdate);
+  }
 
   // 2. スプレッドシートにも反映（Apps Script WebAPI経由）
   const appsScriptUrl = await get(ref(db, 'store_config/apps_script_url')).then(s => s.val()).catch(() => null);
-  if (appsScriptUrl) {
-    // item_optionsなどスプレッドシートにない項目を除外
-    const sheetFields = ['name','kitchen_name','kana','kata','thai','en','price','desc','pakchi','spicy','popular','sake','warning'];
-    const fieldsToSync = {};
-    sheetFields.forEach(function(k) { if (ed[k] !== undefined) fieldsToSync[k] = ed[k]; });
-    if (Object.keys(fieldsToSync).length > 0) {
-      var syncUrl = appsScriptUrl + '?id=' + encodeURIComponent(id) + '&fields=' + encodeURIComponent(JSON.stringify(fieldsToSync));
-      fetch(syncUrl).catch(function(e) { console.warn('スプレッドシート同期失敗:', e); });
-    }
+  if (appsScriptUrl && Object.keys(fieldsToSync).length > 0) {
+    var syncUrl = appsScriptUrl + '?id=' + encodeURIComponent(id) + '&fields=' + encodeURIComponent(JSON.stringify(fieldsToSync));
+    fetch(syncUrl).catch(function(e) { console.warn('スプレッドシート同期失敗:', e); });
   }
 
   // 3. ALL_ITEMSも更新
