@@ -327,9 +327,28 @@ window.saveItem = async (id) => {
   const orig = ALL_ITEMS.find(i => i.id === id);
   const ed = localEdits[id] || {};
   if (Object.keys(ed).length === 0) return;
-  // Firebaseのmenu_overridesに保存
+
+  // 1. Firebaseのmenu_overridesに保存（item_options等を含む全フィールド）
   await update(ref(db, 'menu_overrides/' + id), ed);
-  // ALL_ITEMSも更新
+
+  // 2. スプレッドシートにも反映（Apps Script WebAPI経由）
+  const appsScriptUrl = await get(ref(db, 'store_config/apps_script_url')).then(s => s.val()).catch(() => null);
+  if (appsScriptUrl) {
+    // item_optionsなどスプレッドシートにない項目を除外
+    const sheetFields = ['name','kitchen_name','kana','kata','thai','en','price','desc','pakchi','spicy','popular','sake','warning'];
+    const fieldsToSync = {};
+    sheetFields.forEach(function(k) { if (ed[k] !== undefined) fieldsToSync[k] = ed[k]; });
+    if (Object.keys(fieldsToSync).length > 0) {
+      fetch(appsScriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ id: id, fields: fieldsToSync }),
+      }).catch(function(e) { console.warn('スプレッドシート同期失敗:', e); });
+    }
+  }
+
+  // 3. ALL_ITEMSも更新
   Object.assign(orig, ed);
   delete localEdits[id];
   renderList();
