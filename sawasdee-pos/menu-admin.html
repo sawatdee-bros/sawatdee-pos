@@ -339,12 +339,8 @@ window.saveItem = async (id) => {
     const fieldsToSync = {};
     sheetFields.forEach(function(k) { if (ed[k] !== undefined) fieldsToSync[k] = ed[k]; });
     if (Object.keys(fieldsToSync).length > 0) {
-      fetch(appsScriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ id: id, fields: fieldsToSync }),
-      }).catch(function(e) { console.warn('スプレッドシート同期失敗:', e); });
+      var syncUrl = appsScriptUrl + '?id=' + encodeURIComponent(id) + '&fields=' + encodeURIComponent(JSON.stringify(fieldsToSync));
+      fetch(syncUrl).catch(function(e) { console.warn('スプレッドシート同期失敗:', e); });
     }
   }
 
