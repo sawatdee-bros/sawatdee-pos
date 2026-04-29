@@ -349,20 +349,12 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
   if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
   if (cfg.table_names) TABLE_NAMES = cfg.table_names;
-  // 伝票フィルターのテーブルボタンを動的生成
-  var tableCount = cfg.table_count || 10;
-  var filterBar = document.getElementById('bills-filter-bar');
-  var weekBtn = filterBar.querySelector('[data-filter="week"]');
-  for (var i = 1; i <= tableCount; i++) {
-    var btn = document.createElement('button');
-    btn.className = 'filter-btn';
-    btn.dataset.filter = String(i);
-    btn.textContent = TABLE_NAMES[String(i)] || 'T' + i;
-    filterBar.insertBefore(btn, weekBtn);
-  }
+  // テーブル数を保存（ボタンは_billsFilterBarUpdate()で動的生成）
+  _TABLE_COUNT = cfg.table_count || 10;
 });
 
 // 端数処理関数（store_config.rounding_mode / rounding_unitで切り替え）
+let _TABLE_COUNT = 10;
 let _ROUNDING_MODE = 'floor';
 let _ROUNDING_UNIT = 10;
 function applyRounding(val) {
@@ -826,6 +818,47 @@ window.groupDone = async function(id, type) {
 };
 
 
+// 伝票フィルターバーのテーブルボタンを更新（会計前のテーブルのみ表示）
+function _billsFilterBarUpdate() {
+  var filterBar = document.getElementById('bills-filter-bar');
+  var weekBtn = filterBar.querySelector('[data-filter="week"]');
+  // 既存のテーブルボタンを削除
+  filterBar.querySelectorAll('[data-filter]').forEach(function(btn) {
+    var f = btn.dataset.filter;
+    if (f !== 'unpaid' && f !== 'paid' && f !== 'week') btn.remove();
+  });
+  // 会計前の注文があるテーブルを収集
+  var unpaidTables = new Set();
+  Object.values(_bOrders).forEach(function(o) {
+    if (o.status !== 'paid') unpaidTables.add(String(o.table));
+  });
+  // テーブル番号順にボタンを追加
+  var tables = Array.from(unpaidTables).sort(function(a, b) { return Number(a) - Number(b); });
+  tables.forEach(function(t) {
+    var btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.filter = t;
+    btn.textContent = TABLE_NAMES[t] || 'T' + t;
+    filterBar.insertBefore(btn, weekBtn);
+  });
+  // 現在選択中のフィルターが消えた場合はunpaidに戻す
+  var currentFilter = filterBar.querySelector('.filter-btn.active');
+  if (!currentFilter || (currentFilter.dataset.filter !== 'unpaid' && currentFilter.dataset.filter !== 'paid' && currentFilter.dataset.filter !== 'week' && !unpaidTables.has(currentFilter.dataset.filter))) {
+    filterBar.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    filterBar.querySelector('[data-filter="unpaid"]').classList.add('active');
+    _bFilter = 'unpaid';
+  }
+  // イベントリスナーを再設定
+  filterBar.querySelectorAll('[data-filter]').forEach(function(btn) {
+    btn.onclick = function() {
+      filterBar.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _bFilter = btn.dataset.filter;
+      _billsRender();
+    };
+  });
+}
+
 function _syncOrderToBills(id, updatedItemsDone) {
   if (!_bOrders[id]) return;
   if (orders[id]) {
@@ -835,6 +868,7 @@ function _syncOrderToBills(id, updatedItemsDone) {
     _bOrders[id].itemsDone = updatedItemsDone;
     _bOrders[id].status = 'done';
   }
+  _billsFilterBarUpdate();
   if (currentMode === 'bills') _billsRender();
 }
 let audioEnabled = false;
@@ -1118,6 +1152,7 @@ function _updateBillsData(allData) {
     var isUnpaid = o.status !== 'paid';
     if (isUnpaid || (o.timestamp||0) >= rangeStart) _bOrders[id] = o;
   });
+  _billsFilterBarUpdate();
   if (currentMode === 'bills') _billsRenderWrap();
 }
 
@@ -1666,7 +1701,10 @@ function _billsRender() {
     }
     if (_bFilter==='paid'&&!isPaid) continue;
     if (_bFilter==='unpaid'&&isPaid) continue;
-    if (['1','2','3','4','5','6','7','8','9','10'].indexOf(_bFilter)>=0&&s.tableNum!==_bFilter) continue;
+    var isTableFilter = (_bFilter!=='unpaid'&&_bFilter!=='paid'&&_bFilter!=='week');
+    if (isTableFilter&&s.tableNum!==_bFilter) continue;
+    // テーブルフィルター時は会計前のみ表示
+    if (isTableFilter&&isPaid) continue;
     if (_bFilter==='week') { /* 全期間 */ }
     filtered.push(s);
   }
