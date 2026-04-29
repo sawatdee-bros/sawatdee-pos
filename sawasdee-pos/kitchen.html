@@ -39,7 +39,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .order-items-grid .item-done-btn { margin-left: 6px; }
 .order-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #1e3a5a22; font-size: 14px; }
 .order-item:last-child { border-bottom: none; }
-.order-item.item-done { opacity: 0.35; text-decoration: line-through; }
+.order-item.item-done { opacity: 0.35; }
 .item-qty { color: #fbbf24; font-weight: 600; min-width: 28px; flex-shrink: 0; }
 .item-qty-badge { background: #ef4444; color: white; font-size: 12px; font-weight: 600; padding: 2px 6px; border-radius: 5px; flex-shrink: 0; margin-left: 6px; }
 .item-extras { font-size: 10px; color: #fbbf24; margin-left: 4px; }
@@ -687,7 +687,7 @@ function makeGroupCard(g, items, type, totalMap, compact) {
   // 全提供済み or 全消去済みなら非表示
   if (items.every(e => e.done)) return '';
   const repO = orders[g.ids[0]];
-  const isFoodSingle = compact && items.length === 1;
+  const isFoodSingle = false; // 常に個別ボタン表示（消去後のUI切替を防ぐため）
   const isGrid = compact && items.length > 1;
 
   const itemsHTML = items.map(e => {
