@@ -641,7 +641,7 @@ function renderOrders() {
       const done = o.itemsDone || {};
       const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
       arr.forEach((i, idx) => {
-        if (!isDrinkItem(i.name, i)) {
+        if (!isDrinkItem(i.name, i) && !isDismissed(id, idx)) {
           foodItems.push({i, idx, id, done: !!done[idx]});
         }
       });
@@ -658,7 +658,7 @@ function renderOrders() {
       const done = o.itemsDone || {};
       const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
       arr.forEach((i, idx) => {
-        if (isDrinkItem(i.name, i)) {
+        if (isDrinkItem(i.name, i) && !isDismissed(id, idx)) {
           drinkItems.push({i, idx, id, done: !!done[idx]});
         }
       });
@@ -684,7 +684,7 @@ function renderOrders() {
 
 function makeGroupCard(g, items, type, totalMap, compact) {
   if (items.length === 0) return '';
-  // 全提供済みなら非表示
+  // 全提供済み or 全消去済みなら非表示
   if (items.every(e => e.done)) return '';
   const repO = orders[g.ids[0]];
   const isFoodSingle = compact && items.length === 1;
@@ -761,37 +761,27 @@ window.toggleItem = async function(id, idx) {
   }
 };
 
-window.removeItem = async function(id, idx) {
-  if (!orders[id]) return;
-  const arr = Array.isArray(orders[id].items) ? orders[id].items : Object.values(orders[id].items||{});
-  // idxを除いた新しいitems配列を作成
-  const newItems = arr.filter((_, i) => i !== idx);
-  // itemsDoneのキーを振り直す
-  const oldDone = orders[id].itemsDone || {};
-  const newDone = {};
-  let newIdx = 0;
-  for (let i = 0; i < arr.length; i++) {
-    if (i === idx) continue;
-    if (oldDone[i]) newDone[newIdx] = true;
-    newIdx++;
-  }
-  if (newItems.length === 0) {
-    // 全アイテム消去 → orderをdone扱いに
-    orders[id].items = [];
-    orders[id].itemsDone = {};
-    orders[id].status = 'done';
-    _selfWriteIds.add(id);
-    await update(ref(db, 'orders/'+id), { items: [], itemsDone: {}, status: 'done' });
-  } else {
-    orders[id].items = newItems;
-    orders[id].itemsDone = newDone;
-    const allDone = newItems.every((_, i) => newDone[i]);
-    if (allDone) orders[id].status = 'done';
-    _selfWriteIds.add(id);
-    await update(ref(db, 'orders/'+id), { items: newItems, itemsDone: newDone, status: allDone ? 'done' : orders[id].status });
-  }
+// 消去済みアイテムをlocalStorageで管理（Firebaseは変更しない）
+const DISMISSED_KEY = 'kitchen_dismissed_items';
+function getDismissed() {
+  try { return JSON.parse(localStorage.getItem(DISMISSED_KEY) || '{}'); } catch(e) { return {}; }
+}
+function isDismissed(id, idx) {
+  const d = getDismissed();
+  return !!(d[id] && d[id].includes(idx));
+}
+function saveDismissed(id, idx) {
+  const d = getDismissed();
+  if (!d[id]) d[id] = [];
+  if (!d[id].includes(idx)) d[id].push(idx);
+  // 古いデータを削除（ordersに存在しないIDは削除）
+  Object.keys(d).forEach(function(k) { if (!orders[k]) delete d[k]; });
+  localStorage.setItem(DISMISSED_KEY, JSON.stringify(d));
+}
+
+window.removeItem = function(id, idx) {
+  saveDismissed(id, idx);
   renderOrders();
-  _syncOrderToBills(id);
 };
 
 window.groupDoneMulti = async function(idStr, type) {
@@ -1269,7 +1259,7 @@ window.openCheckout = function(tableNum, idStr) {
     var o = _bOrders[id];
     if (!o) return;
     total += Math.round((o.total||0) / 10) * 10;
-    (o.items||[]).forEach(function(it) {
+    (Array.isArray(o.items)?o.items:Object.values(o.items||{})).forEach(function(it) {
       var extrasTotal = (it.extras||[]).reduce(function(s,ex){ return s+(ex.price||0); }, 0);
       var basePrice = it.price - extrasTotal;
       if (!itemMap[it.name]) itemMap[it.name] = {name:it.name, price:basePrice, qty:0, price_type:it.price_type||null, ...(it.drink_count!==undefined?{drink_count:it.drink_count}:{})};
@@ -1306,7 +1296,7 @@ window.openCheckout = function(tableNum, idStr) {
   // charge_exempt商品が含まれるか判定
   var hasExempt = keys.some(function(id) {
     var o = _bOrders[id]; if (!o) return false;
-    return (o.items||[]).some(function(it) { return it.charge_exempt; });
+    return (Array.isArray(o.items)?o.items:Object.values(o.items||{})).some(function(it) { return it.charge_exempt; });
   });
   var chargeResult = calcCharge(pax, totalDrinks, hasExempt);
   var chargeEx = chargeResult.chargeEx;
@@ -1403,7 +1393,7 @@ function renderEditModal() {
   var groupOrder = [];
   for (var j=0;j<_bEdit.entries.length;j++) {
     var e = _bEdit.entries[j];
-    var items = e.o.items||[];
+    var items = Array.isArray(e.o.items)?e.o.items:Object.values(e.o.items||{});
     for (var k=0;k<items.length;k++) {
       var it = items[k];
       var key = e.id+'_'+k;
@@ -1466,7 +1456,7 @@ window.changeGroupQty = function(name, delta) {
   var allKeys = [];
   for (var j=0;j<_bEdit.entries.length;j++) {
     var e = _bEdit.entries[j];
-    var items = e.o.items||[];
+    var items = Array.isArray(e.o.items)?e.o.items:Object.values(e.o.items||{});
     for (var k=0;k<items.length;k++) {
       if (items[k].name === name) {
         allKeys.push({key:e.id+'_'+k, entryId:e.id, itemIdx:k, origQty:items[k].qty});
@@ -1633,13 +1623,13 @@ function _billsRender() {
     }
     if (!pax) pax=_bPax[s.tableNum]!==undefined?_bPax[s.tableNum]:0;
     for (var j=0;j<s.entries.length;j++) {
-      var items=s.entries[j].o.items||[];
+      var items=Array.isArray(s.entries[j].o.items)?s.entries[j].o.items:Object.values(s.entries[j].o.items||{});
       for (var k=0;k<items.length;k++) {
         sessionEx+=items[k].price*items[k].qty;
         if (isDrinkItem(items[k].name,items[k])&&items[k].name!=='お冷') totalDrinks+=items[k].qty*(items[k].drink_count!==undefined?items[k].drink_count:1);
       }
     }
-    var hasExempt2=s.entries.some(function(e){return (e.o.items||[]).some(function(it){return it.charge_exempt;});});
+    var hasExempt2=s.entries.some(function(e){var _i=Array.isArray(e.o.items)?e.o.items:Object.values(e.o.items||{});return _i.some(function(it){return it.charge_exempt;});});
     var chargeResult=calcCharge(pax,totalDrinks,hasExempt2);
     var hasFreeCharge=chargeResult.hasFreeCharge;
     var chargeEx=chargeResult.chargeEx;
@@ -1702,7 +1692,7 @@ function _billsRender() {
     for (var j=0;j<entries.length;j++) {
       var o=entries[j].o;
       var itemsDone=o.itemsDone||{};
-      var items=o.items||[];
+      var items=Array.isArray(o.items)?o.items:Object.values(o.items||{});
       for (var k=0;k<items.length;k++) {
         var item=items[k];
         var map=isDrinkItem(item.name,item)?drinkMap:foodMap;
@@ -1738,7 +1728,7 @@ function _billsRender() {
     for (var j=0;j<drinkList.length;j++) {
       if (isDrinkItem(drinkList[j].name,drinkList[j]) && drinkList[j].name !== 'お冷') totalDrinks+=drinkList[j].qty*(drinkList[j].drink_count!==undefined?drinkList[j].drink_count:1);
     }
-    var hasExempt3=entries.some(function(e){return (e.o.items||[]).some(function(it){return it.charge_exempt;});});
+    var hasExempt3=entries.some(function(e){var _i=Array.isArray(e.o.items)?e.o.items:Object.values(e.o.items||{});return _i.some(function(it){return it.charge_exempt;});});
     var chargeResult=calcCharge(pax,totalDrinks,hasExempt3);
     var chargeEx=chargeResult.chargeEx;
     var hasFreeCharge=chargeResult.hasFreeCharge;
