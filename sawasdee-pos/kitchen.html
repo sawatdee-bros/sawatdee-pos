@@ -273,6 +273,8 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <div id="view-bills" style="display:none;padding-bottom:56px;">
 
 <div class="filter-bar" id="bills-filter-bar">
+  <button class="filter-btn" data-filter="serving">提供中</button>
+  <button class="filter-btn" data-filter="served">提供済み</button>
   <button class="filter-btn active" data-filter="unpaid">会計前</button>
   <button class="filter-btn paid-tab" data-filter="paid">会計済み</button>
   <!-- テーブルボタンはstore_config/table_countから動的生成 -->
@@ -827,7 +829,7 @@ function _billsFilterBarUpdate() {
   // 既存のテーブルボタンを削除
   filterBar.querySelectorAll('[data-filter]').forEach(function(btn) {
     var f = btn.dataset.filter;
-    if (f !== 'unpaid' && f !== 'paid' && f !== 'week') btn.remove();
+    if (f !== 'unpaid' && f !== 'paid' && f !== 'week' && f !== 'serving' && f !== 'served') btn.remove();
   });
   // 会計前の注文があるテーブルを収集
   var unpaidTables = new Set();
@@ -848,7 +850,7 @@ function _billsFilterBarUpdate() {
     b.classList.toggle('active', b.dataset.filter === _bFilter);
   });
   // 選択中フィルターが消えた場合はunpaidに戻す
-  if (_bFilter !== 'unpaid' && _bFilter !== 'paid' && _bFilter !== 'week' && !unpaidTables.has(_bFilter)) {
+  if (_bFilter !== 'unpaid' && _bFilter !== 'paid' && _bFilter !== 'week' && _bFilter !== 'serving' && _bFilter !== 'served' && !unpaidTables.has(_bFilter)) {
     filterBar.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
     filterBar.querySelector('[data-filter="unpaid"]').classList.add('active');
     _bFilter = 'unpaid';
@@ -1180,7 +1182,6 @@ window.setFilter = function(f) {
   _bRange = f === 'week' ? 'week' : 'today';
   _bFilter = f;
   _updateBillsData(window._allOrdersCache || {});
-  // data-filter属性でactiveを確実に反映
   var bs = document.querySelectorAll('#bills-filter-bar .filter-btn');
   for (var i=0;i<bs.length;i++) {
     if (bs[i].dataset.filter === f) bs[i].classList.add('active');
@@ -1691,13 +1692,22 @@ function _billsRender() {
     var s=sessions[i];
     var isPaid=true, hasPending=false;
     for (var j=0;j<s.entries.length;j++) {
-      var st=s.entries[j].o.status;
-      if (st!=='paid') isPaid=false;
-      if (st!=='done'&&st!=='paid') hasPending=true;
+      var eo=s.entries[j].o;
+      if (eo.status!=='paid') isPaid=false;
+      // itemsDoneベースで未提供アイテムがあるか判定
+      var eItems=Array.isArray(eo.items)?eo.items:Object.values(eo.items||{});
+      var eDone=eo.itemsDone||{};
+      for (var k=0;k<eItems.length;k++) {
+        if (!eDone[k]) { hasPending=true; break; }
+      }
     }
     if (_bFilter==='paid'&&!isPaid) continue;
     if (_bFilter==='unpaid'&&isPaid) continue;
-    var isTableFilter = (_bFilter!=='unpaid'&&_bFilter!=='paid'&&_bFilter!=='week');
+    // 提供中：会計前かつ未提供商品あり
+    if (_bFilter==='serving'&&(isPaid||!hasPending)) continue;
+    // 提供済み：会計前かつ全商品提供済み
+    if (_bFilter==='served'&&(isPaid||hasPending)) continue;
+    var isTableFilter = (_bFilter!=='unpaid'&&_bFilter!=='paid'&&_bFilter!=='week'&&_bFilter!=='serving'&&_bFilter!=='served');
     if (isTableFilter&&String(s.tableNum)!==String(_bFilter)) continue;
     // テーブルフィルター時は会計前のみ表示
     if (isTableFilter&&isPaid) continue;
@@ -1706,8 +1716,8 @@ function _billsRender() {
   }
 
   // ソート
-  if (_bFilter === 'unpaid') {
-    // 会計前：テーブル番号順
+  if (_bFilter === 'unpaid' || _bFilter === 'serving' || _bFilter === 'served') {
+    // 会計前・提供中・提供済み：テーブル番号順
     filtered.sort(function(a,b){ return Number(a.tableNum)-Number(b.tableNum); });
   } else if (_bFilter === 'paid' || _bFilter === 'week') {
     // 会計済み・過去7日：paidAt新しい順
