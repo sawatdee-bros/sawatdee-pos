@@ -349,6 +349,7 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
   if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
   if (cfg.table_names) TABLE_NAMES = cfg.table_names;
+  if (cfg.table_names_short) TABLE_NAMES_SHORT = cfg.table_names_short;
   // テーブル数を保存（ボタンは_billsFilterBarUpdate()で動的生成）
   _TABLE_COUNT = cfg.table_count || 10;
 });
@@ -437,7 +438,8 @@ get(ref(db, 'menu')).then(function(snap) {
 
 let KITCHEN_NAMES = {}; // Firebaseのmenu/kitchen_nameから動的生成
 
-let TABLE_NAMES = {}; // store_config/table_namesから動的読み込み
+let TABLE_NAMES = {};
+let TABLE_NAMES_SHORT = {}; // store_config/table_namesから動的読み込み
 function tableName(t) { return TABLE_NAMES[String(t)] || 'テーブル ' + t; }
 let DRINKS = []; // Firebaseのmenu/drinkから動的生成（下記get(ref(db,'menu')).then参照）
 let orders = {};
@@ -838,7 +840,7 @@ function _billsFilterBarUpdate() {
     var btn = document.createElement('button');
     btn.className = 'filter-btn';
     btn.dataset.filter = t;
-    btn.textContent = TABLE_NAMES[t] || 'T' + t;
+    btn.textContent = TABLE_NAMES_SHORT[t] || TABLE_NAMES[t] || 'T' + t;
     filterBar.insertBefore(btn, weekBtn);
   });
   // 現在選択中のフィルターが消えた場合はunpaidに戻す
@@ -1702,7 +1704,7 @@ function _billsRender() {
     if (_bFilter==='paid'&&!isPaid) continue;
     if (_bFilter==='unpaid'&&isPaid) continue;
     var isTableFilter = (_bFilter!=='unpaid'&&_bFilter!=='paid'&&_bFilter!=='week');
-    if (isTableFilter&&s.tableNum!==_bFilter) continue;
+    if (isTableFilter&&String(s.tableNum)!==String(_bFilter)) continue;
     // テーブルフィルター時は会計前のみ表示
     if (isTableFilter&&isPaid) continue;
     if (_bFilter==='week') { /* 全期間 */ }
