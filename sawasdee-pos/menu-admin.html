@@ -12,9 +12,12 @@ header { background: #1e293b; padding: 14px 20px; display: flex; align-items: ce
 header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
 /* フィルター */
-.filter-bar { background: #1e293b; border-bottom: 1px solid #334155; padding: 10px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
-.filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.filter-bar { background: #1e293b; border-bottom: 1px solid #334155; padding: 8px 16px; display: flex; gap: 8px; flex-wrap: nowrap; }
+.filter-bar-sub { background: #0f172a; border-bottom: 1px solid #1e293b; padding: 6px 16px; display: flex; gap: 6px; flex-wrap: wrap; min-height: 36px; }
+.filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 12px; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
 .filter-btn.active { background: #166534; border-color: #166534; color: white; }
+.filter-btn.sub { font-size: 11px; padding: 3px 10px; }
+.filter-btn.sub.active { background: #1d4ed8; border-color: #1d4ed8; color: white; }
 
 /* 商品リスト */
 .item-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -77,6 +80,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 </div>
 
 <div class="filter-bar" id="filter-bar"></div>
+<div class="filter-bar-sub" id="filter-bar-sub"></div>
 
 <div class="item-list" id="item-list"></div>
 
@@ -130,34 +134,53 @@ async function init() {
   const overridesSnap = await get(ref(db, 'menu_overrides'));
   const overrides = overridesSnap.val() || {};
   ALL_ITEMS = [];
+  // subcatOrderに従って並び替え
+  const subcatOrder = menuData.subcatOrder || {};
+  const foodSubcatOrder = subcatOrder.food ? Object.values(subcatOrder.food) : Object.keys(menuData.food || {});
+  const drinkSubcatOrder = subcatOrder.drink ? Object.values(subcatOrder.drink) : Object.keys(menuData.drink || {});
   var foodSubcats = [];
   var drinkSubcats = [];
-  for (const [subcat, items] of Object.entries(menuData.food || {})) {
+  var setSubcats = [];
+  foodSubcatOrder.forEach(function(subcat) {
+    if (!menuData.food || !menuData.food[subcat]) return;
     foodSubcats.push(subcat);
-    items.forEach(function(item) {
+    menuData.food[subcat].forEach(function(item) {
       var merged = Object.assign({}, item, overrides[item.id] || {}, {category:'food', subcat:subcat});
       ALL_ITEMS.push(merged);
     });
-  }
-  for (const [subcat, items] of Object.entries(menuData.drink || {})) {
+  });
+  drinkSubcatOrder.forEach(function(subcat) {
+    if (!menuData.drink || !menuData.drink[subcat]) return;
     drinkSubcats.push(subcat);
-    items.forEach(function(item) {
+    menuData.drink[subcat].forEach(function(item) {
       var merged = Object.assign({}, item, overrides[item.id] || {}, {category:'drink', subcat:subcat});
       ALL_ITEMS.push(merged);
     });
-  }
+  });
+  const setSubcatOrder = subcatOrder.set ? Object.values(subcatOrder.set) : Object.keys(menuData.set || {});
+  setSubcatOrder.forEach(function(subcat) {
+    if (!menuData.set || !menuData.set[subcat]) return;
+    setSubcats.push(subcat);
+    menuData.set[subcat].forEach(function(item) {
+      var merged = Object.assign({}, item, overrides[item.id] || {}, {category:'set', subcat:subcat});
+      ALL_ITEMS.push(merged);
+    });
+  });
   // フィルターバー生成（ALL_ITEMS読み込み後）
-  var FILTERS = [
+  window._FOOD_SUBCATS = foodSubcats;
+  window._DRINK_SUBCATS = drinkSubcats;
+  window._SET_SUBCATS = setSubcats;
+  var MAIN_FILTERS = [
     { key: 'all', label: 'すべて' },
     { key: 'soldout', label: '🔴 売り切れ中' },
     { key: 'food', label: '🍽 フード' },
     { key: 'drink', label: '🥤 ドリンク' },
   ];
-  foodSubcats.forEach(function(s) { FILTERS.push({ key: 'f_'+s, label: s }); });
-  drinkSubcats.forEach(function(s) { FILTERS.push({ key: 'd_'+s, label: s }); });
-  document.getElementById('filter-bar').innerHTML = FILTERS.map(function(f) {
+  if (setSubcats.length > 0) MAIN_FILTERS.push({ key: 'set', label: '🎁 セット' });
+  document.getElementById('filter-bar').innerHTML = MAIN_FILTERS.map(function(f) {
     return '<button class="filter-btn' + (currentFilter===f.key?' active':'') + '" onclick="setFilter(\'' + f.key + '\')">' + f.label + '</button>';
   }).join('');
+  renderSubcatBar();
   startSoldoutWatch();
 }
 
@@ -177,10 +200,43 @@ init();
 
 window.setFilter = (key) => {
   currentFilter = key;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  // メインフィルターのactive更新
+  document.querySelectorAll('#filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#filter-bar .filter-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + key + "'")) b.classList.add('active');
+  });
+  renderSubcatBar();
   renderList();
 };
+
+window.setSubFilter = (key) => {
+  currentFilter = key;
+  document.querySelectorAll('#filter-bar-sub .filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#filter-bar-sub .filter-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + key + "'")) b.classList.add('active');
+  });
+  renderList();
+};
+
+function renderSubcatBar() {
+  var subBar = document.getElementById('filter-bar-sub');
+  var subcats = [];
+  if (currentFilter === 'all') {
+    subcats = (window._FOOD_SUBCATS || []).map(function(s) { return { key: 'f_'+s, label: s }; })
+      .concat((window._DRINK_SUBCATS || []).map(function(s) { return { key: 'd_'+s, label: s }; }))
+      .concat((window._SET_SUBCATS || []).map(function(s) { return { key: 's_'+s, label: s }; }));
+  } else if (currentFilter === 'food' || currentFilter.startsWith('f_')) {
+    subcats = (window._FOOD_SUBCATS || []).map(function(s) { return { key: 'f_'+s, label: s }; });
+  } else if (currentFilter === 'drink' || currentFilter.startsWith('d_')) {
+    subcats = (window._DRINK_SUBCATS || []).map(function(s) { return { key: 'd_'+s, label: s }; });
+  } else if (currentFilter === 'set' || currentFilter.startsWith('s_')) {
+    subcats = (window._SET_SUBCATS || []).map(function(s) { return { key: 's_'+s, label: s }; });
+  }
+  subBar.innerHTML = subcats.map(function(f) {
+    var isActive = currentFilter === f.key;
+    return '<button class="filter-btn sub' + (isActive?' active':'') + '" onclick="window.setSubFilter(\'' + f.key + '\')">' + f.label + '</button>';
+  }).join('');
+}
 
 function getFiltered() {
   const q = document.getElementById('search').value.trim().toLowerCase();
@@ -188,8 +244,10 @@ function getFiltered() {
     if (currentFilter === 'soldout' && !soldoutState[item.name]) return false;
     if (currentFilter === 'food' && item.category !== 'food') return false;
     if (currentFilter === 'drink' && item.category !== 'drink') return false;
-    if (currentFilter.startsWith('f_') && item.subcat !== currentFilter.slice(2)) return false;
-    if (currentFilter.startsWith('d_') && item.subcat !== currentFilter.slice(2)) return false;
+    if (currentFilter === 'set' && item.category !== 'set') return false;
+    if (currentFilter.startsWith('f_') && (item.category !== 'food' || item.subcat !== currentFilter.slice(2))) return false;
+    if (currentFilter.startsWith('d_') && (item.category !== 'drink' || item.subcat !== currentFilter.slice(2))) return false;
+    if (currentFilter.startsWith('s_') && (item.category !== 'set' || item.subcat !== currentFilter.slice(2))) return false;
     if (q && !item.name.includes(q) && !item.kata.includes(q)) return false;
     return true;
   });
