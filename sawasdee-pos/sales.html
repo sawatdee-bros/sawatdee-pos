@@ -425,7 +425,7 @@ function buildSessionMap(orders) {
     if (o.timestamp < s.ts) s.ts = o.timestamp;
     if (o.pax) s.pax = o.pax;
     s.orders.push(o);
-    (o.items||[]).forEach(function(it) {
+    (Array.isArray(o.items)?o.items:Object.values(o.items||{})).forEach(function(it) {
       var extrasTotal = (it.extras||[]).reduce(function(s,ex){ return s+(ex.price||0); }, 0);
       var basePrice = it.price - extrasTotal; // extrasを除いた本体価格
       s.ex += basePrice * it.qty;
@@ -532,7 +532,7 @@ function render() {
   });
 
   orders.forEach(function(o) {
-    (o.items||[]).forEach(function(it) {
+    (Array.isArray(o.items)?o.items:Object.values(o.items||{})).forEach(function(it) {
       var cat = getItemCategory(it.name);
       catMap[cat] = (catMap[cat] || 0) + it.price * it.qty;
       var extrasTotal2 = (it.extras||[]).reduce(function(s,ex){ return s+(ex.price||0); }, 0);
@@ -1210,7 +1210,7 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
   // ── ④ 商品別 ──
   var itemMap4 = {};
   filtered.forEach(function(o){
-    (o.items||[]).forEach(function(it){
+    (Array.isArray(o.items)?o.items:Object.values(o.items||{})).forEach(function(it){
       var extrasTotal3=(it.extras||[]).reduce(function(s,ex){return s+(ex.price||0);},0);
       var basePrice3=it.price-extrasTotal3;
       if(!itemMap4[it.name])itemMap4[it.name]={name:it.name,cat:getItemCategory(it.name),qty:0,sales:0};
@@ -1341,7 +1341,7 @@ window.downloadCsv = function() {
     csv = BOM + '商品名,カテゴリ,数量,税抜売上合計\n';
     var itemMap = {};
     filtered.forEach(function(o) {
-      (o.items||[]).forEach(function(it) {
+      (Array.isArray(o.items)?o.items:Object.values(o.items||{})).forEach(function(it) {
         if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, cat:getItemCategory(it.name), qty:0, sales:0 };
         itemMap[it.name].qty += it.qty;
         itemMap[it.name].sales += it.price * it.qty;

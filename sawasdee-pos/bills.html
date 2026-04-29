@@ -266,7 +266,7 @@ function renderEditModal() {
   var groupOrder = [];
   for (var j=0;j<editState.entries.length;j++) {
     var e = editState.entries[j];
-    var items = e.o.items||[];
+    var items = Array.isArray(e.o.items)?e.o.items:Object.values(e.o.items||{});
     for (var k=0;k<items.length;k++) {
       var it = items[k];
       var key = e.id+'_'+k;
@@ -321,7 +321,7 @@ window.changeGroupQty = function(name, delta) {
   var allKeys = [];
   for (var j=0;j<editState.entries.length;j++) {
     var e = editState.entries[j];
-    var items = e.o.items||[];
+    var items = Array.isArray(e.o.items)?e.o.items:Object.values(e.o.items||{});
     for (var k=0;k<items.length;k++) {
       if (items[k].name === name) {
         allKeys.push({key:e.id+'_'+k, entryId:e.id, itemIdx:k, origQty:items[k].qty});
@@ -352,7 +352,7 @@ window.changeGroupQty = function(name, delta) {
 };
 
 window.changeEditQty = function(key, entryId, itemIdx, delta) {
-  var origQty = (allOrders[entryId].items||[])[itemIdx].qty;
+  var _eitems = Array.isArray(allOrders[entryId].items)?allOrders[entryId].items:Object.values(allOrders[entryId].items||{}); var origQty = _eitems[itemIdx].qty;
   var cur = editState.qtyMap[key] !== undefined ? editState.qtyMap[key] : origQty;
   var next = Math.max(0, cur + delta);
   if (next === origQty) delete editState.qtyMap[key];
@@ -381,7 +381,7 @@ window.saveEdit = async function() {
     byEntry[eid].push({idx:idx, newQty:editState.qtyMap[qtyKeys[i]]});
   }
   for (var eid in byEntry) {
-    var items = JSON.parse(JSON.stringify(allOrders[eid].items||[]));
+    var _raw = allOrders[eid].items||[]; var items = JSON.parse(JSON.stringify(Array.isArray(_raw)?_raw:Object.values(_raw)));
     var changes = byEntry[eid];
     // 数量0は削除、それ以外は更新（降順で処理）
     changes.sort(function(a,b){return b.idx-a.idx;});
@@ -474,7 +474,7 @@ function render() {
     var s=sessions[i];
     var sessionEx=0;
     for (var j=0;j<s.entries.length;j++) {
-      var items=s.entries[j].o.items||[];
+      var items=Array.isArray(s.entries[j].o.items)?s.entries[j].o.items:Object.values(s.entries[j].o.items||{});
       for (var k=0;k<items.length;k++) sessionEx+=items[k].price*items[k].qty;
     }
     totalSales += applyRounding(sessionEx*1.1);
@@ -523,7 +523,7 @@ function render() {
     for (var j=0;j<entries.length;j++) {
       var o=entries[j].o;
       var itemsDone=o.itemsDone||{};
-      var items=o.items||[];
+      var items=Array.isArray(o.items)?o.items:Object.values(o.items||{});
       for (var k=0;k<items.length;k++) {
         var item=items[k];
         var map=isDrinkItem(item.name,item)?drinkMap:foodMap;
