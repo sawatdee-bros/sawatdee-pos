@@ -843,22 +843,16 @@ function _billsFilterBarUpdate() {
     btn.textContent = TABLE_NAMES_SHORT[t] || TABLE_NAMES[t] || 'T' + t;
     filterBar.insertBefore(btn, weekBtn);
   });
-  // 現在選択中のフィルターが消えた場合はunpaidに戻す
-  var currentFilter = filterBar.querySelector('.filter-btn.active');
-  if (!currentFilter || (currentFilter.dataset.filter !== 'unpaid' && currentFilter.dataset.filter !== 'paid' && currentFilter.dataset.filter !== 'week' && !unpaidTables.has(currentFilter.dataset.filter))) {
+  // 現在のフィルターのactiveを正しく反映
+  filterBar.querySelectorAll('.filter-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.filter === _bFilter);
+  });
+  // 選択中フィルターが消えた場合はunpaidに戻す
+  if (_bFilter !== 'unpaid' && _bFilter !== 'paid' && _bFilter !== 'week' && !unpaidTables.has(_bFilter)) {
     filterBar.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
     filterBar.querySelector('[data-filter="unpaid"]').classList.add('active');
     _bFilter = 'unpaid';
   }
-  // イベントリスナーを再設定
-  filterBar.querySelectorAll('[data-filter]').forEach(function(btn) {
-    btn.onclick = function() {
-      filterBar.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      _bFilter = btn.dataset.filter;
-      _billsRender();
-    };
-  });
 }
 
 function _syncOrderToBills(id, updatedItemsDone) {
