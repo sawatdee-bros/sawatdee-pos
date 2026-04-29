@@ -273,9 +273,9 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <div id="view-bills" style="display:none;padding-bottom:56px;">
 
 <div class="filter-bar" id="bills-filter-bar">
-  <button class="filter-btn" data-filter="serving">提供中</button>
+  <button class="filter-btn active" data-filter="serving">提供中</button>
   <button class="filter-btn" data-filter="served">提供済み</button>
-  <button class="filter-btn active" data-filter="unpaid">会計前</button>
+  <button class="filter-btn" data-filter="unpaid">会計前</button>
   <button class="filter-btn paid-tab" data-filter="paid">会計済み</button>
   <!-- テーブルボタンはstore_config/table_countから動的生成 -->
   <button class="filter-btn" data-filter="week">過去7日</button>
@@ -1103,7 +1103,7 @@ onValue(ref(db, 'orders'), (snap) => {
 
 // === 伝票機能 ===
 var _bOrders = {};
-var _bFilter = 'unpaid';
+var _bFilter = 'serving';
 var _bPax = {};
 
 // Firebase paxノードを監視して_bPaxを同期
