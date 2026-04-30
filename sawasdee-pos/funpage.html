@@ -895,7 +895,7 @@
       <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:14px;">TRIVIA</div>
       <div class="trivia-tabs">
         <button class="trivia-tab active" onclick="setTriviaTab('all', this)" data-i18n="ttab_all">すべて</button>
-        <button class="trivia-tab food" onclick="setTriviaTab('food', this)" data-i18n="ttab_food">料理のルーツ</button>
+        <button class="trivia-tab food" onclick="setTriviaTab('food', this)" data-i18n="ttab_food">食文化</button>
         <button class="trivia-tab" onclick="setTriviaTab('culture', this)" data-i18n="ttab_culture">文化・マナー</button>
       </div>
       <div id="trivia-list"></div>
@@ -977,80 +977,6 @@
     <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.9;" data-i18n="philosophy"></div>
   </div>
 
-  <!-- こだわりの一皿 -->
-  <div style="background:#fff;border-radius:16px;padding:20px;border:1px solid #f0f0f0;">
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:16px;">OUR DISHES</div>
-    <div style="display:flex;flex-direction:column;">
-
-      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;">
-        <img src="https://images.unsplash.com/photo-1562802378-063ec186a863?w=120&q=80"
-          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
-          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🌶️</div>'">
-        <div style="flex:1;">
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
-            <span style="font-size:15px;font-weight:900;color:#111;">ガパオライス</span>
-            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">ข้าวผัดกะเพรา</span>
-          </div>
-          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish1_desc">バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;">
-            <span style="font-size:10px;font-weight:700;color:#A31313;background:#fff5f5;border:1px solid #fdd;padding:2px 8px;border-radius:20px;">シェフおすすめ</span>
-            <span style="font-size:10px;font-weight:700;color:#B8860B;background:#fffbf0;border:1px solid #fde68a;padding:2px 8px;border-radius:20px;">人気No.1</span>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;">
-        <img src="https://images.unsplash.com/photo-1559314809-0d155014e29e?w=120&q=80"
-          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
-          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🍜</div>'">
-        <div style="flex:1;">
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
-            <span style="font-size:15px;font-weight:900;color:#111;">トムヤムクン</span>
-            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">ต้มยำกุ้ง</span>
-          </div>
-          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish2_desc">レモングラス・カー・マクルートの葉を丸ごと使ったスープ。</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;">
-            <span style="font-size:10px;font-weight:700;color:#A31313;background:#fff5f5;border:1px solid #fdd;padding:2px 8px;border-radius:20px;">本格派</span>
-            <span style="font-size:10px;font-weight:700;color:#1a7a3a;background:#f0faf4;border:1px solid #bbf7d0;padding:2px 8px;border-radius:20px;">無添加</span>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;">
-        <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?w=120&q=80"
-          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
-          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🍺</div>'">
-        <div style="flex:1;">
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
-            <span style="font-size:15px;font-weight:900;color:#111;">チャンビール</span>
-            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">เบียร์ช้าง</span>
-          </div>
-          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish3_desc">象がトレードマークのタイを代表するビール。タイ料理との相性バツグン！</div>
-          <div style="display:flex;gap:5px;">
-            <span style="font-size:10px;font-weight:700;color:#B8860B;background:#fffbf0;border:1px solid #fde68a;padding:2px 8px;border-radius:20px;">タイ直輸入</span>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:14px;padding:14px 0;">
-        <img src="https://images.unsplash.com/photo-1637806931049-67c6e35b2a3c?w=120&q=80"
-          style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;"
-          onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border-radius:10px;background:#fff5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;&quot;>🥜</div>'">
-        <div style="flex:1;">
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
-            <span style="font-size:15px;font-weight:900;color:#111;">パッタイ</span>
-            <span style="font-size:10px;color:#bbb;font-family:'Sarabun',sans-serif;">ผัดไทย</span>
-          </div>
-          <div style="font-size:12px;color:#777;line-height:1.7;margin-bottom:6px;" data-i18n="dish4_desc">タマリンドのタレで炒めたタイ風焼きそば。秘伝のソースが決め手。</div>
-          <div style="display:flex;gap:5px;">
-            <span style="font-size:10px;font-weight:700;color:#A31313;background:#fff5f5;border:1px solid #fdd;padding:2px 8px;border-radius:20px;">定番</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
 </div>
 
 <!-- ===== 店内紹介 ===== -->
@@ -1101,11 +1027,13 @@
       <div class="film-grid">
         <!-- 行1: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">1</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0040.JPG" alt="チャオプラヤ川" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">チャオプラヤ川</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">2</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0008.JPG" alt="夜の市場" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜の市場</div>
@@ -1113,16 +1041,19 @@
 
         <!-- 行2: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">3</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0009.JPG" alt="市場の看板" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場の看板</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">4</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0018.JPG" alt="夜の街角" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜の街角</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">5</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0031.JPG" alt="ビル街の看板" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ビル街の看板</div>
@@ -1130,16 +1061,19 @@
 
         <!-- 行3: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">6</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0051.JPG" alt="船乗り場" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">船乗り場</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">7</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0082.JPG" alt="タイの食堂で" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの食堂で</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">8</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0137.JPG" alt="レコードショップ" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">レコードショップ</div>
@@ -1147,11 +1081,13 @@
 
         <!-- 行4: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">9</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0138.JPG" alt="タイの路地裏" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの路地裏</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">10</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0144.JPG" alt="タイのカフェ" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイのカフェ</div>
@@ -1159,16 +1095,19 @@
 
         <!-- 行5: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">11</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0185.JPG" alt="民族衣装のお祭り" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">民族衣装のお祭り</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">12</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0191.JPG" alt="路上の食堂" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">路上の食堂</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">13</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0196.JPG" alt="炭火の屋台" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">炭火の屋台</div>
@@ -1176,11 +1115,13 @@
 
         <!-- 行6: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">14</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0214.JPG" alt="チェンマイの村人" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">チェンマイの村人</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">15</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0259.JPG" alt="タイの雑貨屋" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの雑貨屋</div>
@@ -1188,16 +1129,19 @@
 
         <!-- 行7: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">16</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0312.JPG" alt="チェンマイの市場" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">チェンマイの市場</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">17</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0345.JPG" alt="市場の食品看板" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場の食品看板</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">18</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0385.JPG" alt="ありがとうの看板" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ありがとうの看板</div>
@@ -1205,11 +1149,13 @@
 
         <!-- 行8: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">19</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0399.JPG" alt="果物屋のはかり" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">果物屋のはかり</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">20</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0386.JPG" alt="夜のコンビニ" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜のコンビニ</div>
@@ -1217,16 +1163,19 @@
 
         <!-- 行9: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">21</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0412.JPG" alt="黄色い食堂" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">黄色い食堂</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">22</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0424.JPG" alt="焼き鳥屋さん" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">焼き鳥屋さん</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">23</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0466.JPG" alt="タイの農村" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの農村</div>
@@ -1234,11 +1183,13 @@
 
         <!-- 行10: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">24</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0495.JPG" alt="雑貨屋のお姉さん" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">雑貨屋のお姉さん</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">25</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0510.JPG" alt="夜の屋台街" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜の屋台街</div>
@@ -1246,16 +1197,19 @@
 
         <!-- 行11: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">26</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0520.JPG" alt="タイのバー" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイのバー</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">27</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0560.JPG" alt="タイのドリンク" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイのドリンク</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">28</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0635.JPG" alt="バンコクの夜道" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">バンコクの夜道</div>
@@ -1263,11 +1217,13 @@
 
         <!-- 行12: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">29</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0637.JPG" alt="夜のバンコク" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜のバンコク</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">30</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0827.JPG" alt="パッタイ屋の看板" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">パッタイ屋の看板</div>
@@ -1275,16 +1231,19 @@
 
         <!-- 行13: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">31</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_0831.JPG" alt="屋台のテーブル" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">屋台のテーブル</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">32</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1286.JPG" alt="チェンマイの街並み" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">チェンマイの街並み</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">33</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1732.JPG" alt="市場のアユタヤ麺" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場のアユタヤ麺</div>
@@ -1292,11 +1251,13 @@
 
         <!-- 行14: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">34</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1748.JPG" alt="市場のテント" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場のテント</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">35</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1770.JPG" alt="水上マーケット" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">水上マーケット</div>
@@ -1304,16 +1265,19 @@
 
         <!-- 行15: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">36</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1785.JPG" alt="アムパワー水上市場" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">アムパワー水上市場</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">37</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1789.JPG" alt="水辺のレストラン" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">水辺のレストラン</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">38</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1800.JPG" alt="屋台のお姉さん" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">屋台のお姉さん</div>
@@ -1321,11 +1285,13 @@
 
         <!-- 行16: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">39</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1806.JPG" alt="夜のナイトマーケット" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜のナイトマーケット</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">40</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1810.JPG" alt="夜の観覧車" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜の観覧車</div>
@@ -1333,11 +1299,13 @@
 
         <!-- 行17: 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">41</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1824.JPG" alt="プラトゥーナムの看板" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">プラトゥーナムの看板</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">42</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1847.JPG" alt="水辺の木造家屋" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">水辺の木造家屋</div>
@@ -1345,11 +1313,13 @@
 
         <!-- 行18: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">43</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1849.JPG" alt="タイ料理の食卓" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイ料理の食卓</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">44</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1864.JPG" alt="タイ語の看板・青空" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイ語の看板</div>
@@ -1357,16 +1327,19 @@
 
         <!-- 行19: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">45</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1878.JPG" alt="タイの女性たち・ボート" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの女性たち</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">46</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1882.JPG" alt="海辺の寺院" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">海辺の寺院</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">47</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1895.JPG" alt="タイ料理の食卓" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">トムヤムの食卓</div>
@@ -1374,11 +1347,13 @@
 
         <!-- 行20: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">48</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1901.JPG" alt="タイの海・岩場" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの海</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">49</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1912.JPG" alt="タイの島・灯台" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの島・灯台</div>
@@ -1386,16 +1361,19 @@
 
         <!-- 行21: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">50</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1917.JPG" alt="ビーチのパラソル" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ビーチのパラソル</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">51</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1919.JPG" alt="藁葺き屋根・海" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">藁葺き屋根・海</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">52</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1921.JPG" alt="タイの街・国旗" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの街・国旗</div>
@@ -1403,11 +1381,13 @@
 
         <!-- 行22: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">53</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1925.JPG" alt="タイの港・灯台" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの港・灯台</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">54</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1940.JPG" alt="チャイナタウンのトゥクトゥク" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">チャイナタウン</div>
@@ -1415,16 +1395,19 @@
 
         <!-- 行23: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">55</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1966.JPG" alt="タイのニューハーフショー" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ニューハーフショー</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">56</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1993.JPG" alt="パタヤの夜・ネオン" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">パタヤの夜</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">57</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2009.JPG" alt="タイの果物屋" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの果物屋</div>
@@ -1432,11 +1415,13 @@
 
         <!-- 行24: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">58</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2015.JPG" alt="タイのアンティークショップ" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">アンティークショップ</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">59</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2018.JPG" alt="タイのジュースパック" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイのジュースパック</div>
@@ -1444,16 +1429,19 @@
 
         <!-- 行25: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">60</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2025.JPG" alt="タイの陶器の置物" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの置物</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">61</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2049.JPG" alt="夜の仏塔・ライトアップ" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜の仏塔</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">62</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2059.JPG" alt="ワット・アルン" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ワット・アルン</div>
@@ -1461,11 +1449,13 @@
 
         <!-- 行26: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">63</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2068.JPG" alt="タイの電線・木造家屋" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの電線・家屋</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">64</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2075.JPG" alt="タイの屋台・ランタン" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">屋台のランタン</div>
@@ -1473,16 +1463,19 @@
 
         <!-- 行27: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">65</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2097.JPG" alt="タイの市場・帽子・雑貨" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場の帽子・雑貨</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">66</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2108.JPG" alt="タイの民家・藁屋根" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの民家</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">67</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2111.JPG" alt="仏像の手・螺旋模様" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">仏像の手</div>
@@ -1490,11 +1483,13 @@
 
         <!-- 行28: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">68</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2113.JPG" alt="市場の天井・鉄骨" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場の天井</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">69</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2236.JPG" alt="活気ある市場" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">活気ある市場</div>
@@ -1502,16 +1497,19 @@
 
         <!-- 行29: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">70</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2122.JPG" alt="ワット・アルン遠景" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ワット・アルン遠景</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">71</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2126.JPG" alt="ラープ・バナナの葉" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ラープ</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">72</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2127.JPG" alt="市場の人混み" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場の人混み</div>
@@ -1519,11 +1517,13 @@
 
         <!-- 行30: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">73</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2132.JPG" alt="市場の内部" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場の内部</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">74</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2134.JPG" alt="プラトゥーナム市場内" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">プラトゥーナム市場</div>
@@ -1531,16 +1531,19 @@
 
         <!-- 行31: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">75</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2305.JPG" alt="ขอบคุณの看板" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ขอบคุณ THANK YOU</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">76</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2327.JPG" alt="カオサン通り・屋台" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">カオサン通り</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">77</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2351.JPG" alt="タイの木造家屋の屋根" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">木造家屋の屋根</div>
@@ -1548,11 +1551,13 @@
 
         <!-- 行32: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">78</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2366.JPG" alt="バンコクの路地・ホテル" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">バンコクの路地</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">79</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2376.JPG" alt="タイのスープ・土鍋" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイのスープ</div>
@@ -1560,16 +1565,19 @@
 
         <!-- 行33: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">80</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2396.JPG" alt="市場の野菜・トマト" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場の野菜</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">81</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2421.JPG" alt="市場のおばさん" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場のおばさん</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">82</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2427.JPG" alt="ラープ" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ラープ</div>
@@ -1577,11 +1585,13 @@
 
         <!-- 行34: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">83</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2433.JPG" alt="タイの駄菓子屋" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの駄菓子屋</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">84</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2434.JPG" alt="タイの駄菓子屋" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">子供たちの駄菓子屋</div>
@@ -1589,16 +1599,19 @@
 
         <!-- 行35: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">85</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2435.JPG" alt="タイの駄菓子・おもちゃ" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイのおもちゃ屋</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">86</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1757.JPG" alt="市場のテント" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">市場のテント</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">87</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_1812.JPG" alt="夜の街灯" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜の街灯</div>
@@ -1606,11 +1619,13 @@
 
         <!-- 行36: wide + 1 -->
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">88</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2125.JPG" alt="ワット・アルン塔" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">ワット・アルン塔</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">89</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2003.JPG" alt="タイの空" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの空</div>
@@ -1618,16 +1633,19 @@
 
         <!-- 行37: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">90</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2017.JPG" alt="タイの室内" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの室内</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">91</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2051.JPG" alt="夜の寺院" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">夜の寺院</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">92</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2210.JPG" alt="タイの大木" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの大木</div>
@@ -1635,11 +1653,13 @@
 
         <!-- 行38: 1 + wide -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">93</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2269.JPG" alt="タイの木・青空" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの木・青空</div>
         </div>
         <div class="film-cell wide" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">94</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2355.JPG" alt="タイの民家" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの民家</div>
@@ -1647,16 +1667,19 @@
 
         <!-- 行39: 1 + 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">95</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2439.JPG" alt="タイの風景" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの風景</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">96</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2442.JPG" alt="タイの風景" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの風景</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">97</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2456.JPG" alt="タイの風景" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの風景</div>
@@ -1664,11 +1687,13 @@
 
         <!-- 行40: 1 + 1 -->
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">98</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2465.JPG" alt="タイの風景" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの風景</div>
         </div>
         <div class="film-cell" onclick="openLightbox(this)">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:2;" class="photo-num">99</div>
           <img src="https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/street/IMG_2475.JPG" alt="タイの風景" loading="lazy">
           <div class="film-cell-overlay"></div>
           <div class="film-cell-label">タイの風景</div>
@@ -1733,7 +1758,7 @@
       </a>
       <div style="background:#f9f9f9;border-radius:10px;padding:10px 14px;border:1px solid #f0f0f0;">
         <div style="font-size:10px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:5px;" data-i18n="hashtag_title">投稿するときはこのタグで！</div>
-        <div style="font-size:13px;color:#A31313;font-weight:700;">#サワディーブロス　#sawatdeebros　#タイ料理川崎</div>
+        <div style="font-size:13px;color:#A31313;font-weight:700;">#サワディ兄弟　#sawatdeebros　#タイ料理川崎</div>
       </div>
     </div>
   </div>
@@ -1745,10 +1770,15 @@
       <div style="color:#fff;font-weight:900;font-size:15px;">クチコミ</div>
     </div>
     <div style="padding:16px 20px;">
-      <div style="font-size:13px;color:#555;line-height:1.8;margin-bottom:14px;" data-i18n="google_desc">皆様の口コミが本当に励みになります。おいしいと思ってくれたらよければ投稿お願いします。</div>
-      <a href="https://www.google.com/search?sca_esv=e6aa1a2056371338&sxsrf=ANbL-n7LVje28vPqpiQNbtm9-mvyJchScA:1777574135186&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOaYErhrVYt2_2GF_KyUHRUlq7lQaNiGqE0VwpsiAN7ElMCZQD5tU7gvuswlclyUvFnjCyAaXAlOBagH31ESIRC0PP5TdnhiwhX61ccoTNboR9KFUcQ%3D%3D&q=%E3%82%B5%E3%83%AF%E3%83%87%E3%82%A3%E5%85%84%E5%BC%9F+%E3%82%AF%E3%83%81%E3%82%B3%E3%83%9F&sa=X&ved=2ahUKEwj5247Xm5aUAxVLiK8BHXiKEXUQ0bkNegQIJBAH&biw=1536&bih=695&dpr=1.25#" target="_blank" class="sns-btn google">
+      <div style="font-size:13px;color:#555;line-height:1.8;margin-bottom:14px;" data-i18n="google_desc">皆様の口コミが本当に励みになります。おいしいと思ってくれたらよければ投稿お願いします。星だけでもありがたいです！</div>
+      <a href="https://g.page/r/CX4CLm57vlcHEBM/review" target="_blank" class="sns-btn google" style="margin-bottom:10px;">
         <span class="sns-icon">⭐</span>
         <div class="sns-text"><div class="sns-label">Googleクチコミを書く</div></div>
+        <span>→</span>
+      </a>
+      <a href="https://tabelog.com/kanagawa/A1405/A140504/14058637/" target="_blank" class="sns-btn" style="background:#ff6600;color:#fff;border-color:#ff6600;">
+        <span class="sns-icon">📝</span>
+        <div class="sns-text"><div class="sns-label">食べログで口コミを書く</div></div>
         <span>→</span>
       </a>
     </div>
@@ -1757,7 +1787,7 @@
   <!-- 感想フォーム -->
   <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:14px;">FEEDBACK</div>
-    <div style="font-size:13px;color:#555;line-height:1.8;margin-bottom:16px;" data-i18n="survey_desc">当店へのご意見やアドバイスがあればぜひ聞かせてください。もっといい店にしていきたいです！</div>
+    <div style="font-size:13px;color:#555;line-height:1.8;margin-bottom:16px;" data-i18n="survey_desc">当店へのご意見やアドバイスがあればぜひ聞かせてください。</div>
     <div id="survey-form">
       <div class="survey-label" data-i18n="s_overall">今日の料理はいかがでしたか？</div>
       <div class="star-row" id="star-row">
@@ -1774,7 +1804,16 @@
         <button class="visit-opt" onclick="setVisit(this,'4回以上')" data-i18n="v3">4回以上</button>
         <button class="visit-opt" onclick="setVisit(this,'常連')" data-i18n="v4">常連です！</button>
       </div>
-      <div class="survey-label" data-i18n="s_comment">ひとことコメント（任意）</div>
+      <div class="survey-label" data-i18n="s_source">当店を何で知りましたか？</div>
+      <div class="survey-visit" id="source-opts">
+        <button class="visit-opt" onclick="setSource(this,'食べログ')" data-i18n="src1">食べログ</button>
+        <button class="visit-opt" onclick="setSource(this,'Google')" data-i18n="src2">Google</button>
+        <button class="visit-opt" onclick="setSource(this,'Instagram')" data-i18n="src3">Instagram</button>
+        <button class="visit-opt" onclick="setSource(this,'友人の紹介')" data-i18n="src4">友人の紹介</button>
+        <button class="visit-opt" onclick="setSource(this,'通りがかり')" data-i18n="src5">通りがかり</button>
+        <button class="visit-opt" onclick="setSource(this,'その他')" data-i18n="src6">その他</button>
+      </div>
+      <div class="survey-label" data-i18n="s_comment">ご意見、アドバイス（任意）</div>
       <textarea class="survey-textarea" id="survey-comment" rows="3" placeholder="おいしかった！また来ます etc..." data-i18n-placeholder="comment_placeholder"></textarea>
       <button class="submit-btn" onclick="submitSurvey()" data-i18n="submit_btn">送信する 🙏</button>
     </div>
@@ -1836,7 +1875,7 @@ const I18N = {
     qcat_culture:"タイ文化クイズ",qcat_culture_sub:"タイの文化・歴史・料理 10問",
     next_btn:"次へ →",quiz_fin:"お疲れさまでした！",quiz_score_label:"点 / 100点",retry_btn:"もう一度",change_cat:"カテゴリ変更",
     trivia_title:"タイ文化・豆知識",trivia_desc:"知れば知るほど面白いタイのあれこれ。カルチャーショックを受けるためにタイに行っているといっても過言ではありません。皆様にもタイをもっと知ってもらいたい！",
-    ttab_all:"すべて",ttab_food:"🍜 料理のルーツ",ttab_culture:"🎭 文化・マナー",
+    ttab_all:"すべて",ttab_food:"🍜 食文化",ttab_culture:"🎭 文化・マナー",
     menu_title:"ごあいさつ",kodawari_title:"シェフのこだわり",
     dish1_desc:"バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。ふつうのバジルとは全然違う、スパイシーでパンチのある風味が自慢です。",
     dish2_desc:"レモングラス・カー（タイしょうが）・マクルートの葉を丸ごと使ったスープ。酸味・辛味・旨味のバランスが命です。",
@@ -1859,10 +1898,11 @@ const I18N = {
     th5:"本場のガパオ",th6:"チェンマイの朝",th7:"水上マーケット",th8:"ストリートフード",
     photo_credit:"※写真は順次、実際のタイ訪問写真に差し替え予定",
     ig_desc:"写真はあまり得意じゃないので更新少なめですが、お休みのお知らせなどしてるのでよかったらフォローお願いします。",
-    google_desc:"皆様の口コミが本当に励みになります。おいしいと思ってくれたらよければ投稿お願いします。",
+    google_desc:"皆様の口コミが本当に励みになります。おいしいと思ってくれたらよければ投稿お願いします。星だけでもありがたいです！",
     hashtag_title:"ハッシュタグ",
-    survey_title:"ご感想をお聞かせください",survey_desc:"当店へのご意見やアドバイスがあればぜひ聞かせてください。もっといい店にしていきたいです！",
-    s_overall:"今日の料理はいかがでしたか？",s_visit:"来店回数は？",s_comment:"ひとことコメント（任意）",
+    survey_title:"ご感想をお聞かせください",survey_desc:"当店へのご意見やアドバイスがあればぜひ聞かせてください。",
+    s_overall:"今日の料理はいかがでしたか？",s_visit:"来店回数は？",s_comment:"ご意見、アドバイス（任意）",
+    s_source:"当店を何で知りましたか？",src1:"食べログ",src2:"Google",src3:"Instagram",src4:"友人の紹介",src5:"通りがかり",src6:"その他",
     v1:"初めて",v2:"2〜3回",v3:"4回以上",v4:"常連です！",
     comment_placeholder:"おいしかった！また来ます etc...",submit_btn:"送信する 🙏",
     thanks_title:"ありがとうございます！",thanks_msg:"ご感想をお聞かせいただき、ありがとうございました。またのご来店をお待ちしております。",
@@ -1875,7 +1915,7 @@ const I18N = {
     tap_hint:"Tap to reveal 👆",next_btn:"Next →",
     quiz_title:"Thai Culture Quiz",quiz_fin:"Completed!",quiz_score_label:"pts / 100",retry_btn:"Try Again",
     trivia_title:"Thai Culture Facts",trivia_desc:"The more you learn about Thailand, the more fascinating it gets. It's no exaggeration to say I travel to Thailand just for the culture shock. I want everyone to discover more about Thailand!",
-    ttab_all:"All",ttab_food:"🍜 Food Roots",ttab_culture:"🎭 Culture & Manners",menu_title:"Chef's Pride",
+    ttab_all:"All",ttab_food:"🍜 Food Culture",ttab_culture:"🎭 Culture & Manners",menu_title:"Chef's Pride",
     dish1_desc:"We use Holy Basil (Krapao) imported directly from Thailand. The spicy, punchy flavor is totally different from regular basil!",
     dish2_desc:"Made with whole lemongrass, galangal, and kaffir lime leaves. The balance of sour, spicy, and savory is everything.",
     dish3_desc:"Chang Beer — Thailand's iconic brew with its elephant logo. Light and refreshing, a perfect match for Thai food!",
@@ -1901,10 +1941,12 @@ const I18N = {
     tabimap_desc:"The owner's favorite Thai spots. Tap a pin for details. Heavy on local markets — that's his quirky taste. Use it as a guide to hidden gems you won't find in guidebooks!",
     tabimap_ugc_desc:"Have you been to Thailand? Share your favorite spots — we might add them to the map!",
     ig_desc:"Photos aren't really our strong suit so updates are few, but we post closure notices and news — give us a follow if you'd like!",
-    google_desc:"Your reviews truly encourage us. If you enjoyed the food, we'd really appreciate a review.",
+    google_desc:"Your reviews truly encourage us. If you enjoyed the food, we'd really appreciate a review. Even just a star rating helps a lot!",
     hashtag_title:"Hashtags",
-    survey_title:"Share Your Feedback",survey_desc:"If you have any feedback or suggestions, we'd love to hear them. We're always looking to get better!",s_overall:"How was today's food?",s_visit:"How many times have you visited?",
-    s_comment:"Leave a comment (optional)",v1:"First time",v2:"2–3 times",v3:"4+ times",v4:"Regular!",
+    survey_title:"Share Your Feedback",survey_desc:"If you have any feedback or suggestions, we'd love to hear them.",s_overall:"How was today's food?",s_visit:"How many times have you visited?",
+    s_comment:"Feedback & suggestions (optional)",s_source:"How did you find us?",
+    src1:"Tabelog",src2:"Google",src3:"Instagram",src4:"Friend's recommendation",src5:"Walked by",src6:"Other",
+    v1:"First time",v2:"2–3 times",v3:"4+ times",v4:"Regular!",
     comment_placeholder:"It was delicious! Coming back soon...",submit_btn:"Submit 🙏",
     thanks_title:"Thank you!",thanks_msg:"We appreciate your feedback. Hope to see you again soon!",
   },
@@ -1917,7 +1959,7 @@ const I18N = {
     tap_hint:"แตะเพื่อดู 👆",next_btn:"ต่อไป →",
     quiz_title:"ทายปัญหาวัฒนธรรมไทย",quiz_fin:"เสร็จแล้ว!",quiz_score_label:"คะแนน / 100",retry_btn:"ลองอีกครั้ง",
     trivia_title:"วัฒนธรรมไทย",trivia_desc:"ยิ่งรู้จักประเทศไทยก็ยิ่งสนุก ไม่พูดเกินไปเลยว่าผมไปไทยเพื่อรับ culture shock! อยากให้ทุกคนรู้จักไทยมากขึ้นครับ!",
-    ttab_all:"ทั้งหมด",ttab_food:"🍜 รากอาหาร",ttab_culture:"🎭 วัฒนธรรม",menu_title:"ความภาคภูมิใจของเชฟ",
+    ttab_all:"ทั้งหมด",ttab_food:"🍜 วัฒนธรรมอาหาร",ttab_culture:"🎭 วัฒนธรรม",menu_title:"ความภาคภูมิใจของเชฟ",
     dish1_desc:"ใช้ใบกะเพราแท้จากประเทศไทย กลิ่นหอมเผ็ดร้อน แตกต่างจากโหระพาทั่วไปมาก!",
     dish2_desc:"ใช้ตะไคร้ ข่า และใบมะกรูดสดทั้งใบ สมดุลของรสเปรี้ยว เผ็ด และอูมามิ คือหัวใจ",
     dish3_desc:"เบียร์ช้าง สัญลักษณ์ของไทย ดื่มง่าย ไม่หวาน เข้ากันดีกับอาหารไทย!",
@@ -1932,10 +1974,12 @@ const I18N = {
     tabimap_desc:"สถานที่แนะนำในไทยจากเจ้าของร้าน แตะหมุดเพื่อดูรายละเอียด ตลาดท้องถิ่นเยอะหน่อยเพราะเป็นงานอดิเรกแปลกๆ ของเจ้าของ ลองใช้เป็นไกด์สำหรับที่เที่ยวลับที่ไม่มีในหนังสือนำเที่ยวนะครับ!",
     tabimap_ugc_desc:"เคยไปไทยไหม? แนะนำสถานที่โปรดของคุณ อาจถูกเพิ่มในแผนที่!",
     ig_desc:"ถ่ายรูปไม่ค่อยเก่งเลยอัปเดตไม่บ่อย แต่เราโพสต์ประกาศวันหยุดและข่าวสาร ฝากฟอลโล่ด้วยนะครับ!",
-    google_desc:"รีวิวจากทุกท่านเป็นกำลังใจให้เรามากจริงๆ ถ้าอร่อยก็ช่วยเขียนรีวิวให้ด้วยนะครับ",
+    google_desc:"รีวิวจากทุกท่านเป็นกำลังใจให้เรามากจริงๆ ถ้าอร่อยก็ช่วยเขียนรีวิวให้ด้วยนะครับ แค่ให้ดาวก็ขอบคุณมากครับ!",
     hashtag_title:"แฮชแท็ก",
-    survey_title:"แสดงความคิดเห็น",survey_desc:"หากมีความคิดเห็นหรือคำแนะนำ เรายินดีรับฟังครับ อยากทำร้านให้ดีขึ้นเรื่อยๆ!",s_overall:"อาหารวันนี้เป็นอย่างไรบ้าง?",s_visit:"มากี่ครั้งแล้ว?",
-    s_comment:"ความคิดเห็น (ไม่บังคับ)",v1:"ครั้งแรก",v2:"2–3 ครั้ง",v3:"4 ครั้งขึ้นไป",v4:"ขาประจำ!",
+    survey_title:"แสดงความคิดเห็น",survey_desc:"หากมีความคิดเห็นหรือคำแนะนำ เรายินดีรับฟังครับ",s_overall:"อาหารวันนี้เป็นอย่างไรบ้าง?",s_visit:"มากี่ครั้งแล้ว?",
+    s_comment:"ความคิดเห็น คำแนะนำ (ไม่บังคับ)",s_source:"รู้จักร้านเราจากไหน?",
+    src1:"Tabelog",src2:"Google",src3:"Instagram",src4:"เพื่อนแนะนำ",src5:"เดินผ่าน",src6:"อื่นๆ",
+    v1:"ครั้งแรก",v2:"2–3 ครั้ง",v3:"4 ครั้งขึ้นไป",v4:"ขาประจำ!",
     comment_placeholder:"อร่อยมาก! จะมาอีก...",submit_btn:"ส่ง 🙏",
     thanks_title:"ขอบคุณมากนะคะ!",thanks_msg:"ขอบคุณสำหรับความคิดเห็น หวังว่าจะได้พบกันอีกนะคะ!",
     shop_title:"ภายในร้าน",shop_desc:"ร้านของเราคือบ้านเก่าที่เจ้าของปรับปรุงเอง เต็มไปด้วยของตกแต่งจากไทย แต่ละชิ้นเจ้าของเลือกมาจากเมืองไทยเอง ลองมองหาดูนะครับ!",
@@ -2496,54 +2540,74 @@ function closeShopLb() {
 
 
 const SPOTS = [
-  { id:'staneemeehoi', emoji:'🦞', cat:'グルメ', city:'バンコク',
-    name:{ja:'สถานีมีหอย（スタニーミーホイ）',en:'Sathaneemeehoi',th:'สถานีมีหอย'},
-    comment:{ja:'筋肉系ウェイターが爆音で踊る超個性派シーフード食堂！フアムム市場内。毎日18〜24時。',en:'Wild seafood restaurant with dancing muscle waiters at Huamum Market. Open daily 6PM–midnight.',th:'ร้านอาหารทะเลบรรยากาศสุดฮา พนักงานหนุ่มกล้ามเต้นแจกความสนุก'},
-    lat:13.8189, lng:100.5932 },
-  { id:'railway_market', emoji:'🚂', cat:'市場', city:'サムットソンクラーム',
-    name:{ja:'メークロン鉄道市場',en:'Maeklong Railway Market',th:'ตลาดแม่กลอง'},
-    comment:{ja:'線路の上に市場！列車が通るたびに傘をたたむ世界唯一の光景。バンコクから1.5時間。',en:'A market ON the railway tracks. Vendors fold their awnings as the train passes — must-see!',th:'ตลาดบนรางรถไฟ ร่มหุบ-กางทุกครั้งรถไฟผ่าน ไม่มีที่ไหนในโลก'},
-    lat:13.4108, lng:100.0027 },
-  { id:'banpri', emoji:'🏘️', cat:'観光', city:'サムットプラカーン',
-    name:{ja:'バーンプリー百年市場',en:'Bang Phli Yai Bang Kaeo',th:'ตลาดบางพลีใหญ่'},
-    comment:{ja:'運河沿いに広がる昔ながらのタイの市場。木造の古民家が並ぶレトロな雰囲気が◎',en:'Old-style Thai market along the canal with century-old wooden shophouses.',th:'ตลาดโบราณริมคลอง บ้านไม้เก่าแก่บรรยากาศย้อนยุค'},
+  { id:'seenakarin', emoji:'🚂', cat:'市場', city:'バンコク',
+    name:{ja:'シーナカリン鉄道市場',en:'Srinakarin Train Night Market',th:'ตลาดรถไฟศรีนครินทร์'},
+    comment:{ja:'廃列車を改装したナイトマーケット。ヴィンテージ雑貨・古着・屋台飯が集まるローカル感満載の夜市。観光客少なめで掘り出し物が見つかる！',en:'Night market built around old train carriages. Vintage goods, street food, and a local vibe. Fewer tourists, more hidden gems!',th:'ตลาดนัดกลางคืนในตู้รถไฟเก่า ของวินเทจ เสื้อผ้ามือสอง อาหารริมทาง บรรยากาศโลคอลสุดๆ'},
+    lat:13.6833, lng:100.6386 },
+  { id:'banpri', emoji:'🏘️', cat:'市場', city:'サムットプラカーン',
+    name:{ja:'バーンプリー百年市場',en:'Bang Phli Hundred Year Market',th:'ตลาดบางพลี'},
+    comment:{ja:'運河沿いに100年以上続く市場。木造の古民家が並ぶレトロな雰囲気。ボートに乗ってお菓子を買うのが名物。観光客ほぼゼロの穴場。',en:'Over 100 years old, this canal-side market features wooden shophouses and a retro atmosphere. Buy snacks from boats — a hidden gem with almost no tourists.',th:'ตลาดริมคลองอายุกว่า 100 ปี บ้านไม้เก่าแก่ ซื้อขนมจากเรือ นักท่องเที่ยวแทบไม่มี'},
     lat:13.5987, lng:100.7215 },
-  { id:'makro', emoji:'🛒', cat:'ショッピング', city:'バンコク',
-    name:{ja:'マクロ（Makro）',en:'Makro Thailand',th:'แม็คโคร'},
-    comment:{ja:'タイのプロ御用達の業務用スーパー。食材・調理器具・タイ調味料をまとめ買いするならここ！',en:'Thailand\'s top wholesale supermarket — perfect for buying bulk Thai ingredients & spices.',th:'ซูเปอร์มาร์เก็ตขายส่ง วัตถุดิบครบ เครื่องปรุงไทยครบครัน'},
-    lat:13.7563, lng:100.5368 },
-  { id:'ancientcity', emoji:'🏛️', cat:'観光', city:'サムットプラカーン',
-    name:{ja:'アンシェントシティ（ムアンボーラン）',en:'Ancient City (Muang Boran)',th:'เมืองโบราณ'},
-    comment:{ja:'タイ全土の名所を1日で巡れる世界最大の野外博物館。300haの広大な敷地に116の建造物！',en:'World\'s largest outdoor museum — 116 Thai landmarks across 300 hectares. A full day out!',th:'พิพิธภัณฑ์กลางแจ้งที่ใหญ่ที่สุดในโลก สถาปัตยกรรมไทยทั่วทุกภาค'},
-    lat:13.5489, lng:100.7731 },
-  { id:'route66', emoji:'🎵', cat:'ナイトライフ', city:'バンコク',
-    name:{ja:'Route 66 Club',en:'Route 66 Club',th:'รูท 66'},
-    comment:{ja:'RCAエリアにあるバンコク屈指のメガクラブ。複数フロアで色々なジャンルの音楽が楽しめる！',en:'Bangkok\'s legendary mega-club in the RCA area. Multiple floors, multiple vibes.',th:'คลับยักษ์ใหญ่ย่าน RCA หลายฟลอร์ หลายสไตล์ดนตรี'},
-    lat:13.7483, lng:100.5714 },
-  { id:'jjgreen', emoji:'🌙', cat:'ナイトライフ', city:'バンコク',
-    name:{ja:'JJ Green ナイトマーケット',en:'JJ Green Night Market',th:'เจเจ กรีน'},
-    comment:{ja:'チャトゥチャック近くのヴィンテージ系ナイトマーケット。レトロ雑貨・古着・屋台が集結。',en:'Vintage night market near Chatuchak — retro goods, second-hand clothes, great food stalls.',th:'ตลาดนัดกลางคืนวินเทจใกล้จตุจักร ของเก่า เสื้อผ้า ร้านอาหาร'},
-    lat:13.8027, lng:100.5506 },
   { id:'bahao', emoji:'🍸', cat:'バー', city:'バンコク',
     name:{ja:'Ba Hao 八號',en:'Ba Hao',th:'บาเฮา'},
-    comment:{ja:'チャイナタウンにある中国風カクテルバー。レトロな内装とオリジナルカクテルが人気。',en:'Cool Chinese-style cocktail bar in Chinatown with retro decor and creative drinks.',th:'บาร์ค็อกเทลสไตล์จีนในไชน่าทาวน์ ดีไซน์เรโทรน่าถ่ายรูป'},
+    comment:{ja:'チャイナタウンにある中華レトロなカクテルバー。内装が最高にかっこいい。オリジナルカクテルも絶品。予約なしで行けるけど混んでることが多い。',en:'Retro Chinese-style cocktail bar in Chinatown. Stunning interior and creative cocktails. Walk-in OK but often packed.',th:'บาร์ค็อกเทลสไตล์จีนในไชน่าทาวน์ ตกแต่งเรโทรสุดเท่ ค็อกเทลจัดจ้าน ไม่ต้องจองแต่คนเยอะ'},
     lat:13.7397, lng:100.5135 },
   { id:'tepbar', emoji:'🎭', cat:'バー', city:'バンコク',
-    name:{ja:'TEP BAR',en:'TEP BAR – Cultural Bar of Thailand',th:'เทพบาร์'},
-    comment:{ja:'タイの伝統音楽・文化が楽しめるユニークなバー。ライブ演奏と本格タイカクテルで一夜を。',en:'Unique bar celebrating Thai culture with live traditional music and Thai-inspired cocktails.',th:'บาร์วัฒนธรรมไทย ดนตรีไทยสด ค็อกเทลสไตล์ไทยแท้'},
+    name:{ja:'TEP BAR - Cultural Bar of Thailand',en:'TEP BAR – Cultural Bar of Thailand',th:'เทพบาร์'},
+    comment:{ja:'タイの伝統音楽のライブが毎晩聴けるバー。タイハーブを使ったオリジナルカクテルが面白い。タイ文化を「飲んで感じる」ユニークな体験。',en:'Bar with nightly live Thai traditional music. Thai herb cocktails are a unique experience — drink and feel Thai culture.',th:'บาร์ที่มีดนตรีไทยสดทุกคืน ค็อกเทลสมุนไพรไทยเป็นประสบการณ์ใหม่ ดื่มแล้วรู้สึกถึงวัฒนธรรมไทย'},
     lat:13.7401, lng:100.5118 },
-  { id:'parinya', emoji:'🏨', cat:'ホテル', city:'バンコク',
-    name:{ja:'Parinya Mansion',en:'Parinya Mansion',th:'ปาริณยา แมนชั่น'},
-    comment:{ja:'タクヤおすすめの宿。コスパ◎の快適なマンション型ホテル。',en:'Takuya\'s recommended stay — comfortable mansion-style hotel with great value.',th:'ที่พักแนะนำโดยทาคุยะ ราคาดี บรรยากาศดี'},
-    lat:13.7600, lng:100.5400 },
-  { id:'soimuban', emoji:'🏡', cat:'観光', city:'バンコク',
-    name:{ja:'Soi Mu Ban Den Chai',en:'Soi Mu Ban Den Chai',th:'ซอยหมู่บ้านเด่นชัย'},
-    comment:{ja:'タクヤが見つけたローカルな路地。観光客が来ないリアルなバンコクの日常がここに。',en:'A hidden local street — the real Bangkok that tourists never see.',th:'ซอยลับที่ทาคุยะค้นพบ ชีวิตชาวบ้านแท้ๆ ที่นักท่องเที่ยวไม่มาถึง'},
-    lat:13.7650, lng:100.5550 },
   { id:'chatuchak', emoji:'🛍️', cat:'市場', city:'バンコク',
     name:{ja:'チャトゥチャック市場',en:'Chatuchak Weekend Market',th:'ตลาดจตุจักร'},
-    comment:{ja:'世界最大級の週末市場。土日のみ。雑貨・古着・タイ料理・植物まで何でも揃う！',en:'World\'s largest weekend market (Sat & Sun only) — clothes, crafts, food, plants, everything!',th:'ตลาดนัดใหญ่ที่สุดในโลก เปิดแค่เสาร์-อาทิตย์ มีทุกอย่าง'},
+    comment:{ja:'世界最大級の週末市場。土日のみ。1万5000以上の店舗が並ぶ。雑貨・古着・タイ料理・植物まで何でも揃う。1日では回りきれない。',en:'One of the world\'s largest weekend markets. 15,000+ stalls, open Sat & Sun only. Clothes, crafts, food, plants — impossible to see it all in one day.',th:'ตลาดนัดใหญ่ที่สุดในโลก เปิดแค่เสาร์-อาทิตย์ ร้านค้ากว่า 15,000 ร้าน มีทุกอย่าง วันเดียวเดินไม่หมด'},
     lat:13.7998, lng:100.5504 },
+  { id:'maeklong', emoji:'🚂', cat:'市場', city:'サムットソンクラーム',
+    name:{ja:'メークローン鉄道市場',en:'Maeklong Railway Market',th:'ตลาดแม่กลอง'},
+    comment:{ja:'線路の上に市場！列車が通るたびに屋根をたたんで商品を引く、世界唯一の光景。バンコクから車で1.5時間。アンパワーとセットで行くのがおすすめ。',en:'A market ON the tracks! Vendors fold awnings and pull back goods as the train passes. 1.5 hrs from Bangkok — combine with Amphawa.',th:'ตลาดบนรางรถไฟ! ร่มหุบ-กางทุกครั้งรถไฟผ่าน ไม่มีที่ไหนในโลก จากกรุงเทพฯ 1.5 ชม. ไปกับอัมพวาได้'},
+    lat:13.4108, lng:100.0027 },
+  { id:'zudrangma', emoji:'🎵', cat:'ショッピング', city:'バンコク',
+    name:{ja:'Zudrangma Records（レコード屋）',en:'Zudrangma Records',th:'ซุดรังมา เรคคอร์ดส์'},
+    comment:{ja:'タイのモーラム・ルークトゥンなどのレアなレコードが揃うレコード屋。タイの音楽カルチャーに触れたいならここ。店主もめちゃくちゃ詳しい。当店で流れる音楽の一部もここで買ったものです。',en:'Record shop specializing in rare Thai Molam and Luk Thung vinyl. The owner is incredibly knowledgeable about Thai music culture. Some of the music playing in our restaurant was bought here!',th:'ร้านแผ่นเสียงหายาก หมอลำ ลูกทุ่ง ดนตรีไทยเก่า เจ้าของรู้ลึกมาก เพลงบางส่วนที่เปิดในร้านเราก็ซื้อมาจากที่นี่!'},
+    lat:13.7637, lng:100.5356 },
+  { id:'klongtoei', emoji:'🥬', cat:'市場', city:'バンコク',
+    name:{ja:'クロントーイ市場',en:'Khlong Toei Market',th:'ตลาดคลองเตย'},
+    comment:{ja:'バンコク最大の生鮮市場。プロの料理人も仕入れに来る。野菜・魚・肉・ハーブが超安い。朝早い時間が活気があっておすすめ。',en:'Bangkok\'s largest fresh market where pro chefs shop. Vegetables, fish, meat, herbs at rock-bottom prices. Go early morning for the best atmosphere.',th:'ตลาดสดใหญ่ที่สุดในกรุงเทพฯ เชฟมืออาชีพก็มาซื้อที่นี่ ผัก ปลา เนื้อ สมุนไพร ถูกมาก ไปเช้าๆ บรรยากาศดี'},
+    lat:13.7063, lng:100.5577 },
+  { id:'sabaijai', emoji:'🍛', cat:'グルメ', city:'バンコク',
+    name:{ja:'サバイジャイ レストラン',en:'Sabai Jai Restaurant',th:'สบายใจ'},
+    comment:{ja:'地元民に愛されるイサーン（東北タイ）料理の名店。ソムタム・ガイヤーン・ラープが絶品。安くてうまい。日本人にもっと知ってほしい店。',en:'Beloved local Isan restaurant. Amazing som tam, gai yang, and laab. Cheap, authentic, and deserves more attention from Japanese visitors.',th:'ร้านอาหารอีสานที่คนท้องถิ่นรัก ส้มตำ ไก่ย่าง ลาบ รสเด็ด ราคาถูก อร่อยจริง'},
+    lat:13.7360, lng:100.5610 },
+  { id:'madbacon', emoji:'🎨', cat:'ショッピング', city:'バンコク',
+    name:{ja:'MADBACON（カルチャーショップ）',en:'MADBACON',th:'แมดเบคอน'},
+    comment:{ja:'タイのアーティスト・クリエイターの作品が集まるカルチャーショップ。Tシャツ・ステッカー・ZINE・アートプリントなど。タイのストリートカルチャーが詰まってる。',en:'Culture shop featuring Thai artists and creators. T-shirts, stickers, zines, art prints — packed with Thai street culture.',th:'ร้านวัฒนธรรมรวบรวมผลงานศิลปินและครีเอเตอร์ไทย เสื้อ สติกเกอร์ ซีน อาร์ตปริ้นท์ เต็มไปด้วยวัฒนธรรมสตรีทไทย'},
+    lat:13.7450, lng:100.5350 },
+  { id:'damnoen', emoji:'🛶', cat:'市場', city:'ラチャブリー',
+    name:{ja:'ダムヌン・サドゥアック水上マーケット',en:'Damnoen Saduak Floating Market',th:'ตลาดน้ำดำเนินสะดวก'},
+    comment:{ja:'観光地として超有名な水上マーケット。ボートに乗りながら買い物ができる。観光客は多いけど一度は行く価値あり。朝7〜9時が一番活気がある。',en:'The most famous floating market. Shop from boats — touristy but worth a visit. Go between 7–9 AM for peak action.',th:'ตลาดน้ำที่โด่งดังที่สุด ช้อปจากเรือ นักท่องเที่ยวเยอะแต่ต้องไปสักครั้ง ไป 7-9 โมงเช้าคึกที่สุด'},
+    lat:13.5238, lng:99.9578 },
+  { id:'amphawa', emoji:'🛶', cat:'市場', city:'サムットソンクラーム',
+    name:{ja:'アンパワー水上マーケット',en:'Amphawa Floating Market',th:'ตลาดน้ำอัมพวา'},
+    comment:{ja:'ダムヌンより観光客少なめでローカル感が強い水上マーケット。金土日のみ。夕方からが本番。蛍ボートツアーもあり。メークローンとセットで。',en:'More local than Damnoen Saduak. Open Fri–Sun, evening is prime time. Firefly boat tours available. Pair with Maeklong.',th:'โลคอลกว่าดำเนินสะดวก เปิดศุกร์-อาทิตย์ ช่วงเย็นคึกที่สุด มีล่องเรือดูหิ่งห้อยด้วย ไปกับแม่กลองได้'},
+    lat:13.4261, lng:99.9535 },
+  { id:'makro', emoji:'🛒', cat:'ショッピング', city:'バンコク',
+    name:{ja:'マクロ サトーン（業務スーパー）',en:'Makro Sathorn',th:'แม็คโคร สาทร'},
+    comment:{ja:'タイのプロ御用達の業務用スーパー。ナンプラー・カレーペースト・乾麺など、タイ調味料の品揃えが圧倒的。お土産の大量買いにも。当店のお皿や調理器具の多くもこちらにお世話になってます。バンコクに何店舗かあるので都合のいい場所に寄ってみて。',en:'Thailand\'s top wholesale supermarket. Unbeatable selection of Thai seasonings — fish sauce, curry paste, dried noodles. Many of our plates and cooking tools come from here too. Multiple locations across Bangkok — visit whichever is convenient!',th:'ซูเปอร์มาร์เก็ตขายส่ง น้ำปลา พริกแกง เส้นแห้ง เครื่องปรุงไทยครบ จานและอุปกรณ์ทำครัวหลายชิ้นของร้านเราก็ซื้อจากที่นี่ มีหลายสาขาในกรุงเทพฯ แวะที่ไหนสะดวกก็ได้!'},
+    lat:13.7204, lng:100.5278 },
+  { id:'sampeng', emoji:'🧵', cat:'市場', city:'バンコク',
+    name:{ja:'サンペーン市場（雑貨卸売り通り）',en:'Sampeng Market',th:'ตลาดสำเพ็ง'},
+    comment:{ja:'ヤワラート（チャイナタウン）のど真ん中にある卸売り通り。アクセサリー・布・おもちゃ・雑貨が激安。道が狭くてカオスだけどそれが面白い。',en:'Wholesale alley in the heart of Chinatown. Accessories, fabrics, toys, goods at rock-bottom prices. Narrow and chaotic — that\'s the fun.',th:'ย่านขายส่งใจกลางไชน่าทาวน์ เครื่องประดับ ผ้า ของเล่น ราคาถูก ทางแคบวุ่นวาย แต่สนุก'},
+    lat:13.7390, lng:100.5090 },
+  { id:'yaowarat', emoji:'🐉', cat:'観光', city:'バンコク',
+    name:{ja:'ヤワラート（チャイナタウン）',en:'Yaowarat (Chinatown)',th:'เยาวราช'},
+    comment:{ja:'バンコクのチャイナタウン。夜になると屋台がずらっと並んで圧巻。フカヒレ・点心・マンゴーデザートなど食べ歩きが最高。Ba HaoやTEP BARもこのエリア。',en:'Bangkok\'s Chinatown. At night, street food stalls line up — shark fin soup, dim sum, mango desserts. Ba Hao and TEP BAR are also in this area.',th:'ไชน่าทาวน์กรุงเทพฯ ตอนกลางคืนร้านริมทางเรียงราย หูฉลาม ติ่มซำ ขนมมะม่วง Ba Hao กับ TEP BAR ก็อยู่แถวนี้'},
+    lat:13.7400, lng:100.5090 },
+  { id:'asokpier', emoji:'🚤', cat:'観光', city:'バンコク',
+    name:{ja:'Asok Pier（運河ボート乗り場）',en:'Asok Pier (Canal Boat)',th:'ท่าเรืออโศก'},
+    comment:{ja:'渋滞を完全スルーできるセンセープ運河のボート。地元民の通勤手段。観光客はほぼゼロ。水しぶき注意！ローカル体験としては最高の乗り物。ちょっと電車で行きづらいカオサンに行くときにも便利。',en:'Skip Bangkok traffic on the Saen Saep canal boat. Used by locals for commuting. Almost no tourists. Watch out for splashes! Also handy for reaching Khaosan Road, which is tricky by train.',th:'เรือคลองแสนแสบ หนีรถติดได้เลย คนท้องถิ่นใช้ไปทำงาน นักท่องเที่ยวแทบไม่มี ระวังน้ำกระเด็น! สะดวกสำหรับไปข้าวสารที่นั่งรถไฟไปลำบาก'},
+    lat:13.7360, lng:100.5600 },
+  { id:'huaikhwang', emoji:'🥘', cat:'市場', city:'バンコク',
+    name:{ja:'ホイクワン市場',en:'Huai Khwang Market',th:'ตลาดห้วยขวาง'},
+    comment:{ja:'深夜まで営業してるローカル市場。タイ料理の屋台だけじゃなく中華系の店も多い。地元のタイ人で賑わう。観光客向けじゃないリアルなバンコクの食。',en:'Local market open late into the night. Thai and Chinese food stalls packed with locals. Real Bangkok food — not the tourist version.',th:'ตลาดท้องถิ่นเปิดดึก ร้านอาหารไทยและจีน คนท้องถิ่นเต็ม อาหารกรุงเทพฯ แท้ ไม่ใช่แบบนักท่องเที่ยว'},
+    lat:13.7770, lng:100.5740 },
 ];
 
 const catColors = {'寺院':'#A31313','観光':'#1A5C8A','市場':'#2E5329','ナイトライフ':'#6B3FA0','バー':'#8B2252','グルメ':'#C45E00','ショッピング':'#1A7A6E','ホテル':'#4A6741'};
@@ -2563,8 +2627,10 @@ function renderSpotList() {
 
   const cityEmoji = {
     'バンコク': '🏙️',
-    'チェンマイ': '🌿',
+    'サムットプラカーン': '🏘️',
+    'サムットソンクラーム': '🛶',
     'ラチャブリー': '🚣',
+    'チェンマイ': '🌿',
   };
 
   container.innerHTML = Object.entries(grouped).map(([city, spots]) => {
@@ -2639,73 +2705,99 @@ function submitSpot() {
 
 
 const TRIVIA = [
-  // ===== 文化・マナー =====
   { cat:'culture', num:"C1", tag:{ja:"マナー",en:"Manners",th:"มารยาท"},
-    q:{ja:"タイで頭は触ってはいけない！",en:"Never touch someone's head in Thailand!",th:"ในไทยห้ามจับหัวคนอื่น!"},
-    a:{ja:"タイでは頭は神聖な部位とされており、子どもであっても他人の頭を触るのは大変失礼にあたります。",en:"In Thai culture, the head is considered the most sacred part of the body. Touching anyone's head, even a child's, is considered very rude.",th:"ในวัฒนธรรมไทย ศีรษะถือเป็นส่วนที่ศักดิ์สิทธิ์ที่สุด การจับศีรษะผู้อื่นแม้แต่เด็กถือว่าเป็นการเสียมารยาทอย่างมาก"} },
-  { cat:'culture', num:"C2", tag:{ja:"マナー",en:"Manners",th:"มารยาท"},
-    q:{ja:"足を向けるのはNG！",en:"Don't point your feet at people!",th:"อย่าชี้เท้าใส่คน!"},
-    a:{ja:"足は身体の中で最も「低い」部位とされます。足を人や仏像に向けるのは非常に失礼な行為です。",en:"Feet are considered the lowest, least sacred part of the body. Pointing your feet at people or Buddha images is very disrespectful.",th:"เท้าถือเป็นส่วนที่ต่ำที่สุดของร่างกาย การชี้เท้าไปที่คนอื่นหรือพระพุทธรูปถือว่าไม่เหมาะสมมาก"} },
-  { cat:'culture', num:"C3", tag:{ja:"マナー",en:"Manners",th:"มารยาท"},
-    q:{ja:"寺院に入るときは靴を脱ぐ・肌を隠す",en:"Remove shoes and cover up at temples",th:"เข้าวัดต้องถอดรองเท้าและแต่งกายสุภาพ"},
-    a:{ja:"タイの寺院（ワット）では入口で靴を脱ぐのが必須。また肩・膝を露出した服装での入場はNGです。入口で布を借りられることも多いので安心してください。",en:"You must remove shoes before entering Thai temples (Wat). Shoulders and knees must be covered. Sarongs are often available to borrow at the entrance.",th:"ก่อนเข้าวัดต้องถอดรองเท้าเสมอ และต้องปิดไหล่กับเข่า มักมีผ้าคลุมให้ยืมที่ทางเข้า"} },
-  { cat:'culture', num:"C4", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
-    q:{ja:"タイには「微笑みの国」という別名がある",en:"Thailand is known as 'The Land of Smiles'",th:"ไทยมีชื่อว่า 'ดินแดนแห่งรอยยิ้ม'"},
-    a:{ja:"タイ人は13種類以上の微笑みを使い分けるとも言われています。喜び・照れ・感謝・悲しみ…それぞれに意味があります。",en:"Thai people are said to use over 13 different types of smiles, each with its own meaning — joy, embarrassment, gratitude, sadness, and more.",th:"คนไทยมีรอยยิ้มมากกว่า 13 แบบ แต่ละแบบมีความหมายต่างกัน ทั้งยินดี อาย ขอบคุณ เศร้า ฯลฯ"} },
-  { cat:'culture', num:"C5", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"「頭」と「足」のタブー",en:"The taboo of 'head' and 'feet'",th:"ข้อห้ามเรื่อง 'หัว' และ 'เท้า'"},
+    a:{ja:"体の中で最も神聖なのは「頭」、最も不浄なのは「足」と考えられています。<br>頭： 子供が可愛くても、勝手に頭を撫でるのはNGです（魂が宿る場所とされるため）。<br>足： 足の裏を人や仏像に向けたり、足で物を指し示したりするのは非常に失礼な行為になります。",en:"The head is considered the most sacred part of the body, while the feet are the lowest. Never touch someone's head — even a child's — as it's believed the soul resides there. Pointing your feet at people or Buddha images is extremely rude.",th:"ศีรษะถือเป็นส่วนที่ศักดิ์สิทธิ์ที่สุด ส่วนเท้าเป็นส่วนที่ต่ำที่สุด ห้ามจับหัวคนอื่นแม้แต่เด็ก เพราะเชื่อว่าวิญญาณสถิตอยู่ที่นั่น การชี้เท้าไปที่คนหรือพระพุทธรูปถือว่าเป็นการเสียมารยาทอย่างมาก"} },
+  { cat:'culture', num:"C2", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
     q:{ja:"ソンクラーン（水かけ祭り）は4月！",en:"Songkran (Water Festival) is in April!",th:"สงกรานต์อยู่เดือนเมษายน!"},
-    a:{ja:"タイの旧正月を祝うお祭り。水をかけ合うことで穢れを流し、新年の幸福を祈ります。バンコクでは街中が大水合戦になります！",en:"Thailand's traditional New Year festival. Water is splashed to wash away bad luck and wish for good fortune. Bangkok turns into a city-wide water fight!",th:"ประเพณีปีใหม่ไทย การสาดน้ำเพื่อชำล้างสิ่งไม่ดีและอวยพรปีใหม่ กรุงเทพฯ กลายเป็นสงครามน้ำทั้งเมือง!"} },
-  { cat:'culture', num:"C6", tag:{ja:"言葉",en:"Language",th:"ภาษา"},
-    q:{ja:"パクチー（コリアンダー）はタイ語で「パクチー」",en:"Coriander is called 'Phak Chi' in Thai",th:"ผักชีในภาษาไทยคือ 'ผักชี'"},
-    a:{ja:"そのまま日本語になっています！タイ料理ではトッピングとして非常によく使われます。苦手な方はご注文時にお申し付けください。",en:"The Japanese word is borrowed directly from Thai! Coriander is widely used as a topping in Thai cuisine. Let us know if you'd like it left out!",th:"คำว่า 'ปะกุชิ' ในภาษาญี่ปุ่นมาจากภาษาไทยโดยตรง! ผักชีใช้มากในอาหารไทย บอกได้ถ้าไม่ต้องการ"} },
-  { cat:'culture', num:"C7", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    a:{ja:"タイの旧正月を祝うお祭り。水をかけ合うことで穢れを流し、新年の幸福を祈ります。バンコクでは街中が大水合戦になります！",en:"Thailand's traditional New Year festival. Water is splashed to wash away bad luck and bring good fortune. Bangkok turns into a city-wide water fight!",th:"ประเพณีปีใหม่ไทย การสาดน้ำเพื่อชำล้างสิ่งไม่ดีและอวยพรปีใหม่ กรุงเทพฯ กลายเป็นสงครามน้ำทั้งเมือง!"} },
+  { cat:'culture', num:"C3", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
     q:{ja:"トゥクトゥクの名前の由来はエンジン音",en:"'Tuk-tuk' is named after its engine sound",th:"ชื่อ 'ตุ๊กตุ๊ก' มาจากเสียงเครื่องยนต์"},
-    a:{ja:"タイの三輪タクシー「トゥクトゥク」。その名前はエンジンが動くときの「トゥクトゥク」という音からきています。今やバンコクの象徴的な乗り物ですが、観光客向けの料金交渉は必須です！",en:"Thailand's iconic three-wheeled taxi gets its name from the 'tuk tuk' sound its engine makes. A symbol of Bangkok, but always negotiate the fare before getting in!",th:"รถตุ๊กตุ๊กได้ชื่อมาจากเสียงเครื่องยนต์ 'ตุ๊กตุ๊ก' เป็นสัญลักษณ์ของกรุงเทพฯ แต่ต้องต่อราคาก่อนขึ้นเสมอ!"} },
-  { cat:'culture', num:"C8", tag:{ja:"王室",en:"Royalty",th:"สถาบันกษัตริย์"},
+    a:{ja:"タイの三輪タクシー「トゥクトゥク」。その名前はエンジンが動くときの「トゥクトゥク」という音からきています。今やバンコクの象徴的な乗り物ですが、観光客向けの料金交渉は必須です！",en:"Thailand's iconic three-wheeled taxi gets its name from the 'tuk tuk' sound its engine makes. A symbol of Bangkok, but always negotiate the fare!",th:"รถตุ๊กตุ๊กได้ชื่อมาจากเสียงเครื่องยนต์ 'ตุ๊กตุ๊ก' เป็นสัญลักษณ์ของกรุงเทพฯ แต่ต้องต่อราคาก่อนขึ้นเสมอ!"} },
+  { cat:'culture', num:"C4", tag:{ja:"王室",en:"Royalty",th:"สถาบันกษัตริย์"},
     q:{ja:"タイの国王への敬意は非常に重んじられる",en:"Respect for the Thai monarchy is taken very seriously",th:"การเคารพสถาบันกษัตริย์ไทยสำคัญมาก"},
-    a:{ja:"タイでは国王・王室への不敬罪（不敬罪法）が存在し、軽率な発言は法的問題になる場合があります。紙幣や硬貨には国王の肖像が入っており、踏むことは絶対にNGです。",en:"Thailand has strict lese-majesty laws protecting the monarchy. Never make disrespectful comments, and never step on coins or banknotes, which bear the King's image.",th:"ไทยมีกฎหมายหมิ่นพระบรมเดชานุภาพที่เข้มงวด อย่าพูดจาไม่เคารพ และห้ามเหยียบเหรียญหรือธนบัตรที่มีรูปกษัตริย์"} },
-
-  // ===== 料理のルーツ =====
-  { cat:'food', num:"F1", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
+    a:{ja:"タイでは国王・王室への不敬罪（不敬罪法）が存在し、軽率な発言は法的問題になる場合があります。紙幣や硬貨には国王の肖像が入っており、踏むことは絶対にNGです。",en:"Thailand has strict lese-majesty laws. Never make disrespectful comments, and never step on coins or banknotes bearing the King's image.",th:"ไทยมีกฎหมายหมิ่นพระบรมเดชานุภาพที่เข้มงวด อย่าพูดจาไม่เคารพ และห้ามเหยียบเหรียญหรือธนบัตรที่มีรูปกษัตริย์"} },
+  { cat:'food', num:"F1", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
     q:{ja:"パッタイは「戦争と政治」が生んだ国民食",en:"Pad Thai was born from war and politics",th:"ผัดไทยเกิดจากสงครามและการเมือง"},
-    a:{ja:"1940年代、タイは戦禍と洪水で深刻な米不足に。当時の首相ピブーンは「米を粒で食べる量を減らすため、少量の米から大量に作れる米粉麺を食べよう」と国民運動を起こしました。さらに中国系移民の小麦麺を締め出す政治的意図もあり、あえて米粉麺を「タイの国民食」に選んだのです。戦後は失業対策として屋台での販売も奨励され、パッタイは一気に全国に広まりました。",
-     en:"In the 1940s, Thailand faced severe rice shortages from war and floods. PM Phibun launched a campaign: instead of eating rice grain by grain, make noodles from rice flour — much more people can be fed from the same amount. There was also a political motive to push out Chinese wheat noodles, so rice noodles were deliberately chosen as the 'Thai national dish.' Post-war, street vending was encouraged for employment — and Pad Thai spread nationwide.",
-     th:"ในช่วงทศวรรษ 1940 ไทยขาดแคลนข้าวจากสงครามและน้ำท่วม นายกฯ ปิบูนจึงรณรงค์ให้กินเส้นข้าวแทนข้าวเปล่า เพราะข้าวเพียงเล็กน้อยทำเส้นได้มาก และยังมีเป้าหมายทางการเมืองที่จะกีดกันเส้นข้าวสาลีของชาวจีน หลังสงครามยังส่งเสริมการขายเพื่อแก้ปัญหาการว่างงาน ผัดไทยจึงแพร่หลายทั่วประเทศ"} },
-  { cat:'food', num:"F2", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
+    a:{ja:"1940年代、タイは戦禍と洪水で深刻な米不足に。当時の首相ピブーンは「米を粒で食べる量を減らすため、少量の米から大量に作れる米粉麺を食べよう」と国民運動を起こしました。さらに中国系移民の小麦麺を締め出す政治的意図もあり、あえて米粉麺を「タイの国民食」に選んだのです。戦後は失業対策として屋台での販売も奨励され、パッタイは一気に全国に広まりました。",en:"In the 1940s, Thailand faced severe rice shortages. PM Phibun launched a campaign to eat rice noodles instead, also pushing out Chinese wheat noodles politically. Post-war street vending was encouraged, and Pad Thai spread nationwide.",th:"ในช่วงทศวรรษ 1940 ไทยขาดแคลนข้าว นายกฯ ปิบูนรณรงค์ให้กินเส้นข้าวแทน และยังกีดกันเส้นข้าวสาลีของจีน หลังสงครามส่งเสริมการขายริมทาง ผัดไทยจึงแพร่หลายทั่วประเทศ"} },
+  { cat:'food', num:"F2", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
     q:{ja:"タイカレーとインドカレー、実は別物",en:"Thai curry and Indian curry are completely different",th:"แกงไทยกับแกงอินเดียต่างกันโดยสิ้นเชิง"},
-    a:{ja:"インドカレーはスパイスを乾燥させて粉にしてから使いますが、タイカレーはレモングラス・ガランガル・コブミカンの皮など生のハーブをすりつぶしたペーストが命。ベースにはヤシの実のミルク（ガティ）を使います。インドカレーの影響は受けつつも、東南アジア独自に進化した全く別の料理です。",
-     en:"Indian curries use dried, powdered spices. Thai curries are built on a paste of fresh herbs — lemongrass, galangal, kaffir lime zest — pounded together, with coconut milk as the base. While influenced by India, Thai curry evolved into something completely its own in Southeast Asia.",
-     th:"แกงอินเดียใช้เครื่องเทศแห้งบด แต่แกงไทยใช้เครื่องแกงสดจากตะไคร้ ข่า ผิวมะกรูด โขลกรวมกัน และใช้กะทิเป็นฐาน แม้ได้รับอิทธิพลจากอินเดีย แต่พัฒนาเป็นอาหารที่แตกต่างโดยสิ้นเชิง"} },
-  { cat:'food', num:"F3", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
+    a:{ja:"インドカレーはスパイスを乾燥させて粉にしてから使いますが、タイカレーはレモングラス・ガランガル・コブミカンの皮など生のハーブをすりつぶしたペーストが命。ベースにはヤシの実のミルク（ガティ）を使います。インドカレーの影響は受けつつも、東南アジア独自に進化した全く別の料理です。",en:"Indian curries use dried, powdered spices. Thai curries use fresh herb paste — lemongrass, galangal, kaffir lime — with coconut milk. While influenced by India, Thai curry is its own thing.",th:"แกงอินเดียใช้เครื่องเทศแห้งบด แต่แกงไทยใช้เครื่องแกงสดจากตะไคร้ ข่า ผิวมะกรูด และใช้กะทิเป็นฐาน แม้ได้รับอิทธิพลจากอินเดียแต่พัฒนาเป็นอาหารที่แตกต่างโดยสิ้นเชิง"} },
+  { cat:'food', num:"F3", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
     q:{ja:"タイ料理と中華料理、切っても切れない関係",en:"Thai and Chinese cuisine: inseparable roots",th:"อาหารไทยและจีน: รากที่แยกกันไม่ออก"},
-    a:{ja:"タイに多く移住した中国系移民（ホッケン・テオチュー系）が持ち込んだのが、炒め物・麺料理・豆腐・醤油の文化。ガパオもパッタイも、炒め料理の技法は中華由来です。そこにタイ独自のハーブ・魚醤・唐辛子が合わさって「タイ料理」が生まれました。移民の知恵と現地の食材が融合した料理文化なんです。",
-     en:"Chinese immigrants (Hokkien and Teochew) brought stir-frying, noodles, tofu, and soy sauce to Thailand. Krapao, Pad Thai — the stir-fry technique is Chinese in origin. Mixed with Thai herbs, fish sauce, and chili, 'Thai cuisine' was born. It's a fusion of immigrant wisdom and local ingredients.",
-     th:"ผู้อพยพชาวจีน (ฮกเกี้ยนและแต้จิ๋ว) นำการผัด เส้น เต้าหู้ และซีอิ๊วมาสู่ไทย กะเพรา ผัดไทย — เทคนิคการผัดมาจากจีน ผสมกับสมุนไพรไทย น้ำปลา และพริก จึงกลายเป็น 'อาหารไทย'"} },
-  { cat:'food', num:"F4", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
+    a:{ja:"タイに多く移住した中国系移民（ホッケン・テオチュー系）が持ち込んだのが、炒め物・麺料理・豆腐・醤油の文化。ガパオもパッタイも、炒め料理の技法は中華由来です。そこにタイ独自のハーブ・魚醤・唐辛子が合わさって「タイ料理」が生まれました。移民の知恵と現地の食材が融合した料理文化なんです。",en:"Chinese immigrants brought stir-frying, noodles, tofu, and soy sauce. Krapao, Pad Thai — the stir-fry technique is Chinese. Mixed with Thai herbs, fish sauce, and chili, 'Thai cuisine' was born.",th:"ผู้อพยพชาวจีนนำการผัด เส้น เต้าหู้ และซีอิ๊วมาสู่ไทย เทคนิคการผัดมาจากจีน ผสมกับสมุนไพรไทย น้ำปลา และพริก จึงกลายเป็น 'อาหารไทย'"} },
+  { cat:'food', num:"F4", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
     q:{ja:"ナンプラー・ニョクマム・魚醤——アジアをつなぐうま味",en:"Fish sauce connects all of Asia",th:"น้ำปลาเชื่อมโยงทั้งเอเชีย"},
-    a:{ja:"タイのナンプラー、ベトナムのニョクマム、日本の魚醤（しょっつる・いしる）——全部同じ「魚を塩で発酵させた調味料」です。うま味成分（グルタミン酸）が豊富で、料理に奥深さをもたらします。西洋のアンチョビソースも同じ仲間。人類共通の「発酵の知恵」です。",
-     en:"Thailand's nam pla, Vietnam's nuoc mam, Japan's shottsuru — all the same thing: fish fermented in salt. Rich in glutamate (umami), it adds depth to any dish. Even Western anchovy sauce is in the same family. It's humanity's shared fermentation wisdom.",
-     th:"น้ำปลาไทย นัมปลาเวียดนาม โชตสึรุญี่ปุ่น — ทั้งหมดคือปลาหมักเกลือเหมือนกัน อุดมด้วยกลูตาเมต (อูมามิ) แม้แต่ซอสแอนโชวีตะวันตกก็อยู่ในตระกูลเดียวกัน"} },
-  { cat:'food', num:"F5", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
+    a:{ja:"タイのナンプラー、ベトナムのニョクマム、日本の魚醤（しょっつる・いしる）——全部同じ「魚を塩で発酵させた調味料」です。うま味成分（グルタミン酸）が豊富で、料理に奥深さをもたらします。西洋のアンチョビソースも同じ仲間。人類共通の「発酵の知恵」です。",en:"Thailand's nam pla, Vietnam's nuoc mam, Japan's shottsuru — all fish fermented in salt. Rich in umami. Even Western anchovy sauce is in the same family.",th:"น้ำปลาไทย น้ำปลาเวียดนาม โชตสึรุญี่ปุ่น — ทั้งหมดคือปลาหมักเกลือเหมือนกัน อุดมด้วยอูมามิ แม้แต่ซอสแอนโชวีตะวันตกก็อยู่ในตระกูลเดียวกัน"} },
+  { cat:'food', num:"F5", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
     q:{ja:"唐辛子はもともとタイにはなかった",en:"Chili peppers aren't originally from Thailand",th:"พริกไม่ได้มีต้นกำเนิดในไทย"},
-    a:{ja:"唐辛子の原産地は南アメリカ。コロンブスがヨーロッパに持ち帰り、16世紀にポルトガル商人がアジアに広めました。「タイ料理の辛さ」の歴史はたった500年ほど。それ以前は胡椒や生姜で辛みをつけていました。今では欠かせない食材ですが、意外と「新参者」なんです。",
-     en:"Chili peppers originated in South America. Columbus brought them to Europe, and Portuguese traders spread them to Asia in the 16th century. The 'spiciness of Thai food' is only about 500 years old. Before that, pepper and ginger provided the heat.",
-     th:"พริกมีต้นกำเนิดในอเมริกาใต้ โคลัมบัสนำไปยุโรป และพ่อค้าโปรตุเกสนำมาเอเชียในศตวรรษที่ 16 ความเผ็ดของอาหารไทยจึงมีประวัติเพียง 500 ปี ก่อนหน้านั้นใช้พริกไทยและขิงแทน"} },
-  { cat:'food', num:"F6", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
+    a:{ja:"唐辛子の原産地は南アメリカ。コロンブスがヨーロッパに持ち帰り、16世紀にポルトガル商人がアジアに広めました。「タイ料理の辛さ」の歴史はたった500年ほど。それ以前は胡椒や生姜で辛みをつけていました。今では欠かせない食材ですが、意外と「新参者」なんです。",en:"Chili peppers originated in South America. Portuguese traders brought them to Asia in the 16th century. The 'spiciness of Thai food' is only about 500 years old!",th:"พริกมีต้นกำเนิดในอเมริกาใต้ พ่อค้าโปรตุเกสนำมาเอเชียในศตวรรษที่ 16 ความเผ็ดของอาหารไทยจึงมีประวัติเพียง 500 ปี!"} },
+  { cat:'food', num:"F6", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
     q:{ja:"トムヤムクンは「酸っぱい・辛い・香る」の方程式",en:"Tom Yum's formula: sour + spicy + aromatic",th:"ต้มยำ: สูตร เปรี้ยว+เผ็ด+หอม"},
-    a:{ja:"「トム」は煮る、「ヤム」は混ぜるという意味。タイでは「ヤム」系料理が多数あり、酸味・辛味・ハーブの香りを合わせるのがタイ料理の基本哲学です。レモングラス・カー・コブミカンの葉という三点セットが香りの核心。タイ料理はこの「バランス」を最も大切にします。",
-     en:"'Tom' means to boil, 'Yum' means to mix. 'Yum' dishes are everywhere in Thai cuisine — the philosophy is always sour + spicy + aromatic herbs. Lemongrass, galangal, kaffir lime leaf: the holy trinity of Thai aroma. Thai cuisine is fundamentally about this balance.",
-     th:"'ต้ม' แปลว่าต้ม 'ยำ' แปลว่าคลุกเคล้า ปรัชญาอาหารไทยคือสมดุลของเปรี้ยว เผ็ด และกลิ่นหอม ตะไคร้ ข่า ใบมะกรูด คือสามเสาหลักของกลิ่นหอมไทย"} },
-  { cat:'food', num:"F7", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
+    a:{ja:"「トム」は煮る、「ヤム」は混ぜるという意味。タイでは「ヤム」系料理が多数あり、酸味・辛味・ハーブの香りを合わせるのがタイ料理の基本哲学です。レモングラス・カー・コブミカンの葉という三点セットが香りの核心。タイ料理はこの「バランス」を最も大切にします。",en:"'Tom' means to boil, 'Yum' means to mix. Lemongrass, galangal, kaffir lime leaf: the holy trinity of Thai aroma. Thai cuisine is about this balance.",th:"'ต้ม' แปลว่าต้ม 'ยำ' แปลว่าคลุกเคล้า ตะไคร้ ข่า ใบมะกรูด คือสามเสาหลักของกลิ่นหอมไทย อาหารไทยคือเรื่องของสมดุล"} },
+  { cat:'food', num:"F7", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
     q:{ja:"ガパオ（ホーリーバジル）はふつうのバジルとは別物",en:"Holy basil (Krapao) is totally different from regular basil",th:"กะเพราต่างจากโหระพาโดยสิ้นเชิง"},
-    a:{ja:"日本で「バジル」と言えば甘い香りのスイートバジル。しかしガパオ（ホーリーバジル）はスパイシーでクローブに似た刺激的な香りが特徴。本場のガパオライスには絶対にこちらを使います。当店もタイから直輸入しています。スイートバジルで作ると全然違う料理になってしまいます！",
-     en:"When Japanese people hear 'basil,' they think of sweet basil with its gentle fragrance. But Holy Basil (Krapao) is spicy and peppery, closer to cloves. Authentic Pad Krapao must use this — substitute sweet basil and you get a completely different dish. We import it directly from Thailand!",
-     th:"โหระพาหอมหวาน แต่กะเพรามีกลิ่นฉุนเผ็ดคล้ายกานพลู ผัดกะเพราแท้ต้องใช้กะเพราเท่านั้น ถ้าใช้โหระพาจะได้อาหารคนละอย่างเลย ร้านเรานำเข้าจากไทยโดยตรง!"} },
-  { cat:'food', num:"F8", tag:{ja:"料理のルーツ",en:"Food Roots",th:"รากอาหาร"},
-    q:{ja:"タイ料理に「辛くないカレー」がある",en:"There's a Thai curry that isn't spicy",th:"มีแกงไทยที่ไม่เผ็ด"},
-    a:{ja:"マッサマンカレーは唐辛子をほとんど使わない、まろやかで甘みのあるカレー。シナモン・カルダモン・クローブなどスパイスはインド由来で、タイ南部のムスリム文化が生んだ料理です。「世界で最も美味しい料理」世界ランキングで1位を獲得したことも。辛いものが苦手な方にも安心です！",
-     en:"Massaman curry uses almost no chili — it's rich, sweet, and aromatic with cinnamon, cardamom, and cloves. It was born from Muslim culture in southern Thailand with Indian spice influences. It once topped a 'world's best foods' ranking. Perfect for spice-sensitive diners!",
-     th:"แกงมัสมั่นแทบไม่ใส่พริก รสชาติเข้มข้น หวาน หอมด้วยอบเชย กระวาน กานพลู เกิดจากวัฒนธรรมมุสลิมภาคใต้ของไทยที่ได้รับอิทธิพลจากอินเดีย เคยได้รับการโหวตให้เป็นอาหารที่อร่อยที่สุดในโลกด้วย!"} },
+    a:{ja:"日本で「バジル」と言えば甘い香りのスイートバジル。しかしガパオ（ホーリーバジル）はスパイシーでクローブに似た刺激的な香りが特徴。本場のガパオライスには絶対にこちらを使います。当店もタイから直輸入しています。",en:"Sweet basil has a gentle fragrance. But Holy Basil is spicy and peppery, closer to cloves. Authentic Pad Krapao must use this — we import it directly from Thailand!",th:"โหระพาหอมหวาน แต่กะเพรามีกลิ่นฉุนเผ็ดคล้ายกานพลู ผัดกะเพราแท้ต้องใช้กะเพราเท่านั้น ร้านเรานำเข้าจากไทยโดยตรง!"} },
+  { cat:'culture', num:"C5", tag:{ja:"マナー",en:"Manners",th:"มารยาท"},
+    q:{ja:"挨拶の「ワイ」にはルールがある",en:"The 'Wai' greeting has hidden rules",th:"การ 'ไหว้' มีกฎซ่อนอยู่"},
+    a:{ja:"胸の前で手を合わせる挨拶「ワイ」ですが、実は相手によって手の高さが変わります。<br>友人・同世代： 胸の高さ<br>目上の人（親や先生）： 鼻の高さ<br>僧侶・王室： 眉間の高さ<br>高くなるほど、相手への敬意が深いことを表しています。",en:"The Wai (palms together greeting) changes height depending on who you greet: chest for peers, nose for elders, forehead for monks and royalty. Higher = more respect.",th:"การไหว้เปลี่ยนระดับตามผู้ที่ทักทาย: อก สำหรับเพื่อน จมูก สำหรับผู้ใหญ่ หน้าผาก สำหรับพระและเจ้านาย ยิ่งสูงยิ่งแสดงความเคารพ"} },
+  { cat:'culture', num:"C6", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"毎日2回、街が止まる？",en:"The entire city stops twice a day?",th:"ทั้งเมืองหยุดนิ่งวันละ 2 ครั้ง?"},
+    a:{ja:"駅や公園などの公共の場では、毎日午前8時と午後6時に国歌が流れます。この時、歩いている人も立ち止まって直立不動で敬意を表すのがルールです。初めてタイに行くと、急に全員が彫像のように止まるので驚くかもしれません。",en:"At 8 AM and 6 PM, the national anthem plays in public places. Everyone stops and stands at attention. First-timers are amazed to see the whole crowd freeze like statues!",th:"ทุกวันเวลา 8 โมงเช้าและ 6 โมงเย็น เพลงชาติจะดังขึ้นในที่สาธารณะ ทุกคนหยุดยืนตรง คนที่ไปไทยครั้งแรกจะตกใจที่ทุกคนหยุดนิ่งเหมือนรูปปั้น!"} },
+  { cat:'food', num:"F8", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
+    q:{ja:"ビールには氷を入れる",en:"Beer goes with ice in Thailand",th:"เบียร์ต้องใส่น้ำแข็ง"},
+    a:{ja:"タイでは暑さでビールがすぐぬるくなるため、氷を入れて飲むのが一般的な日常スタイルです。屋台や居酒屋ではバケツやピッチャーで氷が提供されることもあります。日本人としては最初は違和感がありますが、慣れると最高です。タイ在住の日本人の友人は日本に来てもこのスタイルで飲みます。",en:"It's so hot that beer gets warm instantly, so Thais put ice in it. At first it feels wrong, but once you get used to it, it's the best. My Thai expat friends still drink beer on ice even in Japan!",th:"เมืองไทยร้อนมากเบียร์อุ่นเร็ว เลยใส่น้ำแข็ง ตอนแรกรู้สึกแปลกแต่พอชินแล้วดีที่สุด เพื่อนคนไทยมาญี่ปุ่นก็ยังดื่มแบบนี้อยู่!"} },
+  { cat:'culture', num:"C7", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"ニックネームが「本名」より大事",en:"Nicknames matter more than real names",th:"ชื่อเล่นสำคัญกว่าชื่อจริง"},
+    a:{ja:"タイ人の本名は非常に長く、親戚でも知らないことがあるくらいです。そのため、生まれた時に親から「チュー・レン（遊びの名前）」という短いニックネームを付けてもらいます。タイでは動物、虫、食べ物、色の名前をニックネームに使用している人が多いですが、ふざけてるの？って思うくらい変なニックネームが多いので興味があったら調べてみて下さい。",en:"Thai real names are extremely long — even relatives might not know them. So everyone gets a short nickname at birth. Many are named after animals, insects, food, or colors — some are hilariously weird!",th:"ชื่อจริงของคนไทยยาวมากแม้แต่ญาติก็อาจไม่รู้ ทุกคนจึงได้ชื่อเล่นสั้นๆ ตั้งแต่เกิด หลายคนใช้ชื่อสัตว์ แมลง อาหาร หรือสี บางชื่อแปลกสุดๆ!"} },
+  { cat:'culture', num:"C8", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"鼻で嗅ぐリフレッシュ道具「ヤードム」",en:"The nose inhaler 'Ya Dom' — Thailand's refresh tool",th:"ยาดมเครื่องมือคลายร้อนของคนไทย"},
+    a:{ja:"タイの人が鼻に白い筒を突っ込んでいるのを見かけたら、それは「ヤードム（嗅ぎ薬）」です。メンソールやハーブの香りがするスティックで、眠気覚まし、鼻詰まり、暑さしのぎ、さらには気分転換のために、老若男女問わず日常的に愛用されています。最近では日本のドンキなどでも見かけるようになりました。",en:"Thais stick a small tube in their nose — that's Ya Dom, a menthol/herb inhaler. Used for staying awake, clearing sinuses, cooling down. Everyone uses them. Now appearing in Japanese Don Quijote stores too!",th:"หลอดเล็กๆ ที่คนไทยเสียบจมูกคือยาดม มีเมนทอลและสมุนไพร ใช้แก้ง่วง แก้คัดจมูก คลายร้อน ทุกเพศทุกวัยใช้ ตอนนี้เริ่มเห็นในดองกี้ญี่ปุ่นแล้วด้วย!"} },
+  { cat:'culture', num:"C9", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"1日2回の「国歌」だけじゃない",en:"It's not just the national anthem twice a day",th:"ไม่ใช่แค่เพลงชาติวันละ 2 ครั้ง"},
+    a:{ja:"映画館でも上映前に「国王賛歌」が流れます。この時、観客は全員席から立ち上がらなければなりません。観光客であっても、周囲に合わせて起立するのがマナーです。",en:"Before movies in cinemas, the Royal Anthem plays. All audience members must stand. Even tourists should follow suit — it's basic etiquette.",th:"ก่อนฉายหนังในโรงหนัง จะเปิดเพลงสรรเสริญพระบารมี ผู้ชมทุกคนต้องลุกขึ้นยืน แม้แต่นักท่องเที่ยวก็ควรยืนตามมารยาท"} },
+  { cat:'food', num:"F9", tag:{ja:"食文化",en:"Food Roots",th:"รากอาหาร"},
+    q:{ja:"パクチーは「飾り」？",en:"Coriander is just a 'garnish'?",th:"ผักชีเป็นแค่ 'เครื่องตกแต่ง'?"},
+    a:{ja:"意外かもしれませんが、本場タイではパクチーを山盛りにして食べることは稀です。基本的には料理の最後に彩りとして「パラッ」とかける、日本でいうパセリのような立ち位置。日本で流行った「パクチーサラダ」のような食べ方は、タイの人から見ると「えっ、飾りをそんなに食べるの？！」と驚かれることがあります。",en:"In Thailand, coriander is sprinkled lightly as garnish — like parsley in Japan. The Japanese trend of huge coriander salads surprises Thais: 'You eat THAT much garnish?!'",th:"ในไทยผักชีโรยเบาๆ เป็นเครื่องตกแต่ง เหมือนพาร์สลีย์ในญี่ปุ่น สลัดผักชีแบบญี่ปุ่นทำให้คนไทยตกใจ 'กินเครื่องตกแต่งเยอะขนาดนั้นเลยเหรอ?!'"} },
+  { cat:'culture', num:"C10", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"「5」を並べると笑い声",en:"Type '555' and you're laughing",th:"พิมพ์ '555' คือหัวเราะ"},
+    a:{ja:"SNSやメッセージでタイ人が「55555」と打っていたら、それは笑っているサインです。タイ語で数字の「5」は「ハー」と発音するため、「555（ハー・ハー・ハー）」となります。日本の「www」と同じですね。",en:"When Thais type '55555' online, they're laughing. The number 5 in Thai is 'ha', so 555 = 'ha ha ha'. Same concept as Japan's 'www'.",th:"เมื่อคนไทยพิมพ์ '55555' ออนไลน์ นั่นคือหัวเราะ เลข 5 ในภาษาไทยอ่านว่า 'ฮ่า' ดังนั้น 555 = 'ฮ่า ฮ่า ฮ่า' เหมือน 'www' ของญี่ปุ่น"} },
+  { cat:'culture', num:"C11", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"コンビニに「お酒を売っていない時間」がある",en:"Convenience stores won't sell alcohol at certain hours",th:"ร้านสะดวกซื้อมีเวลาที่ขายเหล้าไม่ได้"},
+    a:{ja:"これ、知らないとショックを受けます。タイでは法律で酒類の販売時間が決まっていて、11:00〜14:00、17:00〜24:00の間しか買えません。レジに持って行っても、時間外だと容赦なく断られます（選挙の日などは終日禁止になることも！）。",en:"Thai law restricts alcohol sales to 11:00-14:00 and 17:00-24:00. Take it to the register outside those hours and they'll refuse. On election days, it's banned all day!",th:"กฎหมายไทยจำกัดการขายแอลกอฮอล์เฉพาะ 11:00-14:00 และ 17:00-24:00 นำไปจ่ายนอกเวลาจะถูกปฏิเสธ วันเลือกตั้งห้ามขายทั้งวัน!"} },
+  { cat:'culture', num:"C12", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"タクシーが「超カラフル」",en:"Taxis are insanely colorful",th:"แท็กซี่สีสันจัดจ้านมาก"},
+    a:{ja:"バンコクを走るタクシーは、ピンク、オレンジ、緑と黄色、青、紫……と、目がチカチカするほどカラフルです。これ、実は色によって「個人タクシー」なのか「タクシー会社」なのかが見分けられるようになっています。",en:"Bangkok taxis come in pink, orange, green-yellow, blue, purple — eye-popping colors. The colors actually indicate whether it's a private taxi or a company fleet.",th:"แท็กซี่กรุงเทพฯ มีทั้งชมพู ส้ม เขียว-เหลือง น้ำเงิน ม่วง — สีสันตื่นตา จริงๆ แล้วสีบอกได้ว่าเป็นแท็กซี่ส่วนตัวหรือของบริษัท"} },
+  { cat:'culture', num:"C13", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"誕生日の主役が「ご馳走する」",en:"The birthday person treats everyone",th:"คนเกิดวันเกิดเลี้ยงทุกคน"},
+    a:{ja:"日本では誕生日の人が祝ってもらいますが、タイでは逆です。誕生日の本人が、友人や同僚を食事に招待し、会計も持つのが一般的。「生まれてきて幸せだから、みんなにも幸せを分ける」という徳（タンブン）の考え方がベースにあります。",en:"In Thailand, the birthday person invites friends to dinner and pays. The idea: 'I'm happy to be born, so I'll share my happiness with everyone.' It's rooted in the concept of 'Tham Bun' (making merit).",th:"ในไทยคนเกิดวันเกิดเชิญเพื่อนทานข้าวและเป็นคนจ่าย แนวคิดคือ 'ดีใจที่เกิดมา เลยอยากแบ่งปันความสุขให้ทุกคน' มาจากหลักการทำบุญ"} },
+  { cat:'culture', num:"C14", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"「トイレ」のシャワー",en:"The 'toilet shower'",th:"สายฉีดในห้องน้ำ"},
+    a:{ja:"タイのトイレの横には、小さなシャワーヘッドが付いたホースが備え付けられています。これは「手動ウォシュレット」のようなもの。使いこなすにはコツがいりますが、これがないと落ち着かないというタイ在住日本人も多い、隠れた生活必需品です。",en:"Thai toilets have a small shower hose attached. It's a manual bidet. Takes some getting used to, but many Japanese expats say they can't live without it!",th:"ห้องน้ำไทยมีสายฉีดชำระติดอยู่ เป็นเหมือนวอชเลทแบบแมนนวล ต้องฝึกหน่อยแต่คนญี่ปุ่นที่อยู่ไทยหลายคนบอกว่าขาดไม่ได้!"} },
+  { cat:'culture', num:"C15", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"僧侶の修行は「短期体験」もアリ",en:"Monk ordination can be a 'short-term experience'",th:"การบวชเป็นพระแบบ 'ระยะสั้น' ก็ได้"},
+    a:{ja:"タイの男性にとって、出家して僧侶になることは最大の親孝行とされています。一生続ける人もいますが、多くの人は数週間〜数ヶ月だけの「短期出家」をします。会社員が「1ヶ月、出家してきます」と休暇を取るのも、タイではごく自然なことです。",en:"For Thai men, becoming a monk is the ultimate act of filial piety. But many do 'short-term ordination' for a few weeks to months. An office worker taking a month off to be a monk is perfectly normal.",th:"สำหรับผู้ชายไทย การบวชเป็นการทดแทนคุณพ่อแม่สูงสุด แต่หลายคนบวชแบบ 'ระยะสั้น' ไม่กี่สัปดาห์ถึงเดือน พนักงานลาบวช 1 เดือนเป็นเรื่องปกติ"} },
+  { cat:'culture', num:"C16", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"市場の上が「線路」になっている",en:"A market built on a railway track",th:"ตลาดที่อยู่บนรางรถไฟ"},
+    a:{ja:"有名なメークローン市場では、線路のギリギリまで店が並んでいます。列車が来る合図が鳴ると、店主たちは慣れた手つきで屋根をたたみ、商品を引き、列車が数センチ横を通り過ぎたら、何事もなかったかのようにまた屋根を広げます。この「たくましさ」は必見です。",en:"At Maeklong Market, shops line right up to the railway tracks. When a train comes, vendors fold their roofs and pull back goods, then set up again as if nothing happened. Must-see resilience!",th:"ที่ตลาดแม่กลอง ร้านค้าตั้งอยู่ริมรางรถไฟ พอรถไฟมาก็พับหลังคาเก็บของ แล้วกางใหม่เหมือนไม่มีอะไรเกิดขึ้น ความเก่งที่ต้องไปดู!"} },
+  { cat:'culture', num:"C17", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"傘をさすのは「雨」じゃなく「日差し」",en:"Umbrellas are for sun, not rain",th:"ร่มใช้กันแดด ไม่ใช่กันฝน"},
+    a:{ja:"タイ人は少々の雨では傘をさしません（どうせすぐ止むし、すぐ乾くから）。でも、日差しが強い時は日傘をさしたり、雑誌を頭に乗せたりして徹底的にガードします。タイの人にとって、雨より太陽の方が「敵」なのです。",en:"Thais don't bother with umbrellas for light rain (it stops quickly and dries fast). But they guard against sunshine with parasols or magazines on their heads. Sun is the real enemy!",th:"คนไทยไม่กางร่มตอนฝนตกเบาๆ (เดี๋ยวก็หยุดและแห้งเร็ว) แต่กันแดดอย่างจริงจังด้วยร่มหรือนิตยสารวางบนหัว ดวงอาทิตย์คือศัตรูตัวจริง!"} },
+  { cat:'culture', num:"C18", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"曇りの方が天気がいい？",en:"Cloudy days are 'good weather'?",th:"วันครึมคือ 'อากาศดี'?"},
+    a:{ja:"タイ人は晴れている日ではなく曇りの日ほど「いい天気」といいます。晴れて暑い日よりも、曇っていて涼しい方が快適だからです。年中暑い国ならではの合理的な発想です。",en:"Thais call cloudy days 'good weather' — it's cooler and more comfortable than blazing sun. A perfectly rational view from a country that's hot year-round.",th:"คนไทยเรียกวันครึมว่า 'อากาศดี' เพราะเย็นกว่าและสบายกว่าแดดจ้า แนวคิดสมเหตุสมผลมากสำหรับประเทศที่ร้อนตลอดปี"} },
+  { cat:'culture', num:"C19", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"タイに「冬」はないけど「冬服」はある",en:"Thailand has no 'winter' but has winter clothes",th:"ไทยไม่มี 'หน้าหนาว' แต่มีเสื้อหนาว"},
+    a:{ja:"タイにも一応「乾季（11月〜2月頃）」があり、少しだけ気温が下がります。といっても20℃〜25℃くらいですが、タイの人たちは「寒い！」と言って、待ってましたとばかりにダウンジャケットやニット帽を引っ張り出してきます。年に数回しかできない「冬のファッション」を全力で楽しむ姿は、なんだか微笑ましいです。",en:"Thailand's dry season (Nov-Feb) drops to maybe 20-25°C. Thais say 'It's freezing!' and pull out down jackets and beanies. They enjoy their few chances to do 'winter fashion' to the fullest!",th:"ฤดูแล้งของไทย (พ.ย.-ก.พ.) อุณหภูมิลดลงประมาณ 20-25°C คนไทยบอก 'หนาวมาก!' แล้วดึงเสื้อดาวน์และหมวกไหมพรมมาใส่ สนุกกับ 'แฟชั่นหน้าหนาว' เต็มที่!"} },
+  { cat:'culture', num:"C20", tag:{ja:"文化",en:"Culture",th:"วัฒนธรรม"},
+    q:{ja:"モーターサイ（バイクタクシー）の「オレンジ色のベスト」",en:"Motorbike taxis and their orange vests",th:"มอเตอร์ไซค์รับจ้างกับเสื้อกั๊กสีส้ม"},
+    a:{ja:"渋滞の激しいタイで欠かせないバイクタクシー。運転手は必ずオレンジ色のベストを着ていますが、あのベストを着用する権利（鑑札）は非常に高値で取引されています。場所によっては100万円以上の価値があるとも言われる、実はすごい利権なんです。",en:"Bangkok's essential motorbike taxis always wear orange vests. The right to wear that vest (license) is traded at very high prices — some worth over 1 million yen! It's a serious business.",th:"มอเตอร์ไซค์รับจ้างในกรุงเทพฯ ต้องใส่เสื้อกั๊กสีส้มเสมอ สิทธิ์ในการใส่เสื้อกั๊กนั้น (ป้ายทะเบียน) ซื้อขายกันในราคาสูงมาก บางแห่งมูลค่ากว่าล้านเยน!"} },
+  { cat:'culture', num:"C21", tag:{ja:"王室",en:"Royalty",th:"สถาบันกษัตริย์"},
+    q:{ja:"プミポン国王（前国王）の絶大な人気",en:"The immense popularity of King Bhumibol",th:"ความนิยมอย่างล้นหลามของในหลวงรัชกาลที่ 9"},
+    a:{ja:"プミポン国王は、タイの地方や貧しい村々を自ら歩き回り、国民の貧国解決のために生涯をかけました。2016年に国王が崩御された際、タイ全土は深い深い悲しみに包まれ、街中の看板がモノクロになり、国民のほとんどが1年間、喪に服して黒い服を着続けました。若いタイ人の友人も皆Facebookのアイコンが黒になるなど、その世代を問わない国民的な支持に当時私は非常に衝撃を受けました。プミポン国王のエピソードは伝説的なものばかりですのでぜひ調べてみて下さい。",en:"King Bhumibol spent his life walking through villages, dedicating himself to solving poverty. When he passed in 2016, the entire nation mourned — signs went monochrome, most people wore black for a year. The depth of love across all generations left me deeply moved.",th:"ในหลวงรัชกาลที่ 9 ทรงเดินเยี่ยมหมู่บ้านต่างๆ ตลอดพระชนม์ชีพเพื่อแก้ปัญหาความยากจน เมื่อสวรรคตในปี 2559 ทั้งชาติเศร้าโศก ป้ายกลายเป็นขาวดำ คนส่วนใหญ่ใส่ชุดดำตลอดปี ความรักข้ามรุ่นสร้างความประทับใจอย่างลึกซึ้ง"} },
+  { cat:'food', num:"F10", tag:{ja:"食文化",en:"Food Culture",th:"วัฒนธรรมอาหาร"},
+    q:{ja:"アパートにキッチンがない？",en:"No kitchen in the apartment?",th:"อพาร์ทเมนต์ไม่มีครัว?"},
+    a:{ja:"タイの都市部では、アパートにキッチンがないことが一般的です。安くて美味しい屋台やテイクアウト文化が浸透しており「自炊より買った方が安い」からです。また、強火で唐辛子を炒めるタイ料理は煙と匂いが凄まじいため、室内調理に向かないという事情もあります。そのため、家にあるのは冷蔵庫と電子レンジ、お皿だけの家庭も多く、食事は外で済ませるか、ビニール袋に入った料理を買って帰るのがタイ流のライフスタイルです。",en:"In urban Thailand, apartments often don't have kitchens. Street food and takeout are so cheap and delicious that cooking at home costs more. Plus, Thai cooking with high heat and chili creates intense smoke and smell — not ideal indoors. Many homes only have a fridge and microwave, and meals come in plastic bags from street vendors. That's the Thai way of life.",th:"ในเมืองไทย อพาร์ทเมนต์มักไม่มีครัว เพราะอาหารริมทางถูกและอร่อยกว่าทำเอง แถมอาหารไทยต้องผัดไฟแรงใส่พริก ควันกับกลิ่นจะเยอะมาก หลายบ้านมีแค่ตู้เย็นกับไมโครเวฟ ซื้ออาหารใส่ถุงกลับบ้านคือวิถีชีวิตแบบไทยๆ"} }
 ];
 
 let currentTriviaFilter = 'all';
@@ -2721,8 +2813,13 @@ function setTriviaTab(cat, btn) {
 function renderTrivia() {
   const t = currentLang;
   const filtered = currentTriviaFilter === 'all'
-    ? TRIVIA
+    ? [...TRIVIA]
     : TRIVIA.filter(tr => tr.cat === currentTriviaFilter);
+  // Shuffle (Fisher-Yates)
+  for (let i = filtered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+  }
   const container = document.getElementById('trivia-list');
   container.innerHTML = filtered.map(tr => {
     const isFood = tr.cat === 'food';
@@ -2745,7 +2842,7 @@ function copyCode(code) {
 }
 
 // ===== アンケート =====
-let starVal = 0, visitVal = '';
+let starVal = 0, visitVal = '', sourceVal = '';
 
 function setStar(v) {
   starVal = v;
@@ -2756,7 +2853,13 @@ function setStar(v) {
 
 function setVisit(el, val) {
   visitVal = val;
-  document.querySelectorAll('.visit-opt').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#visit-opts .visit-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setSource(el, val) {
+  sourceVal = val;
+  document.querySelectorAll('#source-opts .visit-opt').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
 }
 
@@ -2765,6 +2868,7 @@ function submitSurvey() {
   const payload = {
     stars: starVal,
     visit: visitVal,
+    source: sourceVal,
     comment: comment,
     lang: currentLang,
     ts: Date.now()
