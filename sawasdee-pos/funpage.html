@@ -566,7 +566,7 @@
   .film-username { color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
   /* 黒枠内スクロール */
   .film-scroll {
-    height: 420px;
+    height: 680px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
@@ -868,6 +868,11 @@
 <!-- ===== 豆知識 ===== -->
 <div id="page-trivia" class="page">
 
+  <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:10px;">TRIVIA & QUIZ</div>
+    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="trivia_desc">知れば知るほど面白いタイのあれこれ。カルチャーショックを受けるためにタイに行っているといっても過言ではありません。皆様にもタイをもっと知ってもらいたい！</p>
+  </div>
+
   <!-- メインサブタブ -->
   <div style="display:flex;gap:8px;padding:0 0 14px;">
     <button id="main-tab-trivia" onclick="setMainTab('trivia')" style="
@@ -1053,7 +1058,7 @@
 
   <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:10px;">INTERIOR</div>
-    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="shop_desc">民家を店主自ら改装。土壁と木造の落ち着く空間に、タイから直輸入した装飾が120％！タイ人が「タイの古い家みたい！」と驚くお店です。</p>
+    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="shop_desc">民家を自ら改装した店内にはタイ雑貨がたくさん。店主がタイから持ち帰ったこだわりのアイテムたち。ぜひ色々見つけてみてください。</p>
   </div>
 
   <!-- コラージュエリア -->
@@ -1681,7 +1686,7 @@
 
   <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid #f0f0f0;">
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#A31313;margin-bottom:10px;">MAP</div>
-    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="tabimap_desc">タクヤのおすすめスポット。カードをタップでその場所にジャンプ！</p>
+    <p style="font-size:13px;color:#555;line-height:1.8;" data-i18n="tabimap_desc">店主おすすめのタイスポット。ピンをタップで詳細を見てね。ローカル市場多めなのは店主の変な趣味。ガイドブックには載らない珍観光地の参考にどうぞ！</p>
   </div>
 
   <!-- 地図 -->
@@ -1848,7 +1853,7 @@ const I18N = {
     tab_coupon:"特典",tab_sns:"SNS",tab_survey:"感想",
     tab_tabimap:"旅マップ",
     tabimap_title:"タイ旅おすすめマップ",
-    tabimap_desc:"店主タクヤのおすすめスポット。タイに行ったらぜひ！ピンをタップして詳細を見てね。",
+    tabimap_desc:"店主おすすめのタイスポット。ピンをタップで詳細を見てね。ローカル市場多めなのは店主の変な趣味。ガイドブックには載らない珍観光地の参考にどうぞ！",
     tabimap_ugc_desc:"タイに行ったことある方、おすすめスポットをぜひ教えてください。採用されたらマップに追加します！",
     coupon1_title:"ドリンク1杯サービス！",coupon1_desc:"フォロー＆この画面をスタッフに見せるだけ",
     coupon2_title:"デザートプレゼント🍮",coupon2_desc:"クチコミ投稿後にこの画面をスタッフへ",
@@ -1856,7 +1861,7 @@ const I18N = {
     qcat_thai:"タイ語クイズ",qcat_thai_sub:"タイ語の単語・フレーズ 10問",
     qcat_culture:"タイ文化クイズ",qcat_culture_sub:"タイの文化・歴史・料理 10問",
     next_btn:"次へ →",quiz_fin:"お疲れさまでした！",quiz_score_label:"点 / 100点",retry_btn:"もう一度",change_cat:"カテゴリ変更",
-    trivia_title:"タイ文化・豆知識",
+    trivia_title:"タイ文化・豆知識",trivia_desc:"知れば知るほど面白いタイのあれこれ。カルチャーショックを受けるためにタイに行っているといっても過言ではありません。皆様にもタイをもっと知ってもらいたい！",
     ttab_all:"すべて",ttab_food:"🍜 料理のルーツ",ttab_culture:"🎭 文化・マナー",
     menu_title:"ごあいさつ",kodawari_title:"シェフのこだわり",
     dish1_desc:"バジルはタイから直輸入のホーリーバジル（ガパオ）を使用。ふつうのバジルとは全然違う、スパイシーでパンチのある風味が自慢です。",
@@ -1864,11 +1869,11 @@ const I18N = {
     dish3_desc:"象（チャン）がトレードマークのタイを代表するビール。甘みが少なくスッキリとした飲み口で、タイ料理との相性バツグン！",
     dish4_desc:"タマリンドのタレで炒めたタイ風焼きそば。ナンプラー・砂糖・チリを絶妙なバランスで合わせた秘伝のソースが決め手。",
     staff_title:"スタッフ紹介",
-    staff1_msg:"タイへの愛とリスペクト——それがこの店の全てです。「日本人向けにアレンジした料理」じゃなく、タイ人が食べても「これ本物だね」と言ってくれる料理を出したい。でも、タイ料理が初めての人にも「おいしい！また来たい！」と思ってほしい。その両立を諦めずに追いかけています。仕事帰りに焼き鳥屋へふらっと寄るみたいに、サワディー兄弟がみなさんの日常に溶け込んだら最高です。",
-    philosophy:"「日本人向けにアレンジしました」——この言葉を使いたくない。<br>タイ人が食べても「本物だ」と感じる料理を、日本人の料理人として追求しています。<br><br>タイ料理をもっと身近に。会社の飲み会にも、家族の団欒にも、ふらっと一人飲みにも。<br>焼き鳥屋に寄るみたいに気軽に来てもらえる、そんな大衆酒場でありたい。",
+    staff1_msg:"ようこそ、サワディー兄弟へ。本日はご来店ありがとうございます。<br><br>タイに初めて行ったとき、屋台のおばちゃんが作るカオマンガイに衝撃を受けました。帰国してからもあの味が忘れられず、気づいたらタイ料理屋で働いていました。<br><br>タイへの愛とリスペクト——それがこの店の全てです。私がタイで受けた衝撃と感動を少しでも皆様にお届けできたら嬉しいです。",
+    philosophy:"「日本人向けにアレンジしました」——この言葉を使いたくない。<br><br>「本物のタイの味」と「タイ料理が初めてでも馴染みやすい」。この二つは矛盾しない。それが私の信念です。タイ人が食べて「本物だ」とうなずく味を、日本人の料理人として真剣に追いかけています。<br><br>ホーリーバジルはタイ直送。ペーストは手作り。そのこだわりを、焼き鳥屋に寄るくらいの気軽さで届けたい。それがサワディー兄弟のスタイルです。",
     staff2_msg:"タイ・チェンマイ出身です！お母さんから教わったレシピをベースに、日本のお客様に合わせた味にアレンジしています。辛さはお気軽に調整しますよ。",
     staff3_msg:"料理の説明はなんでも聞いてください！辛さや食べ方のコツもお伝えできます。楽しいひとときになるようサポートします！",
-    shop_title:"店内紹介",shop_desc:"民家を店主自ら改装。土壁と木造の落ち着く空間に、タイから直輸入した装飾が120％！タイ人が「タイの古い家みたい！」と驚くお店です。",
+    shop_title:"店内紹介",shop_desc:"民家を自ら改装した店内にはタイ雑貨がたくさん。店主がタイから持ち帰ったこだわりのアイテムたち。ぜひ色々見つけてみてください。",
     shop1_title:"4名様テーブル席",shop1_desc:"レトロ感漂うコカコーラの看板がお出迎え",
     shop2_title:"小あがり座敷席",shop2_desc:"半個室感のある落ち着く空間。お子様連れにも◎",
     shop3_title:"2〜4名様テーブル席",shop3_desc:"タイのレコードやポスターが壁を彩る",
@@ -1903,18 +1908,18 @@ const I18N = {
     lesson_title:"Today's Thai Phrase",lesson_desc:"Tap the card to reveal the meaning!",
     tap_hint:"Tap to reveal 👆",next_btn:"Next →",
     quiz_title:"Thai Culture Quiz",quiz_fin:"Completed!",quiz_score_label:"pts / 100",retry_btn:"Try Again",
-    trivia_title:"Thai Culture Facts",
+    trivia_title:"Thai Culture Facts",trivia_desc:"The more you learn about Thailand, the more fascinating it gets. It's no exaggeration to say I travel to Thailand just for the culture shock. I want everyone to discover more about Thailand!",
     ttab_all:"All",ttab_food:"🍜 Food Roots",ttab_culture:"🎭 Culture & Manners",menu_title:"Chef's Pride",
     dish1_desc:"We use Holy Basil (Krapao) imported directly from Thailand. The spicy, punchy flavor is totally different from regular basil!",
     dish2_desc:"Made with whole lemongrass, galangal, and kaffir lime leaves. The balance of sour, spicy, and savory is everything.",
     dish3_desc:"Chang Beer — Thailand's iconic brew with its elephant logo. Light and refreshing, a perfect match for Thai food!",
     dish4_desc:"Thai stir-fried noodles in tamarind sauce. The secret is our house blend of fish sauce, sugar, and chili.",
     staff_title:"Meet the Team",
-    staff1_msg:"Welcome to Sawatdee Bros.<br><br>I fell in love with Thailand, and somehow ended up becoming a chef. The energy of the markets, the smoke from the street stalls, the noise of the local diners — I wanted to bring all of that straight to Kawasaki.<br><br>Whether you're stopping in after work, out with friends, or flying solo tonight — make yourself at home.",
-    philosophy:"We never want to say 'adapted for Japanese tastes.'<br>As a Japanese chef, I pursue flavors that even Thai people recognize as authentic.<br><br>Thai food should be for everyone — after-work drinks, family dinners, solo nights out.<br>We want to be your neighborhood spot, as easy to pop into as your local yakitori bar.",
+    staff1_msg:"Welcome to Sawatdee Bros. Thank you for visiting us today.<br><br>The first time I went to Thailand, I was blown away by the Khao Man Gai from a street vendor. Even after coming back to Japan, I couldn't forget that taste — before I knew it, I was working in a Thai restaurant.<br><br>Love and respect for Thailand — that's what this restaurant is all about. I'd be happy if I could share even a little of the excitement and emotion I felt in Thailand with you.",
+    philosophy:"'Adapted for Japanese tastes' — we never want to use those words.<br><br>'Authentic Thai flavor' and 'approachable even for first-timers' — these two don't contradict each other. That's what I believe. As a Japanese chef, I'm seriously chasing flavors that Thai people would nod at and call the real deal.<br><br>Holy basil flown in from Thailand. Curry paste made by hand. We want to deliver that dedication as casually as popping into your local yakitori bar. That's the Sawatdee Bros style.",
     staff2_msg:"I'm from Chiang Mai, Thailand! I base my recipes on my mother's cooking, adapted for Japanese tastes. Feel free to adjust the spice level!",
     staff3_msg:"Ask me anything about the dishes! I can explain spice levels and how to eat everything. Let's make your visit unforgettable!",
-    shop_title:"Inside the Restaurant",shop_desc:"The owner renovated this traditional house himself. Earthen walls, wooden beams, and 120% Thai decor — all imported directly from Thailand. Thai customers say it feels like an old Thai house!",
+    shop_title:"Inside the Restaurant",shop_desc:"Our space is a renovated private house filled with Thai goods. Each piece was handpicked by the owner from Thailand. Take a look around and see what you can find!",
     shop1_title:"Table Seats (4 pax)",shop1_desc:"A retro Coca-Cola sign welcomes you in",
     shop2_title:"Raised Tatami Seats",shop2_desc:"A cozy semi-private space. Great for families with kids too!",
     shop3_title:"Table Seats (2–4 pax)",shop3_desc:"Thai records and posters line the walls",
@@ -1927,7 +1932,7 @@ const I18N = {
     photo_credit:"※ Photos will be updated with the owner's actual Thailand shots",
     tab_tabimap:"Travel Map",
     tabimap_title:"Thailand Recommended Spots",
-    tabimap_desc:"Owner Takuya's favorite spots in Thailand. Tap a pin for details!",
+    tabimap_desc:"The owner's favorite Thai spots. Tap a pin for details. Heavy on local markets — that's his quirky taste. Use it as a guide to hidden gems you won't find in guidebooks!",
     tabimap_ugc_desc:"Have you been to Thailand? Share your favorite spots — we might add them to the map!",
     coupon1_title:"Free Drink!",coupon1_desc:"Follow & show this screen to staff",
     coupon2_title:"Free Dessert🍮",coupon2_desc:"Show this screen after posting your review",
@@ -1947,20 +1952,20 @@ const I18N = {
     lesson_title:"ประโยคไทยวันนี้",lesson_desc:"แตะการ์ดเพื่อดูความหมาย!",
     tap_hint:"แตะเพื่อดู 👆",next_btn:"ต่อไป →",
     quiz_title:"ทายปัญหาวัฒนธรรมไทย",quiz_fin:"เสร็จแล้ว!",quiz_score_label:"คะแนน / 100",retry_btn:"ลองอีกครั้ง",
-    trivia_title:"วัฒนธรรมไทย",
+    trivia_title:"วัฒนธรรมไทย",trivia_desc:"ยิ่งรู้จักประเทศไทยก็ยิ่งสนุก ไม่พูดเกินไปเลยว่าผมไปไทยเพื่อรับ culture shock! อยากให้ทุกคนรู้จักไทยมากขึ้นครับ!",
     ttab_all:"ทั้งหมด",ttab_food:"🍜 รากอาหาร",ttab_culture:"🎭 วัฒนธรรม",menu_title:"ความภาคภูมิใจของเชฟ",
     dish1_desc:"ใช้ใบกะเพราแท้จากประเทศไทย กลิ่นหอมเผ็ดร้อน แตกต่างจากโหระพาทั่วไปมาก!",
     dish2_desc:"ใช้ตะไคร้ ข่า และใบมะกรูดสดทั้งใบ สมดุลของรสเปรี้ยว เผ็ด และอูมามิ คือหัวใจ",
     dish3_desc:"เบียร์ช้าง สัญลักษณ์ของไทย ดื่มง่าย ไม่หวาน เข้ากันดีกับอาหารไทย!",
     dish4_desc:"ผัดไทยซอสมะขาม รสน้ำปลา น้ำตาล พริก ผสมกันอย่างลงตัว",
     staff_title:"พบทีมงาน",
-    staff1_msg:"ยินดีต้อนรับสู่ Sawatdee Bros ครับ<br><br>ผมหลงรักประเทศไทยจนกลายเป็นเชฟโดยไม่รู้ตัว ความอึกทึกของตลาด ควันจากรถเข็น เสียงหัวเราะในร้านข้าวแผง — อยากพาทุกอย่างนั้นมาไว้ที่คาวาซากิ<br><br>จะมาหลังเลิกงาน มากับเพื่อน หรือมาคนเดียว — นั่งสบายๆ เลยนะครับ",
-    philosophy:"เราไม่เคยพูดว่า 'ปรับให้เหมาะกับคนญี่ปุ่น'<br>ในฐานะเชฟญี่ปุ่น ผมไล่ตามรสชาติที่แม้แต่คนไทยก็บอกว่าแท้<br><br>อาหารไทยควรเป็นของทุกคน — ดื่มหลังเลิกงาน ทานกับครอบครัว หรือแวะคนเดียว<br>อยากให้ร้านเราเป็นเหมือนร้านประจำที่แวะได้ทุกวัน",
+    staff1_msg:"ยินดีต้อนรับสู่ Sawatdee Bros ครับ ขอบคุณที่มาวันนี้นะครับ<br><br>ครั้งแรกที่ไปเมืองไทย ผมตกใจกับข้าวมันไกของป้าร้านริมทาง กลับญี่ปุ่นแล้วก็ลืมรสชาตินั้นไม่ได้ รู้ตัวอีกทีก็ทำงานอยู่ร้านอาหารไทยแล้ว<br><br>ความรักและความเคารพต่อประเทศไทย — นั่นคือทุกสิ่งของร้านนี้ครับ ถ้าผมส่งต่อความตื่นเต้นและความประทับใจที่ได้รับจากเมืองไทยให้คุณได้แม้สักนิด ก็ดีใจมากครับ",
+    philosophy:"'ปรับให้เหมาะกับคนญี่ปุ่น' — เราไม่เคยอยากใช้คำนี้<br><br>'รสชาติไทยแท้' กับ 'คนที่ไม่เคยกินอาหารไทยก็ทานได้สบาย' สองสิ่งนี้ไม่ขัดแย้งกัน นั่นคือสิ่งที่ผมเชื่อ ในฐานะเชฟญี่ปุ่น ผมไล่ตามรสชาติที่แม้แต่คนไทยก็พยักหน้าว่าของแท้<br><br>กะเพราส่งตรงจากไทย พริกแกงทำเอง ความใส่ใจนี้อยากส่งถึงคุณแบบสบายๆ เหมือนแวะร้านยากิโทริประจำ นั่นคือสไตล์ของ Sawatdee Bros",
     staff2_msg:"มาจากเชียงใหม่ค่ะ! ทำตามสูตรแม่ ปรับให้เหมาะกับคนญี่ปุ่น ปรับความเผ็ดได้เลยนะคะ",
     staff3_msg:"ถามได้เลยเรื่องอาหาร! จะบอกระดับความเผ็ดและวิธีกิน ขอให้สนุกนะครับ!",
     tab_tabimap:"แผนที่ท่องเที่ยว",
     tabimap_title:"สถานที่แนะนำในไทย",
-    tabimap_desc:"สถานที่โปรดของเจ้าของร้านทาคุยะ แตะหมุดเพื่อดูรายละเอียด!",
+    tabimap_desc:"สถานที่แนะนำในไทยจากเจ้าของร้าน แตะหมุดเพื่อดูรายละเอียด ตลาดท้องถิ่นเยอะหน่อยเพราะเป็นงานอดิเรกแปลกๆ ของเจ้าของ ลองใช้เป็นไกด์สำหรับที่เที่ยวลับที่ไม่มีในหนังสือนำเที่ยวนะครับ!",
     tabimap_ugc_desc:"เคยไปไทยไหม? แนะนำสถานที่โปรดของคุณ อาจถูกเพิ่มในแผนที่!",
     coupon1_title:"ดื่มฟรี 1 แก้ว!",coupon1_desc:"ฟอลโล่แล้วแสดงหน้าจอนี้ให้พนักงาน",
     coupon2_title:"ของหวานฟรี🍮",coupon2_desc:"แสดงหน้าจอนี้หลังโพสต์รีวิว",
@@ -1971,7 +1976,7 @@ const I18N = {
     s_comment:"ความคิดเห็น (ไม่บังคับ)",v1:"ครั้งแรก",v2:"2–3 ครั้ง",v3:"4 ครั้งขึ้นไป",v4:"ขาประจำ!",
     comment_placeholder:"อร่อยมาก! จะมาอีก...",submit_btn:"ส่ง 🙏",
     thanks_title:"ขอบคุณมากนะคะ!",thanks_msg:"ขอบคุณสำหรับความคิดเห็น หวังว่าจะได้พบกันอีกนะคะ!",
-    shop_title:"ภายในร้าน",shop_desc:"เจ้าของปรับปรุงบ้านเก่าด้วยตัวเอง ผนังดิน ไม้เก่า และของตกแต่งจากไทยแท้ๆ 120%! คนไทยบอกว่าเหมือนบ้านไทยเก่าๆ เลย!",
+    shop_title:"ภายในร้าน",shop_desc:"ร้านของเราคือบ้านเก่าที่เจ้าของปรับปรุงเอง เต็มไปด้วยของตกแต่งจากไทย แต่ละชิ้นเจ้าของเลือกมาจากเมืองไทยเอง ลองมองหาดูนะครับ!",
     shop1_title:"โต๊ะ 4 ที่นั่ง",shop1_desc:"ป้ายโค้กเก่าๆ ต้อนรับคุณ",
     shop2_title:"ห้องนั่งเล่นแบบญี่ปุ่น",shop2_desc:"บรรยากาศส่วนตัว เหมาะสำหรับครอบครัวที่มีเด็กเล็ก",
     shop3_title:"โต๊ะ 2–4 ที่นั่ง",shop3_desc:"แผ่นเสียงและโปสเตอร์ไทยตกแต่งผนัง",
