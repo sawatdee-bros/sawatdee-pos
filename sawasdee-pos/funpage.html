@@ -2449,63 +2449,107 @@ function closeShopLb() {
 
 
 const SPOTS = [
-  { id:'watpho',    emoji:'🛕', cat:'寺院',   city:'バンコク',
-    name:{ja:'ワット・ポー',en:'Wat Pho',th:'วัดโพธิ์'},
-    comment:{ja:'46mの巨大涅槃仏！タイマッサージ発祥の地でもあります。',en:'The 46m reclining Buddha & birthplace of Thai massage!',th:'พระพุทธไสยาสน์ 46 ม. ที่มาของนวดแผนไทย'},
-    lat:13.7464, lng:100.4928 },
-  { id:'grandpalace', emoji:'🏯', cat:'観光', city:'バンコク',
-    name:{ja:'グランドパレス＆エメラルド寺院',en:'Grand Palace & Wat Phra Kaew',th:'พระบรมมหาราชวัง'},
-    comment:{ja:'バンコク観光の王道。エメラルド仏はヒスイ製。肌の露出に注意！',en:'Bangkok\'s iconic landmark. The Emerald Buddha is actually jade!',th:'สถานที่ท่องเที่ยวสำคัญ พระแก้วมรกตทำจากหยก'},
-    lat:13.7499, lng:100.4916 },
+  { id:'staneemeehoi', emoji:'🦞', cat:'グルメ', city:'バンコク',
+    name:{ja:'สถานีมีหอย（スタニーミーホイ）',en:'Sathaneemeehoi',th:'สถานีมีหอย'},
+    comment:{ja:'筋肉系ウェイターが爆音で踊る超個性派シーフード食堂！フアムム市場内。毎日18〜24時。',en:'Wild seafood restaurant with dancing muscle waiters at Huamum Market. Open daily 6PM–midnight.',th:'ร้านอาหารทะเลบรรยากาศสุดฮา พนักงานหนุ่มกล้ามเต้นแจกความสนุก'},
+    lat:13.8189, lng:100.5932 },
+  { id:'railway_market', emoji:'🚂', cat:'市場', city:'サムットソンクラーム',
+    name:{ja:'メークロン鉄道市場',en:'Maeklong Railway Market',th:'ตลาดแม่กลอง'},
+    comment:{ja:'線路の上に市場！列車が通るたびに傘をたたむ世界唯一の光景。バンコクから1.5時間。',en:'A market ON the railway tracks. Vendors fold their awnings as the train passes — must-see!',th:'ตลาดบนรางรถไฟ ร่มหุบ-กางทุกครั้งรถไฟผ่าน ไม่มีที่ไหนในโลก'},
+    lat:13.4108, lng:100.0027 },
+  { id:'banpri', emoji:'🏘️', cat:'観光', city:'サムットプラカーン',
+    name:{ja:'バーンプリー百年市場',en:'Bang Phli Yai Bang Kaeo',th:'ตลาดบางพลีใหญ่'},
+    comment:{ja:'運河沿いに広がる昔ながらのタイの市場。木造の古民家が並ぶレトロな雰囲気が◎',en:'Old-style Thai market along the canal with century-old wooden shophouses.',th:'ตลาดโบราณริมคลอง บ้านไม้เก่าแก่บรรยากาศย้อนยุค'},
+    lat:13.5987, lng:100.7215 },
+  { id:'makro', emoji:'🛒', cat:'ショッピング', city:'バンコク',
+    name:{ja:'マクロ（Makro）',en:'Makro Thailand',th:'แม็คโคร'},
+    comment:{ja:'タイのプロ御用達の業務用スーパー。食材・調理器具・タイ調味料をまとめ買いするならここ！',en:'Thailand\'s top wholesale supermarket — perfect for buying bulk Thai ingredients & spices.',th:'ซูเปอร์มาร์เก็ตขายส่ง วัตถุดิบครบ เครื่องปรุงไทยครบครัน'},
+    lat:13.7563, lng:100.5368 },
+  { id:'ancientcity', emoji:'🏛️', cat:'観光', city:'サムットプラカーン',
+    name:{ja:'アンシェントシティ（ムアンボーラン）',en:'Ancient City (Muang Boran)',th:'เมืองโบราณ'},
+    comment:{ja:'タイ全土の名所を1日で巡れる世界最大の野外博物館。300haの広大な敷地に116の建造物！',en:'World\'s largest outdoor museum — 116 Thai landmarks across 300 hectares. A full day out!',th:'พิพิธภัณฑ์กลางแจ้งที่ใหญ่ที่สุดในโลก สถาปัตยกรรมไทยทั่วทุกภาค'},
+    lat:13.5489, lng:100.7731 },
+  { id:'route66', emoji:'🎵', cat:'ナイトライフ', city:'バンコク',
+    name:{ja:'Route 66 Club',en:'Route 66 Club',th:'รูท 66'},
+    comment:{ja:'RCAエリアにあるバンコク屈指のメガクラブ。複数フロアで色々なジャンルの音楽が楽しめる！',en:'Bangkok\'s legendary mega-club in the RCA area. Multiple floors, multiple vibes.',th:'คลับยักษ์ใหญ่ย่าน RCA หลายฟลอร์ หลายสไตล์ดนตรี'},
+    lat:13.7483, lng:100.5714 },
+  { id:'jjgreen', emoji:'🌙', cat:'ナイトライフ', city:'バンコク',
+    name:{ja:'JJ Green ナイトマーケット',en:'JJ Green Night Market',th:'เจเจ กรีน'},
+    comment:{ja:'チャトゥチャック近くのヴィンテージ系ナイトマーケット。レトロ雑貨・古着・屋台が集結。',en:'Vintage night market near Chatuchak — retro goods, second-hand clothes, great food stalls.',th:'ตลาดนัดกลางคืนวินเทจใกล้จตุจักร ของเก่า เสื้อผ้า ร้านอาหาร'},
+    lat:13.8027, lng:100.5506 },
+  { id:'bahao', emoji:'🍸', cat:'バー', city:'バンコク',
+    name:{ja:'Ba Hao 八號',en:'Ba Hao',th:'บาเฮา'},
+    comment:{ja:'チャイナタウンにある中国風カクテルバー。レトロな内装とオリジナルカクテルが人気。',en:'Cool Chinese-style cocktail bar in Chinatown with retro decor and creative drinks.',th:'บาร์ค็อกเทลสไตล์จีนในไชน่าทาวน์ ดีไซน์เรโทรน่าถ่ายรูป'},
+    lat:13.7397, lng:100.5135 },
+  { id:'tepbar', emoji:'🎭', cat:'バー', city:'バンコク',
+    name:{ja:'TEP BAR',en:'TEP BAR – Cultural Bar of Thailand',th:'เทพบาร์'},
+    comment:{ja:'タイの伝統音楽・文化が楽しめるユニークなバー。ライブ演奏と本格タイカクテルで一夜を。',en:'Unique bar celebrating Thai culture with live traditional music and Thai-inspired cocktails.',th:'บาร์วัฒนธรรมไทย ดนตรีไทยสด ค็อกเทลสไตล์ไทยแท้'},
+    lat:13.7401, lng:100.5118 },
+  { id:'parinya', emoji:'🏨', cat:'ホテル', city:'バンコク',
+    name:{ja:'Parinya Mansion',en:'Parinya Mansion',th:'ปาริณยา แมนชั่น'},
+    comment:{ja:'タクヤおすすめの宿。コスパ◎の快適なマンション型ホテル。',en:'Takuya\'s recommended stay — comfortable mansion-style hotel with great value.',th:'ที่พักแนะนำโดยทาคุยะ ราคาดี บรรยากาศดี'},
+    lat:13.7600, lng:100.5400 },
+  { id:'soimuban', emoji:'🏡', cat:'観光', city:'バンコク',
+    name:{ja:'Soi Mu Ban Den Chai',en:'Soi Mu Ban Den Chai',th:'ซอยหมู่บ้านเด่นชัย'},
+    comment:{ja:'タクヤが見つけたローカルな路地。観光客が来ないリアルなバンコクの日常がここに。',en:'A hidden local street — the real Bangkok that tourists never see.',th:'ซอยลับที่ทาคุยะค้นพบ ชีวิตชาวบ้านแท้ๆ ที่นักท่องเที่ยวไม่มาถึง'},
+    lat:13.7650, lng:100.5550 },
   { id:'chatuchak', emoji:'🛍️', cat:'市場', city:'バンコク',
-    name:{ja:'チャトゥチャック・マーケット',en:'Chatuchak Weekend Market',th:'ตลาดจตุจักร'},
-    comment:{ja:'世界最大級の週末市場。土日のみ開催！服・雑貨・タイ料理が何でも揃う。',en:'World\'s largest weekend market. Sat & Sun only!',th:'ตลาดนัดสุดสัปดาห์ที่ใหญ่ที่สุด เปิดแค่เสาร์-อาทิตย์'},
+    name:{ja:'チャトゥチャック市場',en:'Chatuchak Weekend Market',th:'ตลาดจตุจักร'},
+    comment:{ja:'世界最大級の週末市場。土日のみ。雑貨・古着・タイ料理・植物まで何でも揃う！',en:'World\'s largest weekend market (Sat & Sun only) — clothes, crafts, food, plants, everything!',th:'ตลาดนัดใหญ่ที่สุดในโลก เปิดแค่เสาร์-อาทิตย์ มีทุกอย่าง'},
     lat:13.7998, lng:100.5504 },
-  { id:'khaosan', emoji:'🍺', cat:'夜遊び', city:'バンコク',
-    name:{ja:'カオサン通り',en:'Khao San Road',th:'ถนนข้าวสาร'},
-    comment:{ja:'バックパッカーの聖地。安宿・屋台・バーが集中。夜が特に賑やか！',en:'The backpacker mecca — guesthouses, street food, lively bars.',th:'สวรรค์นักเดินทาง โรงแรมราคาถูก อาหารข้างทาง บาร์สุดคึกคัก'},
-    lat:13.7589, lng:100.4973 },
-  { id:'doisuthep', emoji:'⛰️', cat:'寺院', city:'チェンマイ',
-    name:{ja:'ドイ・ステープ寺院',en:'Wat Phra That Doi Suthep',th:'วัดพระธาตุดอยสุเทพ'},
-    comment:{ja:'チェンマイを一望できる山上の黄金寺院。306段の階段を登ると絶景！',en:'Golden hilltop temple with panoramic views. 306 steps!',th:'วัดบนยอดดอย มองเห็นเชียงใหม่ทั้งเมือง ขึ้นบันได 306 ขั้น'},
-    lat:18.8050, lng:98.9216 },
-  { id:'nimman', emoji:'☕', cat:'カフェ', city:'チェンマイ',
-    name:{ja:'ニマンヘミン通り',en:'Nimmanhaemin Road',th:'ถนนนิมมานเหมินท์'},
-    comment:{ja:'チェンマイのオシャレエリア。カフェ・レストラン・ブティックが集まる。',en:'Chiang Mai\'s trendy district — cafes, restaurants, boutiques.',th:'ย่านทันสมัยของเชียงใหม่ คาเฟ่ ร้านอาหาร บูติก'},
-    lat:18.7958, lng:98.9658 },
-  { id:'floatmkt', emoji:'🚣', cat:'市場', city:'ラチャブリー',
-    name:{ja:'ダムヌン水上マーケット',en:'Damnoen Saduak Floating Market',th:'ตลาดน้ำดำเนินสะดวก'},
-    comment:{ja:'絵葉書のような水上マーケット。ボートで運河を進む体験は格別！',en:'Iconic floating market — the boat canal ride is unforgettable!',th:'ตลาดน้ำสวยงาม นั่งเรือในคลองน่าจดจำ'},
-    lat:13.5202, lng:99.9586 },
 ];
 
-const catColors = {'寺院':'#A31313','観光':'#1A5C8A','市場':'#2E5329','夜遊び':'#6B3FA0','カフェ':'#B5601A'};
+const catColors = {'寺院':'#A31313','観光':'#1A5C8A','市場':'#2E5329','ナイトライフ':'#6B3FA0','バー':'#8B2252','グルメ':'#C45E00','ショッピング':'#1A7A6E','ホテル':'#4A6741'};
 let activeSpotId = null;
 
 function renderSpotList() {
   const t = currentLang;
   const container = document.getElementById('spot-list');
   if (!container) return;
-  container.innerHTML = SPOTS.map(s => {
-    const isActive = s.id === activeSpotId;
-    const color = catColors[s.cat] || '#A31313';
-    return `<div id="spot-card-${s.id}" onclick="selectSpotFromCard('${s.id}')" style="
-      display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
-      border-radius:12px;margin-bottom:8px;cursor:pointer;
-      background:#fff;
-      border:${isActive ? `2px solid ${color}` : '1px solid #f0f0f0'};
-      transition:all 0.2s;">
-      <div style="width:38px;height:38px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${s.emoji}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-          <span style="font-weight:900;font-size:14px;color:#111;">${s.name[t]||s.name.ja}</span>
-          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;color:#fff;background:${color}">${s.cat}</span>
-          <span style="font-size:10px;color:#bbb;">${s.city}</span>
-        </div>
-        <div style="font-size:12px;color:#777;line-height:1.7;">${s.comment[t]||s.comment.ja}</div>
-      </div>
-      <div style="font-size:16px;flex-shrink:0;color:${isActive ? color : '#ddd'};">📍</div>
+
+  // エリア別にグループ化
+  const grouped = {};
+  SPOTS.forEach(s => {
+    if (!grouped[s.city]) grouped[s.city] = [];
+    grouped[s.city].push(s);
+  });
+
+  const cityEmoji = {
+    'バンコク': '🏙️',
+    'チェンマイ': '🌿',
+    'ラチャブリー': '🚣',
+  };
+
+  container.innerHTML = Object.entries(grouped).map(([city, spots]) => {
+    const emoji = cityEmoji[city] || '📍';
+    const header = `<div style="display:flex;align-items:center;gap:8px;margin:16px 0 8px;padding:0 4px;">
+      <span style="font-size:16px;">${emoji}</span>
+      <span style="font-size:13px;font-weight:900;letter-spacing:1.5px;color:#A31313;text-transform:uppercase;">${city}</span>
+      <div style="flex:1;height:1px;background:#f0d0d0;"></div>
     </div>`;
+
+    const cards = spots.map(s => {
+      const isActive = s.id === activeSpotId;
+      const color = catColors[s.cat] || '#A31313';
+      return `<div id="spot-card-${s.id}" onclick="selectSpotFromCard('${s.id}')" style="
+        display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
+        border-radius:12px;margin-bottom:8px;cursor:pointer;
+        background:#fff;
+        border:${isActive ? `2px solid ${color}` : '1px solid #f0f0f0'};
+        transition:all 0.2s;">
+        <div style="width:38px;height:38px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${s.emoji}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+            <span style="font-weight:900;font-size:14px;color:#111;">${s.name[t]||s.name.ja}</span>
+            <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;color:#fff;background:${color}">${s.cat}</span>
+          </div>
+          <div style="font-size:12px;color:#777;line-height:1.7;">${s.comment[t]||s.comment.ja}</div>
+        </div>
+        <div style="font-size:16px;flex-shrink:0;color:${isActive ? color : '#ddd'};">📍</div>
+      </div>`;
+    }).join('');
+
+    return header + cards;
   }).join('');
 }
 
