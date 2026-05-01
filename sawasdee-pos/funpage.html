@@ -1042,6 +1042,7 @@
       <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#bbb;">INTERIOR DETAILS · タップして詳しく見る</div>
     </div>
     <div id="shop-items-container" style="position:relative;height:420px;"></div>
+    <div style="text-align:center;font-size:12px;color:#999;margin-top:8px;" data-i18n="shop_updating">📷 只今随時更新中…！</div>
   </div>
 
 </div>
@@ -1844,7 +1845,7 @@ const I18N = {
     kd8_title:"雰囲気づくりも味のうち",kd8_desc:"古民家を自ら改装し、タイから持ち帰った雑貨で空間を作りました。店内の音楽もタイのレコード屋で直接買い付けたもの。お皿もタイの屋台で使われるモノを直接買ってきています。",
     staff2_msg:"タイ・チェンマイ出身です！お母さんから教わったレシピをベースに、日本のお客様に合わせた味にアレンジしています。辛さはお気軽に調整しますよ。",
     staff3_msg:"料理の説明はなんでも聞いてください！辛さや食べ方のコツもお伝えできます。楽しいひとときになるようサポートします！",
-    shop_title:"店内紹介",shop_desc:"民家を自ら改装した店内にはタイ雑貨がたくさん。店主がタイから持ち帰ったこだわりのアイテムたち。ぜひ色々見つけてみてください。",
+    shop_title:"店内紹介",shop_desc:"民家を自ら改装した店内にはタイ雑貨がたくさん。店主がタイから持ち帰ったこだわりのアイテムたち。ぜひ色々見つけてみてください。",shop_updating:"📷 只今随時更新中…！",
     shop1_title:"4名様テーブル席",shop1_desc:"レトロ感漂うコカコーラの看板がお出迎え",
     shop2_title:"小あがり座敷席",shop2_desc:"半個室感のある落ち着く空間。お子様連れにも◎",
     shop3_title:"2〜4名様テーブル席",shop3_desc:"タイのレコードやポスターが壁を彩る",
@@ -1891,7 +1892,7 @@ const I18N = {
     kd8_title:"Atmosphere is part of the flavor",kd8_desc:"We renovated this old house ourselves and filled it with goods brought back from Thailand. The music playing inside was bought at a record shop in Bangkok. Even the plates are the real ones used at Thai street stalls — bought and brought back ourselves.",
     staff2_msg:"I'm from Chiang Mai, Thailand! I base my recipes on my mother's cooking, adapted for Japanese tastes. Feel free to adjust the spice level!",
     staff3_msg:"Ask me anything about the dishes! I can explain spice levels and how to eat everything. Let's make your visit unforgettable!",
-    shop_title:"Inside the Restaurant",shop_desc:"Our space is a renovated private house filled with Thai goods. Each piece was handpicked by the owner from Thailand. Take a look around and see what you can find!",
+    shop_title:"Inside the Restaurant",shop_desc:"Our space is a renovated private house filled with Thai goods. Each piece was handpicked by the owner from Thailand. Take a look around and see what you can find!",shop_updating:"📷 More items coming soon...!",
     shop1_title:"Table Seats (4 pax)",shop1_desc:"A retro Coca-Cola sign welcomes you in",
     shop2_title:"Raised Tatami Seats",shop2_desc:"A cozy semi-private space. Great for families with kids too!",
     shop3_title:"Table Seats (2–4 pax)",shop3_desc:"Thai records and posters line the walls",
@@ -1956,7 +1957,7 @@ const I18N = {
     v1:"ครั้งแรก",v2:"2–3 ครั้ง",v3:"4 ครั้งขึ้นไป",v4:"ขาประจำ!",
     comment_placeholder:"อร่อยมาก! จะมาอีก...",submit_btn:"ส่ง 🙏",
     thanks_title:"ขอบคุณมากนะคะ!",thanks_msg:"ขอบคุณสำหรับความคิดเห็น หวังว่าจะได้พบกันอีกนะคะ!",
-    shop_title:"ภายในร้าน",shop_desc:"ร้านของเราคือบ้านเก่าที่เจ้าของปรับปรุงเอง เต็มไปด้วยของตกแต่งจากไทย แต่ละชิ้นเจ้าของเลือกมาจากเมืองไทยเอง ลองมองหาดูนะครับ!",
+    shop_title:"ภายในร้าน",shop_desc:"ร้านของเราคือบ้านเก่าที่เจ้าของปรับปรุงเอง เต็มไปด้วยของตกแต่งจากไทย แต่ละชิ้นเจ้าของเลือกมาจากเมืองไทยเอง ลองมองหาดูนะครับ!",shop_updating:"📷 กำลังอัปเดตเรื่อยๆ...!",
     shop1_title:"โต๊ะ 4 ที่นั่ง",shop1_desc:"ป้ายโค้กเก่าๆ ต้อนรับคุณ",
     shop2_title:"ห้องนั่งเล่นแบบญี่ปุ่น",shop2_desc:"บรรยากาศส่วนตัว เหมาะสำหรับครอบครัวที่มีเด็กเล็ก",
     shop3_title:"โต๊ะ 2–4 ที่นั่ง",shop3_desc:"แผ่นเสียงและโปสเตอร์ไทยตกแต่งผนัง",
@@ -2450,27 +2451,6 @@ const SHOP_ITEMS = [
   { emoji:'🛺', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/tuktuk_beercans.png', title:'ビール缶トゥクトゥク',
     desc:'レオ・チャン・シンハーの空き缶で作られたトゥクトゥク。タイの屋台で見つけた職人技。タイ国旗がかわいい！',
     x:62, y:10, rot:5, size:150 },
-  { emoji:'🧿', img:'', title:'タイのお守り',
-    desc:'チェンマイのワット・ドイ・ステープで買ったお守り。お店と来てくれるお客さんを守ってくれています。',
-    x:62, y:10, rot:5, size:76 },
-  { emoji:'🎮', img:'', title:'スーパーファミコン',
-    desc:'タイ料理を食べながらスーファミができる店、日本でここだけかも？お好きなカセットをどうぞ！',
-    x:32, y:110, rot:2, size:100 },
-  { emoji:'🍺', img:'', title:'タイ語グラス',
-    desc:'タイ語が書かれたガラスコップ。チャンビールを注いで飲むのが最高です。',
-    x:4, y:230, rot:-4, size:82 },
-  { emoji:'🛕', img:'', title:'ご本尊・仏像',
-    desc:'タイから持ち帰った仏像。店内を見守ってくれています。むやみに触らないでね笑',
-    x:64, y:210, rot:4, size:86 },
-  { emoji:'🌺', img:'', title:'タイの造花',
-    desc:'タイの寺院でよく見かける造花。本物と見間違えるくらい精巧に作られています。',
-    x:10, y:345, rot:-3, size:78 },
-  { emoji:'💿', img:'', title:'タイのレコード',
-    desc:'タイのポップスのレコード。店内BGMはタイ音楽が中心です。知ってる曲があったら教えてください！',
-    x:62, y:340, rot:7, size:80 },
-  { emoji:'🥢', img:'', title:'タイの箸置き',
-    desc:'タイの象が描かれた陶器の箸置き。チェンマイの市場で見つけた一点もの。',
-    x:36, y:265, rot:-2, size:70 },
 ];
 
 function renderShopGrid() {
