@@ -381,16 +381,28 @@ window.saveEdit = async function() {
     byEntry[eid].push({idx:idx, newQty:editState.qtyMap[qtyKeys[i]]});
   }
   for (var eid in byEntry) {
-    var _raw = allOrders[eid].items||[]; var items = JSON.parse(JSON.stringify(Array.isArray(_raw)?_raw:Object.values(_raw)));
-    var changes = byEntry[eid];
-    // 数量0は削除、それ以外は更新（降順で処理）
-    changes.sort(function(a,b){return b.idx-a.idx;});
-    for (var i=0;i<changes.length;i++) {
-      if (changes[i].newQty === 0) items.splice(changes[i].idx, 1);
-      else items[changes[i].idx].qty = changes[i].newQty;
+    var orig = allOrders[eid];
+    var _raw = orig.items||[]; var origItems = Array.isArray(_raw)?_raw:Object.values(_raw);
+    var origDone = orig.itemsDone || {};
+    var changesById = {};
+    byEntry[eid].forEach(function(c){ changesById[c.idx] = c.newQty; });
+    // 元のidx順に走査して残す商品を拾い、itemsDoneを新しいidxに付け替え
+    var newItems = [];
+    var newDone = {};
+    for (var oi = 0; oi < origItems.length; oi++) {
+      var nq = changesById[oi];
+      if (nq === 0) continue; // 削除
+      var item = JSON.parse(JSON.stringify(origItems[oi]));
+      if (nq !== undefined) item.qty = nq;
+      var newIdx = newItems.length;
+      if (origDone[oi]) newDone[newIdx] = true;
+      newItems.push(item);
     }
-    var newTotal = applyRounding(items.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1);
-    await update(ref(db,'orders/'+eid), {items:items, total:newTotal});
+    var newTotal = applyRounding(newItems.reduce(function(s,it){return s+it.price*it.qty;},0)*1.1);
+    // status再計算：会計済み以外は itemsDone に応じて new/done を切り替え
+    var allDone = newItems.length > 0 && newItems.every(function(_,i){return !!newDone[i];});
+    var newStatus = orig.status === 'paid' ? 'paid' : (allDone ? 'done' : 'new');
+    await update(ref(db,'orders/'+eid), {items:newItems, itemsDone:newDone, total:newTotal, status:newStatus});
   }
 
   // 追加処理（即提供済み）
