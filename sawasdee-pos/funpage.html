@@ -1041,8 +1041,7 @@
     <div style="text-align:center;margin-bottom:4px;">
       <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#bbb;">INTERIOR DETAILS · タップして詳しく見る</div>
     </div>
-    <div id="shop-items-container" style="position:relative;height:420px;"></div>
-    <div style="text-align:center;font-size:12px;color:#999;margin-top:8px;" data-i18n="shop_updating">📷 只今随時更新中…！</div>
+    <div id="shop-items-container" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"></div>
   </div>
 
 </div>
@@ -2451,6 +2450,48 @@ const SHOP_ITEMS = [
   { emoji:'🛺', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/tuktuk_beercans.png', title:'ビール缶トゥクトゥク',
     desc:'レオ・チャン・シンハーの空き缶で作られたトゥクトゥク。タイの屋台で見つけた職人技。タイ国旗がかわいい！',
     x:62, y:10, rot:5, size:150 },
+  { emoji:'🥤', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/coke.png', title:'タイのコカコーラグッズ',
+    desc:'タイ語で「โค้ก」と書かれたコカコーラのレコードとグラス。タイのレトロなコーラグッズはコレクター心をくすぐります。',
+    x:8, y:170, rot:-4, size:130 },
+  { emoji:'🪭', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/fan.png', title:'タイの手織りうちわ',
+    desc:'タイの伝統的な手織り模様のうちわ。カラフルな幾何学柄が美しい。実はちゃんと涼しいです。',
+    x:62, y:160, rot:4, size:120 },
+  { emoji:'🍺', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/glass.png', title:'タイビールのグラスセット',
+    desc:'シンハー・チャン・LEOなどタイビールブランドのグラス。当店でもこのグラスで提供しています！',
+    x:8, y:310, rot:-3, size:130 },
+  { emoji:'🙏', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/god.png', title:'プラクルアン（お守り）',
+    desc:'タイのお寺で授かったお守り。お店と来てくれるお客さんを見守ってくれています。',
+    x:62, y:300, rot:6, size:110 },
+  { emoji:'👑', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/king%26prince.png', title:'国王と王子の肖像画',
+    desc:'タイの人々が深く敬愛する国王の肖像画。タイではお店や家庭に飾るのが一般的です。',
+    x:8, y:440, rot:-2, size:130 },
+  { emoji:'📷', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/kingphoto.png', title:'国王のお写真',
+    desc:'プミポン前国王の在りし日のお写真。タイ国民に絶大な敬愛を受けた偉大な国王です。',
+    x:62, y:430, rot:3, size:110 },
+  { emoji:'🕐', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/LEOclock.png', title:'LEOビールの壁掛け時計',
+    desc:'タイのビールブランド「LEO」の時計。タイのビアガーデンやローカル食堂でよく見かけるやつです。',
+    x:8, y:570, rot:-5, size:120 },
+  { emoji:'🔥', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/match.png', title:'タイのマッチ箱コレクション',
+    desc:'タイのレトロなマッチ箱を額装したもの。一つひとつデザインが違って見ていて飽きません。',
+    x:62, y:560, rot:4, size:130 },
+  { emoji:'💿', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/musicCD.png', title:'タイポップスのCD',
+    desc:'タイのポップスやルークトゥンのCD。店内BGMはここから流れていることも。知ってる曲があったら教えてください！',
+    x:8, y:700, rot:-3, size:130 },
+  { emoji:'🍽️', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/plate.png', title:'タイの食器',
+    desc:'タイの屋台や食堂で実際に使われているお皿。当店の料理もこのお皿で提供しています。マクロで直接買い付けました！',
+    x:62, y:690, rot:5, size:120 },
+  { emoji:'🎬', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/poster.png', title:'タイの映画ポスター',
+    desc:'タイのレトロな映画ポスター。タイ映画は独特の世界観があって面白いです。壁の雰囲気づくりに一役買ってます。',
+    x:8, y:830, rot:-4, size:130 },
+  { emoji:'🛹', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/skate.png', title:'タイのスケートボード',
+    desc:'タイの寺院やモチーフが描かれたスケートデッキ。飾りとして壁に掛けています。タイのストリートカルチャー！',
+    x:62, y:820, rot:6, size:110 },
+  { emoji:'🦺', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/taxivest.png', title:'バイタクのベスト',
+    desc:'バンコク名物バイクタクシーのオレンジベスト。この権利、実は100万円以上で取引されることも！',
+    x:8, y:960, rot:-3, size:120 },
+  { emoji:'🍵', img:'https://raw.githubusercontent.com/sawatdee-bros/sawatdee-pos/main/sawatdee-fun/images/decoration/thaitea.png', title:'タイティーの茶葉',
+    desc:'あの鮮やかなオレンジ色のタイティーの素。本場の茶葉をタイから直接持ち帰りました。',
+    x:62, y:950, rot:4, size:110 },
 ];
 
 function renderShopGrid() {
@@ -2458,23 +2499,20 @@ function renderShopGrid() {
   if (!container) return;
   container.innerHTML = SHOP_ITEMS.map((item, i) => {
     const content = item.img
-      ? `<img src="${item.img}" style="width:${item.size}px;height:${item.size}px;object-fit:contain;filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.18));">`
-      : `<div style="font-size:${item.size * 0.55}px;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.15));line-height:1;">${item.emoji}</div>`;
+      ? `<img src="${item.img}" style="display:block;max-width:100%;max-height:100px;margin:0 auto;filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.18));">`
+      : `<div style="font-size:48px;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.15));line-height:1;display:flex;align-items:center;justify-content:center;">${item.emoji}</div>`;
     return `
       <div onclick="openShopLb(${i})" style="
-        position:absolute;
-        left:${item.x}%;
-        top:${item.y}px;
-        transform:rotate(${item.rot}deg);
         cursor:pointer;
         text-align:center;
+        padding:6px;
         transition:transform 0.2s;
-        width:${item.size}px;
+        border-radius:12px;
       "
-      onmouseover="this.style.transform='rotate(${item.rot}deg) scale(1.12)'"
-      onmouseout="this.style.transform='rotate(${item.rot}deg) scale(1)'">
+      onmouseover="this.style.transform='scale(1.05)';this.style.background='#f9f5f0'"
+      onmouseout="this.style.transform='scale(1)';this.style.background='transparent'">
         ${content}
-        <div style="font-size:9px;font-weight:700;color:#666;margin-top:4px;white-space:nowrap;">${item.title}</div>
+        <div style="font-size:9px;font-weight:700;color:#555;margin-top:2px;line-height:1.3;">${item.title}</div>
       </div>`;
   }).join('');
 }
