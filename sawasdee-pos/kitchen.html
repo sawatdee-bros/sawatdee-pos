@@ -541,6 +541,10 @@ function playBillSound() {
 var _prevCallTs = {};
 var _prevBillCallTs = {};
 
+// 直近トグルした注文ID（全提供済みでもカードに表示し続けてグレーアウト→戻す/消去を可能にする）
+// 同じテーブルに新規注文が来たらクリアして、古い完了注文がゾンビ表示されるのを防ぐ
+const _recentlyToggled = new Set();
+
 onValue(ref(db, 'calls'), snap => {
   var data = snap.val() || {};
   var hasNew = Object.keys(data).some(function(k) {
@@ -613,8 +617,6 @@ function renderOrders() {
   const MERGE_FOOD_MS = 3 * 60 * 1000; // フード：3分
   const MERGE_DRINK_MS = 10 * 1000;    // ドリンク：10秒
   // 注文が全て消去済みかどうか判定
-  // ※「提供済み」では除外しない（同テーブルの他注文とグループ表示中、
-  //   その注文だけ全提供→カードから即消えるとグレーアウト/戻す/消去のUIが使えなくなるため）
   function isOrderFullyDismissed(id) {
     const o = orders[id];
     if (!o) return true;
@@ -623,13 +625,26 @@ function renderOrders() {
     return arr.every((i, idx) => isDismissed(id, idx));
   }
 
+  // 注文が全て提供済みOR消去済みかどうか判定
+  function isOrderFullyDone(id) {
+    const o = orders[id];
+    if (!o) return true;
+    const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
+    if (arr.length === 0) return true;
+    const done = o.itemsDone || {};
+    return arr.every((i, idx) => !!done[idx] || isDismissed(id, idx));
+  }
+
   function groupOrders(keys, mergeMs) {
     const groups = [];
     keys.forEach(id => {
       const o = orders[id];
-      // 全アイテム消去済みの注文はスキップ
-      // （全提供済みの場合は makeGroupCard 側で items.every(e=>e.done) → '' で消える）
+      // 全消去済みは常に除外
       if (isOrderFullyDismissed(id)) return;
+      // 全提供済み かつ 直近トグルしていない注文は除外（ゾンビ表示防止）
+      // 直近トグルした注文は makeGroupCard 側で同グループに未提供があればグレーアウト表示、
+      // グループ全体が提供済みなら items.every(e=>e.done) で '' を返してカード消去
+      if (isOrderFullyDone(id) && !_recentlyToggled.has(id)) return;
       const last = groups[groups.length - 1];
       if (last && last.table === o.table && o.timestamp - last.lastTs <= mergeMs) {
         last.ids.push(id);
@@ -754,11 +769,13 @@ window.toggleItem = async function(id, idx) {
   if (wasDone) {
     orders[id].itemsDone[idx] = false;
     orders[id].status = 'new';
+    _recentlyToggled.delete(id); // 戻したらゾンビ防止フラグ解除
     _selfWriteIds.add(id);
     await update(ref(db, 'orders/'+id), { itemsDone: orders[id].itemsDone, status: 'new' });
     renderOrders(); _syncOrderToBills(id);
   } else {
     orders[id].itemsDone[idx] = true;
+    _recentlyToggled.add(id); // 提供したら直近トグル印を付与（全提供済みでも一旦表示維持）
     const allDone = orders[id].items.every((_,i) => orders[id].itemsDone[i]);
     if (allDone) {
       orders[id].status = 'done';
@@ -809,6 +826,7 @@ window.groupDone = async function(id, type) {
   (orders[id].items||[]).forEach((i,idx) => {
     if ((type==='drink'&&isDrinkItem(i.name,i))||(type==='food'&&!isDrinkItem(i.name,i))||(type==='food'&&orders[id].source==='set')) orders[id].itemsDone[idx] = true;
   });
+  _recentlyToggled.add(id); // 提供完了したら直近トグル印を付与
   const allDone = orders[id].items.every((_,i) => orders[id].itemsDone[i]);
   if (allDone) {
     orders[id].status = 'done';
@@ -1071,6 +1089,17 @@ onValue(ref(db, 'orders'), (snap) => {
   // 自分の書き込み以外の新着注文だけを検知（ignoreNextによる全スキップをやめた）
   const newIds = Object.keys(data).filter(id => !orders[id] && !_selfWriteIds.has(id) && data[id].status !== 'done' && data[id].status !== 'paid');
   _selfWriteIds.clear();
+  // 新規注文が来たテーブルの「直近トグル」フラグをクリア（古い完了注文のゾンビ表示防止）
+  if (newIds.length > 0) {
+    const newTables = new Set();
+    newIds.forEach(id => { if (data[id] && data[id].table) newTables.add(data[id].table); });
+    Array.from(_recentlyToggled).forEach(rid => {
+      const tbl = (orders[rid] && orders[rid].table) || (data[rid] && data[rid].table);
+      if (tbl && newTables.has(tbl)) _recentlyToggled.delete(rid);
+    });
+  }
+  // ordersに存在しない注文IDはフラグから掃除
+  Array.from(_recentlyToggled).forEach(rid => { if (!data[rid]) _recentlyToggled.delete(rid); });
   if (!firstLoad && newIds.length > 0) {
     const now = Date.now();
     newIds.forEach(id => _newIdTs.set(id, now));
