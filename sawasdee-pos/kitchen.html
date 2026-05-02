@@ -612,22 +612,24 @@ function renderOrders() {
   // 同テーブル・3分以内の注文をグループ化
   const MERGE_FOOD_MS = 3 * 60 * 1000; // フード：3分
   const MERGE_DRINK_MS = 10 * 1000;    // ドリンク：10秒
-  // 注文が全て提供済み or 消去済みかどうか判定
-  function isOrderFullyDone(id) {
+  // 注文が全て消去済みかどうか判定
+  // ※「提供済み」では除外しない（同テーブルの他注文とグループ表示中、
+  //   その注文だけ全提供→カードから即消えるとグレーアウト/戻す/消去のUIが使えなくなるため）
+  function isOrderFullyDismissed(id) {
     const o = orders[id];
     if (!o) return true;
     const arr = Array.isArray(o.items) ? o.items : Object.values(o.items||{});
     if (arr.length === 0) return true;
-    const done = o.itemsDone || {};
-    return arr.every((i, idx) => !!done[idx] || isDismissed(id, idx));
+    return arr.every((i, idx) => isDismissed(id, idx));
   }
 
   function groupOrders(keys, mergeMs) {
     const groups = [];
     keys.forEach(id => {
       const o = orders[id];
-      // 全アイテム提供済み or 消去済みの注文はスキップ
-      if (isOrderFullyDone(id)) return;
+      // 全アイテム消去済みの注文はスキップ
+      // （全提供済みの場合は makeGroupCard 側で items.every(e=>e.done) → '' で消える）
+      if (isOrderFullyDismissed(id)) return;
       const last = groups[groups.length - 1];
       if (last && last.table === o.table && o.timestamp - last.lastTs <= mergeMs) {
         last.ids.push(id);
