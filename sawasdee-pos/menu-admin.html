@@ -122,7 +122,6 @@ let openCards = new Set();
   }
 
 // Firebase: soldout読み込み
-let _resetChecked = false;
 // 初期化：Firebaseからメニューを読み込む
 async function init() {
   // store_configを先に読んでDAY_STARTを確定
@@ -186,14 +185,24 @@ async function init() {
 
 function startSoldoutWatch() {
   onValue(ref(db, 'soldout'), snap => {
-  const data = snap.val() || {};
-  if (!_resetChecked) {
-    _resetChecked = true;
+    const data = snap.val() || {};
+    // _reset_at が古ければリセットを発動。Firebase上の値で判定するので、
+    // リセット後はnow()が書き込まれて以降はトリガーされない（無限ループ防止）
     checkAutoReset(data._reset_at || null);
-  }
-  soldoutState = data;
-  renderList();
+    soldoutState = data;
+    renderList();
   });
+  // 念のためFirebaseリスナーが切断された場合に備えて定期的に明示取得して同期
+  // （長時間生きるiframe/iPadスリープ復帰などでローカル状態が固着するケースの救済）
+  setInterval(async () => {
+    try {
+      const snap = await get(ref(db, 'soldout'));
+      const data = snap.val() || {};
+      checkAutoReset(data._reset_at || null);
+      soldoutState = data;
+      renderList();
+    } catch(e) { console.warn('soldout periodic sync failed:', e); }
+  }, 60 * 1000);
 }
 
 init();
