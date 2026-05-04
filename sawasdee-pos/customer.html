@@ -41,6 +41,9 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 .order-cancel-btn { flex: 1; padding: 13px; background: #f3f4f6; border: none; border-radius: 10px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
 .order-confirm-ok-btn { flex: 2; padding: 13px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; }
 .order-confirm-ok-btn:disabled { background: #94a3b8; cursor: default; }
+.order-success-icon { width: 72px; height: 72px; margin: 18px auto 18px; background: #166534; color: white; border-radius: 50%; font-size: 42px; line-height: 72px; font-weight: 700; text-align: center; box-shadow: 0 4px 14px rgba(22,101,52,0.35); }
+.order-success-text { font-size: 19px; font-weight: 700; color: #111827; margin-bottom: 6px; text-align: center; }
+.order-success-sub { font-size: 13px; color: #6b7280; margin-bottom: 14px; text-align: center; }
 .call-btn.calling { color: #dc2626; }
 .call-dot { display: inline-block; opacity: 0.2; animation: dotFade 1.2s infinite; }
 .call-dot:nth-child(1) { animation-delay: 0s; }
@@ -199,12 +202,19 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 <!-- 注文確認モーダル -->
 <div class="order-confirm-modal" id="order-confirm-modal">
   <div class="order-confirm-box">
-    <div class="order-confirm-title">ご注文内容の確認</div>
-    <div class="order-confirm-list" id="order-confirm-list"></div>
-    <div class="order-confirm-total"><span>合計（税込）</span><span id="order-confirm-total-amount">¥0</span></div>
-    <div class="order-confirm-btns">
-      <button class="order-cancel-btn" onclick="window.closeOrderConfirm()">キャンセル</button>
-      <button class="order-confirm-ok-btn" id="order-confirm-ok-btn" onclick="window.confirmOrder()">注文する</button>
+    <div id="order-confirm-content">
+      <div class="order-confirm-title">ご注文内容の確認</div>
+      <div class="order-confirm-list" id="order-confirm-list"></div>
+      <div class="order-confirm-total"><span>合計（税込）</span><span id="order-confirm-total-amount">¥0</span></div>
+      <div class="order-confirm-btns">
+        <button class="order-cancel-btn" onclick="window.closeOrderConfirm()">キャンセル</button>
+        <button class="order-confirm-ok-btn" id="order-confirm-ok-btn" onclick="window.confirmOrder()">注文する</button>
+      </div>
+    </div>
+    <div id="order-success-content" style="display:none">
+      <div class="order-success-icon">✓</div>
+      <div class="order-success-text">ご注文を承りました</div>
+      <div class="order-success-sub">少々お待ちください</div>
     </div>
   </div>
 </div>
@@ -717,6 +727,9 @@ window.placeOrder = function() {
   var okBtn = document.getElementById('order-confirm-ok-btn');
   okBtn.disabled = false;
   okBtn.textContent = '注文する';
+  // 確認画面を表示状態に（前回の完了画面が残っていれば戻す）
+  document.getElementById('order-confirm-content').style.display = '';
+  document.getElementById('order-success-content').style.display = 'none';
   document.getElementById('order-confirm-modal').classList.add('open');
 };
 
@@ -754,11 +767,10 @@ window.confirmOrder = async function() {
   await push(ref(db, 'orders'), orderData);
   cart = {};
   renderMenu(); renderCart();
-  window.closeOrderConfirm();
-  // カート側の注文ボタンで送信完了フィードバック
-  var orderBtn = document.getElementById('order-btn');
-  orderBtn.textContent = '✓ 注文しました！';
-  setTimeout(function() { orderBtn.textContent = '注文する'; }, 2000);
+  // モーダル内で完了表示 → 1.5秒後にモーダルを閉じる
+  document.getElementById('order-confirm-content').style.display = 'none';
+  document.getElementById('order-success-content').style.display = 'block';
+  setTimeout(function() { window.closeOrderConfirm(); }, 1500);
 };
 
 // 起動
