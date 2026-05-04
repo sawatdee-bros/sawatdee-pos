@@ -179,6 +179,18 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 </div>
 
 
+<!-- 店員呼び確認モーダル -->
+<div class="bill-confirm-modal" id="call-confirm-modal">
+  <div class="bill-confirm-box">
+    <div class="bill-confirm-title">🔔 店員呼び出し</div>
+    <div class="bill-confirm-sub">店員を呼びますか？</div>
+    <div class="bill-confirm-btns">
+      <button class="bill-cancel-btn" onclick="window.closeCallConfirm()">キャンセル</button>
+      <button class="bill-ok-btn" onclick="window.confirmCallStaff()">店員を呼ぶ</button>
+    </div>
+  </div>
+</div>
+
 <!-- 注文履歴モーダル -->
 <div class="bill-confirm-modal" id="bill-confirm-modal">
   <div class="bill-confirm-box">
@@ -556,19 +568,44 @@ window.callStaff = async function() {
   var btn = document.getElementById('call-btn');
   var tbl = new URLSearchParams(location.search).get('table') || '?';
   if (btn.classList.contains('calling')) {
+    // 呼出中 → 即取消（モーダルなし）
     await remove(ref(db, 'calls/' + tbl));
     btn.classList.remove('calling');
     btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
   } else {
-    await set(ref(db, 'calls/' + tbl), { table: tbl, timestamp: Date.now() });
-    btn.classList.add('calling');
-    btn.innerHTML = '🔔<span>呼出中<span class="call-dot">.</span><span class="call-dot">.</span><span class="call-dot">.</span></span>';
-    setTimeout(async function() {
-      await remove(ref(db, 'calls/' + tbl));
-      btn.classList.remove('calling');
-      btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
-    }, 3 * 60 * 1000);
+    // 未呼出 → 確認モーダルを表示
+    document.getElementById('call-confirm-modal').classList.add('open');
   }
+};
+
+window.closeCallConfirm = function() {
+  document.getElementById('call-confirm-modal').classList.remove('open');
+  // 中身を初期状態に戻す（次回開いた時に確認画面で開くように）
+  document.querySelector('#call-confirm-modal .bill-confirm-box').innerHTML =
+    '<div class="bill-confirm-title">🔔 店員呼び出し</div>'
+    + '<div class="bill-confirm-sub">店員を呼びますか？</div>'
+    + '<div class="bill-confirm-btns">'
+    + '<button class="bill-cancel-btn" onclick="window.closeCallConfirm()">キャンセル</button>'
+    + '<button class="bill-ok-btn" onclick="window.confirmCallStaff()">店員を呼ぶ</button>'
+    + '</div>';
+};
+
+window.confirmCallStaff = async function() {
+  var btn = document.getElementById('call-btn');
+  var tbl = new URLSearchParams(location.search).get('table') || '?';
+  await set(ref(db, 'calls/' + tbl), { table: tbl, timestamp: Date.now() });
+  btn.classList.add('calling');
+  btn.innerHTML = '🔔<span>呼出中<span class="call-dot">.</span><span class="call-dot">.</span><span class="call-dot">.</span></span>';
+  setTimeout(async function() {
+    await remove(ref(db, 'calls/' + tbl));
+    btn.classList.remove('calling');
+    btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+  }, 3 * 60 * 1000);
+  // モーダルの中身を「呼びました」に差し替え（会計モーダルと同パターン）
+  document.querySelector('#call-confirm-modal .bill-confirm-box').innerHTML =
+    '<div class="bill-confirm-title">🔔 ありがとうございます</div>'
+    + '<div class="bill-confirm-sub">店員をお呼びしました。<br>少々お待ちください。</div>'
+    + '<div class="bill-confirm-btns"><button class="bill-cancel-btn" onclick="window.closeCallConfirm()">閉じる</button></div>';
 };
 
 var _historyItems = [];
