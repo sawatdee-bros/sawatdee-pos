@@ -44,6 +44,17 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 .order-success-icon { width: 72px; height: 72px; margin: 18px auto 18px; background: #166534; color: white; border-radius: 50%; font-size: 42px; line-height: 72px; font-weight: 700; text-align: center; box-shadow: 0 4px 14px rgba(22,101,52,0.35); }
 .order-success-text { font-size: 19px; font-weight: 700; color: #111827; margin-bottom: 6px; text-align: center; }
 .order-success-sub { font-size: 13px; color: #6b7280; margin-bottom: 14px; text-align: center; }
+.order-success-fun { display: flex; flex-direction: column; align-items: center; padding: 6px 0 4px; cursor: pointer; user-select: none; }
+.order-success-fun img { width: 96px; height: 96px; object-fit: contain; transform: scaleX(-1); animation: funFadeIn 0.5s ease-out 0.2s both, funBounce 2s ease-in-out 0.7s infinite; transform-origin: center; }
+.order-success-fun-label { margin-top: 2px; font-size: 12px; color: #A31313; font-weight: 700; letter-spacing: 0.5px; }
+@keyframes funFadeIn { 0% { opacity: 0; transform: scaleX(-1) translateY(20px); } 100% { opacity: 1; transform: scaleX(-1) translateY(0); } }
+@keyframes funBounce { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-6px); } }
+
+.fun-fab { position: fixed; right: 10px; bottom: 130px; width: 78px; height: 78px; z-index: 250; cursor: pointer; padding: 0; background: transparent; border: none; display: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
+.fun-fab.show { display: block; animation: funFabPop 0.4s ease-out, funFabFloat 3s ease-in-out 0.4s infinite; }
+.fun-fab img { width: 100%; height: 100%; object-fit: contain; transform: scaleX(-1); pointer-events: none; }
+@keyframes funFabPop { 0% { transform: scale(0); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes funFabFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .call-btn.calling { color: #dc2626; }
 .call-dot { display: inline-block; opacity: 0.2; animation: dotFade 1.2s infinite; }
 .call-dot:nth-child(1) { animation-delay: 0s; }
@@ -211,6 +222,11 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
   </div>
 </div>
 
+<!-- お楽しみページへのフローティングマスコット（初回注文後にlocalStorage経由で表示） -->
+<button class="fun-fab" id="fun-fab" onclick="window.openFunPage()" aria-label="お楽しみページへ">
+  <img src="https://static.wixstatic.com/media/6250d5_3c7a5adbcdee4e5ab05944d21bc4e11f~mv2.gif" alt="マスコット">
+</button>
+
 <!-- 注文確認モーダル -->
 <div class="order-confirm-modal" id="order-confirm-modal">
   <div class="order-confirm-box">
@@ -226,7 +242,11 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
     <div id="order-success-content" style="display:none">
       <div class="order-success-icon">✓</div>
       <div class="order-success-text">ご注文を承りました</div>
-      <div class="order-success-sub">少々お待ちください</div>
+      <div class="order-success-sub">お料理が来るまで・・・</div>
+      <div class="order-success-fun" onclick="window.openFunPage()">
+        <img src="https://static.wixstatic.com/media/6250d5_3c7a5adbcdee4e5ab05944d21bc4e11f~mv2.gif" alt="マスコット">
+        <div class="order-success-fun-label">タップでお楽しみページへ →</div>
+      </div>
     </div>
   </div>
 </div>
@@ -804,11 +824,24 @@ window.confirmOrder = async function() {
   await push(ref(db, 'orders'), orderData);
   cart = {};
   renderMenu(); renderCart();
-  // モーダル内で完了表示 → 1.5秒後にモーダルを閉じる
+  // 初回注文完了：お楽しみページへのフローティングマスコットを以後常時表示
+  try { localStorage.setItem('sawatdee_first_order_done', '1'); } catch(e) {}
+  showFunFab();
+  // モーダル内で完了表示 → 2.5秒後にモーダルを閉じる（マスコットを見る時間を確保）
   document.getElementById('order-confirm-content').style.display = 'none';
   document.getElementById('order-success-content').style.display = 'block';
-  setTimeout(function() { window.closeOrderConfirm(); }, 1500);
+  setTimeout(function() { window.closeOrderConfirm(); }, 2500);
 };
+
+// お楽しみページ連携
+var FUN_PAGE_URL = 'https://sawatdee-fun.pages.dev/funpage.html';
+window.openFunPage = function() { window.open(FUN_PAGE_URL, '_blank'); };
+function showFunFab() {
+  var fab = document.getElementById('fun-fab');
+  if (fab) fab.classList.add('show');
+}
+// ページロード時：過去に注文済みならフローティングマスコットを表示
+try { if (localStorage.getItem('sawatdee_first_order_done') === '1') showFunFab(); } catch(e) {}
 
 // 起動
 init();
