@@ -26,6 +26,21 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 .bill-confirm-btns { display: flex; gap: 10px; }
 .bill-cancel-btn { flex: 1; padding: 12px; background: #f3f4f6; border: none; border-radius: 10px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
 .bill-ok-btn { flex: 2; padding: 12px; background: #1d4ed8; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+.order-confirm-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 700; display: none; align-items: center; justify-content: center; padding: 20px; }
+.order-confirm-modal.open { display: flex; }
+.order-confirm-box { background: white; border-radius: 16px; padding: 22px 20px; width: 100%; max-width: 360px; max-height: 80vh; display: flex; flex-direction: column; }
+.order-confirm-title { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 14px; text-align: center; }
+.order-confirm-list { flex: 1; overflow-y: auto; margin-bottom: 12px; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; padding: 10px 0; }
+.order-confirm-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 4px; font-size: 14px; }
+.order-confirm-row .ocr-name { color: #1f2937; flex: 1; padding-right: 8px; word-break: break-word; }
+.order-confirm-row .ocr-qty { color: #6b7280; padding-right: 12px; white-space: nowrap; }
+.order-confirm-row .ocr-price { color: #111827; font-weight: 600; white-space: nowrap; }
+.order-confirm-total { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 4px 14px; font-size: 15px; font-weight: 700; color: #111827; }
+.order-confirm-btns { display: flex; gap: 10px; }
+.order-cancel-btn { flex: 1; padding: 13px; background: #f3f4f6; border: none; border-radius: 10px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
+.order-confirm-ok-btn { flex: 2; padding: 13px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; }
+.order-confirm-ok-btn:disabled { background: #94a3b8; cursor: default; }
 .call-btn.calling { color: #dc2626; }
 .call-dot { display: inline-block; opacity: 0.2; animation: dotFade 1.2s infinite; }
 .call-dot:nth-child(1) { animation-delay: 0s; }
@@ -178,6 +193,19 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
     <div class="history-title">📋 注文履歴</div>
     <div id="history-list"></div>
     <button class="history-close" onclick="window.closeHistory()">閉じる</button>
+  </div>
+</div>
+
+<!-- 注文確認モーダル -->
+<div class="order-confirm-modal" id="order-confirm-modal">
+  <div class="order-confirm-box">
+    <div class="order-confirm-title">ご注文内容の確認</div>
+    <div class="order-confirm-list" id="order-confirm-list"></div>
+    <div class="order-confirm-total"><span>合計（税込）</span><span id="order-confirm-total-amount">¥0</span></div>
+    <div class="order-confirm-btns">
+      <button class="order-cancel-btn" onclick="window.closeOrderConfirm()">キャンセル</button>
+      <button class="order-confirm-ok-btn" id="order-confirm-ok-btn" onclick="window.confirmOrder()">注文する</button>
+    </div>
   </div>
 </div>
 <script type="module">
@@ -666,7 +694,41 @@ window.addOhiya = function() {
   renderMenu(); renderCart();
 };
 
-window.placeOrder = async function() {
+window.placeOrder = function() {
+  if (Object.keys(cart).length === 0) return;
+  // 確認モーダルにカート内容を描画
+  var listHTML = '';
+  var totalIn = 0;
+  Object.entries(cart).forEach(function(entry) {
+    var c = entry[1];
+    var extraPrice = c.extras ? c.extras.reduce(function(s, e) { return s + e.price; }, 0) : 0;
+    var unit = c.item.price + extraPrice;
+    var lineIn = (c.item.price_type === 'inclusive' ? unit : taxIn(unit)) * c.qty;
+    totalIn += lineIn;
+    var name = c.item.name + (c.extras && c.extras.length ? ' +' + c.extras.map(function(e) { return e.label; }).join('・') : '');
+    listHTML += '<div class="order-confirm-row">'
+      + '<span class="ocr-name">' + name + '</span>'
+      + '<span class="ocr-qty">×' + c.qty + '</span>'
+      + '<span class="ocr-price">' + fmtY(unit * c.qty) + '</span>'
+      + '</div>';
+  });
+  document.getElementById('order-confirm-list').innerHTML = listHTML;
+  document.getElementById('order-confirm-total-amount').textContent = fmtY(applyRounding(totalIn));
+  var okBtn = document.getElementById('order-confirm-ok-btn');
+  okBtn.disabled = false;
+  okBtn.textContent = '注文する';
+  document.getElementById('order-confirm-modal').classList.add('open');
+};
+
+window.closeOrderConfirm = function() {
+  document.getElementById('order-confirm-modal').classList.remove('open');
+};
+
+window.confirmOrder = async function() {
+  var okBtn = document.getElementById('order-confirm-ok-btn');
+  if (okBtn.disabled) return;
+  okBtn.disabled = true;
+  okBtn.textContent = '送信中...';
   var items = [];
   Object.values(cart).forEach(function(c) {
     var item = { name: c.item.name, qty: c.qty, price: c.item.price };
@@ -682,10 +744,8 @@ window.placeOrder = async function() {
     }
     items.push(item);
   });
-  if (items.length === 0) return;
+  if (items.length === 0) { window.closeOrderConfirm(); return; }
   var total = applyRounding(items.reduce(function(s, i) { return s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty; }, 0));
-  document.getElementById('order-btn').disabled = true;
-  document.getElementById('order-btn').textContent = '送信中...';
   var orderData = { table: tableNum, items: items, total: total, status: 'new', timestamp: Date.now() };
   // セットカテゴリのみの注文はsource:'set'を付ける
   var hasSetItems = Object.keys(cart).some(function(k) { return k.startsWith('set__'); });
@@ -694,8 +754,11 @@ window.placeOrder = async function() {
   await push(ref(db, 'orders'), orderData);
   cart = {};
   renderMenu(); renderCart();
-  document.getElementById('order-btn').textContent = '✓ 注文しました！';
-  setTimeout(function() { document.getElementById('order-btn').textContent = '注文する'; }, 2000);
+  window.closeOrderConfirm();
+  // カート側の注文ボタンで送信完了フィードバック
+  var orderBtn = document.getElementById('order-btn');
+  orderBtn.textContent = '✓ 注文しました！';
+  setTimeout(function() { orderBtn.textContent = '注文する'; }, 2000);
 };
 
 // 起動
