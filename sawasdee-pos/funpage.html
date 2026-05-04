@@ -1049,10 +1049,15 @@
 <!-- 店内ライトボックス -->
 <div id="shop-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;flex-direction:column;align-items:center;justify-content:center;" onclick="closeShopLb()">
   <button onclick="closeShopLb()" style="position:absolute;top:18px;right:20px;color:#fff;font-size:28px;background:none;border:none;cursor:pointer;line-height:1;z-index:2;">×</button>
-  <img id="shop-lb-img" src="" style="max-width:72vw;max-height:55vh;object-fit:contain;">
-  <div style="margin-top:16px;text-align:center;padding:0 28px;">
-    <div id="shop-lb-title" style="color:#fff;font-size:16px;font-weight:900;margin-bottom:6px;"></div>
-    <div id="shop-lb-desc" style="color:rgba(255,255,255,0.75);font-size:13px;line-height:1.7;"></div>
+  <button onclick="event.stopPropagation();shopLbNav(-1)" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#fff;font-size:32px;background:rgba(255,255,255,0.15);border:none;cursor:pointer;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;z-index:2;">‹</button>
+  <button onclick="event.stopPropagation();shopLbNav(1)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#fff;font-size:32px;background:rgba(255,255,255,0.15);border:none;cursor:pointer;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;z-index:2;">›</button>
+  <div onclick="event.stopPropagation()" style="display:flex;flex-direction:column;align-items:center;max-width:90vw;">
+    <img id="shop-lb-img" src="" style="max-width:72vw;max-height:55vh;object-fit:contain;">
+    <div style="margin-top:16px;text-align:center;padding:0 28px;">
+      <div id="shop-lb-title" style="color:#fff;font-size:16px;font-weight:900;margin-bottom:6px;"></div>
+      <div id="shop-lb-desc" style="color:rgba(255,255,255,0.75);font-size:13px;line-height:1.7;"></div>
+      <div id="shop-lb-counter" style="color:rgba(255,255,255,0.4);font-size:11px;margin-top:8px;"></div>
+    </div>
   </div>
 </div>
 
@@ -2522,21 +2527,46 @@ function renderShopGrid() {
   }).join('');
 }
 
+let shopLbIdx = 0;
+let shopTouchStartX = 0;
+
 function openShopLb(i) {
-  const item = SHOP_ITEMS[i];
+  shopLbIdx = i;
+  showShopLbItem();
   const lb = document.getElementById('shop-lightbox');
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function showShopLbItem() {
+  const item = SHOP_ITEMS[shopLbIdx];
   document.getElementById('shop-lb-img').src = item.img || '';
   document.getElementById('shop-lb-img').style.display = item.img ? 'block' : 'none';
   document.getElementById('shop-lb-title').textContent = (item.img ? '' : item.emoji + ' ') + item.title;
   document.getElementById('shop-lb-desc').textContent = item.desc;
-  lb.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  document.getElementById('shop-lb-counter').textContent = (shopLbIdx + 1) + ' / ' + SHOP_ITEMS.length;
+}
+
+function shopLbNav(dir) {
+  shopLbIdx = (shopLbIdx + dir + SHOP_ITEMS.length) % SHOP_ITEMS.length;
+  showShopLbItem();
 }
 
 function closeShopLb() {
   document.getElementById('shop-lightbox').style.display = 'none';
   document.body.style.overflow = '';
 }
+
+document.getElementById('shop-lightbox').addEventListener('touchstart', function(e) {
+  shopTouchStartX = e.changedTouches[0].screenX;
+}, {passive: true});
+document.getElementById('shop-lightbox').addEventListener('touchend', function(e) {
+  const diff = e.changedTouches[0].screenX - shopTouchStartX;
+  if (Math.abs(diff) > 50) {
+    shopLbNav(diff < 0 ? 1 : -1);
+    e.preventDefault();
+  }
+});
 
 
 const SPOTS = [
