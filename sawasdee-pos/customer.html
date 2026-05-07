@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app">
 <title>ご注文 - サワディーブロス</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -266,6 +269,22 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
+// === REST API読み込み（iOS Safari WebSocket "ゾンビ化"問題回避） ===
+// WebSocket接続が確立しても、iOS Safari省電力下でデータが流れないことがあり、
+// 約2分間ハングしてから再接続で復旧する症状を観測（2026-05-07）。
+// 初期描画に必要な読み込みはRESTで行い、リアルタイム更新が必要なsoldoutのみonValueを使う。
+const FB_BASE = FC.databaseURL;
+async function fbRestGet(path, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_BASE + '/' + path + '.json', { signal: ctrl.signal, cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
+
 const TAX = 0.1;
 
 // ---- 状態変数 ----
@@ -292,13 +311,21 @@ document.getElementById('table-no').textContent = 'テーブル ' + tableNum;
 
 
 // ---- 初期化：Firebaseからメニューと売り切れを読み込む ----
+// 初期データ取得はREST API（HTTPS）で並列化。WebSocketゾンビ化を回避。
 async function init() {
   try {
-    const menuSnap = await get(ref(db, 'menu'));
-    MENU_DATA = menuSnap.val() || {};
+    const results = await Promise.all([
+      fbRestGet('menu'),
+      fbRestGet('menu_overrides'),
+      fbRestGet('store_config/has_ohiya'),
+      fbRestGet('store_config/show_set_on_customer')
+    ]);
+    const menuData = results[0];
+    const overrides = results[1] || {};
+    const ohiyaVal = results[2];
+    const showSetVal = results[3];
+    MENU_DATA = menuData || {};
     // menu_overridesをマージ（drink_count等の上書き項目を反映）
-    const overridesSnap = await get(ref(db, 'menu_overrides'));
-    const overrides = overridesSnap.val() || {};
     if (Object.keys(overrides).length > 0) {
       ['food','drink','set'].forEach(function(cat) {
         if (!MENU_DATA[cat]) return;
@@ -316,22 +343,19 @@ async function init() {
         });
       });
     }
-    // 店舗設定：お冷ON/OFF
-    const ohiyaSnap = await get(ref(db, 'store_config/has_ohiya'));
-    hasOhiya = ohiyaSnap.val() === true;
-    // 店舗設定：セットメニュー客席表示ON/OFF
-    const setSnap = await get(ref(db, 'store_config/show_set_on_customer'));
-    showSetOnCustomer = setSnap.val() === true;
+    hasOhiya = ohiyaVal === true;
+    showSetOnCustomer = showSetVal === true;
     if (Object.keys(MENU_DATA).length === 0) {
       document.getElementById('menu-list').innerHTML = '<div style="padding:40px;text-align:center;color:#9ca3af">メニューを読み込めませんでした</div>';
       return;
     }
-    // 売り切れをリアルタイム監視
-    onValue(ref(db, 'soldout'), function(snap) { soldout = snap.val() || {}; renderMenu(); });
+    // 描画は即座に実行
     renderCatTabs();
     renderSubcatTabs();
     renderMenu();
     renderCart();
+    // 売り切れはリアルタイム更新が必要なのでonValue（描画後・ノンブロッキング）
+    onValue(ref(db, 'soldout'), function(snap) { soldout = snap.val() || {}; renderMenu(); });
   } catch(e) {
     document.getElementById('menu-list').innerHTML = '<div style="padding:40px;text-align:center;color:#9ca3af">読み込みに失敗しました。再読み込みしてください。</div>';
     console.error(e);
