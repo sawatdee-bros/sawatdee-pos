@@ -61,6 +61,9 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: #475569; text-align: center; }
 .bell { position: fixed; top: 60px; right: 20px; background: #fbbf24; color: #1a1200; padding: 8px 16px; border-radius: 50px; font-size: 14px; font-weight: 600; display: none; z-index: 100; }
 .call-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 300; pointer-events: none; }
+.audio-broken-banner { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 500; background: #dc2626; color: #fff; padding: 16px 20px; font-size: 18px; font-weight: 700; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: audioBrokenPulse 1.4s ease-in-out infinite; }
+.audio-broken-banner.show { display: block; }
+@keyframes audioBrokenPulse { 0%,100% { background: #dc2626; } 50% { background: #b91c1c; } }
 .call-item { display: flex; align-items: center; justify-content: space-between; background: #dc2626; color: white; padding: 10px 16px; font-size: 14px; font-weight: 700; border-bottom: 1px solid #b91c1c; animation: callSlide 0.3s ease; pointer-events: auto; }
 @keyframes callSlide { from{transform:translateY(-100%)} to{transform:translateY(0)} }
 .bell.show { display: block; animation: bounceIn 0.4s ease; }
@@ -213,6 +216,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   </div>
 </header>
 
+<div class="audio-broken-banner" id="audio-broken-banner" onclick="window.recoverAudio()">⚠️ 音が止まっています。ここをタップして復旧</div>
 <div class="call-banner" id="call-banner"></div>
 <div id="bell" class="bell">🔔 新しい注文！</div>
 <!-- 全て表示（2列） -->
@@ -502,7 +506,7 @@ function playCallSound() {
     var gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.type = 'sine';
+    osc.type = 'triangle';
     osc.frequency.setValueAtTime(freq, startTime);
     gain.gain.setValueAtTime(0, startTime);
     gain.gain.linearRampToValueAtTime(5.0, startTime + 0.02);
@@ -528,7 +532,7 @@ function playBillSound() {
   var gain = ctx.createGain();
   osc.connect(gain);
   gain.connect(ctx.destination);
-  osc.type = 'sine';
+  osc.type = 'triangle';
   osc.frequency.setValueAtTime(520, ctx.currentTime);
   osc.frequency.linearRampToValueAtTime(700, ctx.currentTime + 0.5);
   gain.gain.setValueAtTime(0, ctx.currentTime);
@@ -992,7 +996,17 @@ function applyAudioState() {
 
 
 window.addEventListener('visibilitychange', function() {
-  if (document.visibilityState === 'visible') _showAudioBanner();
+  if (document.visibilityState !== 'visible') return;
+  // 画面復帰時、音がONなのにAudioContextが止まってたら自動復活を試す
+  if (!audioEnabled) return;
+  var ctx = _sharedAudioCtx;
+  if (!ctx) return;
+  if (ctx.state !== 'running') {
+    ctx.resume().then(function() {
+      if (_sharedAudioCtx && _sharedAudioCtx.state === 'running') _hideAudioBrokenBanner();
+      else _showAudioBrokenBanner();
+    }).catch(function() { _showAudioBrokenBanner(); });
+  }
 });
 
 
@@ -1005,6 +1019,21 @@ function getAudioCtx() {
   }
   return _sharedAudioCtx;
 }
+// iOSのinterrupted状態などから完全復旧するため、AudioContextを破棄して作り直す
+function resetAudioCtx() {
+  try {
+    if (_sharedAudioCtx) {
+      try { _sharedAudioCtx.close(); } catch(e) {}
+    }
+  } finally {
+    _sharedAudioCtx = null;
+  }
+  try { _sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  if (_sharedAudioCtx && _sharedAudioCtx.state === 'suspended') {
+    _sharedAudioCtx.resume().catch(function(){});
+  }
+  return _sharedAudioCtx;
+}
 
 window.toggleAudio = function() {
   if (!audioEnabled) {
@@ -1013,17 +1042,44 @@ window.toggleAudio = function() {
       var a = document.getElementById(id);
       if (a) { a.currentTime = 0; a.play().catch(function(){}); }
     });
-    // AudioContextもユーザー操作でunlock（呼び出し音・会計音）
-    var ctx = getAudioCtx();
-    if (ctx && ctx.state === 'suspended') {
-      ctx.resume().catch(function(){});
-    }
+    // AudioContextを完全リセット（interrupted状態などからも確実に復旧）
+    resetAudioCtx();
     audioEnabled = true;
+    _hideAudioBrokenBanner();
   } else {
     audioEnabled = false;
   }
   applyAudioState();
 };
+
+// 赤バナーの表示/非表示
+function _showAudioBrokenBanner() {
+  var el = document.getElementById('audio-broken-banner');
+  if (el) el.classList.add('show');
+}
+function _hideAudioBrokenBanner() {
+  var el = document.getElementById('audio-broken-banner');
+  if (el) el.classList.remove('show');
+}
+
+// バナータップ時の復旧処理（toggleAudioと同じことをユーザー操作下で実行）
+window.recoverAudio = function() {
+  resetAudioCtx();
+  audioEnabled = true;
+  applyAudioState();
+  _hideAudioBrokenBanner();
+};
+
+// 30秒ごとにAudioContextの状態を監視。runningでなければ赤バナー表示
+setInterval(function() {
+  if (!audioEnabled) { _hideAudioBrokenBanner(); return; }
+  var ctx = _sharedAudioCtx;
+  if (!ctx || ctx.state !== 'running') {
+    _showAudioBrokenBanner();
+  } else {
+    _hideAudioBrokenBanner();
+  }
+}, 30000);
 
 // 注文音：フード＝ポーン（中音単音）、ドリンク＝ピピッ（高音2連）
 function playBeep() {
@@ -1042,7 +1098,7 @@ function playSound(type) {
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = 'sine';
+      osc.type = 'triangle';
       osc.frequency.setValueAtTime(1400, startTime);
       gain.gain.setValueAtTime(0, startTime);
       gain.gain.linearRampToValueAtTime(5.0, startTime + 0.01);
@@ -1057,7 +1113,7 @@ function playSound(type) {
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sine';
+    osc.type = 'triangle';
     osc.frequency.setValueAtTime(820, ctx.currentTime);
     osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 0.3);
     gain.gain.setValueAtTime(0, ctx.currentTime);
@@ -1380,7 +1436,8 @@ window.openCheckout = function(tableNum, idStr) {
   var hasFreeCharge = chargeResult.hasFreeCharge;
   var finalEx = totalEx + (chargeResult.isFree ? 0 : chargeEx);
   var grandTotal = applyRounding(finalEx * 1.1) + inclusiveTotal;
-  var grandTax = grandTotal - finalEx - (chargeResult.isFree ? 0 : chargeEx) - inclusiveTotal;
+  // finalEx は既にchargeExを含んでいるので二重減算しない
+  var grandTax = grandTotal - finalEx - inclusiveTotal;
 
   // 伝票スタイルで組み立て
   var drinks = sorted.filter(function(it){ return isDrinkItem(it.name,it); });
