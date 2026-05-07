@@ -995,13 +995,27 @@ function applyAudioState() {
 }
 
 
+var _audioHiddenAt = 0;
 window.addEventListener('visibilitychange', function() {
-  if (document.visibilityState !== 'visible') return;
-  // 画面復帰時、音がONなのにAudioContextが止まってたら自動復活を試す
-  if (!audioEnabled) return;
+  if (document.visibilityState === 'hidden') {
+    _audioHiddenAt = Date.now();
+    return;
+  }
+  // visible に戻った
+  if (!audioEnabled) { _audioHiddenAt = 0; return; }
+  var hiddenDuration = _audioHiddenAt ? (Date.now() - _audioHiddenAt) : 0;
+  _audioHiddenAt = 0;
+  // 3秒以上バックグラウンドにいた場合、iOSが音セッションを奪って
+  // state='running'のまま嘘をつくケースがあるため、stateを信用せず必ずバナー表示
+  if (hiddenDuration > 3000) {
+    var ctx = _sharedAudioCtx;
+    if (ctx && ctx.state !== 'running') ctx.resume().catch(function(){});
+    _showAudioBrokenBanner();
+    return;
+  }
+  // 短時間の切り替えはstateで判断
   var ctx = _sharedAudioCtx;
-  if (!ctx) return;
-  if (ctx.state !== 'running') {
+  if (ctx && ctx.state !== 'running') {
     ctx.resume().then(function() {
       if (_sharedAudioCtx && _sharedAudioCtx.state === 'running') _hideAudioBrokenBanner();
       else _showAudioBrokenBanner();
@@ -1070,16 +1084,14 @@ window.recoverAudio = function() {
   _hideAudioBrokenBanner();
 };
 
-// 30秒ごとにAudioContextの状態を監視。runningでなければ赤バナー表示
+// 10秒ごとにAudioContextの状態を監視。runningでなければ赤バナー表示
 setInterval(function() {
   if (!audioEnabled) { _hideAudioBrokenBanner(); return; }
   var ctx = _sharedAudioCtx;
   if (!ctx || ctx.state !== 'running') {
     _showAudioBrokenBanner();
-  } else {
-    _hideAudioBrokenBanner();
   }
-}, 30000);
+}, 10000);
 
 // 注文音：フード＝ポーン（中音単音）、ドリンク＝ピピッ（高音2連）
 function playBeep() {
