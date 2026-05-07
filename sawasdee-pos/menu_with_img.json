@@ -1080,7 +1080,7 @@
         "price": 680,
         "sake": false,
         "spicy": 2,
-        "img": "/img/ラープガイ.jpg",
+        "img": "/img/ヤムガイ.jpg",
         "kana": "ヤム ガイ",
         "thai": "ยำไก่",
         "en": "Chicken Salad"
@@ -1281,7 +1281,7 @@
         "price": 780,
         "sake": false,
         "spicy": 2,
-        "img": "/img/ヤムガイ.jpg",
+        "img": "/img/ラープガイ.jpg",
         "kana": "ラープ ガイ",
         "thai": "ลาบไก่",
         "en": "Chicken Larb"

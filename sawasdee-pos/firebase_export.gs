@@ -1,4 +1,11 @@
-const FIREBASE_URL = 'https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app/menu.json';
+const FIREBASE_BASE = 'https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+// スクリプトプロパティから認証トークンを取得し、URLに付与する
+function buildFirebaseUrl(path) {
+  const secret = PropertiesService.getScriptProperties().getProperty('FIREBASE_SECRET');
+  const url = FIREBASE_BASE + path;
+  return secret ? url + '?auth=' + encodeURIComponent(secret) : url;
+}
 
 // 空白以外ならtrue（文字の種類を問わない）
 function isOn(val) {
@@ -13,7 +20,10 @@ function exportToFirebase() {
   headers.forEach((h, i) => COL[h] = i);
   const menuData = { drink: {}, food: {}, set: {}, subcatOrder: { drink: [], food: [], set: [] } };
   const subcatOrderMap = { drink: [], food: [], set: [] };
-  const imgData = getImgData();
+
+  // 「画像パス」列があればスプレッドシートが正、無ければ既存Firebase値で保持（レガシー）
+  const hasImgCol = COL['画像パス'] !== undefined;
+  const imgFallback = hasImgCol ? {} : getImgData();
 
   for (let r = 1; r < data.length; r++) {
     const row = data[r];
@@ -45,7 +55,9 @@ function exportToFirebase() {
     const sake = isOn(row[COL['酒に合う']]);
     const warning = row[COL['注意']] ? row[COL['注意']].toString().trim() : '';
 
+    const kitchenName = row[COL['キッチン名']] ? row[COL['キッチン名']].toString().trim() : '';
     const item = { active: true, id, name, kana, thai, en, price, desc, pakchi, spicy, popular, sake };
+    if (kitchenName && kitchenName !== name) item.kitchen_name = kitchenName;
 
     // 税込価格列に値がある場合はprice_type:'inclusive'フラグを付ける
     if (priceIn > 0) item.price_type = 'inclusive';
@@ -62,14 +74,21 @@ function exportToFirebase() {
       }
     }
 
-    const imgKey = catKey + '/' + subcat + '/' + id;
-    if (imgData[imgKey]) item.img = imgData[imgKey];
+    // 画像パス：スプレッドシート列が正、無ければレガシー（既存Firebase値で保持）
+    if (hasImgCol) {
+      const imgPath = row[COL['画像パス']] ? row[COL['画像パス']].toString().trim() : '';
+      if (imgPath) item.img = imgPath;
+    } else {
+      const imgKey = catKey + '/' + subcat + '/' + id;
+      if (imgFallback[imgKey]) item.img = imgFallback[imgKey];
+    }
+
     menuData[catKey][subcat].push(item);
   }
 
   menuData.subcatOrder = subcatOrderMap;
   const options = { method: 'put', contentType: 'application/json', payload: JSON.stringify(menuData), muteHttpExceptions: true };
-  const res = UrlFetchApp.fetch(FIREBASE_URL, options);
+  const res = UrlFetchApp.fetch(buildFirebaseUrl('/menu.json'), options);
   if (res.getResponseCode() === 200) {
     Logger.log('完了');
   } else {
@@ -79,7 +98,7 @@ function exportToFirebase() {
 
 function getImgData() {
   try {
-    const res = UrlFetchApp.fetch('https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app/menu.json');
+    const res = UrlFetchApp.fetch(buildFirebaseUrl('/menu.json'));
     const data = JSON.parse(res.getContentText());
     const imgMap = {};
     ['drink', 'food', 'set'].forEach(function(cat) {
@@ -96,9 +115,44 @@ function getImgData() {
   } catch(e) { return {}; }
 }
 
+// 一度だけ実行：「画像パス」列をシート末尾に追加し、現Firebase値で初期化
+function migrateImgColumn() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('メニュー');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const COL = {};
+  headers.forEach((h, i) => COL[h] = i);
+
+  // ヘッダー追加（既にあれば再利用）
+  let imgColIdx = COL['画像パス'];
+  if (imgColIdx === undefined) {
+    imgColIdx = headers.length;
+    sheet.getRange(1, imgColIdx + 1).setValue('画像パス');
+  }
+
+  const imgMap = getImgData();
+  let filled = 0;
+  for (let r = 1; r < data.length; r++) {
+    const row = data[r];
+    const cat = row[COL['カテゴリ']] ? row[COL['カテゴリ']].toString().trim() : '';
+    const subcat = row[COL['サブカテゴリ']] ? row[COL['サブカテゴリ']].toString().trim() : '';
+    const id = row[COL['ID']] ? row[COL['ID']].toString().trim() : '';
+    if (!cat || !subcat || !id) continue;
+    const catKey = cat === 'ドリンク' ? 'drink' : cat === 'セット' ? 'set' : 'food';
+    const imgKey = catKey + '/' + subcat + '/' + id;
+    if (imgMap[imgKey]) {
+      sheet.getRange(r + 1, imgColIdx + 1).setValue(imgMap[imgKey]);
+      filled++;
+    }
+  }
+  SpreadsheetApp.getUi().alert('画像パス列の初期化完了：' + filled + '行に値を投入しました');
+}
+
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Firebase')
     .addItem('Firebaseに反映する', 'exportToFirebase')
+    .addSeparator()
+    .addItem('画像パス列を初期化（一度だけ）', 'migrateImgColumn')
     .addToUi();
 }
