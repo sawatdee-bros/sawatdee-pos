@@ -226,6 +226,23 @@ store_config/
   charge_per_person, charge_mode, charge_free_drink_count
   day_start_hour, apps_script_url, item_category_overrides
   discount_presets, base_url, qr_note1, qr_note2
+  enable_approval_flow  # スタッフ承認フロー有効化フラグ（デフォルトfalse・フェーズ展開中）
+
+# === スタッフ承認フロー（実装中・フェーズ1〜6で段階導入中・2026-05-08着手） ===
+tables/                # テーブル占有セッション管理（フェーズ2で実装）
+  {tableNum}/
+    session/
+      startedAt: ms       # セッション開始時刻
+      expiresAt: ms       # 失効時刻（startedAt + TTL、デフォルト3時間）
+      pax: number         # 着席人数（PAX）
+      issuedBy: 'handy'|'kitchen'  # 発行元（運用ログ用）
+  # 会計完了時に削除、TTL満了時はクライアント/ルールで判定
+
+# orders.status の値（フェーズ3〜4で追加）
+# 既存：'new' | 'done' | 'paid'
+# 追加：'pending_approval' | 'rejected'
+#   - pending_approval: テーブル占有未確認の注文（スタッフ承認待ち）
+#   - rejected: スタッフが拒否した注文（履歴保持・売上集計対象外）
 
 menu/
   drink/{サブカテゴリ}/[{id, name, kitchen_name?, kana, thai, en,
@@ -321,6 +338,14 @@ handy_groups/
 - `store_config/rounding_mode`（floor/round/ceil）と `store_config/rounding_unit`（1/10/100）で動的設定
 - デフォルト：切り捨て（floor）・10円単位
 - 対象ファイル：kitchen/bills/sales/customer/handy
+
+---
+
+## 進行中タスク
+- **スタッフ承認フロー + テーブルセッション**（2026-05-08着手・フェーズ1完了）
+  - SaaS化の実証も兼ねて本店先行実装。完了後に saas-planning に引き継ぎ
+  - 進捗・チェックリストは `OPEN_ISSUES.md` 参照
+  - 関連memory：`feedback_firebase_ios_safari.md`（クライアント→Firebase直接構成のためREST polling併用）
 
 ---
 

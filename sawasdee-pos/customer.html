@@ -291,6 +291,7 @@ const TAX = 0.1;
 let MENU_DATA = {};
 let hasOhiya = false; // store_config/has_ohiya
 let showSetOnCustomer = false; // store_config/show_set_on_customer
+let APPROVAL_FLOW_ON = false; // フェーズ1〜2では未使用。フェーズ3で承認フロー分岐に使う
 
 // オプション定義（store_config/item_optionsから動的読み込み）
 let ITEM_OPTIONS = {};
@@ -318,12 +319,14 @@ async function init() {
       fbRestGet('menu'),
       fbRestGet('menu_overrides'),
       fbRestGet('store_config/has_ohiya'),
-      fbRestGet('store_config/show_set_on_customer')
+      fbRestGet('store_config/show_set_on_customer'),
+      fbRestGet('store_config/enable_approval_flow')
     ]);
     const menuData = results[0];
     const overrides = results[1] || {};
     const ohiyaVal = results[2];
     const showSetVal = results[3];
+    APPROVAL_FLOW_ON = results[4] === true;
     MENU_DATA = menuData || {};
     // menu_overridesをマージ（drink_count等の上書き項目を反映）
     if (Object.keys(overrides).length > 0) {
