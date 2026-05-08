@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="preconnect" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app">
 <title>飲み放題 - サワディーブロス</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -165,6 +168,19 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
+// === REST API読み込み（iOS Safari WebSocket "ゾンビ化"対策・customer.htmlと同じ方針） ===
+const FB_BASE = FC.databaseURL;
+async function fbRestGet(path, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_BASE + '/' + path + '.json', { signal: ctrl.signal, cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
+
 const params = new URLSearchParams(location.search);
 const tableNum = params.get('table') || '?';
 document.getElementById('header-table').textContent = 'テーブル ' + tableNum;
@@ -195,17 +211,18 @@ window.switchMain = function(mode) {
 };
 
 // ---- 初期化 ----
+// 初期データ取得はREST API（HTTPS）。WebSocketゾンビ化を回避。
 async function init() {
   try {
-    const [configSnap, nomiSnap, foodSnap] = await Promise.all([
-      get(ref(db, 'store_config')),
-      get(ref(db, 'nomi_menu')),
-      get(ref(db, 'menu/food'))
+    const [configRaw, nomiRaw, foodRaw] = await Promise.all([
+      fbRestGet('store_config'),
+      fbRestGet('nomi_menu'),
+      fbRestGet('menu/food')
     ]);
 
-    storeConfig = configSnap.val() || {};
+    storeConfig = configRaw || {};
     TAX = storeConfig.tax_rate || 0.1;
-    NOMI_MENU = nomiSnap.val() || {};
+    NOMI_MENU = nomiRaw || {};
     // FirebaseはJSONのarrayをobjectに変換するので、Object.values()で配列に戻す
     var catOrderRaw = NOMI_MENU.catOrder;
     var catOrder = catOrderRaw
@@ -224,7 +241,7 @@ async function init() {
     } else {
       NOMI_CATS = allCats;
     }
-    var rawFood = foodSnap.val() || {};
+    var rawFood = foodRaw || {};
     // FirebaseがarrayをobjectにするのでFood各サブカテゴリも変換
     FOOD_DATA = {};
     Object.keys(rawFood).forEach(function(sub) {

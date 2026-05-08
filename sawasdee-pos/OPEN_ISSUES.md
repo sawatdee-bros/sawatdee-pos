@@ -7,6 +7,20 @@
 
 ## 動作確認待ち
 
+### customer.html / handy.html / nomi.html のREST API化（2026-05-08修正）
+- **背景**：iPhone Safariでcustomer.htmlの読み込みが約2分間ハングする症状を確認。診断版（customer-debug.html）でFirebase WebSocketが「ゾンビ化」していることを特定（接続は成立するがデータが流れず、約120秒後に再接続で復旧）。
+- **修正内容**：
+  - 客向け画面（customer.html）の初期データ取得を全てREST API（HTTPS fetch）に置換、`Promise.all`で並列化、`onValue(soldout)`は描画後に張る順に変更（実機確認済・解消）
+  - 同症状の予防として handy.html / nomi.html にも同じパターンを適用
+  - 全ファイルに`<link rel="preconnect">`を追加
+- **要確認（要実機テスト）**：
+  - [ ] handy.html：iPad（店内常設）で同じ「アプリ切替→戻る→リロード」シナリオで遅延が起きないか
+  - [ ] nomi.html：飲み放題QRから読み込み、同シナリオで動作確認
+  - [ ] kitchen.html / sales.html / menu-admin.html はWebSocketのまま。iPad常設運用で実害が出ていないかは継続観察
+- **詳細**：memory `feedback_firebase_ios_safari.md` 参照
+
+
+
 ### 売り切れ自動リセット機能の安定性検証
 - **背景**：2026-05-05 に menu-admin.html の売り切れリセット処理を改修
   - `_resetChecked` フラグ廃止（無限ループ防止はFirebase値だけで担保）

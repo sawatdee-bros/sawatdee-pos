@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="preconnect" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app">
 <title>ハンディ - サワディーブロス</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -134,6 +137,19 @@ const FC = {
 };
 const app = initializeApp(FC);
 const db = getDatabase(app);
+
+// === REST API読み込み（iOS Safari WebSocket "ゾンビ化"対策・customer.htmlと同じ方針） ===
+const FB_BASE = FC.databaseURL;
+async function fbRestGet(path, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_BASE + '/' + path + '.json', { signal: ctrl.signal, cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
 
 const TABLE_COUNT = 10;
 let TABLE_NAMES = {}; // store_config/table_names_shortから動的読み込み
@@ -397,19 +413,22 @@ window.placeOrder = async function() {
 };
 
 // 初期化
+// 初期データ取得はREST API（HTTPS）で並列化。WebSocketゾンビ化を回避。
 async function init() {
   try {
-    const cfgSnap = await get(ref(db, 'store_config'));
-    const cfg = cfgSnap.val() || {};
+    const results = await Promise.all([
+      fbRestGet('store_config'),
+      fbRestGet('handy_groups'),
+      fbRestGet('menu/set')
+    ]);
+    const cfg = results[0] || {};
     if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
     if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
     if (cfg.table_names_short) TABLE_NAMES = cfg.table_names_short;
     else if (cfg.table_names) TABLE_NAMES = cfg.table_names;
-    const snap = await get(ref(db, 'handy_groups'));
-    GROUPS_DATA = snap.val() || {};
+    GROUPS_DATA = results[1] || {};
     // menu/set をhandy_groups形式に変換して追加
-    const setSnap = await get(ref(db, 'menu/set'));
-    const setData = setSnap.val();
+    const setData = results[2];
     if (setData && Object.keys(setData).length > 0) {
       GROUPS_DATA['set'] = Object.keys(setData).map(subcat => {
         const items = Array.isArray(setData[subcat]) ? setData[subcat] : Object.values(setData[subcat] || {});
