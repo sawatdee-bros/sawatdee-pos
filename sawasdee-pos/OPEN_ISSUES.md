@@ -7,16 +7,20 @@
 
 ## 動作確認待ち
 
-### customer.html / handy.html / nomi.html のREST API化（2026-05-08修正）
-- **背景**：iPhone Safariでcustomer.htmlの読み込みが約2分間ハングする症状を確認。診断版（customer-debug.html）でFirebase WebSocketが「ゾンビ化」していることを特定（接続は成立するがデータが流れず、約120秒後に再接続で復旧）。
-- **修正内容**：
-  - 客向け画面（customer.html）の初期データ取得を全てREST API（HTTPS fetch）に置換、`Promise.all`で並列化、`onValue(soldout)`は描画後に張る順に変更（実機確認済・解消）
-  - 同症状の予防として handy.html / nomi.html にも同じパターンを適用
-  - 全ファイルに`<link rel="preconnect">`を追加
-- **要確認（要実機テスト）**：
-  - [ ] handy.html：iPad（店内常設）で同じ「アプリ切替→戻る→リロード」シナリオで遅延が起きないか
-  - [ ] nomi.html：飲み放題QRから読み込み、同シナリオで動作確認
-  - [ ] kitchen.html / sales.html / menu-admin.html はWebSocketのまま。iPad常設運用で実害が出ていないかは継続観察
+### 客向け画面のREST化（読み込み 2026-05-08、書き込み 2026-05-09・両方完了）
+- **背景**：iPhone Safariで以下2症状が発生：
+  - 読み込み詰まり（5-07確認）：customer.htmlの読み込みが約2分間ハング
+  - 書き込み詰まり（5-09確認）：注文/呼出/会計が数十分queueに溜まり、後で一気に着信。客側からは「ボタン無反応」に見える
+- **真因**：iOS Safari WebSocket「ゾンビ化」。接続は確立するがデータが流れない状態が約2分続き、その間の読み書きはqueueに溜まる
+- **修正完了**：
+  - customer.html / handy.html / nomi.html の **読み込み・書き込み両方** をREST API（HTTPS）に置換
+  - `fbRestGet` / `fbRestPush` / `fbRestSet` / `fbRestRemove` ヘルパー追加
+  - `Promise.all`で並列化、`onValue(soldout)`は描画後に張る順に変更
+  - `<link rel="preconnect">`を全客向け画面に追加
+  - 検証ファイル：customer-debug.html（読み込み診断）/ customer-write-test.html（書き込み診断）
+- **継続観察**：
+  - kitchen.html / sales.html / menu-admin.html はWebSocket書き込みのまま。iPad常設運用で実害が出たら同パターン適用
+  - NEW判定が「キッチン受信時刻」基準なので、もし詰まり症状が再発したらkitchen側で「客クリック時刻基準」への修正を検討
 - **詳細**：memory `feedback_firebase_ios_safari.md` 参照
 
 
