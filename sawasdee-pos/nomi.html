@@ -191,7 +191,6 @@ let NOMI_CATS = [];
 let FOOD_DATA = {};
 let soldout = {};
 let storeConfig = {};
-let APPROVAL_FLOW_ON = false; // フェーズ1〜2では未使用。フェーズ3で承認フロー分岐に使う
 let currentMode = 'nomi'; // 'nomi' | 'food'
 let currentNomiCat = '';
 let currentFoodSubcat = '';
@@ -223,7 +222,6 @@ async function init() {
 
     storeConfig = configRaw || {};
     TAX = storeConfig.tax_rate || 0.1;
-    APPROVAL_FLOW_ON = storeConfig.enable_approval_flow === true;
     NOMI_MENU = nomiRaw || {};
     // FirebaseはJSONのarrayをobjectに変換するので、Object.values()で配列に戻す
     var catOrderRaw = NOMI_MENU.catOrder;

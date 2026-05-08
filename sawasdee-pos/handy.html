@@ -155,7 +155,6 @@ const TABLE_COUNT = 10;
 let TABLE_NAMES = {}; // store_config/table_names_shortから動的読み込み
 function tableName(n) { return TABLE_NAMES[n] || 'T'+n; }
 let GROUPS_DATA = {};
-let APPROVAL_FLOW_ON = false; // フェーズ1〜2では未使用。フェーズ2でPAX入力時セッション発行に使う
 
 let currentTable = null;
 let currentCat = 'drink';
@@ -427,7 +426,6 @@ async function init() {
     if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
     if (cfg.table_names_short) TABLE_NAMES = cfg.table_names_short;
     else if (cfg.table_names) TABLE_NAMES = cfg.table_names;
-    APPROVAL_FLOW_ON = cfg.enable_approval_flow === true;
     GROUPS_DATA = results[1] || {};
     // menu/set をhandy_groups形式に変換して追加
     const setData = results[2];

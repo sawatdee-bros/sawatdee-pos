@@ -345,7 +345,6 @@ let _CHARGE_PER_PERSON = 250;
 let _CHARGE_MODE = 'conditional'; // none / conditional / always
 let _CHARGE_FREE_DRINK_COUNT = 2;
 let _DISCOUNT_PRESETS = [];
-let APPROVAL_FLOW_ON = false; // フェーズ1〜2では未使用。フェーズ3以降の承認フローで参照
 get(ref(db, 'store_config')).then(function(snap) {
   var cfg = snap.val() || {};
   if (cfg.day_start_hour !== null && cfg.day_start_hour !== undefined) DAY_START = cfg.day_start_hour;
@@ -357,7 +356,6 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
   if (cfg.table_names) TABLE_NAMES = cfg.table_names;
   if (cfg.table_names_short) TABLE_NAMES_SHORT = cfg.table_names_short;
-  APPROVAL_FLOW_ON = cfg.enable_approval_flow === true;
   // テーブル数を保存（ボタンは_billsFilterBarUpdate()で動的生成）
   _TABLE_COUNT = cfg.table_count || 10;
 });
