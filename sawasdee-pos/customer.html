@@ -284,6 +284,50 @@ async function fbRestGet(path, timeoutMs) {
     return await r.json();
   } finally { clearTimeout(timer); }
 }
+// === REST書き込み（書き込みもWSゾンビ化で詰まる症状を回避・2026-05-09） ===
+// 注文/呼出/会計の書き込みもRESTにする。WSは初期接続成立後にデータが流れない
+// 「ゾンビ状態」になると数十分queueに溜まる症状を観測（customer-write-test.htmlで確定）。
+async function fbRestPush(path, data, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_BASE + '/' + path + '.json', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data),
+      signal: ctrl.signal
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const result = await r.json();
+    return result && result.name; // Firebase auto-generated id
+  } finally { clearTimeout(timer); }
+}
+async function fbRestSet(path, data, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_BASE + '/' + path + '.json', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data),
+      signal: ctrl.signal
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
+async function fbRestRemove(path, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_BASE + '/' + path + '.json', { method: 'DELETE', signal: ctrl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return true;
+  } finally { clearTimeout(timer); }
+}
 
 const TAX = 0.1;
 
@@ -600,7 +644,7 @@ window.closeBillConfirm = function() {
 };
 window.confirmBill = async function() {
   var tbl = new URLSearchParams(location.search).get('table') || '?';
-  await set(ref(db, 'bill_calls/' + tbl), { table: tbl, timestamp: Date.now() });
+  await fbRestSet('bill_calls/' + tbl, { table: tbl, timestamp: Date.now() });
   // モーダルの中身を「お待ちください」に差し替え
   document.querySelector('#bill-confirm-modal .bill-confirm-box').innerHTML =
     '<div class="bill-confirm-title">💳 ありがとうございます</div>'
@@ -613,7 +657,7 @@ window.callStaff = async function() {
   var tbl = new URLSearchParams(location.search).get('table') || '?';
   if (btn.classList.contains('calling')) {
     // 呼出中 → 即取消（モーダルなし）
-    await remove(ref(db, 'calls/' + tbl));
+    await fbRestRemove('calls/' + tbl);
     btn.classList.remove('calling');
     btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
   } else {
@@ -637,11 +681,11 @@ window.closeCallConfirm = function() {
 window.confirmCallStaff = async function() {
   var btn = document.getElementById('call-btn');
   var tbl = new URLSearchParams(location.search).get('table') || '?';
-  await set(ref(db, 'calls/' + tbl), { table: tbl, timestamp: Date.now() });
+  await fbRestSet('calls/' + tbl, { table: tbl, timestamp: Date.now() });
   btn.classList.add('calling');
   btn.innerHTML = '🔔<span>呼出中<span class="call-dot">.</span><span class="call-dot">.</span><span class="call-dot">.</span></span>';
   setTimeout(async function() {
-    await remove(ref(db, 'calls/' + tbl));
+    await fbRestRemove('calls/' + tbl);
     btn.classList.remove('calling');
     btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
   }, 3 * 60 * 1000);
@@ -845,7 +889,7 @@ window.confirmOrder = async function() {
   var hasSetItems = Object.keys(cart).some(function(k) { return k.startsWith('set__'); });
   var hasNonSetItems = Object.keys(cart).some(function(k) { return !k.startsWith('set__') && !k.startsWith('ohiya__'); });
   if (hasSetItems && !hasNonSetItems) orderData.source = 'set';
-  await push(ref(db, 'orders'), orderData);
+  await fbRestPush('orders', orderData);
   cart = {};
   renderMenu(); renderCart();
   // 初回注文完了：お楽しみページへのフローティングマスコットを以後常時表示
