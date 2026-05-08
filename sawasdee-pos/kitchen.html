@@ -1302,10 +1302,40 @@ window.setFilter = function(f) {
   }
 })();
 
+// === スタッフ承認フロー：テーブルセッション管理（フェーズ2・2026-05-08） ===
+// PAX入力時に tables/{tableNum}/session を発行（書き込みのみ・読み手はフェーズ3〜4で実装）
+// 会計完了時に削除。動作変更なし（既存orderには影響しない）。
+const SESSION_TTL_MS = 3 * 60 * 60 * 1000; // 3時間
+
+async function issueTableSession(tableNum, pax) {
+  if (!pax || pax < 1) return;
+  const now = Date.now();
+  try {
+    await set(ref(db, 'tables/' + tableNum + '/session'), {
+      startedAt: now,
+      expiresAt: now + SESSION_TTL_MS,
+      pax: pax,
+      issuedBy: 'kitchen'
+    });
+  } catch(e) {
+    console.error('テーブルセッション発行失敗:', e);
+  }
+}
+
+async function clearTableSession(tableNum) {
+  try {
+    await remove(ref(db, 'tables/' + tableNum + '/session'));
+  } catch(e) {
+    console.error('テーブルセッション削除失敗:', e);
+  }
+}
+
 window.changePax = function(t, d) {
   if (!_bPax[t]) _bPax[t] = 0;
   _bPax[t] = Math.max(0, _bPax[t]+d);
   set(ref(db, 'pax/' + t), _bPax[t]);
+  // テーブルセッション発行（フェーズ2：書き込みのみ。フェーズ3で読み手追加）
+  if (_bPax[t] > 0) issueTableSession(t, _bPax[t]);
   _billsRender();
 };
 
@@ -1518,6 +1548,7 @@ window.markPaid = function(tableNum, idStr, discountAmount) {
   setTimeout(function() {
     remove(ref(db, 'pax/' + tableNum));
     remove(ref(db, 'bill_calls/' + tableNum));
+    clearTableSession(tableNum); // フェーズ2：会計完了でセッション失効
     _bPax[tableNum] = 0;
   }, 500);
 };
