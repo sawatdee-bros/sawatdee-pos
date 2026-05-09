@@ -6,8 +6,24 @@
 <link rel="preconnect" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://sawatdee-bros-default-rtdb.asia-southeast1.firebasedatabase.app">
-<title>ご注文 - サワディーブロス</title>
+<title>【Phase3テスト】ご注文 - サワディーブロス</title>
 <style>
+/* === 診断パネル（Phase 3 テスト・本番非搭載） === */
+#dbg-panel { position: fixed; top: 0; left: 0; right: 0; max-height: 45vh; overflow-y: auto; background: #111827; color: #d1fae5; font-family: 'Menlo', 'Consolas', monospace; font-size: 10px; line-height: 1.45; padding: 6px 8px 8px; z-index: 9999; border-bottom: 2px solid #fbbf24; box-shadow: 0 2px 8px rgba(0,0,0,0.4); -webkit-user-select: text; user-select: text; }
+#dbg-panel .dbg-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid #374151; flex-wrap: wrap; }
+#dbg-panel .dbg-title { color: #fbbf24; font-weight: 700; font-size: 11px; }
+#dbg-panel .dbg-btns { display: flex; gap: 4px; }
+#dbg-panel .dbg-btn { background: #fbbf24; color: #111827; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
+#dbg-panel .dbg-btn.copy { background: #10b981; color: white; }
+#dbg-panel .dbg-btn.reload { background: #3b82f6; color: white; }
+#dbg-panel .dbg-row { display: flex; gap: 6px; padding: 1px 0; align-items: flex-start; }
+#dbg-panel .dbg-t { color: #fbbf24; min-width: 60px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+#dbg-panel .dbg-msg { color: #d1fae5; word-break: break-word; flex: 1; }
+#dbg-panel .dbg-msg.warn { color: #fcd34d; }
+#dbg-panel .dbg-msg.err { color: #fca5a5; }
+#dbg-panel .dbg-msg.ok { color: #86efac; font-weight: 700; }
+#dbg-panel .dbg-msg.flow { color: #93c5fd; font-weight: 700; }
+body.has-dbg { padding-top: 200px; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; min-height: 100vh; padding-bottom: 180px; }
 header { background: #1a1a2e; color: white; padding: 12px 16px; text-align: center; }
@@ -168,7 +184,51 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 .history-pax-num { font-size: 15px; font-weight: 700; min-width: 24px; text-align: center; color: #111827; }
 </style>
 </head>
-<body>
+<body class="has-dbg">
+<!-- === 診断パネル（Phase 3 テスト・本番非搭載） === -->
+<div id="dbg-panel">
+  <div class="dbg-head">
+    <div class="dbg-title">🔧 Phase3 テスト DEBUG（FLAG強制ON）</div>
+    <div class="dbg-btns">
+      <button class="dbg-btn copy" onclick="window.dbgCopy()">📋コピー</button>
+      <button class="dbg-btn reload" onclick="location.reload()">↻リロード</button>
+      <button class="dbg-btn" onclick="document.getElementById('dbg-panel').style.display='none';document.body.classList.remove('has-dbg')">×閉</button>
+    </div>
+  </div>
+  <div id="dbg-log"></div>
+</div>
+<script>
+window.__DBG_T0 = performance.now();
+window.__DBG_LINES = [];
+window.dbgLog = function(msg, cls) {
+  var t = (performance.now() - window.__DBG_T0).toFixed(0);
+  var tStr = t.padStart(6, ' ') + 'ms';
+  window.__DBG_LINES.push('[' + tStr + '] ' + msg);
+  var box = document.getElementById('dbg-log');
+  if (box) {
+    var row = document.createElement('div');
+    row.className = 'dbg-row';
+    row.innerHTML = '<span class="dbg-t">' + tStr + '</span><span class="dbg-msg ' + (cls || '') + '">' + msg.replace(/[<>&]/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]}) + '</span>';
+    box.appendChild(row);
+    var panel = document.getElementById('dbg-panel');
+    if (panel) panel.scrollTop = panel.scrollHeight;
+  }
+};
+window.dbgCopy = function() {
+  var txt = window.__DBG_LINES.join('\n');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(function(){alert('コピーしました');}, function(){
+      var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('コピーしました');
+    });
+  } else {
+    var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('コピーしました');
+  }
+};
+window.dbgLog('=== Phase3テスト版ロード開始（FLAG強制ON） ===', 'flow');
+window.dbgLog('UA: ' + navigator.userAgent);
+window.addEventListener('error', function(e){ window.dbgLog('JSエラー: ' + (e.message||e), 'err'); });
+window.addEventListener('unhandledrejection', function(e){ window.dbgLog('Promise reject: ' + (e.reason && e.reason.message || e.reason), 'err'); });
+</script>
 <header>
   <div class="table-no" id="table-no">テーブル ?</div>
   <h1>SAWATDEE BROS ご注文</h1>
@@ -395,7 +455,8 @@ async function init() {
     const overrides = results[1] || {};
     const ohiyaVal = results[2];
     const showSetVal = results[3];
-    APPROVAL_FLOW_ON = results[4] === true;
+    APPROVAL_FLOW_ON = true; // ← Phase3テスト版：Firebaseのフラグ値に関係なく強制ON
+    window.dbgLog && window.dbgLog('APPROVAL_FLOW_ON = true（強制）', 'flow');
     MENU_DATA = menuData || {};
     // menu_overridesをマージ（drink_count等の上書き項目を反映）
     if (Object.keys(overrides).length > 0) {
@@ -943,13 +1004,16 @@ window.confirmOrder = async function() {
 
   // === Phase 3：スタッフ承認フロー（APPROVAL_FLOW_ON時のみ）===
   if (APPROVAL_FLOW_ON) {
+    window.dbgLog && window.dbgLog('Phase3 ENTER: tables/' + tableNum + '/session 確認開始', 'flow');
     // セッション確認：tables/{tableNum}/session が有効ならstatus:'new'、無効ならstatus:'pending_approval'
     var hasValidSession = false;
     try {
       var session = await fbRestGet('tables/' + tableNum + '/session');
       hasValidSession = session && session.expiresAt && session.expiresAt > Date.now();
-    } catch(e) { console.error('セッション確認失敗:', e); }
+      window.dbgLog && window.dbgLog('session=' + JSON.stringify(session) + ' / hasValidSession=' + hasValidSession, hasValidSession ? 'ok' : 'warn');
+    } catch(e) { console.error('セッション確認失敗:', e); window.dbgLog && window.dbgLog('セッション確認失敗:' + e.message, 'err'); }
     orderData.status = hasValidSession ? 'new' : 'pending_approval';
+    window.dbgLog && window.dbgLog('orderData.status = ' + orderData.status, 'flow');
     var orderId;
     try {
       orderId = await fbRestPush('orders', orderData);
@@ -997,24 +1061,27 @@ async function pollOrderStatus(orderId) {
   var POLL_MS = 3000;
   var TIMEOUT_MS = 5 * 60 * 1000;
   var startTime = Date.now();
+  window.dbgLog && window.dbgLog('poll開始 orderId=' + orderId, 'flow');
   while (Date.now() - startTime < TIMEOUT_MS) {
     await new Promise(function(r) { setTimeout(r, POLL_MS); });
     try {
       var status = await fbRestGet('orders/' + orderId + '/status');
+      window.dbgLog && window.dbgLog('poll status=' + status);
       if (status === 'new') {
-        // 承認された → 通常完了UIへ遷移
+        window.dbgLog && window.dbgLog('承認された → 通常完了UIへ', 'ok');
         document.getElementById('order-waiting-content').style.display = 'none';
         document.getElementById('order-success-content').style.display = 'block';
         setTimeout(function() { window.closeOrderConfirm(); }, 2500);
         return;
       } else if (status === 'rejected') {
+        window.dbgLog && window.dbgLog('拒否された → お声がけUIへ', 'warn');
         document.getElementById('order-waiting-content').style.display = 'none';
         document.getElementById('order-rejected-content').style.display = 'block';
         return;
       }
-    } catch(e) { console.error('status監視エラー:', e); }
+    } catch(e) { console.error('status監視エラー:', e); window.dbgLog && window.dbgLog('poll エラー:' + e.message, 'err'); }
   }
-  // タイムアウト：安全側に倒して「店員にお声がけ」表示
+  window.dbgLog && window.dbgLog('poll タイムアウト → お声がけUIへ', 'warn');
   document.getElementById('order-waiting-content').style.display = 'none';
   document.getElementById('order-rejected-content').style.display = 'block';
 }
