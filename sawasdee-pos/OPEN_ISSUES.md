@@ -5,6 +5,64 @@
 
 ---
 
+## 🚧 進行中：スタッフ承認フロー実装（2026-05-08着手）
+
+director裁定により、Phase 1 セキュリティ機能（テーブル占有チェック）をサワディーブロス本店に先行実装中。SaaS化に向けた実証も兼ねる。
+
+### フェーズ進捗
+- [x] **フェーズ1**：feature flag `enable_approval_flow` 追加（kitchen/customer/handy/nomi の4画面で読み出し済・全部false固定）。動作変更なし（2026-05-09再投入完了・1ファイルずつ単独で動作確認）
+- [x] **フェーズ2**：`tables/{tableNum}/session` 実装（kitchen.html）。changePax で issueTableSession・markPaid で clearTableSession を呼び出し。書き込みはRESTで独立化（2026-05-09 E2E成功確認・iPadのPAX +ボタン押下→Firebase consoleで `tables/{T番号}/session` 出現確認・TTL3時間正常）
+- [x] **Phase 5a（部分先行）**：`tables/` ノードへの匿名書き込み許可をFirebase Rulesに1行追加（2026-05-09・director承認下で最小スコープ実施・他ルール非干渉・既存ルールバックアップ取得済）
+- [ ] **フェーズ3**：customer.html — 注文送信前にセッション確認、pending_approval分岐、status監視（REST polling 3〜5秒）。**人数入力UI削除＋pax自動参照も同時実施**
+- [ ] **フェーズ4**：kitchen.html — 承認待ちエリア、承認/拒否モーダル、一括拒否
+- [ ] **Phase 5b**：reservation関連Rule追加（後日まとめて）
+- [ ] **Phase 5本体**：HMAC署名QR等の本格Rules大改修（後日まとめて）
+- [ ] **フェーズ6**：営業終了後フラグON → 最低3営業日観察
+
+### Phase 5a（2026-05-09実施）の記録
+- 追加内容：`"tables": { ".read": true, ".write": true }` 1行のみ
+- 既存ルールバックアップ：`rules-backup-20260509.json` （takuyaローカル保存済）
+- 投入後の既存機能確認：customer/kitchen/handy 全て動作OK
+- E2E確認：iPadでkitchen→伝票タブ→PAX +ボタン押下 → `tables/7/session/` 出現（pax=2, issuedBy=kitchen, expiresAt=startedAt+3時間）
+- 想定外の症状：なし
+
+### フェーズ4で必ず修正する箇所（status分岐ロジック）
+新status（`pending_approval` / `rejected`）が混入したときに既存コードが想定外動作するため、以下の箇所を精密修正：
+
+**kitchen.html（要：rejectedを未会計から除外）**
+- 861行：`if (o.status !== 'paid') unpaidTables.add(...)` → rejectedも除外
+- 1158行：`data[id].status !== 'done' && data[id].status !== 'paid'` → 取込はOK・ただし rejected/pending_approval は別エリア表示分岐を追加
+- 1188行：同上
+- 1194行：`orders[oid].status !== 'done'` → rejected除外
+- 1249行：`var isUnpaid = o.status !== 'paid'` → rejected除外
+- 1766/1774/1808/1854行：伝票/セッション集計の各分岐に rejected 除外を追加
+
+**bills.html（要：rejectedを未会計から除外）**
+- 483行：`if (o.status!=='done' && o.status!=='paid') activeCount++` → rejected除外
+- 686行：`all[id].status !== 'done' && all[id].status !== 'paid'` → rejected除外
+
+**sales.html（修正不要・現状で正解）**
+- `'paid' || 'done'` でフィルタしているのでpending_approval/rejectedは自動的に売上集計対象外
+
+### HMAC署名QRは別タスク
+director裁定により、テーブル占有チェック完了後、別bug-fixサイクルで対応。
+
+### rejected注文の自動削除（後回しOKの小タスク）
+rejected注文がFirebase上に積み上がる懸念。`cleanup_orders.html` を拡張して「rejected注文を30日後自動削除」を追加する。
+
+### 2026-05-08 事故の最終究明結果（2026-05-09判明）
+昨日の「過去の伝票表示されない・注文も受信しない」症状の真因：
+- kitchen.htmlの**既存バグ**で、`?mode=bills` URLパラメータで開いた場合に
+  `var _bOrders = {};` 宣言行（1236行目あたり）よりも先にトップレベルから
+  `setMode('bills')` → `buildSessions()` → `Object.keys(_bOrders)` が呼ばれて
+  `_bOrders` が `var` ホイストで undefined → TypeError → トップレベル中断 →
+  後続の `const _newIdTs` などがTDZ → kitchen.html全体が壊れる
+- フェーズ1+2投入とは無関係の既存バグ。たまたまPCで `?mode=bills` で開いていたため発覚した
+- 修正：`buildSessions` 冒頭に `var bOrders = _bOrders || {};` ガードを追加（コミット d8e1da5）
+- 「カスタマから注文できない」の方は再現せず、Cloudflare中間反映やキャッシュ汚染が疑われる（再発時に深掘り）
+
+---
+
 ## 動作確認待ち
 
 ### 客向け画面のREST化（読み込み 2026-05-08、書き込み 2026-05-09・両方完了）
