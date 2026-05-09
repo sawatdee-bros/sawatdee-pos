@@ -339,6 +339,36 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
+// === REST書き込みヘルパー（tables/ 等の新規ノードへの書き込み専用） ===
+// SDKのset()はFirebase Rules拒否時に内部キューが詰まり他の書き込みに副作用を与える可能性があるため、
+// 新規ノードへの書き込みはRESTで独立させる。既存のorders/pax等のSDK書き込みはそのまま。
+const FB_REST_BASE = FC.databaseURL;
+async function fbRestSet(path, data, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_REST_BASE + '/' + path + '.json', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data),
+      signal: ctrl.signal
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
+async function fbRestRemove(path, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_REST_BASE + '/' + path + '.json', { method: 'DELETE', signal: ctrl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return true;
+  } finally { clearTimeout(timer); }
+}
+
 // 営業日切り替え時刻・チャージ設定（store_configから動的取得）
 let DAY_START = 8;
 let _CHARGE_PER_PERSON = 250;
@@ -1302,10 +1332,41 @@ window.setFilter = function(f) {
   }
 })();
 
+// === スタッフ承認フロー：テーブルセッション管理（フェーズ2再投入版・REST書き込み） ===
+// PAX入力時に tables/{tableNum}/session を発行（フェーズ3以降の承認フローで参照）。
+// 会計完了時に削除。書き込みはRESTで独立させ、Rules拒否時もSDKキューに影響しないようにする。
+const SESSION_TTL_MS = 3 * 60 * 60 * 1000; // 3時間
+
+async function issueTableSession(tableNum, pax) {
+  if (!pax || pax < 1) return;
+  const now = Date.now();
+  try {
+    await fbRestSet('tables/' + tableNum + '/session', {
+      startedAt: now,
+      expiresAt: now + SESSION_TTL_MS,
+      pax: pax,
+      issuedBy: 'kitchen'
+    });
+  } catch(e) {
+    console.error('テーブルセッション発行失敗:', e);
+  }
+}
+
+async function clearTableSession(tableNum) {
+  try {
+    await fbRestRemove('tables/' + tableNum + '/session');
+  } catch(e) {
+    // 既に存在しない場合のエラーは無視
+  }
+}
+
 window.changePax = function(t, d) {
   if (!_bPax[t]) _bPax[t] = 0;
   _bPax[t] = Math.max(0, _bPax[t]+d);
   set(ref(db, 'pax/' + t), _bPax[t]);
+  // テーブルセッション発行（書き込みのみ・読み手はフェーズ3以降）
+  // .catch でPromise reject を握って unhandled rejection 防止
+  if (_bPax[t] > 0) issueTableSession(t, _bPax[t]).catch(function(e) { console.error(e); });
   _billsRender();
 };
 
@@ -1518,6 +1579,7 @@ window.markPaid = function(tableNum, idStr, discountAmount) {
   setTimeout(function() {
     remove(ref(db, 'pax/' + tableNum));
     remove(ref(db, 'bill_calls/' + tableNum));
+    clearTableSession(tableNum).catch(function(e) { console.error(e); });
     _bPax[tableNum] = 0;
   }, 500);
 };
