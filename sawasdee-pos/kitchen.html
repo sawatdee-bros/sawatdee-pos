@@ -1787,9 +1787,11 @@ window.closeEdit = function() {
 // ---- セッション構築 ----
 function buildSessions() {
   var tableMap = {};
-  var keys = Object.keys(_bOrders);
+  // データロード前ガード（`?mode=bills` URLでトップレベルから呼ばれる場合、_bOrdersがまだ未初期化の可能性）
+  var bOrders = _bOrders || {};
+  var keys = Object.keys(bOrders);
   for (var i=0;i<keys.length;i++) {
-    var id=keys[i]; var o=_bOrders[id]; var t=o.table||'?';
+    var id=keys[i]; var o=bOrders[id]; var t=o.table||'?';
     if (!tableMap[t]) tableMap[t]=[];
     tableMap[t].push({id:id,o:o});
   }
