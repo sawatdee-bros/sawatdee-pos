@@ -1825,10 +1825,12 @@ function makeItemRow(item) {
 function _billsRender() {
   var wrap = document.getElementById('receipts-wrap');
   var sessions = buildSessions();
-  var allKeys = Object.keys(_bOrders);
+  // データロード前ガード（`?mode=bills` URLでトップレベルから呼ばれる場合、_bOrdersがvarホイストでundefinedのまま）
+  var bOrders = _bOrders || {};
+  var allKeys = Object.keys(bOrders);
   var activeCount=0, totalSales=0;
   for (var i=0;i<allKeys.length;i++) {
-    var o=_bOrders[allKeys[i]];
+    var o=bOrders[allKeys[i]];
     if (o.status!=='done'&&o.status!=='paid') activeCount++;
   }
   for (var i=0;i<sessions.length;i++) {
