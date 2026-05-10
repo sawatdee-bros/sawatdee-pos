@@ -480,6 +480,8 @@ function render() {
   var activeCount=0, totalSales=0;
   for (var i=0;i<allKeys.length;i++) {
     var o=allOrders[allKeys[i]];
+    // Phase 4: pending_approval/rejected は伝票画面に出さない
+    if (o.status==='pending_approval'||o.status==='rejected') continue;
     if (o.status!=='done'&&o.status!=='paid') activeCount++;
   }
   for (var i=0;i<sessions.length;i++) {
@@ -682,8 +684,8 @@ var _knownOrderIds = null;
 onValue(ref(db,'orders'), function(snap) {
   var all = snap.val()||{};
   var todayStart = getTodayStart();
-  // 新規注文検知
-  var currentIds = Object.keys(all).filter(function(id){ return all[id].status !== 'done' && all[id].status !== 'paid'; });
+  // 新規注文検知（Phase 4: pending_approval/rejected は伝票画面に出さない）
+  var currentIds = Object.keys(all).filter(function(id){ var st = all[id].status; return st !== 'done' && st !== 'paid' && st !== 'pending_approval' && st !== 'rejected'; });
   if (_knownOrderIds !== null) {
     var newIds = currentIds.filter(function(id){ return _knownOrderIds.indexOf(id) < 0; });
     if (newIds.length > 0) _playBeep();

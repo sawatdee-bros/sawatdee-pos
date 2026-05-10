@@ -191,6 +191,47 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .edit-save-btn { width: 100%; padding: 11px; background: #166534; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 14px; }
 .edit-close-btn { width: 100%; padding: 9px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; margin-top: 8px; }
 
+/* === Phase 4: 承認待ちフルスクリーンオーバーレイ === */
+.approval-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.92); z-index: 9000; display: none; padding: 20px 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.approval-overlay.open { display: block; }
+.approval-box { max-width: 720px; margin: 0 auto; }
+.approval-title { color: #fcd34d; font-size: 24px; font-weight: 800; text-align: center; padding: 16px 0 18px; letter-spacing: 0.05em; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+.approval-card { background: #1e293b; border: 2px solid #fbbf24; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+.approval-card-table { font-size: 22px; font-weight: 800; color: #f1f5f9; margin-bottom: 6px; }
+.approval-card-summary { font-size: 14px; color: #94a3b8; margin-bottom: 10px; }
+.approval-card-items { background: #0f172a; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; max-height: 30vh; overflow-y: auto; }
+.approval-card-items > div { font-size: 14px; color: #e2e8f0; padding: 3px 0; }
+.approval-card-pax { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; margin-bottom: 12px; }
+.approval-card-pax > span:first-child { font-size: 14px; color: #94a3b8; flex: 1; }
+.approval-card-pax-num { font-size: 18px; font-weight: 700; color: #fbbf24; min-width: 50px; text-align: center; }
+.approval-card-pax button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 20px; font-weight: 700; cursor: pointer; }
+.approval-card-pax button:active { background: #334155; }
+.approval-card-btns { display: flex; gap: 10px; }
+.approval-reject-btn { flex: 1; padding: 14px; background: #7f1d1d; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; }
+.approval-reject-btn:active { background: #991b1b; }
+.approval-approve-btn { flex: 2; padding: 14px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 800; cursor: pointer; }
+.approval-approve-btn:active { background: #15803d; }
+.approval-bulk-reject { width: 100%; padding: 12px; background: transparent; border: 1px solid #ef4444; border-radius: 10px; color: #fca5a5; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+
+/* === Phase 4: 席案内モーダル === */
+.arrive-btn-header { padding: 6px 12px; background: #1d4ed8; border: none; border-radius: 8px; color: white; font-size: 13px; font-weight: 700; cursor: pointer; margin-right: 4px; }
+.arrive-btn-header:active { background: #1e40af; }
+.arrive-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 8000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.arrive-modal.open { display: flex; }
+.arrive-box { background: #1e293b; border-radius: 14px; padding: 20px; width: 100%; max-width: 420px; max-height: 80vh; overflow-y: auto; }
+.arrive-title { font-size: 18px; font-weight: 800; color: #f1f5f9; margin-bottom: 14px; text-align: center; }
+.arrive-tables { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+.arrive-table-btn { padding: 14px 6px; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 13px; font-weight: 700; cursor: pointer; }
+.arrive-table-btn.active { background: #fbbf24; color: #1a1200; border-color: #fbbf24; }
+.arrive-table-btn.in-session { opacity: 0.4; }
+.arrive-pax-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid #334155; margin-top: 10px; }
+.arrive-pax-row > span:first-child { font-size: 14px; color: #94a3b8; flex: 1; }
+.arrive-pax-num { font-size: 22px; font-weight: 800; color: #fbbf24; min-width: 60px; text-align: center; }
+.arrive-pax-row button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 22px; font-weight: 700; cursor: pointer; }
+.arrive-btns { display: flex; gap: 10px; margin-top: 14px; }
+.arrive-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; border-radius: 8px; color: #94a3b8; font-size: 14px; cursor: pointer; }
+.arrive-issue { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 800; cursor: pointer; }
+.arrive-issue:disabled { background: #475569; cursor: default; }
 
 </style>
 </head>
@@ -203,6 +244,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   <div style="display:flex;align-items:center;gap:10px">
     <span class="status-dot"></span><span class="conn-label">受信中</span>
     <div class="icon-btns">
+      <button class="arrive-btn-header" onclick="window.openArriveModal()" title="お客様ご来店">🪑 席案内</button>
       <button class="audio-icon-btn" id="audio-icon-btn" onclick="window.toggleAudio()" title="音声ON/OFF">
         🔔
         <svg class="audio-slash" id="audio-slash" viewBox="0 0 28 28">
@@ -323,6 +365,27 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
 </nav>
 
+<!-- Phase 4: 承認待ちフルスクリーンオーバーレイ（pending_approval が1件以上で自動出現） -->
+<div class="approval-overlay" id="approval-overlay"></div>
+
+<!-- Phase 4: 席案内モーダル -->
+<div class="arrive-modal" id="arrive-modal">
+  <div class="arrive-box">
+    <div class="arrive-title">🪑 お客様ご来店・席案内</div>
+    <div id="arrive-tables-grid" class="arrive-tables"></div>
+    <div class="arrive-pax-row">
+      <span>人数</span>
+      <button onclick="window.arriveChangePax(-1)">−</button>
+      <span class="arrive-pax-num" id="arrive-pax-num">1名</span>
+      <button onclick="window.arriveChangePax(1)">+</button>
+    </div>
+    <div class="arrive-btns">
+      <button class="arrive-cancel" onclick="window.closeArriveModal()">キャンセル</button>
+      <button class="arrive-issue" id="arrive-issue-btn" onclick="window.confirmArrive()" disabled>セッション発行</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, update, remove, push, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -343,6 +406,16 @@ const db = getDatabase(app);
 // SDKのset()はFirebase Rules拒否時に内部キューが詰まり他の書き込みに副作用を与える可能性があるため、
 // 新規ノードへの書き込みはRESTで独立させる。既存のorders/pax等のSDK書き込みはそのまま。
 const FB_REST_BASE = FC.databaseURL;
+async function fbRestGet(path, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_REST_BASE + '/' + path + '.json', { signal: ctrl.signal, cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
 async function fbRestSet(path, data, timeoutMs) {
   if (!timeoutMs) timeoutMs = 10000;
   const ctrl = new AbortController();
@@ -887,10 +960,10 @@ function _billsFilterBarUpdate() {
     var f = btn.dataset.filter;
     if (f !== 'unpaid' && f !== 'paid' && f !== 'week' && f !== 'serving' && f !== 'served') btn.remove();
   });
-  // 会計前の注文があるテーブルを収集
+  // 会計前の注文があるテーブルを収集（Phase 4: pending_approval/rejected は除外）
   var unpaidTables = new Set();
   Object.values(_bOrders).forEach(function(o) {
-    if (o.status !== 'paid') unpaidTables.add(String(o.table));
+    if (o.status !== 'paid' && o.status !== 'pending_approval' && o.status !== 'rejected') unpaidTables.add(String(o.table));
   });
   // テーブル番号順にボタンを追加
   var tables = Array.from(unpaidTables).sort(function(a, b) { return Number(a) - Number(b); });
@@ -1136,6 +1209,24 @@ function playSound(type) {
   var ctx = getAudioCtx();
   if (!ctx) return;
   if (ctx.state === 'suspended') { ctx.resume(); return; }
+  if (type === 'approval') {
+    // 承認待ち：ピーン・ピーン↓（警告系・既存音と区別）
+    function ding(startTime) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(660, startTime);
+      osc.frequency.linearRampToValueAtTime(520, startTime + 0.18);
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(4.5, startTime + 0.02);
+      gain.gain.linearRampToValueAtTime(0, startTime + 0.32);
+      osc.start(startTime); osc.stop(startTime + 0.36);
+    }
+    var t = ctx.currentTime;
+    ding(t); ding(t + 0.42);
+    return;
+  }
   if (type === 'drink') {
     // ドリンク：ピピッ（高音2連打）
     function pip(startTime) {
@@ -1215,9 +1306,10 @@ onValue(ref(db, 'orders'), (snap) => {
     showBell(hasDrink, hasFood);
   }
   Object.keys(orders).forEach(id => delete orders[id]);
-  // まず全注文を仮読み込み
+  // まず全注文を仮読み込み（Phase 4: pending_approval/rejected は除外・承認オーバーレイ経路で別途処理）
   Object.keys(data).forEach(id => {
-    if (data[id].status !== 'paid') orders[id] = data[id];
+    var st = data[id].status;
+    if (st !== 'paid' && st !== 'pending_approval' && st !== 'rejected') orders[id] = data[id];
   });
   // doneのうち同テーブルに未完了がない注文は除外
   Object.keys(orders).forEach(id => {
@@ -1226,6 +1318,12 @@ onValue(ref(db, 'orders'), (snap) => {
     const hasPending = Object.keys(orders).some(oid => oid !== id && orders[oid].table === tbl && orders[oid].status !== 'done');
     if (!hasPending) delete orders[id];
   });
+  // Phase 4: 承認待ち注文（pending_approval）を別途構築・承認オーバーレイUIで使用
+  Object.keys(_pendingApprovalOrders).forEach(id => delete _pendingApprovalOrders[id]);
+  Object.keys(data).forEach(id => {
+    if (data[id].status === 'pending_approval') _pendingApprovalOrders[id] = data[id];
+  });
+  renderApprovalOverlay();
   renderOrders();
   if (firstLoad) applyAudioState();
   firstLoad = false;
@@ -1236,6 +1334,202 @@ onValue(ref(db, 'orders'), (snap) => {
 var _bOrders = {};
 var _bFilter = 'serving';
 var _bPax = {};
+
+// === Phase 4: 承認待ち注文（pending_approval）状態管理 ===
+var _pendingApprovalOrders = {};       // { orderId: orderData }
+var _pendingApprovalPax = {};          // { tableNum: paxValue } - モーダル内のpax入力値
+var _lastPendingIds = new Set();       // 前回検知したID集合（新規検知用）
+var _approvalSoundShown = false;       // 初回ロード時は音を鳴らさないフラグ
+
+// === Phase 4: 承認待ちフルスクリーンオーバーレイ ===
+function renderApprovalOverlay() {
+  var overlay = document.getElementById('approval-overlay');
+  if (!overlay) return;
+  // tableNum でグルーピング
+  var byTable = {};
+  Object.keys(_pendingApprovalOrders).forEach(function(id) {
+    var o = _pendingApprovalOrders[id];
+    var t = String(o.table || '?');
+    if (!byTable[t]) byTable[t] = [];
+    byTable[t].push({id: id, o: o});
+  });
+  var tables = Object.keys(byTable).sort(function(a,b){ return Number(a) - Number(b); });
+  // 件数0なら閉じる
+  if (tables.length === 0) {
+    overlay.classList.remove('open');
+    overlay.innerHTML = '';
+    _lastPendingIds = new Set();
+    return;
+  }
+  // 新規検知（音）
+  var currentIds = new Set(Object.keys(_pendingApprovalOrders));
+  var hasNew = false;
+  currentIds.forEach(function(id) { if (!_lastPendingIds.has(id)) hasNew = true; });
+  _lastPendingIds = currentIds;
+  if (hasNew && _approvalSoundShown) playSound('approval');
+  _approvalSoundShown = true; // 初回はスキップ、2回目以降に鳴らす（既存pendingでロード時に音鳴らさない）
+  // 描画
+  var html = '<div class="approval-box">';
+  html += '<div class="approval-title">⏳ 承認待ち（' + tables.length + '卓）</div>';
+  tables.forEach(function(t) {
+    var entries = byTable[t];
+    var totalAmount = 0;
+    var allItems = [];
+    entries.forEach(function(e) {
+      totalAmount += e.o.total || 0;
+      (e.o.items || []).forEach(function(it) { allItems.push(it); });
+    });
+    var pax = _pendingApprovalPax[t] !== undefined ? _pendingApprovalPax[t] : 1;
+    var tableLabel = (TABLE_NAMES_SHORT[t] || ('T'+t));
+    html += '<div class="approval-card">';
+    html += '<div class="approval-card-table">' + tableLabel + '</div>';
+    html += '<div class="approval-card-summary">注文 ' + entries.length + '件 / ' + allItems.length + '品 ¥' + (totalAmount).toLocaleString() + '</div>';
+    html += '<div class="approval-card-items">';
+    allItems.forEach(function(it) {
+      var qty = it.qty > 1 ? ' × ' + it.qty : '';
+      html += '<div>・' + (it.name || '') + qty + '</div>';
+    });
+    html += '</div>';
+    html += '<div class="approval-card-pax">';
+    html += '<span>人数</span>';
+    html += '<button onclick="window.approvalPaxChange(\'' + t + '\', -1)">−</button>';
+    html += '<span class="approval-card-pax-num">' + pax + '名</span>';
+    html += '<button onclick="window.approvalPaxChange(\'' + t + '\', 1)">+</button>';
+    html += '</div>';
+    html += '<div class="approval-card-btns">';
+    html += '<button class="approval-reject-btn" onclick="window.rejectTable(\'' + t + '\')">拒否</button>';
+    html += '<button class="approval-approve-btn" onclick="window.approveTable(\'' + t + '\')">承認</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+  if (tables.length > 1) {
+    html += '<button class="approval-bulk-reject" onclick="window.rejectAllPending()">全件まとめて拒否</button>';
+  }
+  html += '</div>';
+  overlay.innerHTML = html;
+  overlay.classList.add('open');
+}
+
+window.approvalPaxChange = function(t, d) {
+  if (_pendingApprovalPax[t] === undefined) _pendingApprovalPax[t] = 1;
+  _pendingApprovalPax[t] = Math.max(1, _pendingApprovalPax[t] + d);
+  renderApprovalOverlay();
+};
+
+window.approveTable = async function(t) {
+  var pax = _pendingApprovalPax[t] !== undefined ? _pendingApprovalPax[t] : 1;
+  if (pax < 1) { alert('人数を1名以上入力してください'); return; }
+  // 該当テーブルの全 pending_approval を 'new' に
+  var ids = [];
+  Object.keys(_pendingApprovalOrders).forEach(function(id) {
+    if (String(_pendingApprovalOrders[id].table) === t) ids.push(id);
+  });
+  for (var i = 0; i < ids.length; i++) {
+    try { await fbRestSet('orders/' + ids[i] + '/status', 'new'); } catch(e) { console.error(e); }
+  }
+  // セッション発行
+  try { await issueTableSession(t, pax); } catch(e) { console.error(e); }
+  // pax永続化
+  try { await fbRestSet('pax/' + t, pax); _bPax[t] = pax; } catch(e) { console.error(e); }
+  delete _pendingApprovalPax[t];
+};
+
+window.rejectTable = async function(t) {
+  if (!confirm('テーブル ' + (TABLE_NAMES_SHORT[t] || ('T'+t)) + ' の注文を拒否しますか？')) return;
+  var ids = [];
+  Object.keys(_pendingApprovalOrders).forEach(function(id) {
+    if (String(_pendingApprovalOrders[id].table) === t) ids.push(id);
+  });
+  for (var i = 0; i < ids.length; i++) {
+    try { await fbRestSet('orders/' + ids[i] + '/status', 'rejected'); } catch(e) { console.error(e); }
+  }
+  delete _pendingApprovalPax[t];
+};
+
+window.rejectAllPending = async function() {
+  var ids = Object.keys(_pendingApprovalOrders);
+  if (ids.length === 0) return;
+  if (!confirm(ids.length + '件まとめて拒否します。よろしいですか？')) return;
+  for (var i = 0; i < ids.length; i++) {
+    try { await fbRestSet('orders/' + ids[i] + '/status', 'rejected'); } catch(e) { console.error(e); }
+  }
+  _pendingApprovalPax = {};
+};
+
+// === Phase 4: 席案内モーダル ===
+var _arriveSelectedTable = null;
+var _arrivePax = 1;
+var _arriveActiveSessions = {}; // { tableNum: true } - 既セッション中
+
+window.openArriveModal = async function() {
+  _arriveSelectedTable = null;
+  _arrivePax = 1;
+  // 既セッション中テーブルをFirebaseから取得
+  try {
+    var snap = await fbRestGet('tables');
+    var data = snap || {};
+    _arriveActiveSessions = {};
+    var now = Date.now();
+    Object.keys(data).forEach(function(t) {
+      var s = data[t] && data[t].session;
+      if (s && s.expiresAt && s.expiresAt > now) _arriveActiveSessions[t] = true;
+    });
+  } catch(e) { _arriveActiveSessions = {}; console.error('arrive: tables 取得失敗', e); }
+  renderArriveModal();
+  document.getElementById('arrive-modal').classList.add('open');
+};
+
+window.closeArriveModal = function() {
+  document.getElementById('arrive-modal').classList.remove('open');
+};
+
+function renderArriveModal() {
+  var grid = document.getElementById('arrive-tables-grid');
+  if (!grid) return;
+  var count = _TABLE_COUNT || 10;
+  var html = '';
+  for (var n = 1; n <= count; n++) {
+    var label = TABLE_NAMES_SHORT[n] || ('T'+n);
+    var inSession = _arriveActiveSessions[String(n)] ? ' in-session' : '';
+    var active = (_arriveSelectedTable === String(n)) ? ' active' : '';
+    html += '<button class="arrive-table-btn' + inSession + active + '" onclick="window.arriveSelectTable(\'' + n + '\')">' + label + '</button>';
+  }
+  grid.innerHTML = html;
+  document.getElementById('arrive-pax-num').textContent = _arrivePax + '名';
+  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
+}
+
+window.arriveSelectTable = function(t) {
+  _arriveSelectedTable = String(t);
+  renderArriveModal();
+};
+
+window.arriveChangePax = function(d) {
+  _arrivePax = Math.max(1, _arrivePax + d);
+  renderArriveModal();
+};
+
+window.confirmArrive = async function() {
+  if (!_arriveSelectedTable || _arrivePax < 1) return;
+  var t = _arriveSelectedTable;
+  var pax = _arrivePax;
+  var btn = document.getElementById('arrive-issue-btn');
+  btn.disabled = true;
+  btn.textContent = '発行中...';
+  try {
+    await issueTableSession(t, pax);
+    await fbRestSet('pax/' + t, pax);
+    _bPax[t] = pax;
+  } catch(e) {
+    console.error('席案内発行失敗:', e);
+    alert('セッション発行に失敗しました。もう一度お試しください。');
+    btn.disabled = false;
+    btn.textContent = 'セッション発行';
+    return;
+  }
+  btn.textContent = 'セッション発行';
+  window.closeArriveModal();
+};
 
 // Firebase paxノードを監視して_bPaxを同期
 onValue(ref(db, 'pax'), function(snap) {
@@ -1278,6 +1572,8 @@ function _updateBillsData(allData) {
   Object.keys(allData).forEach(function(id) {
     var o = allData[id];
     // 未会計orderは時間フィルターに関係なく常に表示
+    // Phase 4: pending_approval/rejected は伝票画面に出さない（承認オーバーレイ専用）
+    if (o.status === 'pending_approval' || o.status === 'rejected') return;
     var isUnpaid = o.status !== 'paid';
     if (isUnpaid || (o.timestamp||0) >= rangeStart) _bOrders[id] = o;
   });

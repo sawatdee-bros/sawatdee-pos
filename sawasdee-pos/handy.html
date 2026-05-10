@@ -78,14 +78,55 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #166534; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 200; white-space: nowrap; }
 .toast.show { display: block; animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* === Phase 4: 席案内モーダル === */
+.arrive-btn-header { padding: 6px 10px; background: #1d4ed8; border: none; border-radius: 8px; color: white; font-size: 12px; font-weight: 700; cursor: pointer; }
+.arrive-btn-header:active { background: #1e40af; }
+.arrive-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 800; display: none; align-items: center; justify-content: center; padding: 16px; }
+.arrive-modal.open { display: flex; }
+.arrive-box { background: #1e293b; border-radius: 14px; padding: 18px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; border: 1px solid #334155; }
+.arrive-title { font-size: 17px; font-weight: 800; color: #f1f5f9; margin-bottom: 14px; text-align: center; }
+.arrive-tables { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px; }
+.arrive-table-btn { padding: 14px 4px; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.arrive-table-btn.active { background: #fbbf24; color: #1a1200; border-color: #fbbf24; }
+.arrive-table-btn.in-session { opacity: 0.4; }
+.arrive-pax-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid #334155; margin-top: 6px; }
+.arrive-pax-row > span:first-child { font-size: 13px; color: #94a3b8; flex: 1; }
+.arrive-pax-num { font-size: 22px; font-weight: 800; color: #fbbf24; min-width: 60px; text-align: center; }
+.arrive-pax-row button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 22px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.arrive-btns { display: flex; gap: 10px; margin-top: 12px; }
+.arrive-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; border-radius: 8px; color: #94a3b8; font-size: 14px; cursor: pointer; }
+.arrive-issue { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 800; cursor: pointer; }
+.arrive-issue:disabled { background: #475569; cursor: default; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🍽 ハンディ</h1>
-  <span class="header-table" id="header-table">テーブル未選択</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="arrive-btn-header" onclick="window.openArriveModal()" title="お客様ご来店">🪑 席案内</button>
+    <span class="header-table" id="header-table">テーブル未選択</span>
+  </div>
 </header>
+
+<!-- Phase 4: 席案内モーダル -->
+<div class="arrive-modal" id="arrive-modal">
+  <div class="arrive-box">
+    <div class="arrive-title">🪑 お客様ご来店・席案内</div>
+    <div id="arrive-tables-grid" class="arrive-tables"></div>
+    <div class="arrive-pax-row">
+      <span>人数</span>
+      <button onclick="window.arriveChangePax(-1)">−</button>
+      <span class="arrive-pax-num" id="arrive-pax-num">1名</span>
+      <button onclick="window.arriveChangePax(1)">+</button>
+    </div>
+    <div class="arrive-btns">
+      <button class="arrive-cancel" onclick="window.closeArriveModal()">キャンセル</button>
+      <button class="arrive-issue" id="arrive-issue-btn" onclick="window.confirmArrive()" disabled>セッション発行</button>
+    </div>
+  </div>
+</div>
 
 <!-- テーブル選択 -->
 <div class="table-bar" id="table-bar"></div>
@@ -188,6 +229,92 @@ let TABLE_NAMES = {}; // store_config/table_names_shortから動的読み込み
 function tableName(n) { return TABLE_NAMES[n] || 'T'+n; }
 let GROUPS_DATA = {};
 let APPROVAL_FLOW_ON = false; // フェーズ3以降の承認フローで参照（現状未使用）
+
+// === Phase 4: 席案内モーダル（テーブルセッション発行） ===
+const SESSION_TTL_MS = 3 * 60 * 60 * 1000; // 3時間（kitchen.htmlと同値）
+
+async function issueTableSession(tableNum, pax) {
+  if (!pax || pax < 1) return;
+  const now = Date.now();
+  try {
+    await fbRestSet('tables/' + tableNum + '/session', {
+      startedAt: now,
+      expiresAt: now + SESSION_TTL_MS,
+      pax: pax,
+      issuedBy: 'handy'
+    });
+  } catch(e) { console.error('テーブルセッション発行失敗:', e); }
+}
+
+let _arriveSelectedTable = null;
+let _arrivePax = 1;
+let _arriveActiveSessions = {};
+
+window.openArriveModal = async function() {
+  _arriveSelectedTable = null;
+  _arrivePax = 1;
+  try {
+    const data = await fbRestGet('tables') || {};
+    _arriveActiveSessions = {};
+    const now = Date.now();
+    Object.keys(data).forEach(function(t) {
+      const s = data[t] && data[t].session;
+      if (s && s.expiresAt && s.expiresAt > now) _arriveActiveSessions[t] = true;
+    });
+  } catch(e) { _arriveActiveSessions = {}; console.error('arrive: tables 取得失敗', e); }
+  renderArriveModal();
+  document.getElementById('arrive-modal').classList.add('open');
+};
+
+window.closeArriveModal = function() {
+  document.getElementById('arrive-modal').classList.remove('open');
+};
+
+function renderArriveModal() {
+  const grid = document.getElementById('arrive-tables-grid');
+  if (!grid) return;
+  let html = '';
+  for (let n = 1; n <= TABLE_COUNT; n++) {
+    const label = TABLE_NAMES[n] || ('T'+n);
+    const inSession = _arriveActiveSessions[String(n)] ? ' in-session' : '';
+    const active = (_arriveSelectedTable === String(n)) ? ' active' : '';
+    html += '<button class="arrive-table-btn' + inSession + active + '" onclick="window.arriveSelectTable(\'' + n + '\')">' + label + '</button>';
+  }
+  grid.innerHTML = html;
+  document.getElementById('arrive-pax-num').textContent = _arrivePax + '名';
+  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
+}
+
+window.arriveSelectTable = function(t) {
+  _arriveSelectedTable = String(t);
+  renderArriveModal();
+};
+
+window.arriveChangePax = function(d) {
+  _arrivePax = Math.max(1, _arrivePax + d);
+  renderArriveModal();
+};
+
+window.confirmArrive = async function() {
+  if (!_arriveSelectedTable || _arrivePax < 1) return;
+  const t = _arriveSelectedTable;
+  const pax = _arrivePax;
+  const btn = document.getElementById('arrive-issue-btn');
+  btn.disabled = true;
+  btn.textContent = '発行中...';
+  try {
+    await issueTableSession(t, pax);
+    await fbRestSet('pax/' + t, pax);
+  } catch(e) {
+    console.error('席案内発行失敗:', e);
+    alert('セッション発行に失敗しました。もう一度お試しください。');
+    btn.disabled = false;
+    btn.textContent = 'セッション発行';
+    return;
+  }
+  btn.textContent = 'セッション発行';
+  window.closeArriveModal();
+};
 
 let currentTable = null;
 let currentCat = 'drink';
