@@ -924,6 +924,9 @@ window.removeItem = function(id, idx) {
 
 window.groupDoneMulti = async function(idStr, type) {
   const ids = idStr.split(',').filter(Boolean);
+  // 全idを事前に _selfWriteIds に追加（onValue発火時の誤検知防止）
+  // 既存バグ：順次updateの間に1個目のupdateで onValue発火 → 他idがstatus='new'のまま新規扱い → NEWバッジ+通知音誤発火
+  ids.forEach(id => _selfWriteIds.add(id));
   for (const id of ids) {
     await window.groupDone(id, type);
   }
