@@ -265,10 +265,15 @@ async function issueTableSession(tableNum, pax) {
 let _arriveSelectedTable = null;
 let _arrivePax = 1;
 let _arriveActiveSessions = {};
+// Phase 4 追補：注文送信時の強制モード用
+let _pendingOrderResolve = null;
+let _arriveForcedTable = null;
 
 window.openArriveModal = async function() {
   _arriveSelectedTable = null;
   _arrivePax = 1;
+  _arriveForcedTable = null; // 通常モード（強制モード状態をクリア）
+  if (_pendingOrderResolve) { _pendingOrderResolve(false); _pendingOrderResolve = null; }
   try {
     const data = await fbRestGet('tables') || {};
     _arriveActiveSessions = {};
@@ -279,11 +284,23 @@ window.openArriveModal = async function() {
     });
   } catch(e) { _arriveActiveSessions = {}; console.error('arrive: tables 取得失敗', e); }
   renderArriveModal();
+  // 通常モード：タイトル・ボタン文言を初期状態に
+  const titleEl = document.querySelector('#arrive-modal .arrive-title');
+  if (titleEl) titleEl.textContent = '🪑 お客様ご来店・席案内';
+  const issueBtn = document.getElementById('arrive-issue-btn');
+  if (issueBtn) issueBtn.textContent = 'セッション発行';
   document.getElementById('arrive-modal').classList.add('open');
 };
 
 window.closeArriveModal = function() {
   document.getElementById('arrive-modal').classList.remove('open');
+  // 強制モードでキャンセルされた → 注文中止
+  if (_pendingOrderResolve) {
+    const r = _pendingOrderResolve;
+    _pendingOrderResolve = null;
+    _arriveForcedTable = null;
+    r(false);
+  }
 };
 
 function renderArriveModal() {
@@ -291,10 +308,16 @@ function renderArriveModal() {
   if (!grid) return;
   let html = '';
   for (let n = 1; n <= TABLE_COUNT; n++) {
+    const ns = String(n);
     const label = TABLE_NAMES[n] || ('T'+n);
-    const inSession = _arriveActiveSessions[String(n)] ? ' in-session' : '';
-    const active = (_arriveSelectedTable === String(n)) ? ' active' : '';
-    html += '<button class="arrive-table-btn' + inSession + active + '" onclick="window.arriveSelectTable(\'' + n + '\')">' + label + '</button>';
+    const inSession = _arriveActiveSessions[ns] ? ' in-session' : '';
+    const active = (_arriveSelectedTable === ns) ? ' active' : '';
+    // 強制モード時：注文しようとしている卓以外は disabled（誤って別卓に切替できない）
+    const forcedDisabled = (_arriveForcedTable && _arriveForcedTable !== ns)
+      ? ' disabled style="opacity:0.25;pointer-events:none"'
+      : '';
+    html += '<button class="arrive-table-btn' + inSession + active + '"' + forcedDisabled
+      + ' onclick="window.arriveSelectTable(\'' + n + '\')">' + label + '</button>';
   }
   grid.innerHTML = html;
   const inp = document.getElementById('arrive-pax-input');
@@ -349,10 +372,19 @@ window.confirmArrive = async function() {
     console.error('席案内発行失敗:', e);
     alert('セッション発行に失敗しました。もう一度お試しください。');
     btn.disabled = false;
-    btn.textContent = 'セッション発行';
+    btn.textContent = _pendingOrderResolve ? '発行して注文' : 'セッション発行';
     return;
   }
   btn.textContent = 'セッション発行';
+  // 強制モードからの呼び出し：注文継続のため resolve(true)
+  if (_pendingOrderResolve) {
+    const r = _pendingOrderResolve;
+    _pendingOrderResolve = null;
+    _arriveForcedTable = null;
+    document.getElementById('arrive-modal').classList.remove('open');
+    r(true);
+    return;
+  }
   window.closeArriveModal();
 };
 
@@ -582,6 +614,41 @@ function getSubcatColor(subcat) {
   return _subcatColorCache[subcat];
 }
 
+// Phase 4 追補: 注文送信前のPAXチェック
+// pax/{tableNum} が未入力なら席案内モーダルを強制表示し、入力完了で注文継続
+async function ensurePaxAndSession(tableNum) {
+  let paxVal = 0;
+  try {
+    const p = await fbRestGet('pax/' + tableNum);
+    paxVal = (typeof p === 'number' && p > 0) ? p : 0;
+  } catch(e) {}
+  if (paxVal > 0) return true; // 既に入力済み
+  // 未入力 → 強制モーダルで入力させる
+  return new Promise(function(resolve) {
+    _pendingOrderResolve = resolve;
+    _arriveForcedTable = String(tableNum);
+    _arriveSelectedTable = String(tableNum);
+    _arrivePax = 1;
+    // 既セッションマップを取得（普通の openArriveModal と同じ初期化）
+    fbRestGet('tables').then(function(data) {
+      _arriveActiveSessions = {};
+      const now = Date.now();
+      Object.keys(data || {}).forEach(function(t) {
+        const s = (data[t] || {}).session;
+        if (s && s.expiresAt && s.expiresAt > now) _arriveActiveSessions[t] = true;
+      });
+    }).catch(function(){ _arriveActiveSessions = {}; }).finally(function() {
+      renderArriveModal();
+      // 強制モード時のUI調整
+      const titleEl = document.querySelector('#arrive-modal .arrive-title');
+      if (titleEl) titleEl.textContent = '🪑 ' + (TABLE_NAMES[tableNum] || ('T'+tableNum)) + ' に人数を入力してください';
+      const issueBtn = document.getElementById('arrive-issue-btn');
+      if (issueBtn) { issueBtn.textContent = '発行して注文'; issueBtn.disabled = false; }
+      document.getElementById('arrive-modal').classList.add('open');
+    });
+  });
+}
+
 window.placeOrder = async function() {
   const items = Object.values(cart).map(c => ({
     name: c.name, qty: c.qty, price: c.price,
@@ -590,6 +657,9 @@ window.placeOrder = async function() {
     ...(c.category ? { category: c.category } : {})
   }));
   if (!items.length || !currentTable) return;
+  // PAX チェック（未入力なら強制モーダル）
+  const paxOk = await ensurePaxAndSession(currentTable);
+  if (!paxOk) return; // ユーザがキャンセル
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
   const total = applyRounding(items.filter(i => i.price > 0).reduce((s, i) => s + (i.price_type === 'inclusive' ? i.price : i.price * 1.1) * i.qty, 0));
