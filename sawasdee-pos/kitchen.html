@@ -213,10 +213,9 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .approval-approve-btn:active { background: #15803d; }
 .approval-bulk-reject { width: 100%; padding: 12px; background: transparent; border: 1px solid #ef4444; border-radius: 10px; color: #fca5a5; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
 
-/* === 予約管理ナビ（バッジ付きリンク） === */
-.nav-link { position: relative; display: inline-flex; align-items: center; padding: 6px 10px; background: transparent; border: 1px solid #334155; border-radius: 8px; color: #cbd5e1; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; margin-right: 4px; }
+/* === 予約管理ナビ（icon-btn統一スタイル+バッジ） === */
+.nav-link { position: relative; width: 36px; height: 36px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
 .nav-link:hover { background: #334155; color: #f1f5f9; }
-.nav-link .nav-label { white-space: nowrap; }
 .nav-badge { position: absolute; top: -6px; right: -8px; min-width: 18px; height: 18px; padding: 0 5px; background: #ef4444; color: white; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; border: 2px solid #1e293b; box-sizing: content-box; }
 
 /* === Phase 4: 席案内モーダル === */
@@ -251,16 +250,15 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     <span class="status-dot"></span><span class="conn-label">受信中</span>
     <div class="icon-btns">
       <button class="arrive-btn-header" onclick="window.openArriveModal()" title="お客様ご来店">🪑 席案内</button>
-      <a id="nav-reservation" class="nav-link" href="https://sawatdee-reservation.pages.dev/admin.html" target="_self" title="予約管理">
-        <span class="nav-label">📋 予約</span>
-        <span class="nav-badge" id="reservation-badge" style="display:none">0</span>
-      </a>
       <button class="audio-icon-btn" id="audio-icon-btn" onclick="window.toggleAudio()" title="音声ON/OFF">
         🔔
         <svg class="audio-slash" id="audio-slash" viewBox="0 0 28 28">
           <line x1="4" y1="4" x2="24" y2="24"/>
         </svg>
       </button>
+      <a id="nav-reservation" class="nav-link" href="https://sawatdee-reservation.pages.dev/admin.html" target="_self" title="予約管理">
+        📋<span class="nav-badge" id="reservation-badge" style="display:none">0</span>
+      </a>
       <button class="icon-btn" id="tab-sales-hdr" onclick="window.setMode('sales')" title="売上管理">📊</button>
       <button class="icon-btn" id="tab-admin-hdr" onclick="window.setMode('admin')" title="管理">⚙️</button>
       <button class="icon-btn" id="tab-settings-hdr" onclick="window.setMode('settings')" title="店舗設定">🏪</button>
