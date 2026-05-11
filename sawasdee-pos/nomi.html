@@ -98,6 +98,17 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
 .opt-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; border-radius: 10px; font-size: 14px; color: #94a3b8; cursor: pointer; }
 .opt-confirm { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; color: white; cursor: pointer; }
 .opt-confirm:disabled { background: #334155; cursor: default; color: #64748b; }
+
+/* === 承認待ち/拒否オーバーレイ（Phase 4追補・nomi.html） === */
+.approval-overlay-n { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: center; justify-content: center; padding: 20px; }
+.approval-overlay-n.open { display: flex; }
+.approval-box-n { background: #1e293b; border-radius: 14px; padding: 30px 24px; max-width: 340px; width: 100%; text-align: center; border: 1px solid #334155; }
+.approval-spinner-n { width: 48px; height: 48px; margin: 0 auto 16px; border: 4px solid #334155; border-top-color: #22c55e; border-radius: 50%; animation: nomi-aspin 0.9s linear infinite; }
+@keyframes nomi-aspin { to { transform: rotate(360deg); } }
+.approval-msg-n { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+.approval-sub-n { font-size: 13px; color: #94a3b8; }
+.approval-reject-icon-n { width: 60px; height: 60px; margin: 0 auto 14px; background: #7f1d1d; color: white; border-radius: 50%; font-size: 30px; line-height: 60px; font-weight: 700; }
+.approval-reject-close-n { width: 100%; margin-top: 16px; padding: 12px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -149,6 +160,25 @@ header { background: #1e293b; padding: 12px 16px; border-bottom: 1px solid #3341
       <button class="opt-cancel" onclick="closeOpt()">キャンセル</button>
       <button class="opt-confirm" id="opt-confirm" onclick="confirmOpt()" disabled>追加する</button>
     </div>
+  </div>
+</div>
+
+<!-- Phase 4追補：承認待ちオーバーレイ -->
+<div class="approval-overlay-n" id="approval-waiting-n">
+  <div class="approval-box-n">
+    <div class="approval-spinner-n"></div>
+    <div class="approval-msg-n">店員に確認中です...</div>
+    <div class="approval-sub-n">そのままお待ちください</div>
+  </div>
+</div>
+
+<!-- Phase 4追補：拒否オーバーレイ -->
+<div class="approval-overlay-n" id="approval-rejected-n">
+  <div class="approval-box-n">
+    <div class="approval-reject-icon-n">!</div>
+    <div class="approval-msg-n">お手数ですが</div>
+    <div class="approval-sub-n">店員にお声がけください</div>
+    <button class="approval-reject-close-n" onclick="document.getElementById('approval-rejected-n').classList.remove('open')">閉じる</button>
   </div>
 </div>
 
@@ -449,6 +479,17 @@ window.placeOrder = async function() {
   document.getElementById('order-btn').disabled = true;
   document.getElementById('order-btn').textContent = '送信中...';
 
+  // === Phase 4追補：APPROVAL_FLOW_ON 時はセッション確認 → status 分岐 ===
+  let status = 'new';
+  if (APPROVAL_FLOW_ON) {
+    let hasValidSession = false;
+    try {
+      const session = await fbRestGet('tables/' + tableNum + '/session');
+      hasValidSession = session && session.expiresAt && session.expiresAt > Date.now();
+    } catch(e) { console.error('セッション確認失敗:', e); }
+    status = hasValidSession ? 'new' : 'pending_approval';
+  }
+
   // 飲み放題とフードを別々のordersとして送信（飲み放題はtotal:0）
   const promises = [];
   if (nomiItems.length > 0) {
@@ -456,7 +497,7 @@ window.placeOrder = async function() {
       table: String(tableNum),
       items: nomiItems,
       total: 0,
-      status: 'new',
+      status: status,
       timestamp: Date.now(),
       source: 'nomi'
     }));
@@ -467,12 +508,21 @@ window.placeOrder = async function() {
       table: String(tableNum),
       items: foodItems,
       total: foodTotal,
-      status: 'new',
+      status: status,
       timestamp: Date.now(),
       source: 'nomi'
     }));
   }
-  await Promise.all(promises);
+  let orderIds;
+  try {
+    orderIds = await Promise.all(promises);
+  } catch(e) {
+    console.error('注文送信失敗:', e);
+    document.getElementById('order-btn').disabled = false;
+    document.getElementById('order-btn').textContent = '注文する';
+    alert('注文送信に失敗しました。もう一度お試しください。');
+    return;
+  }
 
   cart = {};
   foodCart = {};
@@ -480,10 +530,49 @@ window.placeOrder = async function() {
   renderFoodMenu();
   renderCart();
   document.getElementById('order-btn').textContent = '注文する';
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(function() { toast.classList.remove('show'); }, 2500);
+  document.getElementById('order-btn').disabled = false;
+
+  if (status === 'pending_approval') {
+    // 承認待ちオーバーレイ表示 + status監視（承認/拒否で同期解除）
+    document.getElementById('approval-waiting-n').classList.add('open');
+    pollNomiOrderStatus(orderIds.filter(Boolean)[0]);
+  } else {
+    // 通常完了：toast表示
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 2500);
+  }
 };
+
+// Phase 4追補：注文 status 監視（REST polling・customer.html と同パターン）
+async function pollNomiOrderStatus(orderId) {
+  if (!orderId) return;
+  const POLL_MS = 1500;
+  const TIMEOUT_MS = 5 * 60 * 1000;
+  const startTime = Date.now();
+  const waitingEl = document.getElementById('approval-waiting-n');
+  const rejectedEl = document.getElementById('approval-rejected-n');
+  while (Date.now() - startTime < TIMEOUT_MS) {
+    await new Promise(function(r){ setTimeout(r, POLL_MS); });
+    try {
+      const st = await fbRestGet('orders/' + orderId + '/status');
+      if (st === 'new') {
+        waitingEl.classList.remove('open');
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(function() { toast.classList.remove('show'); }, 2500);
+        return;
+      } else if (st === 'rejected') {
+        waitingEl.classList.remove('open');
+        rejectedEl.classList.add('open');
+        return;
+      }
+    } catch(e) { /* polling継続 */ }
+  }
+  // タイムアウト → 安全側に「店員にお声がけください」
+  waitingEl.classList.remove('open');
+  rejectedEl.classList.add('open');
+}
 
 // ---- ラストオーダー監視 ----
 
