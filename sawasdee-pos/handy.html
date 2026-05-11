@@ -90,9 +90,14 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .arrive-table-btn { padding: 14px 4px; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
 .arrive-table-btn.active { background: #fbbf24; color: #1a1200; border-color: #fbbf24; }
 .arrive-table-btn.in-session { opacity: 0.4; }
-.arrive-pax-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid #334155; margin-top: 6px; }
+.arrive-pax-row { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-top: 1px solid #334155; margin-top: 6px; }
 .arrive-pax-row > span:first-child { font-size: 13px; color: #94a3b8; flex: 1; }
 .arrive-pax-num { font-size: 22px; font-weight: 800; color: #fbbf24; min-width: 60px; text-align: center; }
+.arrive-pax-input { width: 70px; height: 44px; font-size: 22px; font-weight: 800; color: #fbbf24; background: #0f172a; border: 1.5px solid #475569; border-radius: 8px; text-align: center; -moz-appearance: textfield; padding: 0 4px; }
+.arrive-pax-input::-webkit-outer-spin-button,
+.arrive-pax-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.arrive-pax-input:focus { outline: 2px solid #fbbf24; border-color: #fbbf24; }
+.arrive-pax-unit { font-size: 16px; color: #fbbf24; font-weight: 700; }
 .arrive-pax-row button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 22px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
 .arrive-btns { display: flex; gap: 10px; margin-top: 12px; }
 .arrive-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; border-radius: 8px; color: #94a3b8; font-size: 14px; cursor: pointer; }
@@ -118,7 +123,8 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
     <div class="arrive-pax-row">
       <span>人数</span>
       <button onclick="window.arriveChangePax(-1)">−</button>
-      <span class="arrive-pax-num" id="arrive-pax-num">1名</span>
+      <input type="number" class="arrive-pax-input" id="arrive-pax-input" min="1" max="99" value="1" inputmode="numeric" oninput="window.arriveSetPax(this.value)" />
+      <span class="arrive-pax-unit">名</span>
       <button onclick="window.arriveChangePax(1)">+</button>
     </div>
     <div class="arrive-btns">
@@ -208,6 +214,16 @@ async function fbRestPush(path, data, timeoutMs) {
     return result && result.name;
   } finally { clearTimeout(timer); }
 }
+async function fbRestRemove(path, timeoutMs) {
+  if (!timeoutMs) timeoutMs = 10000;
+  const ctrl = new AbortController();
+  const timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+  try {
+    const r = await fetch(FB_BASE + '/' + path + '.json', { method: 'DELETE', signal: ctrl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return true;
+  } finally { clearTimeout(timer); }
+}
 async function fbRestSet(path, data, timeoutMs) {
   if (!timeoutMs) timeoutMs = 10000;
   const ctrl = new AbortController();
@@ -281,18 +297,42 @@ function renderArriveModal() {
     html += '<button class="arrive-table-btn' + inSession + active + '" onclick="window.arriveSelectTable(\'' + n + '\')">' + label + '</button>';
   }
   grid.innerHTML = html;
-  document.getElementById('arrive-pax-num').textContent = _arrivePax + '名';
+  const inp = document.getElementById('arrive-pax-input');
+  if (inp && document.activeElement !== inp) inp.value = _arrivePax;
   document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
 }
 
-window.arriveSelectTable = function(t) {
-  _arriveSelectedTable = String(t);
+window.arriveSelectTable = async function(t) {
+  const ts = String(t);
+  // F3-c: 既セッション中テーブルをタップ → 取消確認モーダル
+  if (_arriveActiveSessions[ts]) {
+    const label = TABLE_NAMES[ts] || ('T'+ts);
+    if (!confirm(label + ' は着席中です。\nセッションを取り消して新規案内しますか？')) return;
+    try {
+      await fbRestRemove('tables/' + ts + '/session');
+      await fbRestRemove('pax/' + ts);
+      delete _arriveActiveSessions[ts];
+    } catch(e) {
+      console.error('セッション取消失敗:', e);
+      alert('取り消しに失敗しました。もう一度お試しください。');
+      return;
+    }
+  }
+  _arriveSelectedTable = ts;
   renderArriveModal();
 };
 
 window.arriveChangePax = function(d) {
   _arrivePax = Math.max(1, _arrivePax + d);
   renderArriveModal();
+};
+
+// F3-b: 数字直接入力対応
+window.arriveSetPax = function(val) {
+  const n = parseInt(val, 10);
+  if (isNaN(n) || n < 1) return;
+  _arrivePax = n > 99 ? 99 : n;
+  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
 };
 
 window.confirmArrive = async function() {

@@ -428,6 +428,16 @@ async function init() {
     renderCart();
     // 売り切れはリアルタイム更新が必要なのでonValue（描画後・ノンブロッキング）
     onValue(ref(db, 'soldout'), function(snap) { soldout = snap.val() || {}; renderMenu(); });
+    // F2: 呼出状態の同期（kitchen側で「対応済み」が押されたらclient側「呼出中」表示をOFFに）
+    onValue(ref(db, 'calls/' + tableNum), function(snap) {
+      if (!snap.val()) {
+        var callBtn = document.getElementById('call-btn');
+        if (callBtn && callBtn.classList.contains('calling')) {
+          callBtn.classList.remove('calling');
+          callBtn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+        }
+      }
+    });
   } catch(e) {
     document.getElementById('menu-list').innerHTML = '<div style="padding:40px;text-align:center;color:#9ca3af">読み込みに失敗しました。再読み込みしてください。</div>';
     console.error(e);
