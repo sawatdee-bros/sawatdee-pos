@@ -671,17 +671,114 @@ window.changeQty = function(key, delta) {
   renderMenu(); renderCart();
 };
 
-window.requestBill = function() { document.getElementById('bill-confirm-modal').classList.add('open'); };
-window.closeBillConfirm = function() {
-  document.getElementById('bill-confirm-modal').classList.remove('open');
-  // 中身を元に戻す
-  document.querySelector('#bill-confirm-modal .bill-confirm-box').innerHTML =
-    '<div class="bill-confirm-title">💳 お会計</div>'
-    + '<div class="bill-confirm-sub">お会計でよろしいですか？<br>伝票をお持ちします。</div>'
+// 会計モーダル：金額表示版（Phase 4でPAXが初回注文時に確定する前提）
+window.requestBill = async function() {
+  var tbl = new URLSearchParams(location.search).get('table') || '?';
+  var box = document.querySelector('#bill-confirm-modal .bill-confirm-box');
+  // ロード中表示
+  box.innerHTML = '<div class="bill-confirm-title">💳 お会計</div>'
+    + '<div class="bill-confirm-sub">金額を集計中です...</div>';
+  document.getElementById('bill-confirm-modal').classList.add('open');
+
+  // 1. 必要データを並列取得
+  var ordersData = {}, cfg = {}, paxVal = 0;
+  try {
+    var results = await Promise.all([
+      fbRestGet('orders').catch(function(){ return {}; }),
+      fbRestGet('store_config').catch(function(){ return {}; }),
+      fbRestGet('pax/' + tbl).catch(function(){ return null; })
+    ]);
+    ordersData = results[0] || {};
+    cfg = results[1] || {};
+    var p = results[2];
+    paxVal = (typeof p === 'number' && p > 0) ? p : 0;
+  } catch(e) { console.error('会計集計データ取得失敗:', e); }
+
+  var paxFallback = paxVal === 0; // Phase 4 ON ならまず発生しないが、念のため
+  var paxForCharge = paxFallback ? 1 : paxVal;
+  var chargePerPerson = cfg.charge_per_person !== undefined ? cfg.charge_per_person : 250;
+  var chargeMode = cfg.charge_mode || 'conditional';
+  var chargeFreeDrinkCount = cfg.charge_free_drink_count !== undefined ? cfg.charge_free_drink_count : 2;
+  if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
+  if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
+
+  // 2. 今日の起点（注文履歴と同じ「朝6時切替」）
+  var now = new Date(), todayStart = new Date(now);
+  if (now.getHours() < 6) todayStart.setDate(todayStart.getDate() - 1);
+  todayStart.setHours(6, 0, 0, 0);
+
+  // 3. 注文集計（showHistory と同じ判定ロジック）
+  var totalExclusive = 0;
+  var totalInclusive = 0;
+  var drinkCount = 0;
+  var hasExempt = false;
+  // ドリンク名リスト（既存判定流用）
+  var drinkNames = [];
+  if (MENU_DATA['drink']) {
+    Object.values(MENU_DATA['drink']).forEach(function(subcatItems) {
+      (Array.isArray(subcatItems) ? subcatItems : Object.values(subcatItems)).forEach(function(i) { if (i.name) drinkNames.push(i.name); });
+    });
+  }
+  Object.values(ordersData).forEach(function(o) {
+    if (o.table != tbl) return;
+    if ((o.timestamp || 0) < todayStart.getTime()) return;
+    if (o.status === 'paid' || o.status === 'rejected' || o.status === 'pending_approval') return;
+    (o.items || []).forEach(function(item) {
+      var qty = item.qty || 1;
+      var price = item.price || 0;
+      if (item.price_type === 'inclusive') totalInclusive += price * qty;
+      else totalExclusive += price * qty;
+      if (item.charge_exempt) hasExempt = true;
+      // ドリンクカウント
+      var baseName = (item.name || '').replace(/(.*?)$/, '');
+      var isDrink;
+      if (item.category !== undefined) {
+        isDrink = item.category === 'drink' && item.name !== 'お冷';
+      } else {
+        isDrink = baseName !== 'お冷' && drinkNames.some(function(d) { return baseName === d || baseName.startsWith(d + '（'); });
+      }
+      if (isDrink) drinkCount += qty * (item.drink_count !== undefined ? item.drink_count : 1);
+    });
+  });
+
+  // 4. チャージ計算
+  var chargeTotal = 0;
+  if (chargeMode === 'none' || hasExempt) {
+    chargeTotal = 0;
+  } else if (chargeMode === 'always') {
+    chargeTotal = chargePerPerson * paxForCharge;
+  } else {
+    var isFree = paxForCharge > 0 && drinkCount >= paxForCharge * chargeFreeDrinkCount;
+    chargeTotal = isFree ? 0 : chargePerPerson * paxForCharge;
+  }
+
+  // 5. 最終金額（税込・小計税込込み）
+  var finalEx = totalExclusive + chargeTotal;
+  var finalIn = applyRounding(finalEx * 1.1) + totalInclusive;
+
+  // 6. モーダル本文生成
+  // SaaS化メモ：
+  // - 「お支払いはカウンターまでお願いします」→ 将来 store_config/payment_location から動的取得（テーブル会計店対応）
+  // - 「お支払いは現金のみとなります」→ 将来 store_config/payment_methods から動的取得（カード/QR決済対応）
+  var fallbackNote = paxFallback
+    ? '<div style="font-size:11px;color:#dc2626;margin-top:8px;">※正確な金額は店員にご確認ください</div>'
+    : '';
+  box.innerHTML = '<div class="bill-confirm-title">💳 お会計</div>'
+    + '<div class="bill-confirm-sub" style="text-align:left;">'
+    + 'お会計は <strong style="font-size:20px;color:#111827;">¥' + finalIn.toLocaleString() + '</strong> 円です。<br><br>'
+    + 'お支払いはカウンターまでお願いします。<br>'
+    + 'お支払いは現金のみとなります。'
+    + fallbackNote
+    + '</div>'
     + '<div class="bill-confirm-btns">'
     + '<button class="bill-cancel-btn" onclick="window.closeBillConfirm()">キャンセル</button>'
-    + '<button class="bill-ok-btn" onclick="window.confirmBill()">お会計</button>'
+    + '<button class="bill-ok-btn" onclick="window.confirmBill()">会計する</button>'
     + '</div>';
+};
+
+window.closeBillConfirm = function() {
+  document.getElementById('bill-confirm-modal').classList.remove('open');
+  // 次回 requestBill 時にローディング表示で上書きされるので、ここでデフォルト復元は不要
 };
 window.confirmBill = async function() {
   var tbl = new URLSearchParams(location.search).get('table') || '?';
