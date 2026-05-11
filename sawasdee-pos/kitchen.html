@@ -1309,7 +1309,9 @@ onValue(ref(db, 'orders'), (snap) => {
   window._allOrdersCache = snap.val() || {};
   const data = snap.val() || {};
   // 自分の書き込み以外の新着注文だけを検知（ignoreNextによる全スキップをやめた）
-  const newIds = Object.keys(data).filter(id => !orders[id] && !_selfWriteIds.has(id) && data[id].status !== 'done' && data[id].status !== 'paid');
+  // Phase 4: 通常注文音は status='new' の新着のみで鳴らす。pending_approval/rejected/done/paid は除外
+  // （pending_approval の通知は承認オーバーレイ側で playSound('approval') で別途鳴らす）
+  const newIds = Object.keys(data).filter(id => !orders[id] && !_selfWriteIds.has(id) && data[id].status !== 'done' && data[id].status !== 'paid' && data[id].status !== 'pending_approval' && data[id].status !== 'rejected');
   _selfWriteIds.clear();
   // 新規注文が来たテーブルの「直近トグル」フラグをクリア（古い完了注文のゾンビ表示防止）
   if (newIds.length > 0) {
