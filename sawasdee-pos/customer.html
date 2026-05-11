@@ -428,16 +428,19 @@ async function init() {
     renderCart();
     // 売り切れはリアルタイム更新が必要なのでonValue（描画後・ノンブロッキング）
     onValue(ref(db, 'soldout'), function(snap) { soldout = snap.val() || {}; renderMenu(); });
-    // F2: 呼出状態の同期（kitchen側で「対応済み」が押されたらclient側「呼出中」表示をOFFに）
-    onValue(ref(db, 'calls/' + tableNum), function(snap) {
-      if (!snap.val()) {
-        var callBtn = document.getElementById('call-btn');
-        if (callBtn && callBtn.classList.contains('calling')) {
-          callBtn.classList.remove('calling');
-          callBtn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+    // F2: 呼出状態の同期はREST pollingで実装（iOS Safari WSゾンビ回避）。
+    // ロード時にもし既に calls/{tableNum} があれば（前回の呼出が残ってる）calling状態に復元 + polling開始
+    try {
+      var existingCall = await fbRestGet('calls/' + tableNum);
+      if (existingCall) {
+        var callBtn0 = document.getElementById('call-btn');
+        if (callBtn0) {
+          callBtn0.classList.add('calling');
+          callBtn0.innerHTML = '🔔<span>呼出中<span class="call-dot">.</span><span class="call-dot">.</span><span class="call-dot">.</span></span>';
         }
+        startCallPolling();
       }
-    });
+    } catch(e) { console.error('calls初期取得失敗:', e); }
   } catch(e) {
     document.getElementById('menu-list').innerHTML = '<div style="padding:40px;text-align:center;color:#9ca3af">読み込みに失敗しました。再読み込みしてください。</div>';
     console.error(e);
@@ -690,6 +693,30 @@ window.confirmBill = async function() {
     + '<div class="bill-confirm-btns"><button class="bill-cancel-btn" onclick="window.closeBillConfirm()">閉じる</button></div>';
 };
 
+// F2: 呼出状態をREST pollingで監視（iOS Safari WSゾンビ回避）
+// kitchen側で「対応済み」を押されたらFirebaseの calls/{tableNum} が削除される。
+// このpolling が削除を検知して客側の「呼出中」表示を解除する。
+var _callPollingId = null;
+function startCallPolling() {
+  if (_callPollingId) return;
+  _callPollingId = setInterval(async function() {
+    try {
+      var v = await fbRestGet('calls/' + tableNum);
+      if (!v) {
+        var btn = document.getElementById('call-btn');
+        if (btn && btn.classList.contains('calling')) {
+          btn.classList.remove('calling');
+          btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+        }
+        stopCallPolling();
+      }
+    } catch(e) { /* polling継続 */ }
+  }, 3000);
+}
+function stopCallPolling() {
+  if (_callPollingId) { clearInterval(_callPollingId); _callPollingId = null; }
+}
+
 window.callStaff = async function() {
   var btn = document.getElementById('call-btn');
   var tbl = new URLSearchParams(location.search).get('table') || '?';
@@ -698,6 +725,7 @@ window.callStaff = async function() {
     await fbRestRemove('calls/' + tbl);
     btn.classList.remove('calling');
     btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+    stopCallPolling();
   } else {
     // 未呼出 → 確認モーダルを表示
     document.getElementById('call-confirm-modal').classList.add('open');
@@ -722,10 +750,13 @@ window.confirmCallStaff = async function() {
   await fbRestSet('calls/' + tbl, { table: tbl, timestamp: Date.now() });
   btn.classList.add('calling');
   btn.innerHTML = '🔔<span>呼出中<span class="call-dot">.</span><span class="call-dot">.</span><span class="call-dot">.</span></span>';
+  // F2: kitchen側「対応済み」検知のためpolling開始
+  startCallPolling();
   setTimeout(async function() {
     await fbRestRemove('calls/' + tbl);
     btn.classList.remove('calling');
     btn.innerHTML = '🔔<span>店員を呼ぶ</span>';
+    stopCallPolling();
   }, 3 * 60 * 1000);
   // モーダルの中身を「呼びました」に差し替え（会計モーダルと同パターン）
   document.querySelector('#call-confirm-modal .bill-confirm-box').innerHTML =

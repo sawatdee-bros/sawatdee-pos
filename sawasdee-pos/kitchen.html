@@ -1214,6 +1214,8 @@ setInterval(function() {
   var ctx = _sharedAudioCtx;
   if (!ctx || ctx.state !== 'running') {
     _showAudioBrokenBanner();
+  } else {
+    _hideAudioBrokenBanner(); // running に戻ったら自動で隠す（confirm復帰後等）
   }
 }, 10000);
 
@@ -1525,8 +1527,11 @@ window.arriveSelectTable = async function(t) {
   if (_arriveActiveSessions[ts]) {
     var label = TABLE_NAMES_SHORT[ts] || ('T'+ts);
     if (!confirm(label + ' は着席中です。\nセッションを取り消して新規案内しますか？')) return;
-    // confirm後のAudioContext resume（B1対策）
-    try { if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') await _sharedAudioCtx.resume(); } catch(e) {}
+    // confirm後のAudioContext resume + バナー即時hide（B1対策）
+    try {
+      if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') await _sharedAudioCtx.resume();
+      _hideAudioBrokenBanner();
+    } catch(e) {}
     // セッション削除 + pax削除
     try {
       await fbRestRemove('tables/' + ts + '/session');
@@ -1985,14 +1990,20 @@ function renderEditModal() {
   var parts = []; Object.keys(counts).forEach(function(n){parts.push(n+'\xd7'+counts[n]);});
   document.getElementById('edit-added').textContent = parts.length ? '追加予定: '+parts.join('、') : '';
 
+  // F1: 再構築前に「現在開いているカテゴリ」のidを記憶（再構築後にopenクラスを戻す）
+  var openCatIds = {};
+  document.querySelectorAll('#edit-menu .edit-cat-items.open').forEach(function(el) {
+    openCatIds[el.id] = true;
+  });
   // 追加メニュー（カテゴリ別折りたたみ）
   var mhtml = '';
   for (var ci=0;ci<_bMENU_BY_CAT.length;ci++) {
     var bcat = _bMENU_BY_CAT[ci];
     var catId = 'ecat'+ci;
+    var wasOpen = openCatIds[catId] ? ' open' : '';
     mhtml += '<div class="edit-cat-header" onclick="var el=document.getElementById(\''+catId+'\');el.classList.toggle(\'open\');">'
       +'<span>'+bcat.cat+'</span><span>▾</span></div>'
-      +'<div class="edit-cat-items" id="'+catId+'">';
+      +'<div class="edit-cat-items'+wasOpen+'" id="'+catId+'">';
     for (var mi=0;mi<bcat.items.length;mi++) {
       var mitem = bcat.items[mi];
       // F1: addItems内の該当商品の現在追加数を集計
@@ -2139,13 +2150,13 @@ window.saveEdit = async function() {
 
 window.deleteSession = async function(idStr) {
   if (!confirm('この伝票を削除しますか？')) return;
-  // B1: confirm() ダイアログ表示中に iOS Safari が AudioContext を suspended にすることがあり、
-  // 直後の setInterval audio監視で誤って「音がオフ」赤バナーが表示される問題対策。
-  // ユーザー操作（confirm OK）の直後なので resume() は正当な user gesture 配下で動く。
+  // B1: confirm() 中に iOS Safari が AudioContext を suspended にする挙動対策。
+  // 即時 resume + バナー隠し（10秒間隔の自動チェック待ちを回避）。
   try {
     if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') {
       await _sharedAudioCtx.resume();
     }
+    _hideAudioBrokenBanner();
   } catch(e) {}
   var keys = idStr.split(',').filter(Boolean);
   for (var i=0;i<keys.length;i++) {
