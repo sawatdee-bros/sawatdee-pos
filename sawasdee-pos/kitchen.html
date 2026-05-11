@@ -1527,9 +1527,9 @@ window.arriveSelectTable = async function(t) {
   if (_arriveActiveSessions[ts]) {
     var label = TABLE_NAMES_SHORT[ts] || ('T'+ts);
     if (!confirm(label + ' は着席中です。\nセッションを取り消して新規案内しますか？')) return;
-    // confirm後のAudioContext resume + バナー即時hide（B1対策）
+    // confirm後のAudioContext完全リセット + バナー即時hide（B1対策）
     try {
-      if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') await _sharedAudioCtx.resume();
+      if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
       _hideAudioBrokenBanner();
     } catch(e) {}
     // セッション削除 + pax削除
@@ -2150,11 +2150,11 @@ window.saveEdit = async function() {
 
 window.deleteSession = async function(idStr) {
   if (!confirm('この伝票を削除しますか？')) return;
-  // B1: confirm() 中に iOS Safari が AudioContext を suspended にする挙動対策。
-  // 即時 resume + バナー隠し（10秒間隔の自動チェック待ちを回避）。
+  // B1: confirm() 中に iOS Safari が AudioContext を suspended/interrupted にする挙動対策。
+  // resume() では復旧しないケースがあるので resetAudioCtx() で完全に作り直す。
   try {
     if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') {
-      await _sharedAudioCtx.resume();
+      resetAudioCtx();
     }
     _hideAudioBrokenBanner();
   } catch(e) {}

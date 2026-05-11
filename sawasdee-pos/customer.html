@@ -711,7 +711,7 @@ function startCallPolling() {
         stopCallPolling();
       }
     } catch(e) { /* polling継続 */ }
-  }, 3000);
+  }, 1500);
 }
 function stopCallPolling() {
   if (_callPollingId) { clearInterval(_callPollingId); _callPollingId = null; }
