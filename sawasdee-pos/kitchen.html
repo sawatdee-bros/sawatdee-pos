@@ -1208,14 +1208,23 @@ window.recoverAudio = function() {
   _hideAudioBrokenBanner();
 };
 
+// confirm() ダイアログ後5秒間は赤バナー表示を抑制（iOS Safariがconfirm中にAudioContextを
+// suspendedにする挙動 + resume後即時 running に戻らないケースの抑止）
+var _suppressAudioBannerUntil = 0;
+function _suppressAudioBanner(ms) {
+  _suppressAudioBannerUntil = Date.now() + (ms || 5000);
+  _hideAudioBrokenBanner();
+}
+
 // 10秒ごとにAudioContextの状態を監視。runningでなければ赤バナー表示
 setInterval(function() {
   if (!audioEnabled) { _hideAudioBrokenBanner(); return; }
+  if (Date.now() < _suppressAudioBannerUntil) { _hideAudioBrokenBanner(); return; }
   var ctx = _sharedAudioCtx;
   if (!ctx || ctx.state !== 'running') {
     _showAudioBrokenBanner();
   } else {
-    _hideAudioBrokenBanner(); // running に戻ったら自動で隠す（confirm復帰後等）
+    _hideAudioBrokenBanner();
   }
 }, 10000);
 
@@ -1527,10 +1536,10 @@ window.arriveSelectTable = async function(t) {
   if (_arriveActiveSessions[ts]) {
     var label = TABLE_NAMES_SHORT[ts] || ('T'+ts);
     if (!confirm(label + ' は着席中です。\nセッションを取り消して新規案内しますか？')) return;
-    // confirm後のAudioContext完全リセット + バナー即時hide（B1対策）
+    // B1: confirm() 後の赤バナー誤表示を5秒間抑制
+    _suppressAudioBanner(5000);
     try {
       if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
-      _hideAudioBrokenBanner();
     } catch(e) {}
     // セッション削除 + pax削除
     try {
@@ -2150,13 +2159,10 @@ window.saveEdit = async function() {
 
 window.deleteSession = async function(idStr) {
   if (!confirm('この伝票を削除しますか？')) return;
-  // B1: confirm() 中に iOS Safari が AudioContext を suspended/interrupted にする挙動対策。
-  // resume() では復旧しないケースがあるので resetAudioCtx() で完全に作り直す。
+  // B1: confirm() 後の赤バナー誤表示を5秒間抑制（iOS Safari AudioContext復帰猶予）
+  _suppressAudioBanner(5000);
   try {
-    if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') {
-      resetAudioCtx();
-    }
-    _hideAudioBrokenBanner();
+    if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
   } catch(e) {}
   var keys = idStr.split(',').filter(Boolean);
   for (var i=0;i<keys.length;i++) {
