@@ -783,10 +783,16 @@ window.closeBillConfirm = function() {
 window.confirmBill = async function() {
   var tbl = new URLSearchParams(location.search).get('table') || '?';
   await fbRestSet('bill_calls/' + tbl, { table: tbl, timestamp: Date.now() });
-  // モーダルの中身を「お待ちください」に差し替え
+  // モーダルの中身を完了表示に差し替え（事前モーダルとの整合：カウンター誘導+現金限定）
+  // SaaS化メモ：
+  // - 「お支払いカウンターまでお願いします」→ 将来 store_config/payment_location から動的取得
+  // - 「お支払いは現金のみとなります」→ 将来 store_config/payment_methods から動的取得
   document.querySelector('#bill-confirm-modal .bill-confirm-box').innerHTML =
     '<div class="bill-confirm-title">💳 ありがとうございます</div>'
-    + '<div class="bill-confirm-sub">少々お待ちください。<br>店員が参ります。</div>'
+    + '<div class="bill-confirm-sub" style="text-align:left;">'
+    + 'お支払いカウンターまでお願いします。<br>'
+    + 'お支払いは現金のみとなります。'
+    + '</div>'
     + '<div class="bill-confirm-btns"><button class="bill-cancel-btn" onclick="window.closeBillConfirm()">閉じる</button></div>';
 };
 
