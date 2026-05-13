@@ -204,6 +204,11 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .approval-card-pax { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; margin-bottom: 12px; }
 .approval-card-pax > span:first-child { font-size: 14px; color: #94a3b8; flex: 1; }
 .approval-card-pax-num { font-size: 18px; font-weight: 700; color: #fbbf24; min-width: 50px; text-align: center; }
+.approval-pax-input { width: 64px; height: 40px; font-size: 18px; font-weight: 800; color: #fbbf24; background: #0f172a; border: 1.5px solid #475569; border-radius: 8px; text-align: center; -moz-appearance: textfield; padding: 0 4px; }
+.approval-pax-input::-webkit-outer-spin-button,
+.approval-pax-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.approval-pax-input:focus { outline: 2px solid #fbbf24; border-color: #fbbf24; }
+.approval-pax-unit { font-size: 14px; color: #fbbf24; font-weight: 700; margin-right: 6px; }
 .approval-card-pax button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 20px; font-weight: 700; cursor: pointer; }
 .approval-card-pax button:active { background: #334155; }
 .approval-card-btns { display: flex; gap: 10px; }
@@ -1426,7 +1431,8 @@ function renderApprovalOverlay() {
     html += '<div class="approval-card-pax">';
     html += '<span>人数</span>';
     html += '<button onclick="window.approvalPaxChange(\'' + t + '\', -1)">−</button>';
-    html += '<span class="approval-card-pax-num">' + (pax > 0 ? pax + '名' : '—') + '</span>';
+    html += '<input type="number" class="approval-pax-input" min="1" max="99" value="' + (pax > 0 ? pax : '') + '" inputmode="numeric" data-t="' + t + '" oninput="window.approvalSetPax(\'' + t + '\', this.value)" />';
+    html += '<span class="approval-pax-unit">名</span>';
     html += '<button onclick="window.approvalPaxChange(\'' + t + '\', 1)">+</button>';
     html += '</div>';
     html += '<div class="approval-card-btns">';
@@ -1448,6 +1454,29 @@ window.approvalPaxChange = function(t, d) {
   if (_pendingApprovalPax[t] === undefined) _pendingApprovalPax[t] = 0;
   _pendingApprovalPax[t] = Math.max(0, _pendingApprovalPax[t] + d); // 0まで下げ可（誤承認防止）
   renderApprovalOverlay();
+};
+
+// 数字直接入力対応（席案内モーダルのarriveSetPaxと同パターン）
+window.approvalSetPax = function(t, val) {
+  if (val === '' || val === null || val === undefined) {
+    _pendingApprovalPax[t] = 0;
+  } else {
+    var n = parseInt(val, 10);
+    if (isNaN(n) || n < 0) return;
+    _pendingApprovalPax[t] = n > 99 ? 99 : n;
+  }
+  // 入力中はinput.value再設定しない（フォーカス維持）→ 承認ボタンの状態だけ更新
+  var pax = _pendingApprovalPax[t];
+  // 該当カードの承認ボタンを直接更新
+  document.querySelectorAll('#approval-overlay .approval-approve-btn').forEach(function(btn) {
+    // tableNum を onclick から抽出（'window.approveTable('T')' の T を含む）
+    var m = btn.getAttribute('onclick') && btn.getAttribute('onclick').match(/approveTable\('([^']+)'\)/);
+    if (m && m[1] === t) {
+      btn.disabled = pax < 1;
+      btn.style.opacity = pax < 1 ? '0.4' : '';
+      btn.style.cursor = pax < 1 ? 'not-allowed' : '';
+    }
+  });
 };
 
 window.approveTable = async function(t) {
