@@ -1412,7 +1412,7 @@ function renderApprovalOverlay() {
       totalAmount += e.o.total || 0;
       (e.o.items || []).forEach(function(it) { allItems.push(it); });
     });
-    var pax = _pendingApprovalPax[t] !== undefined ? _pendingApprovalPax[t] : 1;
+    var pax = _pendingApprovalPax[t] !== undefined ? _pendingApprovalPax[t] : 0; // 誤承認防止：0スタート
     var tableLabel = (TABLE_NAMES_SHORT[t] || ('T'+t));
     html += '<div class="approval-card">';
     html += '<div class="approval-card-table">' + tableLabel + '</div>';
@@ -1426,12 +1426,13 @@ function renderApprovalOverlay() {
     html += '<div class="approval-card-pax">';
     html += '<span>人数</span>';
     html += '<button onclick="window.approvalPaxChange(\'' + t + '\', -1)">−</button>';
-    html += '<span class="approval-card-pax-num">' + pax + '名</span>';
+    html += '<span class="approval-card-pax-num">' + (pax > 0 ? pax + '名' : '—') + '</span>';
     html += '<button onclick="window.approvalPaxChange(\'' + t + '\', 1)">+</button>';
     html += '</div>';
     html += '<div class="approval-card-btns">';
     html += '<button class="approval-reject-btn" onclick="window.rejectTable(\'' + t + '\')">拒否</button>';
-    html += '<button class="approval-approve-btn" onclick="window.approveTable(\'' + t + '\')">承認</button>';
+    var approveDisabled = pax < 1 ? ' disabled style="opacity:0.4;cursor:not-allowed"' : '';
+    html += '<button class="approval-approve-btn"' + approveDisabled + ' onclick="window.approveTable(\'' + t + '\')">承認</button>';
     html += '</div>';
     html += '</div>';
   });
@@ -1444,13 +1445,13 @@ function renderApprovalOverlay() {
 }
 
 window.approvalPaxChange = function(t, d) {
-  if (_pendingApprovalPax[t] === undefined) _pendingApprovalPax[t] = 1;
-  _pendingApprovalPax[t] = Math.max(1, _pendingApprovalPax[t] + d);
+  if (_pendingApprovalPax[t] === undefined) _pendingApprovalPax[t] = 0;
+  _pendingApprovalPax[t] = Math.max(0, _pendingApprovalPax[t] + d); // 0まで下げ可（誤承認防止）
   renderApprovalOverlay();
 };
 
 window.approveTable = async function(t) {
-  var pax = _pendingApprovalPax[t] !== undefined ? _pendingApprovalPax[t] : 1;
+  var pax = _pendingApprovalPax[t] !== undefined ? _pendingApprovalPax[t] : 0;
   if (pax < 1) { alert('人数を1名以上入力してください'); return; }
   // 該当テーブルの全 pending_approval を 'new' に
   var ids = [];
