@@ -1491,12 +1491,12 @@ window.rejectAllPending = async function() {
 
 // === Phase 4: 席案内モーダル ===
 var _arriveSelectedTable = null;
-var _arrivePax = 1;
+var _arrivePax = 0; // 誤発行防止：0スタート・1以上にしないと発行ボタンが押せない
 var _arriveActiveSessions = {}; // { tableNum: true } - 既セッション中
 
 window.openArriveModal = async function() {
   _arriveSelectedTable = null;
-  _arrivePax = 1;
+  _arrivePax = 0;
   // 既セッション中テーブルをFirebaseから取得
   try {
     var snap = await fbRestGet('tables');
@@ -1529,8 +1529,10 @@ function renderArriveModal() {
   }
   grid.innerHTML = html;
   var inp = document.getElementById('arrive-pax-input');
-  if (inp && document.activeElement !== inp) inp.value = _arrivePax;
-  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
+  // PAX=0 のときは空文字表示（誤発行防止のためデフォルト値で押すクセを断つ）
+  if (inp && document.activeElement !== inp) inp.value = _arrivePax > 0 ? _arrivePax : '';
+  // 発行ボタン：テーブル選択 + PAX>=1 で有効
+  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable || _arrivePax < 1;
 }
 
 window.arriveSelectTable = async function(t) {
@@ -1561,18 +1563,19 @@ window.arriveSelectTable = async function(t) {
 };
 
 window.arriveChangePax = function(d) {
-  _arrivePax = Math.max(1, _arrivePax + d);
+  _arrivePax = Math.max(0, _arrivePax + d); // 0まで下げ可（誤発行防止）
   renderArriveModal();
 };
 
 // F3-b: 数字直接入力対応
 window.arriveSetPax = function(val) {
+  if (val === '' || val === null || val === undefined) { _arrivePax = 0; document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable || _arrivePax < 1; return; }
   var n = parseInt(val, 10);
-  if (isNaN(n) || n < 1) return; // 入力途中の空文字や0は許容（最終的にvalidateする）
+  if (isNaN(n) || n < 0) return;
   if (n > 99) n = 99;
   _arrivePax = n;
   // 入力中は input.value をいじらない（フォーカス維持のためrenderはdisabled更新のみ）
-  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
+  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable || _arrivePax < 1;
 };
 
 window.confirmArrive = async function() {

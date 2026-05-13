@@ -263,7 +263,7 @@ async function issueTableSession(tableNum, pax) {
 }
 
 let _arriveSelectedTable = null;
-let _arrivePax = 1;
+let _arrivePax = 0; // 誤発行防止：0スタート・1以上にしないと発行ボタンが押せない
 let _arriveActiveSessions = {};
 // Phase 4 追補：注文送信時の強制モード用
 let _pendingOrderResolve = null;
@@ -271,7 +271,7 @@ let _arriveForcedTable = null;
 
 window.openArriveModal = async function() {
   _arriveSelectedTable = null;
-  _arrivePax = 1;
+  _arrivePax = 0;
   _arriveForcedTable = null; // 通常モード（強制モード状態をクリア）
   if (_pendingOrderResolve) { _pendingOrderResolve(false); _pendingOrderResolve = null; }
   try {
@@ -321,8 +321,10 @@ function renderArriveModal() {
   }
   grid.innerHTML = html;
   const inp = document.getElementById('arrive-pax-input');
-  if (inp && document.activeElement !== inp) inp.value = _arrivePax;
-  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
+  // PAX=0 のときは空文字表示（誤発行防止のためデフォルト値で押すクセを断つ）
+  if (inp && document.activeElement !== inp) inp.value = _arrivePax > 0 ? _arrivePax : '';
+  // 発行ボタン：テーブル選択 + PAX>=1 で有効
+  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable || _arrivePax < 1;
 }
 
 window.arriveSelectTable = async function(t) {
@@ -346,16 +348,17 @@ window.arriveSelectTable = async function(t) {
 };
 
 window.arriveChangePax = function(d) {
-  _arrivePax = Math.max(1, _arrivePax + d);
+  _arrivePax = Math.max(0, _arrivePax + d); // 0まで下げ可（誤発行防止）
   renderArriveModal();
 };
 
 // F3-b: 数字直接入力対応
 window.arriveSetPax = function(val) {
+  if (val === '' || val === null || val === undefined) { _arrivePax = 0; document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable || _arrivePax < 1; return; }
   const n = parseInt(val, 10);
-  if (isNaN(n) || n < 1) return;
+  if (isNaN(n) || n < 0) return;
   _arrivePax = n > 99 ? 99 : n;
-  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable;
+  document.getElementById('arrive-issue-btn').disabled = !_arriveSelectedTable || _arrivePax < 1;
 };
 
 window.confirmArrive = async function() {
@@ -628,7 +631,7 @@ async function ensurePaxAndSession(tableNum) {
     _pendingOrderResolve = resolve;
     _arriveForcedTable = String(tableNum);
     _arriveSelectedTable = String(tableNum);
-    _arrivePax = 1;
+    _arrivePax = 0; // 誤発行防止：0スタート
     // 既セッションマップを取得（普通の openArriveModal と同じ初期化）
     fbRestGet('tables').then(function(data) {
       _arriveActiveSessions = {};
