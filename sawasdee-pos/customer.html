@@ -19,7 +19,6 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 .cat-tabs-action-row { display: flex; justify-content: flex-end; border-bottom: 1px solid #e5e7eb; }
 .cat-tabs-scroll { display: flex; flex: 1; overflow-x: auto; }
 .fun-btn { flex-shrink: 0; padding: 0 10px; height: 40px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #7c3aed; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
-.fun-btn img { width: 14px; height: 14px; object-fit: contain; transform: scaleX(-1); pointer-events: none; display: block; }
 .history-icon-btn { flex-shrink: 0; padding: 0 10px; height: 40px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #6b7280; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
 .call-btn { flex-shrink: 0; padding: 0 10px; height: 40px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #dc2626; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
 .bill-btn { flex-shrink: 0; padding: 0 10px; height: 40px; background: transparent; border: none; border-left: 1px solid #e5e7eb; color: #1d4ed8; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.2; }
@@ -51,7 +50,7 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 .order-success-sub { font-size: 13px; color: #6b7280; margin-bottom: 14px; text-align: center; }
 .order-success-fun { display: flex; flex-direction: column; align-items: center; padding: 6px 0 4px; cursor: pointer; user-select: none; }
 .order-success-fun img { width: 96px; height: 96px; object-fit: contain; transform: scaleX(-1); animation: funFadeIn 0.5s ease-out 0.2s both, funBounce 2s ease-in-out 0.7s infinite; transform-origin: center; }
-.order-success-fun-label { margin-top: 2px; font-size: 12px; color: #A31313; font-weight: 700; letter-spacing: 0.5px; }
+.order-success-cta { display: block; margin: 4px auto 0; padding: 10px 22px; background: #7c3aed; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; }
 @keyframes funFadeIn { 0% { opacity: 0; transform: scaleX(-1) translateY(20px); } 100% { opacity: 1; transform: scaleX(-1) translateY(0); } }
 @keyframes funBounce { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-6px); } }
 
@@ -170,7 +169,7 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
   <div class="table-no" id="table-no">テーブル ?</div>
   <h1>SAWATDEE BROS ご注文</h1>
 </header>
-<div class="cat-tabs"><div class="cat-tabs-action-row"><button class="fun-btn" onclick="window.openFunPage()" aria-label="お楽しみ"><img src="assets/mascot.gif" alt="" onerror="this.style.display='none'"><span>お楽しみ</span></button><button class="history-icon-btn" onclick="window.showHistory()">📋<span>注文履歴</span></button><button class="call-btn" id="call-btn" onclick="window.callStaff()">🔔<span>店員を呼ぶ</span></button><button class="bill-btn" onclick="window.requestBill()">💳<span>会計する</span></button></div><div class="cat-tabs-scroll" id="cat-tabs"></div></div>
+<div class="cat-tabs"><div class="cat-tabs-action-row"><button class="fun-btn" onclick="window.openFunPage()" aria-label="お楽しみ">🪷<span>お楽しみ</span></button><button class="history-icon-btn" onclick="window.showHistory()">📋<span>注文履歴</span></button><button class="call-btn" id="call-btn" onclick="window.callStaff()">🔔<span>店員を呼ぶ</span></button><button class="bill-btn" onclick="window.requestBill()">💳<span>会計する</span></button></div><div class="cat-tabs-scroll" id="cat-tabs"></div></div>
 <div class="subcat-tabs" id="subcat-tabs"></div>
 <div class="menu-list" id="menu-list"></div>
 <!-- オプションモーダル -->
@@ -249,11 +248,11 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
     <div id="order-success-content" style="display:none">
       <div class="order-success-icon">✓</div>
       <div class="order-success-text">ご注文を承りました</div>
-      <div class="order-success-sub">お料理が来るまで・・・</div>
       <div class="order-success-fun" onclick="window.openFunPage()">
         <img src="assets/mascot.gif" alt="マスコット" onerror="this.style.display='none'">
-        <div class="order-success-fun-label">タップでお楽しみページへ →</div>
       </div>
+      <div class="order-success-sub">お料理が来るまで・・・</div>
+      <button class="order-success-cta" onclick="window.openFunPage()">お楽しみページを見る</button>
     </div>
     <!-- 承認待ち（フェーズ3・APPROVAL_FLOW_ON時のみ表示） -->
     <div id="order-waiting-content" class="approval-waiting" style="display:none">
@@ -1102,7 +1101,7 @@ window.confirmOrder = async function() {
       // 通常完了
       document.getElementById('order-confirm-content').style.display = 'none';
       document.getElementById('order-success-content').style.display = 'block';
-      setTimeout(function() { window.closeOrderConfirm(); }, 2500);
+      setTimeout(function() { window.closeOrderConfirm(); }, 5000);
     } else {
       // 承認待ちUI表示 + status監視開始
       document.getElementById('order-confirm-content').style.display = 'none';
@@ -1119,7 +1118,7 @@ window.confirmOrder = async function() {
   // モーダル内で完了表示 → 2.5秒後にモーダルを閉じる
   document.getElementById('order-confirm-content').style.display = 'none';
   document.getElementById('order-success-content').style.display = 'block';
-  setTimeout(function() { window.closeOrderConfirm(); }, 2500);
+  setTimeout(function() { window.closeOrderConfirm(); }, 5000);
 };
 
 // Phase 3：注文status監視（承認待ち→new/rejected を待つ）
@@ -1136,7 +1135,7 @@ async function pollOrderStatus(orderId) {
         // 承認された → 通常完了UIへ遷移
         document.getElementById('order-waiting-content').style.display = 'none';
         document.getElementById('order-success-content').style.display = 'block';
-        setTimeout(function() { window.closeOrderConfirm(); }, 2500);
+        setTimeout(function() { window.closeOrderConfirm(); }, 5000);
         return;
       } else if (status === 'rejected') {
         document.getElementById('order-waiting-content').style.display = 'none';
