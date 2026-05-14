@@ -1153,7 +1153,9 @@ function _openExternalIframe(frameId, url) {
   document.getElementById('iframe-close-btn').classList.add('show');
 }
 window.openReservation = function() {
-  _openExternalIframe('view-reservation', 'https://sawatdee-reservation.pages.dev/admin.html');
+  // /admin.html は 308 で /admin にリダイレクトされるが、cross-origin iframe で
+  // リダイレクト追従に失敗するケースを観測したため最終 URL を直接指定。
+  _openExternalIframe('view-reservation', 'https://sawatdee-reservation.pages.dev/admin');
 };
 window.openAttendance = function() {
   _openExternalIframe('view-attendance', 'https://sawatdee-attendance.pages.dev/');
