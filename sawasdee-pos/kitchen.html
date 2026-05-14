@@ -83,9 +83,6 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 /* タブバー */
 .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 56px; background: #1e293b; border-top: 1px solid #334155; display: flex; z-index: 200; }
 .iframe-view { position: fixed; top: 0; left: 0; width: 100%; height: calc(100% - 56px); border: none; display: none; z-index: 150; }
-/* 外部 iframe（予約・勤怠）用の閉じるボタン。cross-origin で postMessage 不可なので親側に明示提供。 */
-.iframe-close-btn { position: fixed; top: 8px; right: 8px; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.75); color: white; border: none; font-size: 20px; font-weight: 700; cursor: pointer; z-index: 200; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-.iframe-close-btn.show { display: flex; }
 .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #64748b; font-size: 10px; cursor: pointer; border: none; background: none; }
 .tab-item.active { color: #22c55e; }
 .tab-item:hover { color: #94a3b8; }
@@ -397,10 +394,10 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <iframe class="iframe-view" id="view-sales" src="" title="売上管理"></iframe>
 <iframe class="iframe-view" id="view-admin" src="" title="商品管理"></iframe>
 <iframe class="iframe-view" id="view-settings" src="" title="店舗設定"></iframe>
-<!-- 2026-05-15: cross-origin iframe で予約・勤怠を開く。AudioContext を kitchen 側に保持して音オフ問題を回避。 -->
+<!-- 2026-05-15: cross-origin iframe で予約・勤怠を開く。AudioContext を kitchen 側に保持して音オフ問題を回避。
+     ← ボタンで戻る挙動は予約・勤怠リポ側で postMessage で kitchen に通知（売上・商品管理と同じパターン）。 -->
 <iframe class="iframe-view" id="view-reservation" src="" title="予約管理"></iframe>
 <iframe class="iframe-view" id="view-attendance" src="" title="勤怠打刻"></iframe>
-<button class="iframe-close-btn" id="iframe-close-btn" onclick="window.closeExternalIframe()" title="閉じる" aria-label="閉じる">✕</button>
 
 <nav class="tab-bar">
   <button class="tab-item" id="tab-all" onclick="window.setMode('all')"><span class="tab-icon">👁</span>全て</button>
@@ -1111,13 +1108,12 @@ function setMode(mode) {
     settingsFrame.style.display = 'none';
     if (tabBar) tabBar.style.display = 'flex';
   }
-  // 2026-05-15: 既存タブ切替時は外部 iframe（予約・勤怠）も閉じる
+  // 2026-05-15: 既存タブ切替時は外部 iframe（予約・勤怠）も閉じる + about:blank で state クリア
+  // 売上・商品管理と同じく ← ボタンの postMessage({type:'setMode',mode:'all'}) もこの分岐に乗る。
   var rsvFrame = document.getElementById('view-reservation');
   var attFrame = document.getElementById('view-attendance');
-  var closeBtn = document.getElementById('iframe-close-btn');
-  if (rsvFrame) rsvFrame.style.display = 'none';
-  if (attFrame) attFrame.style.display = 'none';
-  if (closeBtn) closeBtn.classList.remove('show');
+  if (rsvFrame) { rsvFrame.style.display = 'none'; rsvFrame.src = 'about:blank'; }
+  if (attFrame) { attFrame.style.display = 'none'; attFrame.src = 'about:blank'; }
   // タブのアクティブ状態
   ['all','food','drink','bills','sales','admin','settings'].forEach(function(m) {
     var el = document.getElementById('tab-'+m);
@@ -1153,7 +1149,6 @@ function _openExternalIframe(frameId, url) {
   frame.style.height = '100%';
   var tabBar = document.querySelector('nav.tab-bar');
   if (tabBar) tabBar.style.display = 'none';
-  document.getElementById('iframe-close-btn').classList.add('show');
 }
 window.openReservation = function() {
   // /admin.html は 308 で /admin にリダイレクトされるが、cross-origin iframe で
@@ -1162,14 +1157,6 @@ window.openReservation = function() {
 };
 window.openAttendance = function() {
   _openExternalIframe('view-attendance', 'https://sawatdee-attendance.pages.dev/');
-};
-window.closeExternalIframe = function() {
-  // 2026-05-15: 外部 iframe を about:blank でクリア（中身の state を次回に持ち越さない）
-  var rsv = document.getElementById('view-reservation');
-  var att = document.getElementById('view-attendance');
-  if (rsv) rsv.src = 'about:blank';
-  if (att) att.src = 'about:blank';
-  setMode('all'); // 既存ロジックに乗せて元のタブに戻す（外部 iframe も閉じる処理込み）
 };
 
 // iframeからのpostMessageを受け取る（←ボタンで戻るとき）
