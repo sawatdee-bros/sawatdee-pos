@@ -1163,6 +1163,25 @@ function getAudioCtx() {
   }
   return _sharedAudioCtx;
 }
+// confirm() OK 押下の user gesture context 内で AudioContext を強制 unlock。
+// resetAudioCtx() で close/new した直後の AudioContext が iOS Safari で
+// suspended のまま running に戻らないケースの対策（無音 dummy beep で kick）。
+// 2026-05-15 案A 採用：deleteSession / arriveSelectTable の confirm() 後に呼ぶ。
+function _kickAudioCtx() {
+  if (!audioEnabled || !_sharedAudioCtx) return;
+  try {
+    var ctx = _sharedAudioCtx;
+    if (ctx.state === 'suspended') ctx.resume();
+    var osc = ctx.createOscillator();
+    var g = ctx.createGain();
+    g.gain.value = 0;
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.01);
+  } catch(e) {}
+}
+
 // iOSのinterrupted状態などから完全復旧するため、AudioContextを破棄して作り直す
 function resetAudioCtx() {
   try {
@@ -1575,6 +1594,7 @@ window.arriveSelectTable = async function(t) {
     _suppressAudioBanner(5000);
     try {
       if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
+      _kickAudioCtx(); // 案A: user gesture context 内で AudioContext を強制 running 化
     } catch(e) {}
     // セッション削除 + pax削除
     try {
@@ -2208,6 +2228,7 @@ window.deleteSession = async function(idStr) {
   _suppressAudioBanner(5000);
   try {
     if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
+    _kickAudioCtx(); // 案A: user gesture context 内で AudioContext を強制 running 化
   } catch(e) {}
   var keys = idStr.split(',').filter(Boolean);
   for (var i=0;i<keys.length;i++) {
