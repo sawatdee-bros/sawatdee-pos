@@ -66,11 +66,6 @@ header .table-no { font-size: 22px; font-weight: 700; color: #fbbf24; }
 @keyframes funFadeIn { 0% { opacity: 0; transform: scaleX(-1) translateY(20px); } 100% { opacity: 1; transform: scaleX(-1) translateY(0); } }
 @keyframes funBounce { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-6px); } }
 
-.fun-fab { position: fixed; right: 6px; top: 4px; width: 62px; height: 62px; z-index: 250; cursor: pointer; padding: 0; background: transparent; border: none; display: none; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)); }
-.fun-fab.show { display: block; animation: funFabPop 0.4s ease-out, funFabFloat 3s ease-in-out 0.4s infinite; }
-.fun-fab img { width: 100%; height: 100%; object-fit: contain; transform: scaleX(-1); pointer-events: none; }
-@keyframes funFabPop { 0% { transform: scale(0); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
-@keyframes funFabFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .call-btn.calling { color: #dc2626; }
 .call-dot { display: inline-block; opacity: 0.2; animation: dotFade 1.2s infinite; }
 .call-dot:nth-child(1) { animation-delay: 0s; }
@@ -300,11 +295,6 @@ window.addEventListener('unhandledrejection', function(e){ window.dbgLog('Promis
   </div>
 </div>
 
-<!-- お楽しみページへのフローティングマスコット（初回注文後にlocalStorage経由で表示） -->
-<button class="fun-fab" id="fun-fab" onclick="window.openFunPage()" aria-label="お楽しみページへ">
-  <img src="https://static.wixstatic.com/media/6250d5_3c7a5adbcdee4e5ab05944d21bc4e11f~mv2.gif" alt="マスコット">
-</button>
-
 <!-- 注文確認モーダル -->
 <div class="order-confirm-modal" id="order-confirm-modal">
   <div class="order-confirm-box">
@@ -322,7 +312,7 @@ window.addEventListener('unhandledrejection', function(e){ window.dbgLog('Promis
       <div class="order-success-text">ご注文を承りました</div>
       <div class="order-success-sub">お料理が来るまで・・・</div>
       <div class="order-success-fun" onclick="window.openFunPage()">
-        <img src="https://static.wixstatic.com/media/6250d5_3c7a5adbcdee4e5ab05944d21bc4e11f~mv2.gif" alt="マスコット">
+        <img src="assets/mascot.gif" alt="マスコット" onerror="this.style.display='none'">
         <div class="order-success-fun-label">タップでお楽しみページへ →</div>
       </div>
     </div>
@@ -951,10 +941,7 @@ window.confirmOrder = async function() {
   await push(ref(db, 'orders'), orderData);
   cart = {};
   renderMenu(); renderCart();
-  // 初回注文完了：お楽しみページへのフローティングマスコットを以後常時表示
-  try { localStorage.setItem('sawatdee_first_order_done', '1'); } catch(e) {}
-  showFunFab();
-  // モーダル内で完了表示 → 2.5秒後にモーダルを閉じる（マスコットを見る時間を確保）
+  // モーダル内で完了表示 → 2.5秒後にモーダルを閉じる
   document.getElementById('order-confirm-content').style.display = 'none';
   document.getElementById('order-success-content').style.display = 'block';
   setTimeout(function() { window.closeOrderConfirm(); }, 2500);
@@ -963,12 +950,6 @@ window.confirmOrder = async function() {
 // お楽しみページ連携
 var FUN_PAGE_URL = 'https://sawatdee-fun.pages.dev/funpage.html';
 window.openFunPage = function() { window.open(FUN_PAGE_URL, '_blank'); };
-function showFunFab() {
-  var fab = document.getElementById('fun-fab');
-  if (fab) fab.classList.add('show');
-}
-// ページロード時：過去に注文済みならフローティングマスコットを表示
-try { if (localStorage.getItem('sawatdee_first_order_done') === '1') showFunFab(); } catch(e) {}
 
 // 起動
 init();
