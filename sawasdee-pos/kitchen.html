@@ -64,6 +64,13 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; }
 .audio-broken-banner { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 500; background: #dc2626; color: #fff; padding: 16px 20px; font-size: 18px; font-weight: 700; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: audioBrokenPulse 1.4s ease-in-out infinite; }
 .audio-broken-banner.show { display: block; }
 @keyframes audioBrokenPulse { 0%,100% { background: #dc2626; } 50% { background: #b91c1c; } }
+.custom-confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9999; align-items: center; justify-content: center; padding: 24px; }
+.custom-confirm-overlay.open { display: flex; }
+.custom-confirm-box { background: white; border-radius: 12px; padding: 22px 22px 16px; max-width: 360px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+.custom-confirm-msg { font-size: 15px; color: #111827; margin-bottom: 18px; line-height: 1.55; white-space: pre-line; }
+.custom-confirm-btns { display: flex; gap: 10px; justify-content: flex-end; }
+.custom-confirm-cancel-btn { padding: 10px 18px; background: #f3f4f6; border: none; border-radius: 8px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
+.custom-confirm-ok-btn { padding: 10px 18px; background: #dc2626; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
 .call-item { display: flex; align-items: center; justify-content: space-between; background: #dc2626; color: white; padding: 10px 16px; font-size: 14px; font-weight: 700; border-bottom: 1px solid #b91c1c; animation: callSlide 0.3s ease; pointer-events: auto; }
 @keyframes callSlide { from{transform:translateY(-100%)} to{transform:translateY(0)} }
 .bell.show { display: block; animation: bounceIn 0.4s ease; }
@@ -280,6 +287,16 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 </header>
 
 <div class="audio-broken-banner" id="audio-broken-banner" onclick="window.recoverAudio()">⚠️ 音が止まっています。ここをタップして復旧</div>
+<!-- 案B (2026-05-15): confirm() を置換するカスタムモーダル。OK ボタン onclick が user gesture 保持 → AudioContext を確実に running 化 -->
+<div class="custom-confirm-overlay" id="custom-confirm-overlay">
+  <div class="custom-confirm-box">
+    <div class="custom-confirm-msg" id="custom-confirm-msg"></div>
+    <div class="custom-confirm-btns">
+      <button class="custom-confirm-cancel-btn" id="custom-confirm-cancel">キャンセル</button>
+      <button class="custom-confirm-ok-btn" id="custom-confirm-ok">OK</button>
+    </div>
+  </div>
+</div>
 <div class="call-banner" id="call-banner"></div>
 <div id="bell" class="bell">🔔 新しい注文！</div>
 <!-- 全て表示（2列） -->
@@ -1163,10 +1180,9 @@ function getAudioCtx() {
   }
   return _sharedAudioCtx;
 }
-// confirm() OK 押下の user gesture context 内で AudioContext を強制 unlock。
-// resetAudioCtx() で close/new した直後の AudioContext が iOS Safari で
-// suspended のまま running に戻らないケースの対策（無音 dummy beep で kick）。
-// 2026-05-15 案A 採用：deleteSession / arriveSelectTable の confirm() 後に呼ぶ。
+// user gesture event handler 内で AudioContext を強制 unlock（無音 dummy beep）。
+// iOS Safari の AudioContext は user gesture context 内で AudioNode を生成・start
+// しないと running に戻らない。案B の customConfirm OK button onclick 内で呼ぶ。
 function _kickAudioCtx() {
   if (!audioEnabled || !_sharedAudioCtx) return;
   try {
@@ -1180,6 +1196,40 @@ function _kickAudioCtx() {
     osc.start();
     osc.stop(ctx.currentTime + 0.01);
   } catch(e) {}
+}
+
+// 案B (2026-05-15): confirm() のカスタムモーダル置換。
+// iOS Safari の confirm() は transient activation を consume するため、戻り値後の
+// AudioContext kick が user gesture context 外になり失効する（案A 失敗の原因）。
+// カスタムモーダルなら OK ボタンの onclick が正真正銘の user gesture event handler。
+function customConfirm(message, opts) {
+  opts = opts || {};
+  return new Promise(function(resolve) {
+    var overlay = document.getElementById('custom-confirm-overlay');
+    var msgEl = document.getElementById('custom-confirm-msg');
+    var okBtn = document.getElementById('custom-confirm-ok');
+    var cancelBtn = document.getElementById('custom-confirm-cancel');
+    msgEl.textContent = message;
+    okBtn.textContent = opts.okText || 'OK';
+    cancelBtn.textContent = opts.cancelText || 'キャンセル';
+    var close = function(result) {
+      overlay.classList.remove('open');
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+      resolve(result);
+    };
+    okBtn.onclick = function() {
+      // 案B の核心：user gesture event handler 内で AudioContext を強制 running 化
+      try {
+        if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
+        _kickAudioCtx();
+      } catch(e) {}
+      _suppressAudioBanner(5000);
+      close(true);
+    };
+    cancelBtn.onclick = function() { close(false); };
+    overlay.classList.add('open');
+  });
 }
 
 // iOSのinterrupted状態などから完全復旧するため、AudioContextを破棄して作り直す
@@ -1589,13 +1639,8 @@ window.arriveSelectTable = async function(t) {
   // F3-c: 既セッション中テーブルをタップ → 取消確認モーダル
   if (_arriveActiveSessions[ts]) {
     var label = TABLE_NAMES_SHORT[ts] || ('T'+ts);
-    if (!confirm(label + ' は着席中です。\nセッションを取り消して新規案内しますか？')) return;
-    // B1: confirm() 後の赤バナー誤表示を5秒間抑制
-    _suppressAudioBanner(5000);
-    try {
-      if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
-      _kickAudioCtx(); // 案A: user gesture context 内で AudioContext を強制 running 化
-    } catch(e) {}
+    // 案B (2026-05-15): customConfirm の OK ボタン onclick 内で AudioContext kick 完結。
+    if (!await customConfirm(label + ' は着席中です。\nセッションを取り消して新規案内しますか？', { okText: '取り消す' })) return;
     // セッション削除 + pax削除
     try {
       await fbRestRemove('tables/' + ts + '/session');
@@ -2223,13 +2268,9 @@ window.saveEdit = async function() {
 };
 
 window.deleteSession = async function(idStr) {
-  if (!confirm('この伝票を削除しますか？')) return;
-  // B1: confirm() 後の赤バナー誤表示を5秒間抑制（iOS Safari AudioContext復帰猶予）
-  _suppressAudioBanner(5000);
-  try {
-    if (_sharedAudioCtx && _sharedAudioCtx.state !== 'running') resetAudioCtx();
-    _kickAudioCtx(); // 案A: user gesture context 内で AudioContext を強制 running 化
-  } catch(e) {}
+  // 案B (2026-05-15): customConfirm の OK ボタン onclick 内で AudioContext kick 完結。
+  // 案A で confirm() 戻り値後に kick していたが iOS Safari の transient activation 喪失で失敗。
+  if (!await customConfirm('この伝票を削除しますか？', { okText: '削除する' })) return;
   var keys = idStr.split(',').filter(Boolean);
   for (var i=0;i<keys.length;i++) {
     await remove(ref(db,'orders/'+keys[i]));
