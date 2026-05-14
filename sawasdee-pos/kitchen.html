@@ -1137,13 +1137,16 @@ window.setMode = setMode;
 function _openExternalIframe(frameId, url) {
   var frame = document.getElementById(frameId);
   if (!frame) return;
-  if (!frame.src || !frame.src.startsWith(url.split('/').slice(0, 3).join('/'))) {
-    frame.src = url;
-  }
-  // 他の iframe を全て非表示
+  // 2026-05-15: 毎回 src 再設定で state 混同を回避（前回 iframe 内 navigate されてても、
+  // 閉じた後でも、確実に意図した URL を開き直す）。iframe 内 ← で kitchen に飛んでも次回フレッシュ。
+  frame.src = url;
+  // 他の iframe を全て非表示 + 外部 iframe は about:blank で中身もクリア（次回フレッシュロード）
   ['view-sales','view-admin','view-settings','view-reservation','view-attendance'].forEach(function(id) {
     var f = document.getElementById(id);
-    if (f && f.id !== frameId) f.style.display = 'none';
+    if (f && f.id !== frameId) {
+      f.style.display = 'none';
+      if (id === 'view-reservation' || id === 'view-attendance') f.src = 'about:blank';
+    }
   });
   frame.style.display = 'block';
   frame.style.top = '0';
@@ -1161,6 +1164,11 @@ window.openAttendance = function() {
   _openExternalIframe('view-attendance', 'https://sawatdee-attendance.pages.dev/');
 };
 window.closeExternalIframe = function() {
+  // 2026-05-15: 外部 iframe を about:blank でクリア（中身の state を次回に持ち越さない）
+  var rsv = document.getElementById('view-reservation');
+  var att = document.getElementById('view-attendance');
+  if (rsv) rsv.src = 'about:blank';
+  if (att) att.src = 'about:blank';
   setMode('all'); // 既存ロジックに乗せて元のタブに戻す（外部 iframe も閉じる処理込み）
 };
 
