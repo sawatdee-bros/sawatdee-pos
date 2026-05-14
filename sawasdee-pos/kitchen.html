@@ -1730,7 +1730,16 @@ window.setFilter = function(f) {
 // === スタッフ承認フロー：テーブルセッション管理（フェーズ2再投入版・REST書き込み） ===
 // PAX入力時に tables/{tableNum}/session を発行（フェーズ3以降の承認フローで参照）。
 // 会計完了時に削除。書き込みはRESTで独立させ、Rules拒否時もSDKキューに影響しないようにする。
-const SESSION_TTL_MS = 3 * 60 * 60 * 1000; // 3時間
+// expiresAt は「次の day_start_hour（営業日切り替え時刻）」とする：
+//   - 長居客（3時間超）対応
+//   - 翌営業日開始時点で自動失効（会計取り忘れ→翌日の客の悪用を防ぐ）
+function _nextDayStartMs() {
+  const dh = (typeof DAY_START === 'number') ? DAY_START : 8;
+  const t = new Date();
+  t.setHours(dh, 0, 0, 0);
+  if (t.getTime() <= Date.now()) t.setDate(t.getDate() + 1);
+  return t.getTime();
+}
 
 async function issueTableSession(tableNum, pax) {
   if (!pax || pax < 1) return;
@@ -1738,7 +1747,7 @@ async function issueTableSession(tableNum, pax) {
   try {
     await fbRestSet('tables/' + tableNum + '/session', {
       startedAt: now,
-      expiresAt: now + SESSION_TTL_MS,
+      expiresAt: _nextDayStartMs(),
       pax: pax,
       issuedBy: 'kitchen'
     });

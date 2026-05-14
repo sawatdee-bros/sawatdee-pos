@@ -247,7 +247,14 @@ let GROUPS_DATA = {};
 let APPROVAL_FLOW_ON = false; // フェーズ3以降の承認フローで参照（現状未使用）
 
 // === Phase 4: 席案内モーダル（テーブルセッション発行） ===
-const SESSION_TTL_MS = 3 * 60 * 60 * 1000; // 3時間（kitchen.htmlと同値）
+// expiresAt は「次の day_start_hour（営業日切り替え時刻）」とする（kitchen.htmlと同方式）。
+let _HANDY_DAY_START = 8; // store_config/day_start_hour（init()で上書き）
+function _nextDayStartMs() {
+  const t = new Date();
+  t.setHours(_HANDY_DAY_START, 0, 0, 0);
+  if (t.getTime() <= Date.now()) t.setDate(t.getDate() + 1);
+  return t.getTime();
+}
 
 async function issueTableSession(tableNum, pax) {
   if (!pax || pax < 1) return;
@@ -255,7 +262,7 @@ async function issueTableSession(tableNum, pax) {
   try {
     await fbRestSet('tables/' + tableNum + '/session', {
       startedAt: now,
-      expiresAt: now + SESSION_TTL_MS,
+      expiresAt: _nextDayStartMs(),
       pax: pax,
       issuedBy: 'handy'
     });
@@ -697,6 +704,7 @@ async function init() {
     const cfg = results[0] || {};
     if (cfg.rounding_mode) _ROUNDING_MODE = cfg.rounding_mode;
     if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
+    if (cfg.day_start_hour != null) _HANDY_DAY_START = cfg.day_start_hour;
     if (cfg.table_names_short) TABLE_NAMES = cfg.table_names_short;
     else if (cfg.table_names) TABLE_NAMES = cfg.table_names;
     APPROVAL_FLOW_ON = cfg.enable_approval_flow === true;
