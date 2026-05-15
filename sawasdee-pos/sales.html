@@ -667,10 +667,20 @@ function render() {
   var now = new Date();
   var isCur = curR ? curR.isCurrent : false;
   if (currentPeriod === 'day') {
+    // 注文単位で時間帯にバラす（商品売上のみ・税込・チャージ除く）
+    var taxRate1 = storeConfig.tax_rate || 10;
+    var hourly = new Array(24).fill(0);
+    orders.forEach(function(o) {
+      if (!o.timestamp) return;
+      var hh = new Date(o.timestamp).getHours();
+      var ex = 0;
+      (Array.isArray(o.items) ? o.items : Object.values(o.items || {})).forEach(function(it) {
+        ex += (it.price || 0) * (it.qty || 0);
+      });
+      hourly[hh] += ex * (1 + taxRate1 / 100);
+    });
     for (var hh = 11; hh <= 23; hh++) {
-      var v = 0;
-      sessions.forEach(function(s){ if (new Date(s.ts).getHours() === hh) v += s.sales; });
-      barData.push({ label: hh+'時', val: v, isNow: isCur && now.getHours()===hh });
+      barData.push({ label: hh+'時', val: Math.round(hourly[hh]), isNow: isCur && now.getHours()===hh });
     }
   } else if (currentPeriod === 'week') {
     // 月曜始まり: d=0→月, ..., d=6→日
@@ -793,7 +803,7 @@ function render() {
       h += '</div></div>';
     } else {
       // 日次・週次・累計は棒グラフ
-      var chartTitle = currentPeriod==='day' ? '時間帯別売上'
+      var chartTitle = currentPeriod==='day' ? '時間帯別売上（注文単位・チャージ除く）'
                      : currentPeriod==='all' ? '曜日別平均売上（累計）'
                      : '曜日別売上';
       h += '<div class="chart-wrap"><div class="section-title">' + chartTitle + '</div>'
