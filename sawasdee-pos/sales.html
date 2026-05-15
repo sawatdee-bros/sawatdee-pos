@@ -673,10 +673,12 @@ function render() {
       barData.push({ label: hh+'時', val: v, isNow: isCur && now.getHours()===hh });
     }
   } else if (currentPeriod === 'week') {
+    // 月曜始まり: d=0→月, ..., d=6→日
     for (var d = 0; d < 7; d++) {
+      var rawDow = (d + 1) % 7;  // d=0(月)→1, d=6(日)→0
       var v = 0;
-      sessions.forEach(function(s){ if (new Date(s.ts - DAY_START*3600000).getDay()===d) v += s.sales; });
-      barData.push({ label: DOW[d], val: v, isNow: isCur && now.getDay()===d });
+      sessions.forEach(function(s){ if (new Date(s.ts - DAY_START*3600000).getDay()===rawDow) v += s.sales; });
+      barData.push({ label: DOW[rawDow], val: v, isNow: isCur && now.getDay()===rawDow });
     }
   } else if (currentPeriod === 'month') {
     var dim = new Date(curR.year, curR.month+1, 0).getDate();
@@ -686,19 +688,20 @@ function render() {
       barData.push({ label: d%5===0?String(d):'', val: v, isNow: isCur && now.getDate()===d });
     }
   } else if (currentPeriod === 'all') {
-    // 曜日別の「平均売上」（累計合計 ÷ その曜日の営業日数）
-    var dowTotals = [0,0,0,0,0,0,0]; // 日〜土
-    var dowDays   = [{},{},{},{},{},{},{}]; // 曜日ごとの営業日セット
+    // 曜日別の「平均売上」（累計合計 ÷ その曜日の営業日数）月曜始まり
+    var dowTotals = [0,0,0,0,0,0,0]; // index 0=日…6=土（getDay準拠）
+    var dowDays   = [{},{},{},{},{},{},{}];
     sessions.forEach(function(s) {
       var dw = new Date(s.ts - DAY_START*3600000).getDay();
-      var ds = toDayStr(s.ts); // 日付文字列でユニーク日数を数える
+      var ds = toDayStr(s.ts);
       dowTotals[dw] += s.sales;
       dowDays[dw][ds] = true;
     });
     for (var d = 0; d < 7; d++) {
-      var days = Object.keys(dowDays[d]).length;
-      var avg = days > 0 ? Math.round(dowTotals[d] / days) : 0;
-      barData.push({ label: DOW[d], val: avg, isNow: now.getDay()===d, count: days });
+      var rawDow = (d + 1) % 7;  // d=0(月)→1, d=6(日)→0
+      var days = Object.keys(dowDays[rawDow]).length;
+      var avg = days > 0 ? Math.round(dowTotals[rawDow] / days) : 0;
+      barData.push({ label: DOW[rawDow], val: avg, isNow: now.getDay()===rawDow, count: days });
     }
   }
   var maxBar = barData.reduce(function(m,b){ return Math.max(m, b.val); }, 1);
