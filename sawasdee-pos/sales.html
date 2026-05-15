@@ -490,12 +490,12 @@ function getRange(unit, offset) {
   if (unit === 'week') {
     var d = _todayBase();
     var dow = d.getDay();
-    var diff = (dow >= 3) ? dow-3 : dow+4;  // 水曜始まり
+    var diff = (dow === 0) ? 6 : dow - 1;  // 月曜始まり（日曜は前週扱い）
     d.setDate(d.getDate() - diff + offset * 7);
     var fromTs = d.getTime();
     var toTs = fromTs + 7 * 86400000;
     var endD = new Date(d); endD.setDate(endD.getDate() + 6);
-    var label = (d.getMonth()+1)+'/'+d.getDate()+'(水)〜'+(endD.getMonth()+1)+'/'+endD.getDate()+'(火)';
+    var label = (d.getMonth()+1)+'/'+d.getDate()+'(月)〜'+(endD.getMonth()+1)+'/'+endD.getDate()+'(日)';
     return { fromTs:fromTs, toTs:toTs, label:label, isCurrent: offset===0,
              year:d.getFullYear(), month:d.getMonth() };
   }
@@ -1100,7 +1100,7 @@ function renderCalendar() {
 
   var maxDay = Object.values(dayMap).reduce(function(m,d){ return Math.max(m, d.sales); }, 1);
 
-  // 週グループ（水曜始まり）
+  // 週グループ（月曜始まり）
   var weeks = [], curWeek = null;
   days.forEach(function(day) {
     if (day.dow === 1 || curWeek === null) { curWeek = {days:[],total:0,sessions:0}; weeks.push(curWeek); }
