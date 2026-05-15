@@ -165,11 +165,11 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .checkout-discount-apply { padding: 6px 12px; background: #166534; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-discount-line { display: flex; justify-content: space-between; font-size: 13px; color: #dc2626; padding: 4px 0; font-family: -apple-system, sans-serif; }
 .checkout-discount-clear { font-size: 11px; color: #64748b; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font-family: -apple-system, sans-serif; }
-.checkout-btns { display: flex; gap: 8px; padding: 12px; background: #f8fafc; }
-.checkout-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; color: #64748b; font-size: 13px; cursor: pointer; font-family: -apple-system, sans-serif; }
+.checkout-btns { display: flex; gap: 8px; padding: 12px; background: #f8fafc; align-items: stretch; }
+.checkout-cancel { flex: 0 0 56px; padding: 8px 4px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; color: #64748b; font-size: 11px; line-height: 1.2; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-confirm { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; }
-.checkout-pay-buttons { flex: 2; display: flex; gap: 6px; }
-.checkout-pay-btn { flex: 1; padding: 12px 6px; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; }
+.checkout-pay-buttons { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 6px; }
+.checkout-pay-btn { padding: 14px 6px; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; min-width: 0; }
 .checkout-pay-btn:active { transform: scale(0.97); }
 .delete-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #ef4444; border-radius: 4px; font-size: 11px; color: #ef4444; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
 .delete-btn:hover { background: #fee2e2; }
