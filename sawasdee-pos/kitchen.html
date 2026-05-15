@@ -168,6 +168,9 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .checkout-btns { display: flex; gap: 8px; padding: 12px; background: #f8fafc; }
 .checkout-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; color: #64748b; font-size: 13px; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-confirm { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; }
+.checkout-pay-buttons { flex: 2; display: flex; gap: 6px; }
+.checkout-pay-btn { flex: 1; padding: 12px 6px; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; }
+.checkout-pay-btn:active { transform: scale(0.97); }
 .delete-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #ef4444; border-radius: 4px; font-size: 11px; color: #ef4444; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
 .delete-btn:hover { background: #fee2e2; }
 .edit-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #aaa; border-radius: 4px; font-size: 11px; color: #666; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
@@ -355,7 +358,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     </div>
     <div class="checkout-btns">
       <button class="checkout-cancel" onclick="window.closeCheckout()">キャンセル</button>
-      <button class="checkout-confirm" onclick="window.confirmCheckout()">✓ 会計完了</button>
+      <div class="checkout-pay-buttons" id="checkout-pay-buttons"></div>
     </div>
   </div>
 </div>
@@ -499,6 +502,15 @@ let _CHARGE_MODE = 'conditional'; // none / conditional / always
 let _CHARGE_FREE_DRINK_COUNT = 2;
 let _DISCOUNT_PRESETS = [];
 let APPROVAL_FLOW_ON = false; // フェーズ3以降の承認フローで参照（現状未使用）
+
+// 支払方法マスタ定義（SaaS化時はテナント設定で payment_methods 配列を切替）
+var PAYMENT_METHOD_DEFS = {
+  'cash': { label: '現金',   icon: '💴', color: '#166534' },
+  'card': { label: 'カード', icon: '💳', color: '#1d4ed8' },
+  'qr':   { label: 'QR決済', icon: '📱', color: '#7c3aed' }
+};
+let _PAYMENT_METHODS = ['cash', 'card']; // store_config.payment_methods 未設定時のフォールバック
+
 get(ref(db, 'store_config')).then(function(snap) {
   var cfg = snap.val() || {};
   if (cfg.day_start_hour !== null && cfg.day_start_hour !== undefined) DAY_START = cfg.day_start_hour;
@@ -510,6 +522,10 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
   if (cfg.table_names) TABLE_NAMES = cfg.table_names;
   if (cfg.table_names_short) TABLE_NAMES_SHORT = cfg.table_names_short;
+  if (Array.isArray(cfg.payment_methods) && cfg.payment_methods.length > 0) {
+    var filtered = cfg.payment_methods.filter(function(id){ return PAYMENT_METHOD_DEFS[id]; });
+    if (filtered.length > 0) _PAYMENT_METHODS = filtered;
+  }
   APPROVAL_FLOW_ON = cfg.enable_approval_flow === true;
   // テーブル数を保存（ボタンは_billsFilterBarUpdate()で動的生成）
   _TABLE_COUNT = cfg.table_count || 10;
@@ -2091,6 +2107,16 @@ window.openCheckout = function(tableNum, idStr) {
   _discountAmount = 0;
   _discountType = 'amount';
   window.renderDiscountArea();
+  // 支払方法ボタンを動的生成（store_config.payment_methodsまたはデフォルト）
+  var payBtnHtml = '';
+  _PAYMENT_METHODS.forEach(function(pm) {
+    var def = PAYMENT_METHOD_DEFS[pm];
+    if (!def) return;
+    payBtnHtml += '<button class="checkout-pay-btn" style="background:' + def.color + '" '
+      + 'onclick="window.confirmCheckoutWith(\'' + pm + '\')">'
+      + def.icon + ' ' + def.label + '</button>';
+  });
+  document.getElementById('checkout-pay-buttons').innerHTML = payBtnHtml;
   document.getElementById('checkout-modal').classList.add('open');
 };
 
@@ -2100,16 +2126,17 @@ window.closeCheckout = function() {
   _checkoutIds = null;
 };
 
-window.confirmCheckout = function() {
+window.confirmCheckoutWith = function(paymentMethod) {
   if (!_checkoutTable || !_checkoutIds) return;
+  if (!PAYMENT_METHOD_DEFS[paymentMethod]) return;
   document.getElementById('checkout-modal').classList.remove('open');
-  window.markPaid(_checkoutTable, _checkoutIds, _discountAmount > 0 ? _discountAmount : null);
+  window.markPaid(_checkoutTable, _checkoutIds, _discountAmount > 0 ? _discountAmount : null, paymentMethod);
   _checkoutTable = null;
   _checkoutIds = null;
   _discountAmount = 0;
 };
 
-window.markPaid = function(tableNum, idStr, discountAmount) {
+window.markPaid = function(tableNum, idStr, discountAmount, paymentMethod) {
   var pax = _bPax[tableNum] !== undefined ? _bPax[tableNum] : 0;
   if (pax < 1) { alert('客数を1名以上入力してから会計済みにしてください。'); return; }
   var keys = idStr.split(',');
@@ -2118,7 +2145,12 @@ window.markPaid = function(tableNum, idStr, discountAmount) {
     if (keys[i]) {
       var updateData = {status:'paid', paidAt:paidAt, pax:pax};
       if (discountAmount) updateData.discount = discountAmount;
-      if (_bOrders[keys[i]]) { _bOrders[keys[i]].status = 'paid'; _bOrders[keys[i]].pax = pax; }
+      if (paymentMethod) updateData.paymentMethod = paymentMethod;
+      if (_bOrders[keys[i]]) {
+        _bOrders[keys[i]].status = 'paid';
+        _bOrders[keys[i]].pax = pax;
+        if (paymentMethod) _bOrders[keys[i]].paymentMethod = paymentMethod;
+      }
       update(ref(db,'orders/'+keys[i]), updateData);
     }
   }
