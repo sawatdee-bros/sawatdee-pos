@@ -22,6 +22,16 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .period-btn.cal { border-color: #7c3aed; color: #a78bfa; }
 .period-btn.cal.active { background: #7c3aed; border-color: #7c3aed; color: white; }
 
+/* ── 期間ナビゲーション ── */
+.period-nav-wrap { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #1e293b; border-radius: 12px; border: 1px solid #334155; }
+.period-nav-arrow { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.period-nav-arrow:hover:not(:disabled) { background: #334155; color: #f1f5f9; }
+.period-nav-arrow:disabled { opacity: 0.25; cursor: default; }
+.period-nav-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.period-nav-label { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+.period-nav-reset { padding: 2px 10px; background: transparent; border: 1px solid #475569; border-radius: 6px; color: #94a3b8; font-size: 11px; cursor: pointer; }
+.period-nav-reset:hover { background: #334155; color: #f1f5f9; }
+
 /* ── コンテナ ── */
 .container { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
 
@@ -219,9 +229,9 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
   <button class="csv-btn" id="gs-btn" onclick="window.syncToSheets()" style="background:#166534;border-color:#16a34a;">&#128202; スプレッドシートに保存</button>
 </header>
 <div class="period-bar">
-  <button class="period-btn active" onclick="setPeriod('today',this)">今日</button>
-  <button class="period-btn" onclick="setPeriod('week',this)">今週</button>
-  <button class="period-btn" onclick="setPeriod('month',this)">今月</button>
+  <button class="period-btn active" onclick="setPeriod('day',this)">日次</button>
+  <button class="period-btn" onclick="setPeriod('week',this)">週次</button>
+  <button class="period-btn" onclick="setPeriod('month',this)">月次</button>
   <button class="period-btn" onclick="setPeriod('all',this)">累計</button>
   <button class="period-btn cal" onclick="setPeriod('calendar',this)">&#128197; 日別一覧</button>
 </div>
@@ -300,7 +310,8 @@ var menuData = {};       // menu/ ノード全体
 var storeConfig = {};    // store_config/ ノード全体
 var drinkKeySet = null;    // Firebaseから構築したドリンク名セット
 var itemOverrides = {};    // store_config/item_category_overrides（Firebase保存済み分類）
-var currentPeriod = 'today';
+var currentPeriod = 'day';
+var navOffset = 0;       // 期間ナビゲーション（0=現在、-1=前、-2=前々…）
 var rankMode = 'qty';    // 'qty' | 'sales'
 var navCalYear = null;   // 月めくりカレンダーの表示年
 var navCalMonth = null;  // 月めくりカレンダーの表示月（0-11）
@@ -454,29 +465,105 @@ function buildSessionMap(orders) {
 //  期間フィルタ
 // ─────────────────────────────────────────────
 var DAY_START = 8;
-function startOf(unit) {
+
+// 「営業日」基準の現在の日（DAY_START 未満なら前日扱い）
+function _todayBase() {
   var d = new Date();
-  if (unit === 'today') {
-    if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
-    d.setHours(DAY_START,0,0,0); return d.getTime();
+  if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
+  d.setHours(DAY_START, 0, 0, 0);
+  return d;
+}
+
+// 期間範囲を返す（unit: 'day'|'week'|'month'、offset: 0=現在,-1=前,-2=前々…）
+// 戻り値: { fromTs, toTs, label, isCurrent, year, month, date }
+function getRange(unit, offset) {
+  offset = offset || 0;
+  if (unit === 'day') {
+    var d = _todayBase();
+    d.setDate(d.getDate() + offset);
+    var fromTs = d.getTime();
+    var toTs = fromTs + 86400000;
+    var label = d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+'('+DOW[d.getDay()]+')';
+    return { fromTs:fromTs, toTs:toTs, label:label, isCurrent: offset===0,
+             year:d.getFullYear(), month:d.getMonth(), date:d.getDate() };
   }
   if (unit === 'week') {
-    if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
-    var dow = d.getDay(); var diff = (dow >= 3) ? dow-3 : dow+4;
-    d.setDate(d.getDate()-diff); d.setHours(DAY_START,0,0,0); return d.getTime();
+    var d = _todayBase();
+    var dow = d.getDay();
+    var diff = (dow >= 3) ? dow-3 : dow+4;  // 水曜始まり
+    d.setDate(d.getDate() - diff + offset * 7);
+    var fromTs = d.getTime();
+    var toTs = fromTs + 7 * 86400000;
+    var endD = new Date(d); endD.setDate(endD.getDate() + 6);
+    var label = (d.getMonth()+1)+'/'+d.getDate()+'(水)〜'+(endD.getMonth()+1)+'/'+endD.getDate()+'(火)';
+    return { fromTs:fromTs, toTs:toTs, label:label, isCurrent: offset===0,
+             year:d.getFullYear(), month:d.getMonth() };
   }
   if (unit === 'month') {
-    if (d.getHours() < DAY_START) d.setDate(d.getDate()-1);
-    d.setDate(1); d.setHours(DAY_START,0,0,0); return d.getTime();
+    var base = _todayBase();
+    var newMonth = base.getMonth() + offset;
+    var newYear = base.getFullYear();
+    while (newMonth < 0) { newMonth += 12; newYear--; }
+    while (newMonth > 11) { newMonth -= 12; newYear++; }
+    var from = new Date(newYear, newMonth, 1, DAY_START, 0, 0);
+    var to = new Date(newYear, newMonth+1, 1, DAY_START, 0, 0);
+    var label = newYear+'年'+(newMonth+1)+'月';
+    return { fromTs:from.getTime(), toTs:to.getTime(), label:label, isCurrent: offset===0,
+             year:newYear, month:newMonth };
   }
-  return 0;
+  return null;
+}
+
+// 最古の paid/done 注文の timestamp
+function getOldestPaidTs() {
+  var minTs = null;
+  Object.values(allOrders).forEach(function(o) {
+    if ((o.status === 'paid' || o.status === 'done') && (minTs === null || o.timestamp < minTs)) {
+      minTs = o.timestamp;
+    }
+  });
+  return minTs;
 }
 
 function getFiltered() {
-  var from = startOf(currentPeriod);
+  if (currentPeriod === 'all') {
+    return Object.values(allOrders).filter(function(o) {
+      return (o.status === 'paid' || o.status === 'done');
+    });
+  }
+  var r = getRange(currentPeriod, navOffset);
+  if (!r) return [];
   return Object.values(allOrders).filter(function(o) {
-    return (o.status === 'paid' || o.status === 'done') && o.timestamp >= from;
+    return (o.status === 'paid' || o.status === 'done') &&
+           o.timestamp >= r.fromTs && o.timestamp < r.toTs;
   });
+}
+
+// 期間ナビゲーション
+window.navPeriodPrev = function() { navOffset--; render(); };
+window.navPeriodNext = function() { if (navOffset < 0) { navOffset++; render(); } };
+window.navPeriodReset = function() { navOffset = 0; render(); };
+
+function renderPeriodNav() {
+  if (currentPeriod === 'all' || currentPeriod === 'calendar') return '';
+  var r = getRange(currentPeriod, navOffset);
+  if (!r) return '';
+  var oldestTs = getOldestPaidTs();
+  var prevDisabled = false;
+  if (oldestTs !== null) {
+    var prevR = getRange(currentPeriod, navOffset - 1);
+    if (prevR && prevR.toTs <= oldestTs) prevDisabled = true;
+  }
+  var nextDisabled = navOffset >= 0;
+  var unitLabel = currentPeriod === 'day' ? '日' : currentPeriod === 'week' ? '週' : '月';
+  return '<div class="period-nav-wrap">'
+    + '<button class="period-nav-arrow" onclick="window.navPeriodPrev()" '+(prevDisabled?'disabled':'')+'>&#8249;</button>'
+    + '<div class="period-nav-center">'
+    + '<div class="period-nav-label">'+r.label+'</div>'
+    + (r.isCurrent ? '' : '<button class="period-nav-reset" onclick="window.navPeriodReset()">今'+unitLabel+'に戻る</button>')
+    + '</div>'
+    + '<button class="period-nav-arrow" onclick="window.navPeriodNext()" '+(nextDisabled?'disabled':'')+'>&#8250;</button>'
+    + '</div>';
 }
 
 // ─────────────────────────────────────────────
@@ -498,6 +585,7 @@ function todayStr() {
 // ─────────────────────────────────────────────
 window.setPeriod = function(p, btn) {
   currentPeriod = p;
+  navOffset = 0;
   document.querySelectorAll('.period-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   if (p === 'calendar') renderCalendar();
@@ -505,15 +593,17 @@ window.setPeriod = function(p, btn) {
 };
 
 // ─────────────────────────────────────────────
-//  メインレンダリング（今日 / 今週 / 今月 / 累計）
+//  メインレンダリング（日次 / 週次 / 月次 / 累計）
 // ─────────────────────────────────────────────
 function render() {
   var orders = getFiltered();
   var cont = document.getElementById('container');
+  var navHtml = renderPeriodNav();
   if (orders.length === 0) {
-    cont.innerHTML = '<div class="no-data">この期間の売上データがありません</div>';
+    cont.innerHTML = navHtml + '<div class="no-data">この期間の売上データがありません</div>';
     return;
   }
+  var curR = (currentPeriod !== 'all') ? getRange(currentPeriod, navOffset) : null;
 
   var sessionMap = buildSessionMap(orders);
   var sessions = Object.values(sessionMap);
@@ -558,41 +648,42 @@ function render() {
   var avgPax = paxCount > 0 ? (totalPax / paxCount).toFixed(1) : '-';
   var avgPerPax = (totalPax > 0) ? Math.floor(totalIn / totalPax) : 0;
 
-  // 前期比計算
+  // 前期比計算（同単位の1つ前の期間と比較）
   var prevSales = 0;
   if (currentPeriod !== 'all') {
-    var from = startOf(currentPeriod);
-    var duration = Date.now() - from;
-    var prevFrom = from - duration;
-    var prevOrders = Object.values(allOrders).filter(function(o) {
-      return (o.status==='paid'||o.status==='done') && o.timestamp>=prevFrom && o.timestamp<from;
-    });
-    var prevMap = buildSessionMap(prevOrders);
-    Object.values(prevMap).forEach(function(s){ prevSales += s.sales; });
+    var prevR = getRange(currentPeriod, navOffset - 1);
+    if (prevR) {
+      var prevOrders = Object.values(allOrders).filter(function(o) {
+        return (o.status==='paid'||o.status==='done') && o.timestamp>=prevR.fromTs && o.timestamp<prevR.toTs;
+      });
+      var prevMap = buildSessionMap(prevOrders);
+      Object.values(prevMap).forEach(function(s){ prevSales += s.sales; });
+    }
   }
   var diffPct = prevSales > 0 ? Math.round((totalIn - prevSales) / prevSales * 100) : null;
 
   // 棒グラフデータ
   var barData = [];
   var now = new Date();
-  if (currentPeriod === 'today') {
+  var isCur = curR ? curR.isCurrent : false;
+  if (currentPeriod === 'day') {
     for (var hh = 11; hh <= 23; hh++) {
       var v = 0;
       sessions.forEach(function(s){ if (new Date(s.ts).getHours() === hh) v += s.sales; });
-      barData.push({ label: hh+'時', val: v, isNow: now.getHours()===hh });
+      barData.push({ label: hh+'時', val: v, isNow: isCur && now.getHours()===hh });
     }
   } else if (currentPeriod === 'week') {
     for (var d = 0; d < 7; d++) {
       var v = 0;
       sessions.forEach(function(s){ if (new Date(s.ts - DAY_START*3600000).getDay()===d) v += s.sales; });
-      barData.push({ label: DOW[d], val: v, isNow: now.getDay()===d });
+      barData.push({ label: DOW[d], val: v, isNow: isCur && now.getDay()===d });
     }
   } else if (currentPeriod === 'month') {
-    var dim = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    var dim = new Date(curR.year, curR.month+1, 0).getDate();
     for (var d = 1; d <= dim; d++) {
       var v = 0;
       sessions.forEach(function(s){ if (new Date(s.ts - DAY_START*3600000).getDate()===d) v += s.sales; });
-      barData.push({ label: d%5===0?String(d):'', val: v, isNow: now.getDate()===d });
+      barData.push({ label: d%5===0?String(d):'', val: v, isNow: isCur && now.getDate()===d });
     }
   } else if (currentPeriod === 'all') {
     // 曜日別の「平均売上」（累計合計 ÷ その曜日の営業日数）
@@ -624,7 +715,7 @@ function render() {
   var CAT_COLORS = { 'ドリンク':'#0ea5e9', 'フード':'#f97316', 'セット':'#a78bfa', 'その他':'#64748b' };
 
   // ── HTML構築 ──
-  var h = '';
+  var h = navHtml;
 
   // サマリー
   h += '<div class="summary-grid">'
@@ -650,15 +741,14 @@ function render() {
   // 棒グラフ
   if (barData.length > 0) {
     if (currentPeriod === 'month') {
-      // カレンダー表示
-      var calNow = new Date();
-      var calYear = calNow.getFullYear();
-      var calMonth = calNow.getMonth();
+      // カレンダー表示（表示中の月）
+      var calYear = curR.year;
+      var calMonth = curR.month;
       var firstDow = new Date(calYear, calMonth, 1).getDay(); // 0=日
       // 月曜始まりに変換（0=月 … 6=日）
       var startOffset = (firstDow === 0) ? 6 : firstDow - 1;
       var dim = new Date(calYear, calMonth+1, 0).getDate();
-      var todayD = calNow.getDate();
+      var todayD = curR.isCurrent ? (new Date()).getDate() : -1;
       var DOW_CAL = ['月','火','水','木','金','土','日'];
       h += '<div class="month-cal-wrap"><div class="section-title">日別売上</div>';
       h += '<div class="month-cal-grid">';
@@ -699,9 +789,9 @@ function render() {
       }
       h += '</div></div>';
     } else {
-      // 今日・今週・累計は棒グラフ
-      var chartTitle = currentPeriod==='today' ? '時間帯別売上'
-                     : currentPeriod==='all'   ? '曜日別平均売上（累計）'
+      // 日次・週次・累計は棒グラフ
+      var chartTitle = currentPeriod==='day' ? '時間帯別売上'
+                     : currentPeriod==='all' ? '曜日別平均売上（累計）'
                      : '曜日別売上';
       h += '<div class="chart-wrap"><div class="section-title">' + chartTitle + '</div>'
         + '<div class="bar-chart">';
