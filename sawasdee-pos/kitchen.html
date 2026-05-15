@@ -146,7 +146,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 /* 会計モーダル */
 .checkout-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px; }
 .checkout-modal.open { display: flex; }
-.checkout-box { background: white; border-radius: 10px; width: 100%; max-width: 320px; overflow: hidden; font-family: 'Courier New', Courier, monospace; }
+.checkout-box { background: white; border-radius: 10px; width: 100%; max-width: 480px; overflow: hidden; font-family: 'Courier New', Courier, monospace; }
 .checkout-body { padding: 16px; max-height: 55vh; overflow-y: auto; }
 .checkout-grand { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #166534; }
 .checkout-grand-label { font-size: 14px; font-weight: 700; color: #dcfce7; font-family: -apple-system, sans-serif; }
@@ -357,7 +357,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
       <span class="checkout-grand-amount" id="checkout-final-amount"></span>
     </div>
     <div class="checkout-btns">
-      <button class="checkout-cancel" onclick="window.closeCheckout()">キャンセル</button>
+      <button class="checkout-cancel" onclick="window.closeCheckout()">キャン<br>セル</button>
       <div class="checkout-pay-buttons" id="checkout-pay-buttons"></div>
     </div>
   </div>
