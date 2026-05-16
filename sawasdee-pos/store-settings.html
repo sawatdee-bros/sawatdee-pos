@@ -421,11 +421,29 @@ for (var h = 0; h < 24; h++) {
 
 // デフォルト値
 // 支払方法マスタ定義（kitchen.html / sales.html と同期）
-var PAYMENT_METHOD_DEFS = {
-  'cash': { label: '現金',   icon: '💴', color: '#166534' },
-  'card': { label: 'カード', icon: '💳', color: '#1d4ed8' },
-  'qr':   { label: 'QR決済', icon: '📱', color: '#7c3aed' }
+var PAYMENT_METHOD_DEFS_MASTER = {
+  'cash':    { label: '現金',     icon: '💴', color: '#166534' },
+  'card':    { label: 'カード',   icon: '💳', color: '#1d4ed8' },
+  'qr':      { label: 'QR決済',   icon: '📱', color: '#7c3aed' },
+  'paypay':  { label: 'PayPay',   icon: '🅿️', color: '#ef4444' },
+  'rakuten': { label: '楽天Pay',  icon: '🅡', color: '#dc2626' },
+  'dpay':    { label: 'd払い',    icon: '🇩', color: '#db2777' },
+  'suica':   { label: '交通系IC', icon: '🚃', color: '#10b981' },
+  'other':   { label: 'その他',   icon: '💠', color: '#475569' }
 };
+window._customPaymentMethods = {}; // load 時にstore_configから設定
+function getPaymentMethodDefs() {
+  return Object.assign({}, PAYMENT_METHOD_DEFS_MASTER, window._customPaymentMethods);
+}
+var PAYMENT_METHOD_DEFS = new Proxy({}, {
+  get: function(_, key) { return getPaymentMethodDefs()[key]; },
+  has: function(_, key) { return key in getPaymentMethodDefs(); },
+  ownKeys: function() { return Object.keys(getPaymentMethodDefs()); },
+  getOwnPropertyDescriptor: function(_, key) {
+    var defs = getPaymentMethodDefs();
+    if (key in defs) return { configurable: true, enumerable: true, value: defs[key] };
+  }
+});
 
 var DEFAULTS = {
   store_name: '',
@@ -479,8 +497,11 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('qr_note2').value = cfg.qr_note2 || '';
   window._discountPresets = Array.isArray(cfg.discount_presets) ? cfg.discount_presets : [];
   window.renderDiscountPresets();
+  window._customPaymentMethods = (cfg.custom_payment_methods && typeof cfg.custom_payment_methods === 'object')
+    ? Object.assign({}, cfg.custom_payment_methods) : {};
+  var allDefs = getPaymentMethodDefs();
   window._paymentMethodsEnabled = Array.isArray(cfg.payment_methods) && cfg.payment_methods.length > 0
-    ? cfg.payment_methods.filter(function(id){ return PAYMENT_METHOD_DEFS[id]; })
+    ? cfg.payment_methods.filter(function(id){ return allDefs[id]; })
     : ['cash', 'card'];
   if (window._paymentMethodsEnabled.length === 0) window._paymentMethodsEnabled = ['cash', 'card'];
   window.renderPaymentMethods();
@@ -543,6 +564,7 @@ function getFormState() {
     apps_script_url: document.getElementById('apps_script_url').value,
     discount_presets: JSON.stringify(window._discountPresets || []),
     payment_methods: JSON.stringify(window._paymentMethodsEnabled || []),
+    custom_payment_methods: JSON.stringify(window._customPaymentMethods || {}),
   });
 }
 
@@ -556,22 +578,102 @@ window.renderPaymentMethods = function() {
   var list = document.getElementById('payment-methods-list');
   if (!list) return;
   var enabled = window._paymentMethodsEnabled || ['cash', 'card'];
+  var defs = getPaymentMethodDefs();
+  var custom = window._customPaymentMethods || {};
   var html = '';
-  Object.keys(PAYMENT_METHOD_DEFS).forEach(function(id) {
-    var def = PAYMENT_METHOD_DEFS[id];
+  Object.keys(defs).forEach(function(id) {
+    var def = defs[id];
+    var isCustom = !!custom[id];
     var checked = enabled.indexOf(id) >= 0 ? 'checked' : '';
     html += '<div class="field-row">'
       + '<div class="field-label">'
-      + '<div class="field-label-main">' + def.icon + ' ' + def.label + '</div>'
-      + '<div class="field-label-sub">ID: ' + id + '</div>'
+      + '<div class="field-label-main">' + def.icon + ' ' + def.label
+      +   (isCustom ? ' <span style="font-size:10px;background:#7c3aed;color:white;padding:1px 6px;border-radius:8px;margin-left:4px;">カスタム</span>' : '')
       + '</div>'
-      + '<label class="toggle">'
+      + '<div class="field-label-sub">ID: ' + id + '</div>'
+      + '</div>';
+    if (isCustom) {
+      html += '<button onclick="window.removeCustomPaymentMethod(\'' + id + '\')" '
+        + 'style="padding:4px 10px;border:1px solid #ef4444;border-radius:6px;background:transparent;color:#ef4444;font-size:11px;cursor:pointer;margin-right:8px;">削除</button>';
+    }
+    html += '<label class="toggle">'
       + '<input type="checkbox" id="pm-enable-' + id + '" ' + checked + ' onchange="window.togglePaymentMethod(\'' + id + '\', this.checked)">'
       + '<span class="toggle-slider"></span>'
       + '</label>'
       + '</div>';
   });
+  html += '<button onclick="window.openCustomPaymentMethodModal()" '
+    + 'style="width:100%;margin-top:8px;padding:8px;border:1px dashed #94a3b8;border-radius:8px;background:transparent;color:#64748b;font-size:13px;cursor:pointer;">'
+    + '＋ カスタム支払方法を追加</button>';
   list.innerHTML = html;
+};
+
+window.removeCustomPaymentMethod = function(id) {
+  if (!confirm('「' + (PAYMENT_METHOD_DEFS_MASTER[id] || window._customPaymentMethods[id] || {label:id}).label + '」を削除しますか？')) return;
+  delete window._customPaymentMethods[id];
+  window._paymentMethodsEnabled = (window._paymentMethodsEnabled || []).filter(function(x){ return x !== id; });
+  window.renderPaymentMethods();
+};
+
+window.openCustomPaymentMethodModal = function() {
+  var modal = document.getElementById('custom-pm-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'custom-pm-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = '<div style="background:white;border-radius:12px;padding:20px;max-width:380px;width:100%;">'
+      + '<div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:14px;">＋ カスタム支払方法を追加</div>'
+      + '<div style="margin-bottom:10px;"><div style="font-size:12px;color:#6b7280;margin-bottom:4px;">表示名（必須）</div>'
+      + '<input id="custom-pm-label" type="text" placeholder="例: 食べログPay" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;"></div>'
+      + '<div style="margin-bottom:10px;"><div style="font-size:12px;color:#6b7280;margin-bottom:4px;">アイコン（絵文字1〜2文字）</div>'
+      + '<input id="custom-pm-icon" type="text" placeholder="例: 🍴" maxlength="4" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;"></div>'
+      + '<div style="margin-bottom:10px;"><div style="font-size:12px;color:#6b7280;margin-bottom:4px;">色</div>'
+      + '<div id="custom-pm-color-palette" style="display:flex;gap:6px;flex-wrap:wrap;"></div></div>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">'
+      + '<button onclick="document.getElementById(\'custom-pm-modal\').remove()" style="padding:8px 16px;background:#f3f4f6;border:none;border-radius:6px;color:#374151;font-size:14px;cursor:pointer;">キャンセル</button>'
+      + '<button onclick="window.saveCustomPaymentMethod()" style="padding:8px 16px;background:#166534;border:none;border-radius:6px;color:white;font-size:14px;font-weight:700;cursor:pointer;">追加</button>'
+      + '</div></div>';
+    document.body.appendChild(modal);
+    // カラーパレット生成
+    var palette = ['#166534','#1d4ed8','#7c3aed','#ef4444','#dc2626','#db2777','#10b981','#0891b2','#ea580c','#475569'];
+    var paletteEl = modal.querySelector('#custom-pm-color-palette');
+    palette.forEach(function(c, i) {
+      var btn = document.createElement('button');
+      btn.style.cssText = 'width:32px;height:32px;border-radius:8px;border:2px solid '+(i===0?'#111827':'transparent')+';background:'+c+';cursor:pointer;';
+      btn.dataset.color = c;
+      btn.onclick = function() {
+        paletteEl.querySelectorAll('button').forEach(function(b){ b.style.borderColor = 'transparent'; });
+        btn.style.borderColor = '#111827';
+      };
+      paletteEl.appendChild(btn);
+    });
+  }
+  // フィールドリセット
+  modal.querySelector('#custom-pm-label').value = '';
+  modal.querySelector('#custom-pm-icon').value = '💠';
+  modal.querySelectorAll('#custom-pm-color-palette button').forEach(function(b, i){
+    b.style.borderColor = i === 0 ? '#111827' : 'transparent';
+  });
+};
+
+window.saveCustomPaymentMethod = function() {
+  var modal = document.getElementById('custom-pm-modal');
+  if (!modal) return;
+  var label = modal.querySelector('#custom-pm-label').value.trim();
+  var icon = modal.querySelector('#custom-pm-icon').value.trim() || '💠';
+  var selectedBtn = Array.from(modal.querySelectorAll('#custom-pm-color-palette button'))
+    .find(function(b){ return b.style.borderColor.indexOf('rgb(17, 24, 39)') >= 0 || b.style.borderColor === '#111827'; });
+  var color = selectedBtn ? selectedBtn.dataset.color : '#475569';
+  if (!label) { alert('表示名を入力してください'); return; }
+  // ID自動生成: custom_1, custom_2... 連番
+  var allDefs = getPaymentMethodDefs();
+  var n = 1;
+  while (allDefs['custom_' + n]) n++;
+  var id = 'custom_' + n;
+  window._customPaymentMethods[id] = { label: label, icon: icon, color: color };
+  window._paymentMethodsEnabled = (window._paymentMethodsEnabled || []).concat([id]);
+  modal.remove();
+  window.renderPaymentMethods();
 };
 
 window.togglePaymentMethod = function(id, on) {
@@ -694,7 +796,9 @@ window.saveAll = async function() {
     qr_note1: document.getElementById('qr_note1').value.trim() || null,
     qr_note2: document.getElementById('qr_note2').value.trim() || null,
     discount_presets: window._discountPresets && window._discountPresets.length > 0 ? window._discountPresets : null,
-    payment_methods: (window._paymentMethodsEnabled || []).slice()
+    payment_methods: (window._paymentMethodsEnabled || []).slice(),
+    custom_payment_methods: (window._customPaymentMethods && Object.keys(window._customPaymentMethods).length > 0)
+      ? window._customPaymentMethods : null
   };
   if (!cfg.payment_methods || cfg.payment_methods.length === 0) {
     alert('支払方法を少なくとも1つ選択してください。');

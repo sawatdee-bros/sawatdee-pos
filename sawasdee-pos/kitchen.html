@@ -531,11 +531,31 @@ let _DISCOUNT_PRESETS = [];
 let APPROVAL_FLOW_ON = false; // フェーズ3以降の承認フローで参照（現状未使用）
 
 // 支払方法マスタ定義（SaaS化時はテナント設定で payment_methods 配列を切替）
-var PAYMENT_METHOD_DEFS = {
-  'cash': { label: '現金',   icon: '💴', color: '#166534' },
-  'card': { label: 'カード', icon: '💳', color: '#1d4ed8' },
-  'qr':   { label: 'QR決済', icon: '📱', color: '#7c3aed' }
+// 店舗固有はstore_config.custom_payment_methodsで追加可能（マージして使用）
+var PAYMENT_METHOD_DEFS_MASTER = {
+  'cash':    { label: '現金',     icon: '💴', color: '#166534' },
+  'card':    { label: 'カード',   icon: '💳', color: '#1d4ed8' },
+  'qr':      { label: 'QR決済',   icon: '📱', color: '#7c3aed' },
+  'paypay':  { label: 'PayPay',   icon: '🅿️', color: '#ef4444' },
+  'rakuten': { label: '楽天Pay',  icon: '🅡', color: '#dc2626' },
+  'dpay':    { label: 'd払い',    icon: '🇩', color: '#db2777' },
+  'suica':   { label: '交通系IC', icon: '🚃', color: '#10b981' },
+  'other':   { label: 'その他',   icon: '💠', color: '#475569' }
 };
+var _customPaymentMethods = {}; // store_configから読み込み
+function getPaymentMethodDefs() {
+  return Object.assign({}, PAYMENT_METHOD_DEFS_MASTER, _customPaymentMethods);
+}
+// 既存互換: PAYMENT_METHOD_DEFS は getter として動作
+var PAYMENT_METHOD_DEFS = new Proxy({}, {
+  get: function(_, key) { return getPaymentMethodDefs()[key]; },
+  has: function(_, key) { return key in getPaymentMethodDefs(); },
+  ownKeys: function() { return Object.keys(getPaymentMethodDefs()); },
+  getOwnPropertyDescriptor: function(_, key) {
+    var defs = getPaymentMethodDefs();
+    if (key in defs) return { configurable: true, enumerable: true, value: defs[key] };
+  }
+});
 let _PAYMENT_METHODS = ['cash', 'card']; // store_config.payment_methods 未設定時のフォールバック
 
 get(ref(db, 'store_config')).then(function(snap) {
@@ -549,8 +569,10 @@ get(ref(db, 'store_config')).then(function(snap) {
   if (cfg.rounding_unit) _ROUNDING_UNIT = cfg.rounding_unit;
   if (cfg.table_names) TABLE_NAMES = cfg.table_names;
   if (cfg.table_names_short) TABLE_NAMES_SHORT = cfg.table_names_short;
+  _customPaymentMethods = (cfg.custom_payment_methods && typeof cfg.custom_payment_methods === 'object') ? cfg.custom_payment_methods : {};
   if (Array.isArray(cfg.payment_methods) && cfg.payment_methods.length > 0) {
-    var filtered = cfg.payment_methods.filter(function(id){ return PAYMENT_METHOD_DEFS[id]; });
+    var defs = getPaymentMethodDefs();
+    var filtered = cfg.payment_methods.filter(function(id){ return defs[id]; });
     if (filtered.length > 0) _PAYMENT_METHODS = filtered;
   }
   APPROVAL_FLOW_ON = cfg.enable_approval_flow === true;

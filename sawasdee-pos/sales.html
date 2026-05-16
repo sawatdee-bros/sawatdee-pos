@@ -318,11 +318,30 @@ var menuData = {};       // menu/ ノード全体
 var storeConfig = {};    // store_config/ ノード全体
 
 // 支払方法マスタ定義（kitchen.html と同期させる）
-var PAYMENT_METHOD_DEFS = {
-  'cash': { label: '現金',   icon: '💴', color: '#22c55e' },
-  'card': { label: 'カード', icon: '💳', color: '#38bdf8' },
-  'qr':   { label: 'QR決済', icon: '📱', color: '#a78bfa' }
+// 店舗固有はstore_config.custom_payment_methodsで追加可能
+var PAYMENT_METHOD_DEFS_MASTER = {
+  'cash':    { label: '現金',     icon: '💴', color: '#22c55e' },
+  'card':    { label: 'カード',   icon: '💳', color: '#38bdf8' },
+  'qr':      { label: 'QR決済',   icon: '📱', color: '#a78bfa' },
+  'paypay':  { label: 'PayPay',   icon: '🅿️', color: '#ef4444' },
+  'rakuten': { label: '楽天Pay',  icon: '🅡', color: '#dc2626' },
+  'dpay':    { label: 'd払い',    icon: '🇩', color: '#db2777' },
+  'suica':   { label: '交通系IC', icon: '🚃', color: '#10b981' },
+  'other':   { label: 'その他',   icon: '💠', color: '#94a3b8' }
 };
+var _customPaymentMethods = {};
+function getPaymentMethodDefs() {
+  return Object.assign({}, PAYMENT_METHOD_DEFS_MASTER, _customPaymentMethods);
+}
+var PAYMENT_METHOD_DEFS = new Proxy({}, {
+  get: function(_, key) { return getPaymentMethodDefs()[key]; },
+  has: function(_, key) { return key in getPaymentMethodDefs(); },
+  ownKeys: function() { return Object.keys(getPaymentMethodDefs()); },
+  getOwnPropertyDescriptor: function(_, key) {
+    var defs = getPaymentMethodDefs();
+    if (key in defs) return { configurable: true, enumerable: true, value: defs[key] };
+  }
+});
 var _PAYMENT_METHODS = ['cash', 'card'];   // store_config.payment_methods 未設定時のフォールバック
 var drinkKeySet = null;    // Firebaseから構築したドリンク名セット
 var itemOverrides = {};    // store_config/item_category_overrides（Firebase保存済み分類）
@@ -1628,9 +1647,13 @@ onValue(ref(db, 'store_config'), function(snap) {
   }
   // item_category_overrides を同期（Firebase保存済み分類）
   itemOverrides = storeConfig.item_category_overrides || {};
+  // custom_payment_methods をマージ
+  _customPaymentMethods = (storeConfig.custom_payment_methods && typeof storeConfig.custom_payment_methods === 'object')
+    ? storeConfig.custom_payment_methods : {};
   // payment_methods を同期（未設定時はフォールバック維持）
   if (Array.isArray(storeConfig.payment_methods) && storeConfig.payment_methods.length > 0) {
-    var filtered = storeConfig.payment_methods.filter(function(id){ return PAYMENT_METHOD_DEFS[id]; });
+    var defs = getPaymentMethodDefs();
+    var filtered = storeConfig.payment_methods.filter(function(id){ return defs[id]; });
     if (filtered.length > 0) _PAYMENT_METHODS = filtered;
   }
   dataReady.config = true;
