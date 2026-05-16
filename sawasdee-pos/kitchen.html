@@ -143,6 +143,20 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .receipt-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; padding: 4px 0 2px; color: #111; }
 .pay-btn { width: 100%; margin-top: 10px; padding: 7px 0; background: #1d4ed8; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
 .pay-btn:disabled { background: #475569; color: #94a3b8; cursor: default; }
+.pay-btn.paid-method { background: #166534; }
+.pay-method-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: center; justify-content: center; padding: 20px; }
+.pay-method-modal.open { display: flex; }
+.pay-method-box { background: white; border-radius: 12px; padding: 20px; max-width: 420px; width: 100%; font-family: -apple-system, sans-serif; }
+.pay-method-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.pay-method-sub { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
+.pay-method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 16px; }
+.pay-method-btn { padding: 14px 6px; border: 2px solid transparent; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; min-width: 0; opacity: 0.65; }
+.pay-method-btn.selected { opacity: 1; border-color: #111827; transform: scale(1.02); }
+.pay-method-btn:active { transform: scale(0.97); }
+.pay-method-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.pay-method-cancel { padding: 10px 18px; background: #f3f4f6; border: none; border-radius: 8px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
+.pay-method-save { padding: 10px 22px; background: #166534; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
+.pay-method-save:disabled { background: #9ca3af; cursor: default; }
 /* 会計モーダル */
 .checkout-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px; }
 .checkout-modal.open { display: flex; }
@@ -339,6 +353,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     <div class="col-header drink">🥤 ドリンク</div>
     <div class="col-cards" id="drink-cards-single">
       <div class="empty-state" style="height:40vh"><div style="font-size:32px">🥤</div><div style="font-size:14px;margin-top:8px">注文待ち</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 支払方法変更モーダル -->
+<div class="pay-method-modal" id="pay-method-modal">
+  <div class="pay-method-box">
+    <div class="pay-method-title">💰 支払方法を変更</div>
+    <div class="pay-method-sub" id="pay-method-sub"></div>
+    <div class="pay-method-grid" id="pay-method-grid"></div>
+    <div class="pay-method-actions">
+      <button class="pay-method-cancel" onclick="window.closePaymentMethodChange()">キャンセル</button>
+      <button class="pay-method-save" id="pay-method-save-btn" onclick="window.savePaymentMethodChange()">変更を保存</button>
     </div>
   </div>
 </div>
@@ -2120,6 +2147,73 @@ window.openCheckout = function(tableNum, idStr) {
   document.getElementById('checkout-modal').classList.add('open');
 };
 
+// ===== 支払方法変更モーダル =====
+var _pmEntryIds = null;
+var _pmCurrentPm = null;
+var _pmSelected = null;
+
+window.openPaymentMethodChange = function(entryIds, currentPm) {
+  _pmEntryIds = entryIds;
+  _pmCurrentPm = currentPm || 'cash';
+  _pmSelected = _pmCurrentPm;
+  var curDef = PAYMENT_METHOD_DEFS[_pmCurrentPm] || PAYMENT_METHOD_DEFS['cash'];
+  document.getElementById('pay-method-sub').textContent = '現在: ' + curDef.icon + ' ' + curDef.label;
+  renderPaymentMethodGrid();
+  document.getElementById('pay-method-modal').classList.add('open');
+};
+
+function renderPaymentMethodGrid() {
+  var grid = document.getElementById('pay-method-grid');
+  var html = '';
+  var keys = _PAYMENT_METHODS.slice();
+  if (_pmCurrentPm && keys.indexOf(_pmCurrentPm) < 0 && PAYMENT_METHOD_DEFS[_pmCurrentPm]) {
+    keys.push(_pmCurrentPm);
+  }
+  keys.forEach(function(pm) {
+    var def = PAYMENT_METHOD_DEFS[pm];
+    if (!def) return;
+    var selected = (pm === _pmSelected) ? ' selected' : '';
+    html += '<button class="pay-method-btn' + selected + '" style="background:' + def.color + '"'
+      + ' onclick="window.selectPaymentMethod(\'' + pm + '\')">'
+      + def.icon + ' ' + def.label + '</button>';
+  });
+  grid.innerHTML = html;
+  document.getElementById('pay-method-save-btn').disabled = (_pmSelected === _pmCurrentPm);
+}
+
+window.selectPaymentMethod = function(pm) {
+  if (!PAYMENT_METHOD_DEFS[pm]) return;
+  _pmSelected = pm;
+  renderPaymentMethodGrid();
+};
+
+window.closePaymentMethodChange = function() {
+  document.getElementById('pay-method-modal').classList.remove('open');
+  _pmEntryIds = null;
+  _pmCurrentPm = null;
+  _pmSelected = null;
+};
+
+window.savePaymentMethodChange = async function() {
+  if (!_pmEntryIds || !_pmSelected || _pmSelected === _pmCurrentPm) return;
+  if (!PAYMENT_METHOD_DEFS[_pmSelected]) return;
+  var keys = _pmEntryIds.split(',').filter(Boolean);
+  var newPm = _pmSelected;
+  var updates = {};
+  keys.forEach(function(k) {
+    updates['orders/' + k + '/paymentMethod'] = newPm;
+    if (_bOrders[k]) _bOrders[k].paymentMethod = newPm;
+  });
+  try {
+    await update(ref(db), updates);
+    _billsRender();
+  } catch(e) {
+    alert('支払方法の更新に失敗しました: ' + e.message);
+    console.error(e);
+  }
+  window.closePaymentMethodChange();
+};
+
 window.closeCheckout = function() {
   document.getElementById('checkout-modal').classList.remove('open');
   _checkoutTable = null;
@@ -2608,10 +2702,23 @@ function _billsRender() {
       ?'<div class="receipt-charge-free"><span>チャージ料 \xd7'+pax+'名（免除）</span><span>\xa5'+chargeEx.toLocaleString()+'</span></div>'
       :'<div class="receipt-charge"><span>チャージ料 \xd7'+pax+'名</span><span>\xa5'+chargeEx.toLocaleString()+'</span></div>';
 
+    var _paidPmHTML = '';
+    if (isPaid) {
+      var _sessPm = null;
+      for (var _pi = 0; _pi < entries.length; _pi++) {
+        if (entries[_pi].o.paymentMethod) { _sessPm = entries[_pi].o.paymentMethod; break; }
+      }
+      var _pmKey = _sessPm || 'cash';
+      var _pmDef = PAYMENT_METHOD_DEFS[_pmKey] || PAYMENT_METHOD_DEFS['cash'];
+      _paidPmHTML = '<button class="pay-btn paid-method" style="background:' + _pmDef.color + '"'
+        + ' onclick="window.openPaymentMethodChange(\'' + entryIds + '\',\'' + _pmKey + '\')">'
+        + _pmDef.icon + ' ' + _pmDef.label + 'で会計済み （タップで変更）</button>';
+    }
     var payHTML=isPaid
       ?'<button class="pay-btn" disabled>\u2713 会計済み</button>'
       :'<button class="pay-btn" onclick="window.openCheckout(\''+tableNum+'\',\''+entryIds+'\')">💳 会計する</button>';
 
+    if (isPaid && _paidPmHTML) payHTML = _paidPmHTML;
     var editHTML='<button class="edit-btn" onclick="window.openEdit(\''+tableNum+'\',\''+entryIds+'\')">&#9999;&#65039; 伝票を編集する</button>';
 
     var receiptCls='receipt'+(isPaid?' paid':hasActive?' active':allDone?' done':'');
