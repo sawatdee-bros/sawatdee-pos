@@ -317,6 +317,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
   <div class="section">
     <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">支払方法</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
+        <div class="field-label-sub" style="margin-bottom:10px;">会計モーダルに表示する支払方法をON/OFFできます。最低1つは必須。</div>
+        <div id="payment-methods-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
       <span class="accordion-title">割引プリセット</span>
       <span class="accordion-arrow">▼</span>
     </div>
@@ -407,6 +420,13 @@ for (var h = 0; h < 24; h++) {
 }
 
 // デフォルト値
+// 支払方法マスタ定義（kitchen.html / sales.html と同期）
+var PAYMENT_METHOD_DEFS = {
+  'cash': { label: '現金',   icon: '💴', color: '#166534' },
+  'card': { label: 'カード', icon: '💳', color: '#1d4ed8' },
+  'qr':   { label: 'QR決済', icon: '📱', color: '#7c3aed' }
+};
+
 var DEFAULTS = {
   store_name: '',
   tax_rate: 0.1,
@@ -421,7 +441,8 @@ var DEFAULTS = {
   day_start_hour: 8,
   charge_mode: 'conditional',
   charge_free_drink_count: 2,
-  discount_presets: []
+  discount_presets: [],
+  payment_methods: ['cash', 'card']
 };
 
 
@@ -458,6 +479,11 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('qr_note2').value = cfg.qr_note2 || '';
   window._discountPresets = Array.isArray(cfg.discount_presets) ? cfg.discount_presets : [];
   window.renderDiscountPresets();
+  window._paymentMethodsEnabled = Array.isArray(cfg.payment_methods) && cfg.payment_methods.length > 0
+    ? cfg.payment_methods.filter(function(id){ return PAYMENT_METHOD_DEFS[id]; })
+    : ['cash', 'card'];
+  if (window._paymentMethodsEnabled.length === 0) window._paymentMethodsEnabled = ['cash', 'card'];
+  window.renderPaymentMethods();
   document.getElementById('loading').style.display = 'none';
   document.getElementById('main').style.display = 'block';
   setTimeout(function() { originalState = getFormState(); }, 100);
@@ -516,6 +542,7 @@ function getFormState() {
     day_start_hour: document.getElementById('day_start_hour').value,
     apps_script_url: document.getElementById('apps_script_url').value,
     discount_presets: JSON.stringify(window._discountPresets || []),
+    payment_methods: JSON.stringify(window._paymentMethodsEnabled || []),
   });
 }
 
@@ -524,6 +551,38 @@ function isDirty() {
 }
 
 window._discountPresets = [];
+
+window.renderPaymentMethods = function() {
+  var list = document.getElementById('payment-methods-list');
+  if (!list) return;
+  var enabled = window._paymentMethodsEnabled || ['cash', 'card'];
+  var html = '';
+  Object.keys(PAYMENT_METHOD_DEFS).forEach(function(id) {
+    var def = PAYMENT_METHOD_DEFS[id];
+    var checked = enabled.indexOf(id) >= 0 ? 'checked' : '';
+    html += '<div class="field-row">'
+      + '<div class="field-label">'
+      + '<div class="field-label-main">' + def.icon + ' ' + def.label + '</div>'
+      + '<div class="field-label-sub">ID: ' + id + '</div>'
+      + '</div>'
+      + '<label class="toggle">'
+      + '<input type="checkbox" id="pm-enable-' + id + '" ' + checked + ' onchange="window.togglePaymentMethod(\'' + id + '\', this.checked)">'
+      + '<span class="toggle-slider"></span>'
+      + '</label>'
+      + '</div>';
+  });
+  list.innerHTML = html;
+};
+
+window.togglePaymentMethod = function(id, on) {
+  var enabled = window._paymentMethodsEnabled || [];
+  if (on) {
+    if (enabled.indexOf(id) < 0) enabled.push(id);
+  } else {
+    enabled = enabled.filter(function(x){ return x !== id; });
+  }
+  window._paymentMethodsEnabled = enabled;
+};
 
 window.renderDiscountPresets = function() {
   var list = document.getElementById('discount-presets-list');
@@ -634,8 +693,14 @@ window.saveAll = async function() {
     base_url: document.getElementById('base_url').value.trim() || null,
     qr_note1: document.getElementById('qr_note1').value.trim() || null,
     qr_note2: document.getElementById('qr_note2').value.trim() || null,
-    discount_presets: window._discountPresets && window._discountPresets.length > 0 ? window._discountPresets : null
+    discount_presets: window._discountPresets && window._discountPresets.length > 0 ? window._discountPresets : null,
+    payment_methods: (window._paymentMethodsEnabled || []).slice()
   };
+  if (!cfg.payment_methods || cfg.payment_methods.length === 0) {
+    alert('支払方法を少なくとも1つ選択してください。');
+    btn.disabled = false; btn.textContent = '保存する';
+    return;
+  }
   // テーブル名を収集
   var tableNames = {}, tableNamesShort = {};
   var count = parseInt(document.getElementById('table_count').value) || 1;
