@@ -149,6 +149,14 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .month-cal-cnt { font-size: 9px; color: #475569; }
 .month-cal-cell.zero { background: #0f172a; border-color: #1e293b; opacity: 0.4; }
 
+/* ── 支払方法別売上 ── */
+.payment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.payment-card { background: #1e293b; border-radius: 12px; padding: 12px 14px; border: 1px solid #334155; border-left-width: 4px; }
+.payment-card-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+.payment-card-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+.payment-card-sub { font-size: 10px; color: #64748b; margin-top: 2px; }
+.payment-card-pct { font-size: 10px; color: #64748b; }
+
 /* ── pax分析 ── */
 .pax-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .pax-card { background: #1e293b; border-radius: 10px; padding: 10px 12px; border: 1px solid #334155; text-align: center; }
@@ -308,6 +316,14 @@ var allOrders = {};
 var allPax = {};
 var menuData = {};       // menu/ ノード全体
 var storeConfig = {};    // store_config/ ノード全体
+
+// 支払方法マスタ定義（kitchen.html と同期させる）
+var PAYMENT_METHOD_DEFS = {
+  'cash': { label: '現金',   icon: '💴', color: '#22c55e' },
+  'card': { label: 'カード', icon: '💳', color: '#38bdf8' },
+  'qr':   { label: 'QR決済', icon: '📱', color: '#a78bfa' }
+};
+var _PAYMENT_METHODS = ['cash', 'card'];   // store_config.payment_methods 未設定時のフォールバック
 var drinkKeySet = null;    // Firebaseから構築したドリンク名セット
 var itemOverrides = {};    // store_config/item_category_overrides（Firebase保存済み分類）
 var currentPeriod = 'day';
@@ -430,11 +446,13 @@ function buildSessionMap(orders) {
     if (!map[sk]) map[sk] = {
       table: o.table||'?', ex: 0, ts: o.timestamp,
       drinkQty: 0, pax: 0, hasChargeExempt: false,
+      paymentMethod: null,
       items: {}, orders: []
     };
     var s = map[sk];
     if (o.timestamp < s.ts) s.ts = o.timestamp;
     if (o.pax) s.pax = o.pax;
+    if (o.paymentMethod && !s.paymentMethod) s.paymentMethod = o.paymentMethod;
     s.orders.push(o);
     (Array.isArray(o.items)?o.items:Object.values(o.items||{})).forEach(function(it) {
       var extrasTotal = (it.extras||[]).reduce(function(s,ex){ return s+(ex.price||0); }, 0);
@@ -613,12 +631,18 @@ function render() {
   var itemMap = {}, catMap = { 'ドリンク':0, 'フード':0, 'セット':0, 'その他':0 };
   var tableMap = {};
 
+  // 支払方法別集計（過去データ＝paymentMethod未設定は'cash'扱い）
+  var paymentTotals = {};
   sessions.forEach(function(s) {
     totalIn += s.sales;
     totalPax += s.pax; if (s.pax > 0) paxCount++;
     if (!tableMap[s.table]) tableMap[s.table] = { sales:0, sessions:0 };
     tableMap[s.table].sales += s.sales;
     tableMap[s.table].sessions++;
+    var pm = s.paymentMethod || 'cash';
+    if (!paymentTotals[pm]) paymentTotals[pm] = { sales:0, sessions:0 };
+    paymentTotals[pm].sales += s.sales;
+    paymentTotals[pm].sessions++;
   });
 
   orders.forEach(function(o) {
@@ -742,6 +766,29 @@ function render() {
     + '<div class="stat-sub">客単価 &#165;'+avgPerSession.toLocaleString()+'</div>'
     + '</div>'
     + '</div>';
+
+  // 支払方法別売上（store_config.payment_methods の順 + 過去データ救済）
+  var pmKeys = _PAYMENT_METHODS.slice();
+  Object.keys(paymentTotals).forEach(function(k){
+    if (pmKeys.indexOf(k) < 0 && PAYMENT_METHOD_DEFS[k]) pmKeys.push(k);
+  });
+  // 売上が1件でもある支払方法だけ表示（payment_methods 有効でも該当ゼロは省く）
+  var visiblePm = pmKeys.filter(function(k){ return paymentTotals[k] && paymentTotals[k].sessions > 0; });
+  if (visiblePm.length > 0) {
+    h += '<div class="section-title">&#128176; 支払方法別売上</div>'
+      + '<div class="payment-grid">';
+    visiblePm.forEach(function(k) {
+      var def = PAYMENT_METHOD_DEFS[k] || { label:k, icon:'❓', color:'#64748b' };
+      var data = paymentTotals[k];
+      var pct = totalIn > 0 ? Math.round(data.sales / totalIn * 100) : 0;
+      h += '<div class="payment-card" style="border-left-color:'+def.color+'">'
+        + '<div class="payment-card-label">'+def.icon+' '+def.label+'</div>'
+        + '<div class="payment-card-value" style="color:'+def.color+'">&#165;'+data.sales.toLocaleString()+'</div>'
+        + '<div class="payment-card-sub">'+data.sessions+'件 ・ '+pct+'%</div>'
+        + '</div>';
+    });
+    h += '</div>';
+  }
 
   // pax分析
   h += '<div class="section-title">&#128101; 人数・客単価分析</div>'
@@ -1257,20 +1304,23 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
 
   // ── ① 伝票別 ──
   var sessMap1 = buildSessionMap(filtered);
-  var rows1 = [['日付','時刻','曜日','テーブル','人数','税抜小計','チャージ','消費税','税込合計']];
+  var rows1 = [['日付','時刻','曜日','テーブル','人数','支払方法','税抜小計','チャージ','消費税','税込合計']];
   Object.values(sessMap1).sort(function(a,b){return a.ts-b.ts;}).forEach(function(s) {
     var dt = new Date(s.ts); var ds = toDayStr(s.ts);
     var timeStr = pad(dt.getHours())+':'+pad(dt.getMinutes());
+    var pmKey = s.paymentMethod || 'cash';
+    var pmLabel = (PAYMENT_METHOD_DEFS[pmKey] && PAYMENT_METHOD_DEFS[pmKey].label) || pmKey;
     rows1.push([ds, timeStr, DOW[dt.getDay()],
       TABLE_NAMES[String(s.table)]||'テーブル '+s.table,
       s.pax > 0 ? s.pax : '',
+      pmLabel,
       s.ex, s.charge, s.sales - Math.round(s.ex + s.charge), s.sales]);
   });
   // 合計行
-  var t1 = rows1.slice(1).reduce(function(a,r){return{ex:a.ex+r[5],ch:a.ch+r[6],tax:a.tax+(typeof r[7]==='number'?r[7]:0),tot:a.tot+r[8]};},{ex:0,ch:0,tax:0,tot:0});
-  rows1.push(['合計','','','','',t1.ex,t1.ch,t1.tax,t1.tot]);
+  var t1 = rows1.slice(1).reduce(function(a,r){return{ex:a.ex+r[6],ch:a.ch+r[7],tax:a.tax+(typeof r[8]==='number'?r[8]:0),tot:a.tot+r[9]};},{ex:0,ch:0,tax:0,tot:0});
+  rows1.push(['合計','','','','','',t1.ex,t1.ch,t1.tax,t1.tot]);
   var ws1 = XLSX.utils.aoa_to_sheet(rows1);
-  ws1['!cols'] = [{wch:12},{wch:7},{wch:5},{wch:16},{wch:6},{wch:11},{wch:10},{wch:10},{wch:12}];
+  ws1['!cols'] = [{wch:12},{wch:7},{wch:5},{wch:16},{wch:6},{wch:9},{wch:11},{wch:10},{wch:10},{wch:12}];
   XLSX.utils.book_append_sheet(wb, ws1, '①伝票別');
 
   // ── ② 日別 ──
@@ -1400,7 +1450,7 @@ window.downloadCsv = function() {
   var BOM = '\uFEFF';
 
   if (unit === 'session') {
-    csv = BOM + '日付,時刻,テーブル,人数,ドリンク杯数,チャージ,税抜売上,消費税,税込売上\n';
+    csv = BOM + '日付,時刻,テーブル,人数,支払方法,ドリンク杯数,チャージ,税抜売上,消費税,税込売上\n';
     var sessMap = buildSessionMap(filtered);
     Object.values(sessMap).sort(function(a,b){ return a.ts-b.ts; }).forEach(function(s) {
       var dt = new Date(s.ts);
@@ -1410,8 +1460,10 @@ window.downloadCsv = function() {
       var taxRate = storeConfig.tax_rate || 10;
       var exWithCharge = s.ex + chargeEx;
       var tax = s.sales - Math.round(exWithCharge);
+      var pmKey = s.paymentMethod || 'cash';
+      var pmLabel = (PAYMENT_METHOD_DEFS[pmKey] && PAYMENT_METHOD_DEFS[pmKey].label) || pmKey;
       csv += [ds, timeStr, TABLE_NAMES[String(s.table)]||'テーブル '+s.table,
-        s.pax, s.drinkQty, chargeEx,
+        s.pax, pmLabel, s.drinkQty, chargeEx,
         Math.round(exWithCharge), tax, s.sales].join(',') + '\n';
     });
   } else if (unit === 'day') {
@@ -1576,6 +1628,11 @@ onValue(ref(db, 'store_config'), function(snap) {
   }
   // item_category_overrides を同期（Firebase保存済み分類）
   itemOverrides = storeConfig.item_category_overrides || {};
+  // payment_methods を同期（未設定時はフォールバック維持）
+  if (Array.isArray(storeConfig.payment_methods) && storeConfig.payment_methods.length > 0) {
+    var filtered = storeConfig.payment_methods.filter(function(id){ return PAYMENT_METHOD_DEFS[id]; });
+    if (filtered.length > 0) _PAYMENT_METHODS = filtered;
+  }
   dataReady.config = true;
   checkAndRender();
   renderUnclassifiedBanner(); // バナーも更新
