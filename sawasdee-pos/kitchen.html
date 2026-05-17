@@ -119,7 +119,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .receipt.done { opacity: 0.55; }
 .receipt.paid { opacity: 0.4; filter: grayscale(0.3); }
 .receipt-top { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-top: 2px dashed #ccc; flex-shrink: 0; }
-.receipt-inner { padding: 7px 14px 14px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.receipt-inner { padding: 6px 14px 4px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .receipt-items { flex: 1; min-height: 0; overflow-y: auto; }
 .receipt-table { font-size: 20px; font-weight: 900; color: #111; line-height: 1.1; }
 .receipt-header-row { display: flex; align-items: flex-start; gap: 6px; margin: 0; }
@@ -148,7 +148,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .receipt-charge { display: flex; justify-content: space-between; font-size: 12px; color: #dc2626; font-weight: 600; padding: 3px 0; border-bottom: 1px dashed #ccc; }
 .receipt-charge-free { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; text-decoration: line-through; padding: 2px 0; }
 .receipt-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; padding: 4px 0 2px; color: #111; }
-.pay-btn { width: 100%; margin-top: 10px; padding: 10px 0; background: #1d4ed8; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
+.pay-btn { width: 100%; margin-top: 10px; padding: 8px 0; line-height: 1.4; background: #1d4ed8; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Courier New', Courier, monospace; min-height: 50px; }
 .pay-btn:disabled { background: #475569; color: #94a3b8; cursor: default; }
 .pay-btn.paid-method { background: #166534; }
 .pay-method-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -2930,7 +2930,7 @@ function _billsRender() {
       }
       var _pmKey = _sessPm || 'cash';
       var _pmDef = PAYMENT_METHOD_DEFS[_pmKey] || PAYMENT_METHOD_DEFS['cash'];
-      _paidPmHTML = '<button class="pay-btn paid-method" style="background:' + _pmDef.color + ';line-height:1.4;padding:8px 0;"'
+      _paidPmHTML = '<button class="pay-btn paid-method" style="background:' + _pmDef.color + ';"'
         + ' onclick="window.openPaymentMethodChange(\'' + entryIds + '\',\'' + _pmKey + '\')">'
         + _pmDef.icon + ' ' + _pmDef.label + 'で会計済み<br>'
         + '<span style="font-size:10px;opacity:0.85;font-weight:600;">（タップで変更）</span>'
