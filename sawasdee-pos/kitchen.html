@@ -189,6 +189,23 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .delete-btn:hover { background: #fee2e2; }
 .edit-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #aaa; border-radius: 4px; font-size: 11px; color: #666; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
 .edit-btn:hover { background: #f0f0e0; }
+.move-table-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #ea580c; border-radius: 4px; font-size: 11px; color: #c2410c; cursor: pointer; font-family: 'Courier New', Courier, monospace; font-weight: 700; }
+.move-table-btn:hover { background: #fff7ed; }
+.move-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: center; justify-content: center; padding: 20px; }
+.move-modal.open { display: flex; }
+.move-box { background: white; border-radius: 12px; padding: 22px; max-width: 480px; width: 100%; font-family: -apple-system, sans-serif; }
+.move-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.move-sub { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
+.move-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 16px; }
+.move-table-cell { padding: 14px 6px; border: 2px solid #cbd5e1; border-radius: 10px; background: white; color: #111827; font-size: 13px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; }
+.move-table-cell:hover:not(:disabled) { background: #fef3c7; border-color: #ea580c; }
+.move-table-cell.selected { background: #fed7aa; border-color: #ea580c; }
+.move-table-cell:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; border-color: #e5e7eb; }
+.move-table-cell .move-cell-sub { display: block; font-size: 10px; color: #9ca3af; margin-top: 2px; font-weight: normal; }
+.move-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.move-cancel { padding: 10px 18px; background: #f3f4f6; border: none; border-radius: 8px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
+.move-save { padding: 10px 22px; background: #ea580c; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
+.move-save:disabled { background: #9ca3af; cursor: default; }
 .receipt-bottom { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-bottom: 2px dashed #ccc; }
 /* 編集モーダル */
 .edit-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: flex-start; justify-content: center; padding-top: 40px; overflow-y: auto; }
@@ -353,6 +370,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     <div class="col-header drink">🥤 ドリンク</div>
     <div class="col-cards" id="drink-cards-single">
       <div class="empty-state" style="height:40vh"><div style="font-size:32px">🥤</div><div style="font-size:14px;margin-top:8px">注文待ち</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 席替えモーダル -->
+<div class="move-modal" id="move-modal">
+  <div class="move-box">
+    <div class="move-title">🔄 席替え</div>
+    <div class="move-sub" id="move-sub"></div>
+    <div class="move-grid" id="move-grid"></div>
+    <div class="move-actions">
+      <button class="move-cancel" onclick="window.closeMoveTable()">キャンセル</button>
+      <button class="move-save" id="move-save-btn" onclick="window.confirmMoveTable()">席替え実行</button>
     </div>
   </div>
 </div>
@@ -2169,6 +2199,120 @@ window.openCheckout = function(tableNum, idStr) {
   document.getElementById('checkout-modal').classList.add('open');
 };
 
+// ===== 席替えモーダル =====
+var _moveFromTable = null;
+var _moveEntryIds = null;
+var _moveSelectedTable = null;
+
+function _isTableInUse(tableNum) {
+  // 自分自身（移動元）は使用中扱いしない
+  if (String(tableNum) === String(_moveFromTable)) return false;
+  // pax がある = 着席中
+  if (_bPax[tableNum] && _bPax[tableNum] > 0) return true;
+  // 未会計の orders があれば使用中
+  var keys = Object.keys(_bOrders || {});
+  for (var i = 0; i < keys.length; i++) {
+    var o = _bOrders[keys[i]];
+    if (!o) continue;
+    if (String(o.table) === String(tableNum) && o.status !== 'paid') return true;
+  }
+  return false;
+}
+
+window.openMoveTable = function(fromTable, entryIds) {
+  _moveFromTable = fromTable;
+  _moveEntryIds = entryIds;
+  _moveSelectedTable = null;
+  document.getElementById('move-sub').textContent =
+    '現在: ' + (tableName(fromTable) || fromTable) + ' → 移動先を選んでください';
+  renderMoveGrid();
+  document.getElementById('move-modal').classList.add('open');
+};
+
+function renderMoveGrid() {
+  var grid = document.getElementById('move-grid');
+  var count = _TABLE_COUNT || 10;
+  var html = '';
+  for (var n = 1; n <= count; n++) {
+    if (String(n) === String(_moveFromTable)) continue; // 自分自身は出さない
+    var inUse = _isTableInUse(n);
+    var selected = (String(n) === String(_moveSelectedTable)) ? ' selected' : '';
+    var disabled = inUse ? ' disabled' : '';
+    var sub = inUse ? '<span class="move-cell-sub">使用中</span>' : '<span class="move-cell-sub">空席</span>';
+    html += '<button class="move-table-cell' + selected + '"' + disabled
+      + ' onclick="window.selectMoveTarget(' + n + ')">'
+      + (tableName(n) || ('T' + n)) + sub
+      + '</button>';
+  }
+  grid.innerHTML = html;
+  document.getElementById('move-save-btn').disabled = !_moveSelectedTable;
+}
+
+window.selectMoveTarget = function(n) {
+  _moveSelectedTable = String(n);
+  renderMoveGrid();
+};
+
+window.closeMoveTable = function() {
+  document.getElementById('move-modal').classList.remove('open');
+  _moveFromTable = null;
+  _moveEntryIds = null;
+  _moveSelectedTable = null;
+};
+
+window.confirmMoveTable = async function() {
+  if (!_moveFromTable || !_moveEntryIds || !_moveSelectedTable) return;
+  var fromT = String(_moveFromTable);
+  var toT = String(_moveSelectedTable);
+  if (fromT === toT) return;
+  if (_isTableInUse(toT)) {
+    alert('移動先 ' + (tableName(toT)||toT) + ' は既に使用中です。');
+    return;
+  }
+  var keys = _moveEntryIds.split(',').filter(Boolean);
+  var pax = _bPax[fromT] || 0;
+  try {
+    // 1) 各 order の table を新テーブルに更新
+    var orderUpdates = {};
+    keys.forEach(function(k) {
+      orderUpdates['orders/' + k + '/table'] = Number(toT);
+      if (_bOrders[k]) _bOrders[k].table = Number(toT);
+    });
+    await update(ref(db), orderUpdates);
+    // 2) pax を移動
+    if (pax > 0) {
+      await set(ref(db, 'pax/' + toT), pax);
+      await remove(ref(db, 'pax/' + fromT));
+      _bPax[toT] = pax;
+      _bPax[fromT] = 0;
+    }
+    // 3) tables/{n}/session を移動（REST で原子的に）
+    try {
+      var sessRes = await fetch(FB_REST_BASE + '/tables/' + fromT + '/session.json');
+      var sessJson = await sessRes.json();
+      if (sessJson) {
+        await fbRestSet('tables/' + toT + '/session', sessJson);
+        await fbRestRemove('tables/' + fromT + '/session');
+      }
+    } catch(e) { console.warn('session 移動スキップ:', e); }
+    // 4) bill_calls を移動（あれば）
+    try {
+      var billCalls = window._billCalls || {};
+      if (billCalls[fromT]) {
+        await set(ref(db, 'bill_calls/' + toT), {
+          table: Number(toT), timestamp: billCalls[fromT].timestamp || Date.now()
+        });
+        await remove(ref(db, 'bill_calls/' + fromT));
+      }
+    } catch(e) { console.warn('bill_calls 移動スキップ:', e); }
+    _billsRender();
+  } catch(e) {
+    alert('席替えに失敗しました: ' + e.message);
+    console.error(e);
+  }
+  window.closeMoveTable();
+};
+
 // ===== 支払方法変更モーダル =====
 var _pmEntryIds = null;
 var _pmCurrentPm = null;
@@ -2742,6 +2886,7 @@ function _billsRender() {
 
     if (isPaid && _paidPmHTML) payHTML = _paidPmHTML;
     var editHTML='<button class="edit-btn" onclick="window.openEdit(\''+tableNum+'\',\''+entryIds+'\')">&#9999;&#65039; 伝票を編集する</button>';
+    var moveHTML = isPaid ? '' : '<button class="move-table-btn" onclick="window.openMoveTable(\''+tableNum+'\',\''+entryIds+'\')">🔄 席替え</button>';
 
     var receiptCls='receipt'+(isPaid?' paid':hasActive?' active':allDone?' done':'');
 
@@ -2762,6 +2907,7 @@ function _billsRender() {
       +'<div class="receipt-total"><span>合計</span><span>\xa5'+finalIn.toLocaleString()+'</span></div>'
       +payHTML
       +editHTML
+      +moveHTML
       +(isPaid ? '<button class="delete-btn" onclick="window.deleteSession(\'' + entryIds + '\')">🗑 この伝票を削除</button>' : '')
       +'</div>'
       +'<div class="receipt-bottom"></div>'
