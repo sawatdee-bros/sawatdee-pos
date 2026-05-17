@@ -80,7 +80,6 @@
     },
     "surveys":          { ".read": "auth != null", ".write": true },
     "spot_suggestions": { ".read": "auth != null", ".write": true },
-    "quiz_scores":      { ".read": "auth != null", ".write": true },
-    "__rollback_test__":{ ".read": false, ".write": false }
+    "quiz_scores":      { ".read": "auth != null", ".write": true }
   }
 }
