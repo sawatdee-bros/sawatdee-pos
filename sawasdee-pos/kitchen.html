@@ -463,14 +463,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
         <label>お預かり</label>
         <input type="text" id="cash-received-input" readonly placeholder="0" onclick="window.openNumKeypad()">
       </div>
-      <div class="cash-quick-btns">
-        <button onclick="window.addReceived(1000)">+1000</button>
-        <button onclick="window.addReceived(5000)">+5000</button>
-        <button onclick="window.addReceived(10000)">+10000</button>
-        <button class="exact" onclick="window.setExactReceived()">ぴったり</button>
-        <button class="clear" onclick="window.clearReceived()">クリア</button>
-      </div>
-      <div class="cash-change-row">
+      <div class="cash-change-row" id="cash-change-row" style="visibility:hidden">
         <span class="cash-change-label" id="cash-change-label">お釣り</span>
         <span class="cash-change-amount" id="cash-change-amount">¥0</span>
       </div>
@@ -2555,11 +2548,20 @@ window.selectPayment = function(pm) {
 
 // 電卓：お釣り表示更新
 function _updateCashChange() {
-  var final = Math.max(0, (_checkoutGrandTotal||0) - (_discountAmount||0));
-  var change = (_cashReceived||0) - final;
   var label = document.getElementById('cash-change-label');
   var amt = document.getElementById('cash-change-amount');
+  var row = document.getElementById('cash-change-row');
   if (!label || !amt) return;
+  var inp = document.getElementById('cash-received-input');
+  var hasInput = inp && inp.value !== '' && inp.value != null;
+  if (!hasInput) {
+    // 未入力なら表示しない（領域は維持してレイアウトシフト防止）
+    if (row) row.style.visibility = 'hidden';
+    return;
+  }
+  if (row) row.style.visibility = '';
+  var final = Math.max(0, (_checkoutGrandTotal||0) - (_discountAmount||0));
+  var change = (_cashReceived||0) - final;
   if (change >= 0) {
     label.textContent = 'お釣り';
     amt.textContent = '¥' + change.toLocaleString();
@@ -2571,22 +2573,10 @@ function _updateCashChange() {
   }
 }
 
-window.addReceived = function(amount) {
-  _cashReceived = (_cashReceived||0) + amount;
-  var inp = document.getElementById('cash-received-input');
-  if (inp) inp.value = _cashReceived;
-  _updateCashChange();
-};
 window.clearReceived = function() {
   _cashReceived = 0;
   var inp = document.getElementById('cash-received-input');
   if (inp) inp.value = '';
-  _updateCashChange();
-};
-window.setExactReceived = function() {
-  _cashReceived = Math.max(0, (_checkoutGrandTotal||0) - (_discountAmount||0));
-  var inp = document.getElementById('cash-received-input');
-  if (inp) inp.value = _cashReceived;
   _updateCashChange();
 };
 
