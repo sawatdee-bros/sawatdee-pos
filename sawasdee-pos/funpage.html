@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>サワディーブロス | お楽しみページ</title>
+<!-- Google Analytics (GA4) - 業務改善目的のアクセス解析 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CGE9DLCJT0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-CGE9DLCJT0');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Sarabun:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1795,6 +1803,9 @@
 
 <div class="footer">
   <span>サワディーブロス</span> &copy; 2025 | <span>สวัสดีบรอส</span>
+  <div style="font-size:10px;color:#94a3b8;margin-top:6px;opacity:0.8;line-height:1.4;">
+    本ページはアクセス解析にGoogle Analytics (GA4) を使用しています
+  </div>
 </div>
 
 <!-- Firebase SDK -->
@@ -2347,6 +2358,7 @@ function shuffle(arr) {
 }
 
 function startQuiz(cat) {
+  if (window.gtag) gtag('event', 'quiz_start', { quiz_category: cat, lang: currentLang });
   quizCategory = cat;
   const pool = cat === 'thai' ? QUIZ_THAI : QUIZ_CULTURE;
   quizSession = shuffle(pool).slice(0, 10);
@@ -2429,6 +2441,7 @@ function nextQuestion() {
 function showQuizScore() {
   document.getElementById('quiz-area').style.display = 'none';
   const score = Math.round(quizScore / quizSession.length * 100);
+  if (window.gtag) gtag('event', 'quiz_complete', { quiz_category: quizCategory, score: score, correct: quizScore, total: quizSession.length, lang: currentLang });
   document.getElementById('quiz-score-num').textContent = score;
   const emoji = score === 100 ? '🏆' : score >= 70 ? '🎉' : score >= 40 ? '😊' : '💪';
   const msg = {
@@ -2715,12 +2728,14 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   event.currentTarget.classList.add('active');
+  if (window.gtag) gtag('event', 'tab_view', { tab_name: name, lang: currentLang });
 }
 
 function submitSpot() {
   const name = document.getElementById('spot-name').value.trim();
   const comment = document.getElementById('spot-comment').value.trim();
   if (!name) { alert('スポット名を入力してください'); return; }
+  if (window.gtag) gtag('event', 'spot_submit', { has_comment: comment.length > 0, lang: currentLang });
   db.ref('spot_suggestions').push({ name, comment, ts: Date.now(), lang: currentLang }).then(() => {
     document.getElementById('spot-form').style.display = 'none';
     document.getElementById('spot-thanks').style.display = 'block';
@@ -2903,6 +2918,7 @@ function submitSurvey() {
     lang: currentLang,
     ts: Date.now()
   };
+  if (window.gtag) gtag('event', 'survey_submit', { stars: starVal, visit: visitVal, source: sourceVal, has_comment: comment.length > 0, lang: currentLang });
   db.ref('fun_survey').push(payload).then(() => {
     document.getElementById('survey-form').style.display = 'none';
     document.getElementById('survey-thanks').classList.add('show');
