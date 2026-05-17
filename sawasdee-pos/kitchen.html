@@ -1136,6 +1136,8 @@ window.groupDone = async function(id, type) {
 // 伝票フィルターバーのテーブルボタンを更新（会計前のテーブルのみ表示）
 function _billsFilterBarUpdate() {
   var filterBar = document.getElementById('bills-filter-bar');
+  if (!filterBar) return;
+  if (!_bOrders) _bOrders = {};
   var weekBtn = filterBar.querySelector('[data-filter="week"]');
   // 既存のテーブルボタンを削除
   filterBar.querySelectorAll('[data-filter]').forEach(function(btn) {
@@ -1259,7 +1261,12 @@ function setMode(mode) {
   });
   var newUrl = window.location.pathname + '?mode=' + mode;
   history.replaceState(null, '', newUrl);
-  if (mode === 'bills') _billsRenderWrap();
+  if (mode === 'bills') {
+    // 伝票タブを開くたびに会計前フィルタにリセット
+    _bFilter = 'unpaid';
+    _billsFilterBarUpdate();
+    _billsRenderWrap();
+  }
 }
 window.setMode = setMode;
 
