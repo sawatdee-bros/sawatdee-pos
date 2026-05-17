@@ -38,6 +38,10 @@
           ".write": true,
           ".validate": "newData.hasChild('business_hours_by_dow') || newData.hasChild('time_slots_by_dow') || newData.hasChild('time_slots')"
         },
+        "courses": {
+          ".read": true,
+          ".write": true
+        },
         "email_log": {
           ".read": true,
           ".write": true
