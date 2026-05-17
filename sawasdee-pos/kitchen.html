@@ -870,9 +870,24 @@ window.dismissBillCall = async function(tableNum) {
 };
 
 window.gotoBill = function(tableNum) {
+  // 該当テーブルの未会計 entryIds を集める
+  var ids = [];
+  Object.keys(_bOrders||{}).forEach(function(id) {
+    var o = _bOrders[id];
+    if (!o) return;
+    if (String(o.table) !== String(tableNum)) return;
+    if (o.status === 'paid' || o.status === 'pending_approval' || o.status === 'rejected') return;
+    ids.push(id);
+  });
+  if (ids.length === 0) {
+    alert((tableName(tableNum)||tableNum) + ' に未会計の注文がありません');
+    return;
+  }
+  // 伝票タブに切り替え＋テーブルフィルタも適用（モーダルを閉じた後の状態）
   setMode('bills');
   setTimeout(function() {
-    window.setFilter(tableNum);
+    if (window.setFilter) window.setFilter(tableNum);
+    window.openCheckout(tableNum, ids.join(','));
   }, 300);
 };
 
