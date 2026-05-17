@@ -2420,6 +2420,8 @@ window.confirmCheckoutWith = function(paymentMethod) {
   _checkoutTable = null;
   _checkoutIds = null;
   _discountAmount = 0;
+  // 会計完了後は受注画面（全て）に戻る
+  setMode('all');
 };
 
 window.markPaid = function(tableNum, idStr, discountAmount, paymentMethod) {
