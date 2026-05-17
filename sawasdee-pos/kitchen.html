@@ -121,15 +121,21 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .receipt-top { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-top: 2px dashed #ccc; flex-shrink: 0; }
 .receipt-inner { padding: 10px 14px 14px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .receipt-items { flex: 1; min-height: 0; overflow-y: auto; }
-.receipt-table { text-align: center; font-size: 20px; font-weight: 900; margin: 4px 0 2px; color: #111; }
-.receipt-time { text-align: center; font-size: 10px; color: #666; margin-bottom: 8px; }
-.receipt-status { text-align: center; margin-bottom: 6px; }
+.receipt-table { font-size: 16px; font-weight: 900; color: #111; line-height: 1.1; }
+.receipt-header-row { display: flex; align-items: center; gap: 6px; margin: 2px 0 4px; }
+.receipt-header-meta { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.receipt-time { font-size: 9px; color: #666; line-height: 1.2; }
+.receipt-status { display: flex; align-items: center; justify-content: space-between; margin: 2px 0 4px; gap: 4px; }
+.receipt-icon-btn { width: 26px; height: 26px; border-radius: 6px; border: 1px solid #aaa; background: transparent; color: #555; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; font-family: 'Courier New', Courier, monospace; }
+.receipt-icon-btn:hover { background: #f0f0e0; }
+.receipt-icon-btn.danger { border-color: #b91c1c; color: #b91c1c; }
+.receipt-icon-btn.danger:hover { background: #fee2e2; }
 .pill-active { display: inline-block; background: #fbbf24; color: #1a1200; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
 .pill-done { display: inline-block; background: #166534; color: white; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
 .pill-paid { display: inline-block; background: #7c3aed; color: white; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
-.receipt-divider { border: none; border-top: 1px dashed #aaa; margin: 6px 0; }
-.receipt-pax { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 4px 0; }
-.receipt-pax label { font-size: 11px; color: #666; }
+.receipt-divider { border: none; border-top: 1px dashed #aaa; margin: 4px 0; }
+.receipt-pax { display: flex; align-items: center; gap: 6px; }
+.receipt-pax label { font-size: 10px; color: #666; }
 .pax-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #aaa; background: #f5f5e0; color: #333; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; touch-action: manipulation; }
 .pax-num { font-size: 14px; font-weight: 700; min-width: 28px; text-align: center; color: #111; }
 .receipt-category { font-size: 10px; font-weight: 700; color: #888; letter-spacing: 0.05em; padding: 2px 0 3px; }
@@ -213,6 +219,10 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .edit-modal.open { display: flex; }
 .edit-box { background: #1e293b; border-radius: 14px; border: 1px solid #334155; padding: 20px; width: 360px; max-width: 95vw; color: #e2e8f0; font-family: -apple-system, sans-serif; margin-bottom: 40px; }
 .edit-title { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 14px; }
+.edit-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 8px; }
+.edit-title-row .edit-title { margin-bottom: 0; flex: 1; }
+.edit-move-btn { padding: 6px 12px; background: transparent; border: 1px solid #ea580c; border-radius: 6px; color: #fb923c; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.edit-move-btn:hover { background: #1e1411; }
 .edit-section { font-size: 11px; font-weight: 600; color: #64748b; letter-spacing: 0.05em; margin: 12px 0 6px; text-transform: uppercase; }
 .edit-item-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid #334155; }
 .edit-item-row:last-child { border-bottom: none; }
@@ -447,7 +457,10 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <!-- 編集モーダル -->
 <div class="edit-modal" id="edit-modal">
   <div class="edit-box">
-    <div class="edit-title" id="edit-modal-title">伝票を編集</div>
+    <div class="edit-title-row">
+      <div class="edit-title" id="edit-modal-title">伝票を編集</div>
+      <button class="edit-move-btn" id="edit-move-btn" onclick="window.openMoveTableFromEdit()">🔄 席替え</button>
+    </div>
     <div class="edit-section">現在の注文</div>
     <div id="edit-current"></div>
     <div id="edit-added" class="edit-added"></div>
@@ -2255,6 +2268,16 @@ window.openMoveTable = function(fromTable, entryIds) {
   document.getElementById('move-modal').classList.add('open');
 };
 
+// 編集モーダルからの席替え呼び出し（_bEditから情報を取る）
+window.openMoveTableFromEdit = function() {
+  if (!_bEdit || !_bEdit.tableNum) return;
+  var tn = _bEdit.tableNum;
+  var entryIds = _bEdit.entries.map(function(e){ return e.id; }).join(',');
+  // 編集モーダルは閉じる（_bEditがnull化される前にローカル退避済み）
+  window.closeEdit();
+  window.openMoveTable(tn, entryIds);
+};
+
 function renderMoveGrid() {
   var grid = document.getElementById('move-grid');
   var count = _TABLE_COUNT || 10;
@@ -2461,6 +2484,10 @@ window.openEdit = function(tableNum, idStr) {
   }
   _bEdit = {tableNum:tableNum, entries:entries, cancelSet:{}, qtyMap:{}, addItems:[]};
   document.getElementById('edit-modal-title').textContent = tableName(tableNum)+' の伝票を編集';
+  // 会計済み伝票では席替えボタンを非表示
+  var allPaid = entries.length > 0 && entries.every(function(e){ return e.o.status === 'paid'; });
+  var moveBtn = document.getElementById('edit-move-btn');
+  if (moveBtn) moveBtn.style.display = allPaid ? 'none' : '';
   renderEditModal();
   document.getElementById('edit-modal').classList.add('open');
 };
@@ -2874,11 +2901,11 @@ function _billsRender() {
     var entryIds=entries.map(function(e){return e.id;}).join(',');
 
     var pillHTML=isPaid?'<span class="pill-paid">会計済み</span>':hasActive?'<span class="pill-active">対応中</span>':'<span class="pill-done">提供済み</span>';
-    var paxHTML='<div class="receipt-pax"><label>人数</label>';
-    if (!isPaid) paxHTML+='<button class="pax-btn" onclick="window.changePax(\''+tableNum+'\',-1)">&#8722;</button>';
-    paxHTML+='<span class="pax-num">'+pax+'名</span>';
-    if (!isPaid) paxHTML+='<button class="pax-btn" onclick="window.changePax(\''+tableNum+'\',1)">+</button>';
-    paxHTML+='</div>';
+    var paxInline='<div class="receipt-pax"><label>人数</label>';
+    if (!isPaid) paxInline+='<button class="pax-btn" onclick="window.changePax(\''+tableNum+'\',-1)">&#8722;</button>';
+    paxInline+='<span class="pax-num">'+pax+'名</span>';
+    if (!isPaid) paxInline+='<button class="pax-btn" onclick="window.changePax(\''+tableNum+'\',1)">+</button>';
+    paxInline+='</div>';
 
     var itemsHTML='';
     if (drinkList.length>0) {
@@ -2912,19 +2939,26 @@ function _billsRender() {
       :'<button class="pay-btn" onclick="window.openCheckout(\''+tableNum+'\',\''+entryIds+'\')">💳 会計する</button>';
 
     if (isPaid && _paidPmHTML) payHTML = _paidPmHTML;
-    var editHTML='<button class="edit-btn" onclick="window.openEdit(\''+tableNum+'\',\''+entryIds+'\')">&#9999;&#65039; 伝票を編集する</button>';
-    var moveHTML = isPaid ? '' : '<button class="move-table-btn" onclick="window.openMoveTable(\''+tableNum+'\',\''+entryIds+'\')">🔄 席替え</button>';
+    // 編集・削除はヘッダー右端のアイコンに集約
+    var editIconHTML = '<button class="receipt-icon-btn" title="伝票を編集" onclick="window.openEdit(\''+tableNum+'\',\''+entryIds+'\')">&#9999;&#65039;</button>';
+    var deleteIconHTML = isPaid
+      ? '<button class="receipt-icon-btn danger" title="この伝票を削除" onclick="window.deleteSession(\'' + entryIds + '\')">🗑</button>'
+      : '';
 
     var receiptCls='receipt'+(isPaid?' paid':hasActive?' active':allDone?' done':'');
 
     html+='<div class="'+receiptCls+'" data-table="'+tableNum+'">'
       +'<div class="receipt-top"></div>'
       +'<div class="receipt-inner">'
-      +'<div class="receipt-table">'+tableName(tableNum)+'</div>'
-      +'<div class="receipt-time">'+firstTime+' 〜 '+entries.length+'回注文</div>'
-      +'<div class="receipt-status">'+pillHTML+'</div>'
-      +'<hr class="receipt-divider">'
-      +paxHTML
+      +'<div class="receipt-header-row">'
+      +  '<div class="receipt-header-meta">'
+      +    '<div class="receipt-table">'+tableName(tableNum)+'</div>'
+      +    '<div class="receipt-time">'+firstTime+' 〜 '+entries.length+'回注文</div>'
+      +  '</div>'
+      +  editIconHTML
+      +  deleteIconHTML
+      +'</div>'
+      +'<div class="receipt-status">'+pillHTML+paxInline+'</div>'
       +'<hr class="receipt-divider">'
       +'<div class="receipt-items">'+itemsHTML+'</div>'
       +'<hr class="receipt-divider">'
@@ -2933,9 +2967,6 @@ function _billsRender() {
       +'<div class="receipt-subtotal"><span>消費税（10%）</span><span>\xa5'+finalTax.toLocaleString()+'</span></div>'
       +'<div class="receipt-total"><span>合計</span><span>\xa5'+finalIn.toLocaleString()+'</span></div>'
       +payHTML
-      +editHTML
-      +moveHTML
-      +(isPaid ? '<button class="delete-btn" onclick="window.deleteSession(\'' + entryIds + '\')">🗑 この伝票を削除</button>' : '')
       +'</div>'
       +'<div class="receipt-bottom"></div>'
       +'</div>';
