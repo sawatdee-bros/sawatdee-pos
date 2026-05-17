@@ -36,7 +36,7 @@
         "reservation_settings": {
           ".read": true,
           ".write": true,
-          ".validate": "newData.hasChild('time_slots_by_dow') || newData.hasChild('time_slots')"
+          ".validate": "newData.hasChild('business_hours_by_dow') || newData.hasChild('time_slots_by_dow') || newData.hasChild('time_slots')"
         },
         "email_log": {
           ".read": true,
