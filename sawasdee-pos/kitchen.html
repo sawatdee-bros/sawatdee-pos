@@ -165,10 +165,10 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .pay-method-save { padding: 10px 22px; background: #166534; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
 .pay-method-save:disabled { background: #9ca3af; cursor: default; }
 /* 会計モーダル */
-.checkout-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 600; display: none; align-items: center; justify-content: center; padding: 20px; }
+.checkout-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 600; display: none; align-items: flex-start; justify-content: center; padding: 12px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .checkout-modal.open { display: flex; }
 .checkout-box { background: white; border-radius: 10px; width: 100%; max-width: 480px; overflow: hidden; font-family: 'Courier New', Courier, monospace; }
-.checkout-body { padding: 16px; max-height: 55vh; overflow-y: auto; }
+.checkout-body { padding: 16px; max-height: 35vh; overflow-y: auto; }
 .checkout-grand { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #166534; }
 .checkout-grand-label { font-size: 14px; font-weight: 700; color: #dcfce7; font-family: -apple-system, sans-serif; }
 .checkout-grand-amount { font-size: 28px; font-weight: 900; color: white; font-family: -apple-system, sans-serif; }
@@ -217,8 +217,8 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .kp-btn { padding: 12px 0; background: white; border: 1px solid #d97706; border-radius: 8px; font-size: 18px; font-weight: 700; color: #1f2937; cursor: pointer; font-family: -apple-system, sans-serif; }
 .kp-btn:active { background: #fef3c7; transform: scale(0.97); }
 .kp-btn.kp-back { background: #fee2e2; color: #b91c1c; border-color: #b91c1c; }
-.kp-btn.kp-close { background: #166534; color: white; border-color: #166534; }
-.kp-btn.kp-close:active { background: #14532d; }
+.kp-btn.kp-clear { grid-column: 1 / span 3; background: #fef3c7; color: #92400e; border-color: #d97706; font-size: 14px; padding: 10px 0; }
+.kp-btn.kp-clear:active { background: #fde68a; }
 .delete-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #ef4444; border-radius: 4px; font-size: 11px; color: #ef4444; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
 .delete-btn:hover { background: #fee2e2; }
 .edit-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #aaa; border-radius: 4px; font-size: 11px; color: #666; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
@@ -485,9 +485,10 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
         <button class="kp-btn" onclick="window.kpDigit('7')">7</button>
         <button class="kp-btn" onclick="window.kpDigit('8')">8</button>
         <button class="kp-btn" onclick="window.kpDigit('9')">9</button>
-        <button class="kp-btn kp-back" onclick="window.kpBackspace()">⌫</button>
+        <button class="kp-btn" onclick="window.kpDigit('00')">00</button>
         <button class="kp-btn" onclick="window.kpDigit('0')">0</button>
-        <button class="kp-btn kp-close" onclick="window.closeNumKeypad()">✓</button>
+        <button class="kp-btn kp-back" onclick="window.kpBackspace()">⌫</button>
+        <button class="kp-btn kp-clear" onclick="window.clearReceived()">C</button>
       </div>
     </div>
     <!-- キャンセル / 会計完了 -->
@@ -2601,10 +2602,12 @@ window.closeNumKeypad = function() {
 window.kpDigit = function(d) {
   var inp = document.getElementById('cash-received-input');
   if (!inp) return;
-  // 「0」始まりを防止（先頭0は消す。ただし 0 だけは許可）
   var cur = inp.value || '';
+  // 「0」始まりを防止（先頭0は消す）
   if (cur === '0') cur = '';
   var next = cur + d;
+  // 空状態で '00' を押した場合は '0' として扱う
+  if (next === '00' || next === '000') next = '0';
   // 上限: 9999999（7桁）
   if (next.length > 7) return;
   inp.value = next;
