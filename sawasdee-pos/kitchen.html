@@ -188,10 +188,16 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .checkout-discount-clear { font-size: 11px; color: #64748b; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font-family: -apple-system, sans-serif; }
 .checkout-btns { display: flex; gap: 8px; padding: 12px; background: #f8fafc; align-items: stretch; }
 .checkout-cancel { flex: 0 0 56px; padding: 8px 4px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; color: #64748b; font-size: 11px; line-height: 1.2; cursor: pointer; font-family: -apple-system, sans-serif; }
-.checkout-confirm { flex: 2; padding: 12px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; }
-.checkout-pay-buttons { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 6px; }
-.checkout-pay-btn { padding: 14px 6px; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; min-width: 0; }
+.checkout-confirm { flex: 1; padding: 14px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; }
+.checkout-confirm:disabled { background: #9ca3af; cursor: default; opacity: 0.7; }
+.checkout-pay-select-wrap { padding: 10px 12px 0; background: #f8fafc; }
+.checkout-pay-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 6px; }
+.checkout-pay-btn { padding: 14px 6px; border: 3px solid transparent; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; min-width: 0; opacity: 0.55; transition: opacity 0.15s, transform 0.1s; }
 .checkout-pay-btn:active { transform: scale(0.97); }
+.checkout-pay-btn.selected { opacity: 1; border-color: #fbbf24; transform: scale(1.03); }
+.checkout-discount-toggle-wrap { padding: 8px 12px 0; background: white; }
+.checkout-discount-toggle-btn { width: 100%; padding: 8px; background: transparent; border: 1px dashed #94a3b8; border-radius: 8px; color: #6b7280; font-size: 12px; cursor: pointer; font-family: -apple-system, sans-serif; }
+.checkout-discount-toggle-btn:hover { background: #f3f4f6; }
 .delete-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #ef4444; border-radius: 4px; font-size: 11px; color: #ef4444; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
 .delete-btn:hover { background: #fee2e2; }
 .edit-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #aaa; border-radius: 4px; font-size: 11px; color: #666; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
@@ -415,18 +421,25 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 <div class="checkout-modal" id="checkout-modal">
   <div class="checkout-box">
     <div class="checkout-body" id="checkout-body"></div>
-    <div class="checkout-grand" id="checkout-grand-before">
-      <span class="checkout-grand-label">小計</span>
-      <span class="checkout-grand-amount" id="checkout-grand-amount"></span>
+    <!-- 割引適用ボタン（割引未適用時に表示） -->
+    <div class="checkout-discount-toggle-wrap" id="checkout-discount-toggle-wrap">
+      <button class="checkout-discount-toggle-btn" onclick="window.toggleDiscountArea()">＋ 割引を適用</button>
     </div>
-    <div class="checkout-discount-area" id="checkout-discount-area"></div>
+    <!-- 割引エリア（デフォルト非表示） -->
+    <div class="checkout-discount-area" id="checkout-discount-area" style="display:none"></div>
+    <!-- 最終合計（割引適用後） -->
     <div class="checkout-grand">
-      <span class="checkout-grand-label">割引後お会計</span>
+      <span class="checkout-grand-label">お会計</span>
       <span class="checkout-grand-amount" id="checkout-final-amount"></span>
     </div>
+    <!-- 支払方法選択 -->
+    <div class="checkout-pay-select-wrap">
+      <div class="checkout-pay-buttons" id="checkout-pay-buttons"></div>
+    </div>
+    <!-- キャンセル / 会計完了 -->
     <div class="checkout-btns">
       <button class="checkout-cancel" onclick="window.closeCheckout()">キャン<br>セル</button>
-      <div class="checkout-pay-buttons" id="checkout-pay-buttons"></div>
+      <button class="checkout-confirm" id="checkout-confirm-btn" onclick="window.confirmCheckoutFinal()" disabled>✓ 会計完了</button>
     </div>
   </div>
 </div>
@@ -2220,21 +2233,33 @@ window.openCheckout = function(tableNum, idStr) {
   }
   itemsHTML += '<div class="receipt-subtotal"><span>消費税（10%）</span><span>¥' + grandTax.toLocaleString() + '</span></div>';
   document.getElementById('checkout-body').innerHTML = itemsHTML;
-  document.getElementById('checkout-grand-amount').textContent = '¥' + grandTotal.toLocaleString();
   _checkoutGrandTotal = grandTotal;
   _discountAmount = 0;
   _discountType = 'amount';
   window.renderDiscountArea();
-  // 支払方法ボタンを動的生成（store_config.payment_methodsまたはデフォルト）
+  // 支払方法ボタン: 選択型・現金は最後（右端）に並べる
+  var sortedMethods = _PAYMENT_METHODS.slice().sort(function(a, b) {
+    if (a === 'cash' && b !== 'cash') return 1;
+    if (b === 'cash' && a !== 'cash') return -1;
+    return 0;
+  });
   var payBtnHtml = '';
-  _PAYMENT_METHODS.forEach(function(pm) {
+  sortedMethods.forEach(function(pm) {
     var def = PAYMENT_METHOD_DEFS[pm];
     if (!def) return;
-    payBtnHtml += '<button class="checkout-pay-btn" style="background:' + def.color + '" '
-      + 'onclick="window.confirmCheckoutWith(\'' + pm + '\')">'
+    payBtnHtml += '<button class="checkout-pay-btn" data-pm="' + pm + '" style="background:' + def.color + '" '
+      + 'onclick="window.selectPayment(\'' + pm + '\')">'
       + def.icon + ' ' + def.label + '</button>';
   });
   document.getElementById('checkout-pay-buttons').innerHTML = payBtnHtml;
+  // 状態リセット
+  _selectedPaymentMethod = null;
+  document.getElementById('checkout-confirm-btn').disabled = true;
+  // 割引エリアを毎回リセット（前回開いた状態を引き継がない）
+  var dArea = document.getElementById('checkout-discount-area');
+  var dToggle = document.getElementById('checkout-discount-toggle-wrap');
+  if (dArea) dArea.style.display = 'none';
+  if (dToggle) dToggle.style.display = '';
   document.getElementById('checkout-modal').classList.add('open');
 };
 
@@ -2433,16 +2458,48 @@ window.closeCheckout = function() {
   document.getElementById('checkout-modal').classList.remove('open');
   _checkoutTable = null;
   _checkoutIds = null;
+  _selectedPaymentMethod = null;
 };
 
-window.confirmCheckoutWith = function(paymentMethod) {
-  if (!_checkoutTable || !_checkoutIds) return;
-  if (!PAYMENT_METHOD_DEFS[paymentMethod]) return;
+// 選択中の支払方法を保持（会計完了時に使う）
+var _selectedPaymentMethod = null;
+
+// 支払方法選択（ボタン押下時）
+window.selectPayment = function(pm) {
+  if (!PAYMENT_METHOD_DEFS[pm]) return;
+  _selectedPaymentMethod = pm;
+  document.querySelectorAll('#checkout-pay-buttons .checkout-pay-btn').forEach(function(b) {
+    b.classList.toggle('selected', b.dataset.pm === pm);
+  });
+  // 支払方法選択後は会計完了ボタンを enable
+  var confirmBtn = document.getElementById('checkout-confirm-btn');
+  if (confirmBtn) confirmBtn.disabled = false;
+};
+
+// 割引エリアの表示/非表示切替
+window.toggleDiscountArea = function() {
+  var area = document.getElementById('checkout-discount-area');
+  var toggle = document.getElementById('checkout-discount-toggle-wrap');
+  if (!area || !toggle) return;
+  if (area.style.display === 'none') {
+    area.style.display = '';
+    toggle.style.display = 'none';
+  } else {
+    area.style.display = 'none';
+    toggle.style.display = '';
+  }
+};
+
+// 会計完了（支払方法選択済み前提）
+window.confirmCheckoutFinal = function() {
+  if (!_checkoutTable || !_checkoutIds || !_selectedPaymentMethod) return;
+  if (!PAYMENT_METHOD_DEFS[_selectedPaymentMethod]) return;
   document.getElementById('checkout-modal').classList.remove('open');
-  window.markPaid(_checkoutTable, _checkoutIds, _discountAmount > 0 ? _discountAmount : null, paymentMethod);
+  window.markPaid(_checkoutTable, _checkoutIds, _discountAmount > 0 ? _discountAmount : null, _selectedPaymentMethod);
   _checkoutTable = null;
   _checkoutIds = null;
   _discountAmount = 0;
+  _selectedPaymentMethod = null;
   // 会計完了後は受注画面（全て）に戻る
   setMode('all');
 };
