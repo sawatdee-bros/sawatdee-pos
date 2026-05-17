@@ -819,6 +819,26 @@ window.saveAll = async function() {
 
   // nullのキーは除去（Firebaseに不要な値を残さない）
   Object.keys(cfg).forEach(function(k){ if (cfg[k] === null) delete cfg[k]; });
+  // UI管理キーリスト（cfg に存在するキー = この画面で管理しているもの）
+  var MANAGED_KEYS = Object.keys(cfg).concat([
+    // cfg.payment_methodsなどnull除去対象も保護候補に含めるため明示
+    'store_name','tax_rate','rounding_mode','rounding_unit',
+    'charge_per_person','charge_free_drink_count','charge_mode',
+    'table_count','nomi_table_count','table_names','table_names_short',
+    'has_ohiya','has_nomi_hodai','has_call_button','show_set_on_customer',
+    'day_start_hour','apps_script_url','base_url','qr_note1','qr_note2',
+    'discount_presets','payment_methods','custom_payment_methods'
+  ]);
+  // UI未管理のキー（enable_approval_flow / item_category_overrides 等）を既存から温存
+  try {
+    var existingSnap = await get(ref(db, 'store_config'));
+    var existing = existingSnap.val() || {};
+    Object.keys(existing).forEach(function(k) {
+      if (MANAGED_KEYS.indexOf(k) < 0 && !(k in cfg)) {
+        cfg[k] = existing[k];
+      }
+    });
+  } catch(e) { console.warn('既存store_config取得失敗・温存スキップ:', e); }
   try {
     await set(ref(db, 'store_config'), cfg);
     var toast = document.getElementById('toast');
