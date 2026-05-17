@@ -1,0 +1,85 @@
+{
+  "rules": {
+    "menu":             { ".read": true, ".write": "auth != null" },
+    "menu_overrides":   { ".read": true, ".write": true },
+    "soldout":          { ".read": true, ".write": true },
+    "store_config":     { ".read": true, ".write": true },
+    "nomi_menu":        { ".read": true, ".write": "auth != null" },
+    "nomi_lo":          { ".read": true, ".write": "auth != null" },
+    "orders":           { ".read": true, ".write": true },
+    "handy_groups":     { ".read": true, ".write": true },
+    "calls":            { ".read": true, ".write": true },
+    "bill_calls":       { ".read": true, ".write": true },
+    "pax":              { ".read": true, ".write": true },
+    "tables":           { ".read": true, ".write": true },
+    "ohiya":            { ".read": true, ".write": true },
+    "tenants": {
+      "$tid": {
+        "reservations": {
+          ".read": true,
+          "$date": {
+            ".indexOn": ["time_slot", "status"],
+            "$id": {
+              ".write": true,
+              ".validate": "newData.hasChildren(['date','time_slot','party_size','name','phone','status','created_at'])",
+              "party_size": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20" },
+              "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
+              "phone": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30" },
+              "note": { ".validate": "newData.isString() && newData.val().length <= 500" },
+              "email": { ".validate": "newData.isString() && newData.val().length <= 100" },
+              "email_sent_at": { ".validate": "newData.isNumber()" },
+              "status": { ".validate": "newData.val() === 'pending' || newData.val() === 'confirmed' || newData.val() === 'cancelled' || newData.val() === 'no_show'" },
+              "$other": { ".validate": true }
+            }
+          }
+        },
+        "reservation_settings": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.hasChild('time_slots_by_dow') || newData.hasChild('time_slots')"
+        },
+        "email_log": {
+          ".read": true,
+          ".write": true
+        },
+        "staff_master": {
+          ".read": true,
+          "$staffId": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['name','pin','hourly_wage','role','active'])",
+            "pin": { ".validate": "newData.isString() && newData.val().length === 4" },
+            "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
+            "hourly_wage": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+            "withholding_type": { ".validate": "newData.val() === '甲' || newData.val() === '乙' || newData.val() === '対象外'" },
+            "$other": { ".validate": true }
+          }
+        },
+        "shifts": {
+          ".read": true,
+          ".write": true
+        },
+        "attendance": {
+          ".read": true,
+          ".write": true
+        },
+        "attendance_settings": {
+          ".read": true,
+          ".write": true
+        },
+        "attendance_confirmations": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    "system": {
+      "holidays": {
+        ".read": true,
+        ".write": false
+      }
+    },
+    "surveys":          { ".read": "auth != null", ".write": true },
+    "spot_suggestions": { ".read": "auth != null", ".write": true },
+    "quiz_scores":      { ".read": "auth != null", ".write": true }
+  }
+}

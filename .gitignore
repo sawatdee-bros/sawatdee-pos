@@ -1,2 +1,14 @@
 /sawatdee-reservation/
 /sawatdee-attendance/
+
+# Firebase CLI
+.firebase/
+firebase-debug.log
+*-debug.log
+
+# Firebase sensitive files (service account credentials など将来用)
+serviceAccount*.json
+*-firebase-adminsdk-*.json
+
+# Local dumps / temp
+_rules_dump.txt
