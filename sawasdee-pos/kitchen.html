@@ -114,12 +114,13 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .summary-label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
 .summary-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
 .receipts-wrap { padding: 16px; padding-bottom: 72px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
-.receipt { background: #fffef0; border-radius: 2px; width: 220px; flex-shrink: 0; box-shadow: 2px 3px 8px rgba(0,0,0,0.4); font-family: 'Courier New', Courier, monospace; color: #1a1a1a; }
+.receipt { background: #fffef0; border-radius: 2px; width: 220px; flex-shrink: 0; box-shadow: 2px 3px 8px rgba(0,0,0,0.4); font-family: 'Courier New', Courier, monospace; color: #1a1a1a; display: flex; flex-direction: column; height: 580px; }
 .receipt.active { outline: 2px solid #fbbf24; }
 .receipt.done { opacity: 0.55; }
 .receipt.paid { opacity: 0.4; filter: grayscale(0.3); }
-.receipt-top { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-top: 2px dashed #ccc; }
-.receipt-inner { padding: 10px 14px 14px; }
+.receipt-top { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-top: 2px dashed #ccc; flex-shrink: 0; }
+.receipt-inner { padding: 10px 14px 14px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.receipt-items { flex: 1; min-height: 0; overflow-y: auto; }
 .receipt-table { text-align: center; font-size: 20px; font-weight: 900; margin: 4px 0 2px; color: #111; }
 .receipt-time { text-align: center; font-size: 10px; color: #666; margin-bottom: 8px; }
 .receipt-status { text-align: center; margin-bottom: 6px; }
@@ -206,7 +207,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .move-cancel { padding: 10px 18px; background: #f3f4f6; border: none; border-radius: 8px; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; }
 .move-save { padding: 10px 22px; background: #ea580c; border: none; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
 .move-save:disabled { background: #9ca3af; cursor: default; }
-.receipt-bottom { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-bottom: 2px dashed #ccc; }
+.receipt-bottom { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-bottom: 2px dashed #ccc; flex-shrink: 0; }
 /* 編集モーダル */
 .edit-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 700; display: none; align-items: flex-start; justify-content: center; padding-top: 40px; overflow-y: auto; }
 .edit-modal.open { display: flex; }
