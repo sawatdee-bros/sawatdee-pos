@@ -198,6 +198,21 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .checkout-discount-toggle-wrap { padding: 8px 12px 12px; background: white; }
 .checkout-discount-toggle-btn { width: 100%; padding: 8px; background: transparent; border: 1px dashed #94a3b8; border-radius: 8px; color: #6b7280; font-size: 12px; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-discount-toggle-btn:hover { background: #f3f4f6; }
+.checkout-cash-calc { padding: 10px 12px; background: #fffbeb; border-top: 1px solid #fde68a; border-bottom: 1px solid #fde68a; font-family: -apple-system, sans-serif; }
+.cash-calc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.cash-calc-row label { font-size: 13px; color: #78350f; font-weight: 700; min-width: 70px; }
+.cash-calc-row input { flex: 1; padding: 8px 12px; border: 1px solid #d97706; border-radius: 8px; font-size: 16px; text-align: right; font-family: -apple-system, sans-serif; }
+.cash-calc-row input:focus { outline: 2px solid #d97706; outline-offset: -1px; }
+.cash-quick-btns { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 4px; }
+.cash-quick-btns button { padding: 7px 4px; background: white; border: 1px solid #d97706; border-radius: 6px; font-size: 12px; font-weight: 700; color: #78350f; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; }
+.cash-quick-btns button:active { background: #fef3c7; transform: scale(0.97); }
+.cash-quick-btns button.exact { background: #d97706; color: white; border-color: #b45309; }
+.cash-quick-btns button.exact:active { background: #b45309; }
+.cash-quick-btns button.clear { background: transparent; color: #92400e; border-style: dashed; }
+.cash-change-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 4px 0; }
+.cash-change-label { font-size: 14px; font-weight: 700; color: #78350f; }
+.cash-change-amount { font-size: 22px; font-weight: 900; color: #166534; }
+.cash-change-amount.short { color: #dc2626; }
 .delete-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #ef4444; border-radius: 4px; font-size: 11px; color: #ef4444; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
 .delete-btn:hover { background: #fee2e2; }
 .edit-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #aaa; border-radius: 4px; font-size: 11px; color: #666; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
@@ -435,6 +450,24 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     <!-- 支払方法選択 -->
     <div class="checkout-pay-select-wrap">
       <div class="checkout-pay-buttons" id="checkout-pay-buttons"></div>
+    </div>
+    <!-- 現金時のみ表示する電卓エリア -->
+    <div class="checkout-cash-calc" id="checkout-cash-calc" style="display:none">
+      <div class="cash-calc-row">
+        <label>お預かり</label>
+        <input type="number" id="cash-received-input" inputmode="numeric" placeholder="0">
+      </div>
+      <div class="cash-quick-btns">
+        <button onclick="window.addReceived(1000)">+1000</button>
+        <button onclick="window.addReceived(5000)">+5000</button>
+        <button onclick="window.addReceived(10000)">+10000</button>
+        <button class="exact" onclick="window.setExactReceived()">ぴったり</button>
+        <button class="clear" onclick="window.clearReceived()">クリア</button>
+      </div>
+      <div class="cash-change-row">
+        <span class="cash-change-label" id="cash-change-label">お釣り</span>
+        <span class="cash-change-amount" id="cash-change-amount">¥0</span>
+      </div>
     </div>
     <!-- キャンセル / 会計完了 -->
     <div class="checkout-btns">
@@ -2254,12 +2287,19 @@ window.openCheckout = function(tableNum, idStr) {
   document.getElementById('checkout-pay-buttons').innerHTML = payBtnHtml;
   // 状態リセット
   _selectedPaymentMethod = null;
+  _cashReceived = 0;
   document.getElementById('checkout-confirm-btn').disabled = true;
   // 割引エリアを毎回リセット（前回開いた状態を引き継がない）
   var dArea = document.getElementById('checkout-discount-area');
   var dToggle = document.getElementById('checkout-discount-toggle-wrap');
   if (dArea) dArea.style.display = 'none';
   if (dToggle) dToggle.style.display = '';
+  // 電卓エリアもリセット
+  var calc = document.getElementById('checkout-cash-calc');
+  if (calc) calc.style.display = 'none';
+  var inp = document.getElementById('cash-received-input');
+  if (inp) inp.value = '';
+  _updateCashChange();
   document.getElementById('checkout-modal').classList.add('open');
 };
 
@@ -2459,10 +2499,13 @@ window.closeCheckout = function() {
   _checkoutTable = null;
   _checkoutIds = null;
   _selectedPaymentMethod = null;
+  _cashReceived = 0;
 };
 
 // 選択中の支払方法を保持（会計完了時に使う）
 var _selectedPaymentMethod = null;
+// 現金時の預かり金額
+var _cashReceived = 0;
 
 // 支払方法選択（ボタン押下時）
 window.selectPayment = function(pm) {
@@ -2471,10 +2514,74 @@ window.selectPayment = function(pm) {
   document.querySelectorAll('#checkout-pay-buttons .checkout-pay-btn').forEach(function(b) {
     b.classList.toggle('selected', b.dataset.pm === pm);
   });
+  // 現金時のみ電卓エリア表示
+  var calc = document.getElementById('checkout-cash-calc');
+  if (calc) calc.style.display = (pm === 'cash') ? '' : 'none';
+  // 現金以外を選んだ時は預かり金もリセット
+  if (pm !== 'cash') {
+    _cashReceived = 0;
+    var inp = document.getElementById('cash-received-input');
+    if (inp) inp.value = '';
+    _updateCashChange();
+  }
   // 支払方法選択後は会計完了ボタンを enable
   var confirmBtn = document.getElementById('checkout-confirm-btn');
   if (confirmBtn) confirmBtn.disabled = false;
 };
+
+// 電卓：お釣り表示更新
+function _updateCashChange() {
+  var final = Math.max(0, (_checkoutGrandTotal||0) - (_discountAmount||0));
+  var change = (_cashReceived||0) - final;
+  var label = document.getElementById('cash-change-label');
+  var amt = document.getElementById('cash-change-amount');
+  if (!label || !amt) return;
+  if (change >= 0) {
+    label.textContent = 'お釣り';
+    amt.textContent = '¥' + change.toLocaleString();
+    amt.classList.remove('short');
+  } else {
+    label.textContent = '不足';
+    amt.textContent = '¥' + Math.abs(change).toLocaleString();
+    amt.classList.add('short');
+  }
+}
+
+window.addReceived = function(amount) {
+  _cashReceived = (_cashReceived||0) + amount;
+  var inp = document.getElementById('cash-received-input');
+  if (inp) inp.value = _cashReceived;
+  _updateCashChange();
+};
+window.clearReceived = function() {
+  _cashReceived = 0;
+  var inp = document.getElementById('cash-received-input');
+  if (inp) inp.value = '';
+  _updateCashChange();
+};
+window.setExactReceived = function() {
+  _cashReceived = Math.max(0, (_checkoutGrandTotal||0) - (_discountAmount||0));
+  var inp = document.getElementById('cash-received-input');
+  if (inp) inp.value = _cashReceived;
+  _updateCashChange();
+};
+// 手動入力イベントを1回だけバインド
+(function() {
+  function bindCashInput() {
+    var inp = document.getElementById('cash-received-input');
+    if (!inp || inp._bound) return;
+    inp.addEventListener('input', function(e) {
+      _cashReceived = parseInt(e.target.value) || 0;
+      _updateCashChange();
+    });
+    inp._bound = true;
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindCashInput);
+  } else {
+    bindCashInput();
+  }
+})();
 
 // 割引エリアの表示/非表示切替
 window.toggleDiscountArea = function() {
@@ -2500,6 +2607,7 @@ window.confirmCheckoutFinal = function() {
   _checkoutIds = null;
   _discountAmount = 0;
   _selectedPaymentMethod = null;
+  _cashReceived = 0;
   // 会計完了後は受注画面（全て）に戻る
   setMode('all');
 };
