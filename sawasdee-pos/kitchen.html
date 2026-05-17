@@ -187,7 +187,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .checkout-discount-line { display: flex; justify-content: space-between; font-size: 13px; color: #dc2626; padding: 4px 0; font-family: -apple-system, sans-serif; }
 .checkout-discount-clear { font-size: 11px; color: #64748b; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font-family: -apple-system, sans-serif; }
 .checkout-btns { display: flex; gap: 8px; padding: 12px; background: #f8fafc; align-items: stretch; }
-.checkout-cancel { flex: 0 0 56px; padding: 8px 4px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; color: #64748b; font-size: 11px; line-height: 1.2; cursor: pointer; font-family: -apple-system, sans-serif; }
+.checkout-cancel { flex: 0 0 88px; padding: 8px 8px; background: transparent; border: 1px solid #cbd5e1; border-radius: 10px; color: #64748b; font-size: 13px; line-height: 1.2; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-confirm { flex: 1; padding: 14px; background: #166534; border: none; border-radius: 10px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-confirm:disabled { background: #9ca3af; cursor: default; opacity: 0.7; }
 .checkout-pay-select-wrap { padding: 10px 12px 0; background: #f8fafc; }
@@ -195,7 +195,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .checkout-pay-btn { padding: 14px 6px; border: 3px solid transparent; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: -apple-system, sans-serif; white-space: nowrap; min-width: 0; opacity: 0.55; transition: opacity 0.15s, transform 0.1s; }
 .checkout-pay-btn:active { transform: scale(0.97); }
 .checkout-pay-btn.selected { opacity: 1; border-color: #fbbf24; transform: scale(1.03); }
-.checkout-discount-toggle-wrap { padding: 8px 12px 0; background: white; }
+.checkout-discount-toggle-wrap { padding: 8px 12px 12px; background: white; }
 .checkout-discount-toggle-btn { width: 100%; padding: 8px; background: transparent; border: 1px dashed #94a3b8; border-radius: 8px; color: #6b7280; font-size: 12px; cursor: pointer; font-family: -apple-system, sans-serif; }
 .checkout-discount-toggle-btn:hover { background: #f3f4f6; }
 .delete-btn { width: 100%; margin-top: 6px; padding: 6px 0; background: transparent; border: 1px solid #ef4444; border-radius: 4px; font-size: 11px; color: #ef4444; cursor: pointer; font-family: 'Courier New', Courier, monospace; }
@@ -438,7 +438,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
     </div>
     <!-- キャンセル / 会計完了 -->
     <div class="checkout-btns">
-      <button class="checkout-cancel" onclick="window.closeCheckout()">キャン<br>セル</button>
+      <button class="checkout-cancel" onclick="window.closeCheckout()">キャンセル</button>
       <button class="checkout-confirm" id="checkout-confirm-btn" onclick="window.confirmCheckoutFinal()" disabled>✓ 会計完了</button>
     </div>
   </div>
