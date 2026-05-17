@@ -121,7 +121,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .receipt-top { height: 14px; background: repeating-linear-gradient(90deg, #fffef0 0px, #fffef0 10px, transparent 10px, transparent 14px); border-top: 2px dashed #ccc; flex-shrink: 0; }
 .receipt-inner { padding: 10px 14px 14px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .receipt-items { flex: 1; min-height: 0; overflow-y: auto; }
-.receipt-table { font-size: 16px; font-weight: 900; color: #111; line-height: 1.1; }
+.receipt-table { font-size: 18px; font-weight: 900; color: #111; line-height: 1.1; }
 .receipt-header-row { display: flex; align-items: center; gap: 6px; margin: 2px 0 4px; }
 .receipt-header-meta { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .receipt-time { font-size: 9px; color: #666; line-height: 1.2; }
@@ -2930,17 +2930,21 @@ function _billsRender() {
       }
       var _pmKey = _sessPm || 'cash';
       var _pmDef = PAYMENT_METHOD_DEFS[_pmKey] || PAYMENT_METHOD_DEFS['cash'];
-      _paidPmHTML = '<button class="pay-btn paid-method" style="background:' + _pmDef.color + '"'
+      _paidPmHTML = '<button class="pay-btn paid-method" style="background:' + _pmDef.color + ';line-height:1.4;padding:8px 0;"'
         + ' onclick="window.openPaymentMethodChange(\'' + entryIds + '\',\'' + _pmKey + '\')">'
-        + _pmDef.icon + ' ' + _pmDef.label + 'で会計済み （タップで変更）</button>';
+        + _pmDef.icon + ' ' + _pmDef.label + 'で会計済み<br>'
+        + '<span style="font-size:10px;opacity:0.85;font-weight:600;">（タップで変更）</span>'
+        + '</button>';
     }
     var payHTML=isPaid
       ?'<button class="pay-btn" disabled>\u2713 会計済み</button>'
       :'<button class="pay-btn" onclick="window.openCheckout(\''+tableNum+'\',\''+entryIds+'\')">💳 会計する</button>';
 
     if (isPaid && _paidPmHTML) payHTML = _paidPmHTML;
-    // 編集・削除はヘッダー右端のアイコンに集約
-    var editIconHTML = '<button class="receipt-icon-btn" title="伝票を編集" onclick="window.openEdit(\''+tableNum+'\',\''+entryIds+'\')">&#9999;&#65039;</button>';
+    // 編集・削除はヘッダー右端のアイコンに集約（編集は会計前のみ）
+    var editIconHTML = isPaid
+      ? ''
+      : '<button class="receipt-icon-btn" title="伝票を編集" onclick="window.openEdit(\''+tableNum+'\',\''+entryIds+'\')">&#9999;&#65039;</button>';
     var deleteIconHTML = isPaid
       ? '<button class="receipt-icon-btn danger" title="この伝票を削除" onclick="window.deleteSession(\'' + entryIds + '\')">🗑</button>'
       : '';
