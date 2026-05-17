@@ -651,7 +651,12 @@ get(ref(db, 'menu')).then(function(snap) {
     var cats = [];
     ['drink', 'food', 'set'].forEach(function(catKey) {
       if (!menuData[catKey]) return;
-      Object.keys(menuData[catKey]).forEach(function(subcat) {
+      // customer.html と同じ順序: subcatOrder で並べ、未登録は末尾
+      var order = (menuData.subcatOrder || {})[catKey] || [];
+      var all = Object.keys(menuData[catKey]);
+      var sortedSubcats = order.filter(function(s) { return all.indexOf(s) >= 0; })
+        .concat(all.filter(function(s) { return order.indexOf(s) < 0; }));
+      sortedSubcats.forEach(function(subcat) {
         var items = menuData[catKey][subcat];
         if (!Array.isArray(items)) return;
         var catItems = items
