@@ -2652,6 +2652,9 @@ window.deleteSession = async function(idStr) {
 window.closeEdit = function() {
   _bEdit = null;
   document.getElementById('edit-modal').classList.remove('open');
+  // カテゴリの開閉状態をリセット（次回openEdit時に全て閉じた状態で開く）
+  var em = document.getElementById('edit-menu');
+  if (em) em.innerHTML = '';
 };
 
 // ---- セッション構築 ----
