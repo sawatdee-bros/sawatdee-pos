@@ -1408,17 +1408,19 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
   ws4['!cols'] = [{wch:6},{wch:28},{wch:9},{wch:8},{wch:14},{wch:8}];
   XLSX.utils.book_append_sheet(wb, ws4, '④商品別集計');
 
-  // ── ⑤ 全データ（伝票明細）──
-  var rows5 = [['日付','時刻','曜日','テーブル','伝票ID','人数','商品名','カテゴリ','数量','単価(税抜)','小計(税抜)','チャージ','消費税','税込合計']];
+  // ── ⑤ 全データ（伝票明細）── 支払方法列追加
+  var rows5 = [['日付','時刻','曜日','テーブル','伝票ID','人数','支払方法','商品名','カテゴリ','数量','単価(税抜)','小計(税抜)','チャージ','消費税','税込合計']];
   var sessMap5 = buildSessionMap(filtered);
-  Object.values(sessMap5).sort(function(a,b){return a.ts-b.ts;}).forEach(function(sess) {
+  var sessions5 = Object.values(sessMap5).sort(function(a,b){return a.ts-b.ts;});
+  sessions5.forEach(function(sess) {
     var dt=new Date(sess.ts); var ds=toDayStr(sess.ts);
     var timeStr=pad(dt.getHours())+':'+pad(dt.getMinutes());
     var dow=DOW[dt.getDay()];
     var tblName=TABLE_NAMES[String(sess.table)]||'テーブル '+sess.table;
     var billId=String(sess.orders[0].paidAt||sess.ts);
-    var chargeEx=calcCharge(sess.drinkQty,sess.pax,sess.hasChargeExempt);
-    var taxAmt=sess.sales-Math.round(sess.ex+chargeEx);
+    var taxAmt=sess.sales-Math.round(sess.ex+sess.charge);
+    var pmKey5 = sess.paymentMethod || 'cash';
+    var pmLabel5 = (PAYMENT_METHOD_DEFS[pmKey5] && PAYMENT_METHOD_DEFS[pmKey5].label) || pmKey5;
     var sortedItems=Object.values(sess.items).sort(function(a,b){
       var aD=isDrinkItem(a.name,a),bD=isDrinkItem(b.name,b);
       return aD===bD?0:aD?-1:1;
@@ -1428,19 +1430,79 @@ window.downloadExcel = function(fromStr, toStr, fromTs, toTs, filtered) {
         idx===0?ds:'', idx===0?timeStr:'', idx===0?dow:'',
         idx===0?tblName:'', idx===0?billId:'',
         idx===0&&sess.pax>0?sess.pax:'',
+        idx===0?pmLabel5:'',
         it.name, getItemCategory(it.name), it.qty, it.price, it.price*it.qty,
-        idx===0?chargeEx:'', idx===0?taxAmt:'', idx===0?sess.sales:''
+        idx===0?sess.charge:'', idx===0?taxAmt:'', idx===0?sess.sales:''
       ]);
     });
   });
   var t5ex=0,t5ch=0,t5tax=0,t5tot=0;
   rows5.slice(1).forEach(function(r){
-    t5ex+=r[10]; if(r[11]!=='')t5ch+=r[11]; if(r[12]!=='')t5tax+=r[12]; if(r[13]!=='')t5tot+=r[13];
+    t5ex+=r[11]; if(r[12]!=='')t5ch+=r[12]; if(r[13]!=='')t5tax+=r[13]; if(r[14]!=='')t5tot+=r[14];
   });
-  rows5.push(['','','','','','','合計','','','',t5ex,t5ch,t5tax,t5tot]);
+  rows5.push(['','','','','','','','合計','','','',t5ex,t5ch,t5tax,t5tot]);
   var ws5 = XLSX.utils.aoa_to_sheet(rows5);
-  ws5['!cols'] = [{wch:12},{wch:7},{wch:5},{wch:16},{wch:16},{wch:6},{wch:26},{wch:9},{wch:6},{wch:11},{wch:11},{wch:10},{wch:10},{wch:12}];
-  XLSX.utils.book_append_sheet(wb, ws5, '⑤全データ（伝票明細）');
+  ws5['!cols'] = [{wch:12},{wch:7},{wch:5},{wch:16},{wch:16},{wch:6},{wch:9},{wch:26},{wch:9},{wch:6},{wch:11},{wch:11},{wch:10},{wch:10},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws5, '⑤全データ(伝票明細)');
+
+  // ── ⑥ 支払方法別集計（月別×支払方法）──
+  var pad2 = pad;
+  var pmMonthMap = {};
+  var pmIdsUsed = {};
+  sessions5.forEach(function(s) {
+    var pmId = s.paymentMethod || 'cash';
+    pmIdsUsed[pmId] = true;
+    var d = new Date(s.ts - DAY_START*3600000);
+    var ym = d.getFullYear()+'-'+pad2(d.getMonth()+1);
+    if (!pmMonthMap[ym]) pmMonthMap[ym] = {};
+    if (!pmMonthMap[ym][pmId]) pmMonthMap[ym][pmId] = { cnt:0, sales:0 };
+    pmMonthMap[ym][pmId].cnt++;
+    pmMonthMap[ym][pmId].sales += s.sales;
+  });
+  var pmIdList = Object.keys(pmIdsUsed);
+  var pmOrder = ['cash','card','qr','paypay','rakuten','dpay','suica','other'];
+  pmIdList.sort(function(a,b){
+    var ai = pmOrder.indexOf(a), bi = pmOrder.indexOf(b);
+    if (ai < 0) ai = 100; if (bi < 0) bi = 100;
+    if (ai !== bi) return ai - bi;
+    return a.localeCompare(b);
+  });
+  function pmL(id) { return (PAYMENT_METHOD_DEFS[id] && PAYMENT_METHOD_DEFS[id].label) || id; }
+  var rows6Header = ['年月'];
+  pmIdList.forEach(function(id) { rows6Header.push(pmL(id)+' 件数'); rows6Header.push(pmL(id)+' 売上'); });
+  rows6Header.push('合計 件数'); rows6Header.push('合計 売上');
+  var rows6 = [rows6Header];
+  Object.keys(pmMonthMap).sort().forEach(function(ym) {
+    var row = [ym];
+    var totCnt = 0, totSales = 0;
+    pmIdList.forEach(function(id) {
+      var v = pmMonthMap[ym][id] || { cnt:0, sales:0 };
+      row.push(v.cnt > 0 ? v.cnt : '');
+      row.push(v.sales > 0 ? v.sales : '');
+      totCnt += v.cnt; totSales += v.sales;
+    });
+    row.push(totCnt); row.push(totSales);
+    rows6.push(row);
+  });
+  var totalRow6 = ['合計'];
+  var grandCnt = 0, grandSales = 0;
+  pmIdList.forEach(function(id) {
+    var sumCnt = 0, sumSales = 0;
+    Object.keys(pmMonthMap).forEach(function(ym) {
+      var v = pmMonthMap[ym][id]; if (v) { sumCnt += v.cnt; sumSales += v.sales; }
+    });
+    totalRow6.push(sumCnt > 0 ? sumCnt : '');
+    totalRow6.push(sumSales > 0 ? sumSales : '');
+    grandCnt += sumCnt; grandSales += sumSales;
+  });
+  totalRow6.push(grandCnt); totalRow6.push(grandSales);
+  rows6.push(totalRow6);
+  var widths6 = [{wch:10}];
+  pmIdList.forEach(function() { widths6.push({wch:8}); widths6.push({wch:12}); });
+  widths6.push({wch:10}); widths6.push({wch:14});
+  var ws6 = XLSX.utils.aoa_to_sheet(rows6);
+  ws6['!cols'] = widths6;
+  XLSX.utils.book_append_sheet(wb, ws6, '⑥支払方法別集計');
 
   // 出力
   XLSX.writeFile(wb, 'sawatdee_sales_' + fromStr + '_' + toStr + '_全シート.xlsx');
@@ -1469,21 +1531,21 @@ window.downloadCsv = function() {
   var BOM = '\uFEFF';
 
   if (unit === 'session') {
-    csv = BOM + '日付,時刻,テーブル,人数,支払方法,ドリンク杯数,チャージ,税抜売上,消費税,税込売上\n';
+    // Excel/GAS と列構成を統一
+    csv = BOM + '日付,時刻,曜日,テーブル,人数,支払方法,税抜小計,チャージ,消費税,税込合計\n';
     var sessMap = buildSessionMap(filtered);
     Object.values(sessMap).sort(function(a,b){ return a.ts-b.ts; }).forEach(function(s) {
       var dt = new Date(s.ts);
       var ds = toDayStr(s.ts);
       var timeStr = ('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
-      var chargeEx = calcCharge(s.drinkQty, s.pax, s.hasChargeExempt);
-      var taxRate = storeConfig.tax_rate || 10;
-      var exWithCharge = s.ex + chargeEx;
-      var tax = s.sales - Math.round(exWithCharge);
+      var dow = DOW[dt.getDay()];
       var pmKey = s.paymentMethod || 'cash';
       var pmLabel = (PAYMENT_METHOD_DEFS[pmKey] && PAYMENT_METHOD_DEFS[pmKey].label) || pmKey;
-      csv += [ds, timeStr, TABLE_NAMES[String(s.table)]||'テーブル '+s.table,
-        s.pax, pmLabel, s.drinkQty, chargeEx,
-        Math.round(exWithCharge), tax, s.sales].join(',') + '\n';
+      var taxAmt = s.sales - Math.round(s.ex + s.charge);
+      csv += [ds, timeStr, dow,
+        '"'+(TABLE_NAMES[String(s.table)]||'テーブル '+s.table)+'"',
+        s.pax > 0 ? s.pax : '', pmLabel,
+        s.ex, s.charge, taxAmt, s.sales].join(',') + '\n';
     });
   } else if (unit === 'day') {
     csv = BOM + '日付,曜日,会計件数,税込売上\n';
@@ -1512,20 +1574,33 @@ window.downloadCsv = function() {
       csv += [ym, monthMap[ym].sessions, monthMap[ym].sales].join(',') + '\n';
     });
   } else if (unit === 'item') {
-    csv = BOM + '商品名,カテゴリ,数量,税抜売上合計\n';
+    // Excel/GAS と列構成を統一（順位・構成比・extras 別計上）
+    csv = BOM + '順位,商品名,カテゴリ,数量,税抜売上,構成比\n';
     var itemMap = {};
     filtered.forEach(function(o) {
       (Array.isArray(o.items)?o.items:Object.values(o.items||{})).forEach(function(it) {
+        var extrasTotal = (it.extras||[]).reduce(function(s,ex){ return s+(ex.price||0); }, 0);
+        var basePrice = it.price - extrasTotal;
         if (!itemMap[it.name]) itemMap[it.name] = { name:it.name, cat:getItemCategory(it.name), qty:0, sales:0 };
         itemMap[it.name].qty += it.qty;
-        itemMap[it.name].sales += it.price * it.qty;
+        itemMap[it.name].sales += basePrice * it.qty;
+        (it.extras||[]).forEach(function(ex) {
+          if (!ex.price) return;
+          if (!itemMap[ex.label]) itemMap[ex.label] = { name:ex.label, cat:getItemCategory(ex.label), qty:0, sales:0 };
+          itemMap[ex.label].qty += it.qty;
+          itemMap[ex.label].sales += ex.price * it.qty;
+        });
       });
     });
-    Object.values(itemMap).sort(function(a,b){ return b.sales-a.sales; }).forEach(function(it) {
-      csv += ['"'+it.name+'"', it.cat, it.qty, it.sales].join(',') + '\n';
+    var sortedItems = Object.values(itemMap).sort(function(a,b){ return b.sales-a.sales; });
+    var totalItemSales = sortedItems.reduce(function(a,i){ return a+i.sales; }, 0);
+    sortedItems.forEach(function(it, i) {
+      var pct = totalItemSales > 0 ? (Math.round(it.sales/totalItemSales*1000)/10)+'%' : '0%';
+      csv += [(i+1), '"'+it.name+'"', it.cat, it.qty, it.sales, pct].join(',') + '\n';
     });
   } else if (unit === 'raw') {
-    csv = BOM + '日付,時刻,曜日,テーブル,伝票ID,人数,商品名,カテゴリ,数量,単価(税抜),小計(税抜),チャージ,消費税,税込合計\n';
+    // Excel/GAS と列構成を統一（支払方法 列追加）
+    csv = BOM + '日付,時刻,曜日,テーブル,伝票ID,人数,支払方法,商品名,カテゴリ,数量,単価(税抜),小計(税抜),チャージ,消費税,税込合計\n';
     var rawSessMap = buildSessionMap(filtered);
     var rawSessions = Object.values(rawSessMap).sort(function(a,b){ return a.ts-b.ts; });
     rawSessions.forEach(function(sess) {
@@ -1535,8 +1610,9 @@ window.downloadCsv = function() {
       var dow = DOW[dt.getDay()];
       var tblName = TABLE_NAMES[String(sess.table)] || 'テーブル '+sess.table;
       var billId = String(sess.orders[0].paidAt || sess.ts);
-      var chargeEx = calcCharge(sess.drinkQty, sess.pax, sess.hasChargeExempt);
-      var taxAmt = sess.sales - Math.round(sess.ex + chargeEx);
+      var taxAmt = sess.sales - Math.round(sess.ex + sess.charge);
+      var pmKey = sess.paymentMethod || 'cash';
+      var pmLabel = (PAYMENT_METHOD_DEFS[pmKey] && PAYMENT_METHOD_DEFS[pmKey].label) || pmKey;
       // ドリンク→フードの順でソート
       var sortedItems = Object.values(sess.items).sort(function(a,b){
         var aD=isDrinkItem(a.name), bD=isDrinkItem(b.name);
@@ -1550,12 +1626,13 @@ window.downloadCsv = function() {
           idx===0 ? '"'+tblName+'"' : '',
           idx===0 ? billId : '',
           idx===0 && sess.pax>0 ? sess.pax : '',
+          idx===0 ? pmLabel : '',
           '"'+it.name+'"',
           getItemCategory(it.name),
           it.qty,
           it.price,
           it.price * it.qty,
-          idx===0 ? chargeEx : '',
+          idx===0 ? sess.charge : '',
           idx===0 ? taxAmt : '',
           idx===0 ? sess.sales : ''
         ].join(',') + '\n';
