@@ -186,6 +186,8 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
     <input class="custom-input" type="text" id="custom-name" placeholder="例：本日のおまかせ">
     <div class="custom-label">金額（税抜）</div>
     <input class="custom-input" type="number" id="custom-price" placeholder="例：800" min="0" inputmode="numeric">
+    <div class="custom-label">個数</div>
+    <input class="custom-input" type="number" id="custom-qty" value="1" min="1" inputmode="numeric">
     <div class="custom-label">カテゴリ</div>
     <div class="custom-cat-row">
       <label class="custom-cat-opt"><input type="radio" name="custom-cat" value="food" id="custom-cat-food">🍽 フード</label>
@@ -315,6 +317,9 @@ let _pendingOrderResolve = null;
 let _arriveForcedTable = null;
 
 window.openArriveModal = async function() {
+  // init() の完了を待つ。これがないと初回タップで TABLE_NAMES が空のまま
+  // render され、卓ボタンに「コーラ」等の略称ではなく fallback 'T5' が出る。
+  if (window._initPromise) await window._initPromise;
   _arriveSelectedTable = null;
   _arrivePax = 0;
   _arriveForcedTable = null; // 通常モード（強制モード状態をクリア）
@@ -648,6 +653,7 @@ window.orderOhiya = async function() {
 window.openCustomModal = function() {
   document.getElementById('custom-name').value = '手打ち商品';
   document.getElementById('custom-price').value = '';
+  document.getElementById('custom-qty').value = '1';
   // 初期選択は現在開いているタブ（drink/food）。それ以外なら food
   var defaultCat = (currentCat === 'drink') ? 'drink' : 'food';
   document.getElementById('custom-cat-' + defaultCat).checked = true;
@@ -660,10 +666,11 @@ window.closeCustomModal = function() {
 window.addCustomItem = function() {
   const name = document.getElementById('custom-name').value.trim();
   const price = parseInt(document.getElementById('custom-price').value) || 0;
+  const qty = Math.max(1, parseInt(document.getElementById('custom-qty').value) || 1);
   const cat = (document.querySelector('input[name="custom-cat"]:checked') || {}).value || 'food';
   if (!name) { alert('商品名を入力してください'); return; }
   const key = 'custom__' + Date.now();
-  cart[key] = { name: name, price: price, qty: 1, charge_exempt: false, price_type: null, category: cat };
+  cart[key] = { name: name, price: price, qty: qty, charge_exempt: false, price_type: null, category: cat };
   window.closeCustomModal();
   renderMenu();
   renderCart();
@@ -690,6 +697,8 @@ function getSubcatColor(subcat) {
 // Phase 4 追補: 注文送信前のPAXチェック
 // pax/{tableNum} が未入力なら席案内モーダルを強制表示し、入力完了で注文継続
 async function ensurePaxAndSession(tableNum) {
+  // 初期化未完了で TABLE_NAMES が空のまま render されるのを防ぐ
+  if (window._initPromise) await window._initPromise;
   let paxVal = 0;
   try {
     const p = await fbRestGet('pax/' + tableNum);
@@ -790,7 +799,9 @@ async function init() {
     console.error('初期化失敗:', e);
   }
 }
-init();
+// init() の完了を await できるよう Promise を window に保持。
+// openArriveModal / ensurePaxAndSession が初期化前に走ったときに待たせる。
+window._initPromise = init();
 </script>
 </body>
 </html>
