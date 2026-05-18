@@ -12,6 +12,69 @@ function isOn(val) {
   return val !== null && val !== undefined && val.toString().trim() !== '';
 }
 
+// ── Web API エントリーポイント（menu-admin.html の保存ボタンから叩かれる）
+// GET ?id=<itemId>&fields=<JSON stringify>
+function doGet(e) { return doPost(e); }
+function doPost(e) {
+  try {
+    var id = (e && e.parameter) ? e.parameter.id : null;
+    var fieldsStr = (e && e.parameter) ? e.parameter.fields : null;
+    if (!id || !fieldsStr) {
+      return ContentService.createTextOutput(JSON.stringify({ ok: false, error: 'missing_params' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    var fields = JSON.parse(fieldsStr);
+    updateItem(id, fields);
+    exportToFirebase();
+    return ContentService.createTextOutput(JSON.stringify({ ok: true, id: id }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: String(err && err.message ? err.message : err) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// menu-admin.html から来る field 名 → スプレッドシート列名のマッピング
+var FIELD_TO_COL = {
+  name: '商品名',
+  kitchen_name: 'キッチン名',
+  kana: 'カタカナ',
+  thai: 'タイ語',
+  en: '英語',
+  price: '価格（税抜）',
+  desc: '説明',
+  pakchi: 'パクチー',
+  spicy: '辛さ',
+  popular: '人気',
+  sake: '酒に合う',
+  warning: '注意'
+};
+
+function updateItem(id, fields) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('メニュー');
+  if (!sheet) throw new Error('「メニュー」シートが見つかりません');
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var COL = {};
+  headers.forEach(function(h, i) { COL[h] = i; });
+  var idCol = COL['ID'];
+  if (idCol === undefined) throw new Error('「ID」列が見つかりません');
+
+  for (var r = 1; r < data.length; r++) {
+    var rowId = data[r][idCol] ? data[r][idCol].toString().trim() : '';
+    if (rowId !== id) continue;
+    Object.keys(fields).forEach(function(k) {
+      var colName = FIELD_TO_COL[k];
+      if (!colName) return; // 未マップフィールドは無視
+      var colIdx = COL[colName];
+      if (colIdx === undefined) return;
+      sheet.getRange(r + 1, colIdx + 1).setValue(fields[k]);
+    });
+    return;
+  }
+  throw new Error('商品 id が見つかりません: ' + id);
+}
+
 function exportToFirebase() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('メニュー');
   const data = sheet.getDataRange().getValues();
