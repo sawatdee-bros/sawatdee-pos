@@ -88,6 +88,10 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .custom-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
 .custom-input { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f1f5f9; font-size: 15px; font-family: inherit; box-sizing: border-box; margin-bottom: 12px; }
 .custom-input:focus { outline: none; border-color: #7c3aed; }
+.custom-cat-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.custom-cat-opt { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; user-select: none; }
+.custom-cat-opt input { accent-color: #7c3aed; }
+.custom-cat-opt:has(input:checked) { background: #2e1065; border-color: #7c3aed; color: #f1f5f9; }
 .custom-btns { display: flex; gap: 8px; margin-top: 4px; }
 .custom-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; border-radius: 10px; color: #94a3b8; font-size: 14px; cursor: pointer; }
 .custom-add { flex: 2; padding: 12px; background: #4c1d95; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
@@ -182,6 +186,11 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
     <input class="custom-input" type="text" id="custom-name" placeholder="例：本日のおまかせ">
     <div class="custom-label">金額（税抜）</div>
     <input class="custom-input" type="number" id="custom-price" placeholder="例：800" min="0" inputmode="numeric">
+    <div class="custom-label">カテゴリ</div>
+    <div class="custom-cat-row">
+      <label class="custom-cat-opt"><input type="radio" name="custom-cat" value="food" id="custom-cat-food">🍽 フード</label>
+      <label class="custom-cat-opt"><input type="radio" name="custom-cat" value="drink" id="custom-cat-drink">🥤 ドリンク</label>
+    </div>
     <div class="custom-btns">
       <button class="custom-cancel" onclick="window.closeCustomModal()">キャンセル</button>
       <button class="custom-add" onclick="window.addCustomItem()">カートに追加</button>
@@ -639,6 +648,9 @@ window.orderOhiya = async function() {
 window.openCustomModal = function() {
   document.getElementById('custom-name').value = '手打ち商品';
   document.getElementById('custom-price').value = '';
+  // 初期選択は現在開いているタブ（drink/food）。それ以外なら food
+  var defaultCat = (currentCat === 'drink') ? 'drink' : 'food';
+  document.getElementById('custom-cat-' + defaultCat).checked = true;
   document.getElementById('custom-modal').classList.add('open');
   setTimeout(() => document.getElementById('custom-name').focus(), 100);
 };
@@ -648,9 +660,10 @@ window.closeCustomModal = function() {
 window.addCustomItem = function() {
   const name = document.getElementById('custom-name').value.trim();
   const price = parseInt(document.getElementById('custom-price').value) || 0;
+  const cat = (document.querySelector('input[name="custom-cat"]:checked') || {}).value || 'food';
   if (!name) { alert('商品名を入力してください'); return; }
   const key = 'custom__' + Date.now();
-  cart[key] = { name: name, price: price, qty: 1, charge_exempt: false, price_type: null, category: currentCat || 'food' };
+  cart[key] = { name: name, price: price, qty: 1, charge_exempt: false, price_type: null, category: cat };
   window.closeCustomModal();
   renderMenu();
   renderCart();
