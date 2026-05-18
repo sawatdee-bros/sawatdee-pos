@@ -88,6 +88,10 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
 .custom-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
 .custom-input { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f1f5f9; font-size: 15px; font-family: inherit; box-sizing: border-box; margin-bottom: 12px; }
 .custom-input:focus { outline: none; border-color: #7c3aed; }
+.custom-qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.custom-qty-btn { width: 44px; height: 44px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f1f5f9; font-size: 22px; font-weight: 700; line-height: 1; cursor: pointer; touch-action: manipulation; user-select: none; }
+.custom-qty-btn:active { background: #1e293b; transform: scale(0.96); }
+.custom-qty-display { flex: 1; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f1f5f9; font-size: 18px; font-weight: 700; text-align: center; font-family: inherit; box-sizing: border-box; cursor: default; }
 .custom-cat-row { display: flex; gap: 8px; margin-bottom: 16px; }
 .custom-cat-opt { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; user-select: none; }
 .custom-cat-opt input { accent-color: #7c3aed; }
@@ -187,7 +191,11 @@ header h1 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
     <div class="custom-label">金額（税抜）</div>
     <input class="custom-input" type="number" id="custom-price" placeholder="例：800" min="0" inputmode="numeric">
     <div class="custom-label">個数</div>
-    <input class="custom-input" type="number" id="custom-qty" value="1" min="1" inputmode="numeric">
+    <div class="custom-qty-row">
+      <button class="custom-qty-btn" type="button" onclick="window.adjustCustomQty(-1)">−</button>
+      <input class="custom-qty-display" id="custom-qty" value="1" readonly>
+      <button class="custom-qty-btn" type="button" onclick="window.adjustCustomQty(1)">＋</button>
+    </div>
     <div class="custom-label">カテゴリ</div>
     <div class="custom-cat-row">
       <label class="custom-cat-opt"><input type="radio" name="custom-cat" value="food" id="custom-cat-food">🍽 フード</label>
@@ -446,15 +454,21 @@ let currentCat = 'drink';
 let currentGroupIdx = 0;
 let cart = {};
 
-// テーブルボタン
-const tableBar = document.getElementById('table-bar');
-for (let i = 1; i <= TABLE_COUNT; i++) {
-  const btn = document.createElement('button');
-  btn.className = 'table-btn';
-  btn.textContent = tableName(i);
-  btn.onclick = () => selectTable(i);
-  tableBar.appendChild(btn);
+// テーブルボタン（init() で TABLE_NAMES が設定された後に呼ぶ・初回は fallback で生成して
+// init 完了後に再生成することでラベルを略称に置き換える）
+function renderTableBar() {
+  const tableBar = document.getElementById('table-bar');
+  if (!tableBar) return;
+  tableBar.innerHTML = '';
+  for (let i = 1; i <= TABLE_COUNT; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'table-btn' + (currentTable === i ? ' active' : '');
+    btn.textContent = tableName(i);
+    btn.onclick = () => selectTable(i);
+    tableBar.appendChild(btn);
+  }
 }
+renderTableBar();
 
 function selectTable(n) {
   currentTable = n;
@@ -663,6 +677,11 @@ window.openCustomModal = function() {
 window.closeCustomModal = function() {
   document.getElementById('custom-modal').classList.remove('open');
 };
+window.adjustCustomQty = function(delta) {
+  const el = document.getElementById('custom-qty');
+  const next = Math.max(1, (parseInt(el.value) || 1) + delta);
+  el.value = next;
+};
 window.addCustomItem = function() {
   const name = document.getElementById('custom-name').value.trim();
   const price = parseInt(document.getElementById('custom-price').value) || 0;
@@ -779,6 +798,7 @@ async function init() {
     if (cfg.day_start_hour != null) _HANDY_DAY_START = cfg.day_start_hour;
     if (cfg.table_names_short) TABLE_NAMES = cfg.table_names_short;
     else if (cfg.table_names) TABLE_NAMES = cfg.table_names;
+    renderTableBar(); // TABLE_NAMES が確定したのでテーブルボタンを再生成（略称ラベルに更新）
     APPROVAL_FLOW_ON = cfg.enable_approval_flow === true;
     GROUPS_DATA = results[1] || {};
     // menu/set をhandy_groups形式に変換して追加
