@@ -63,6 +63,19 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 .hour-select { background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; padding: 8px 12px; font-size: 14px; font-family: inherit; cursor: pointer; }
 .hour-select:focus { outline: none; border-color: #166534; }
 
+.hours-by-dow { display: flex; flex-direction: column; gap: 6px; }
+.hours-row { display: grid; grid-template-columns: 28px 64px 1fr auto 1fr; align-items: center; gap: 8px; padding: 8px 10px; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; }
+.hours-row .dow { font-size: 14px; font-weight: 700; color: #f1f5f9; text-align: center; }
+.hours-row.sun .dow { color: #f87171; }
+.hours-row.sat .dow { color: #60a5fa; }
+.hours-row .closed-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; cursor: pointer; }
+.hours-row .closed-label input { accent-color: #ef4444; cursor: pointer; }
+.hours-row select { background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; padding: 6px 8px; font-size: 13px; font-family: inherit; cursor: pointer; width: 100%; }
+.hours-row select:focus { outline: none; border-color: #166534; }
+.hours-row select:disabled { opacity: 0.35; cursor: not-allowed; }
+.hours-row .sep { color: #64748b; font-size: 12px; text-align: center; }
+.hours-row.closed { background: #1f2937; border-color: #334155; }
+
 /* 離脱確認モーダル */
 .leave-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
 .leave-modal.open { display: flex; }
@@ -261,6 +274,14 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
         </select>
         <span class="field-unit">時</span>
       </div>
+
+      <div class="field-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div class="field-label">
+          <div class="field-label-main">営業時間（曜日別）</div>
+          <div class="field-label-sub">公式サイトの営業時間表示と「ただいま営業中」判定に使われます。<br>予約システムの「予約可能時間」とは別物です。</div>
+        </div>
+        <div id="hours-by-dow" class="hours-by-dow"></div>
+      </div>
     </div>
   </div>
 
@@ -419,6 +440,106 @@ for (var h = 0; h < 24; h++) {
   sel.appendChild(opt);
 }
 
+// 営業時間 UI 用ヘルパー
+var DOW_INFO = [
+  { key: '0', label: '日', cls: 'sun' },
+  { key: '1', label: '月', cls: '' },
+  { key: '2', label: '火', cls: '' },
+  { key: '3', label: '水', cls: '' },
+  { key: '4', label: '木', cls: '' },
+  { key: '5', label: '金', cls: '' },
+  { key: '6', label: '土', cls: 'sat' }
+];
+var DEFAULT_BUSINESS_HOURS = {
+  '0': [{start: '14:00', end: '23:00'}],
+  '1': [],
+  '2': [],
+  '3': [{start: '17:30', end: '24:00'}],
+  '4': [{start: '17:30', end: '24:00'}],
+  '5': [{start: '17:30', end: '26:00'}],
+  '6': [{start: '17:30', end: '26:00'}]
+};
+window._businessHours = JSON.parse(JSON.stringify(DEFAULT_BUSINESS_HOURS));
+
+// 時刻ラベル '17:30' → '17:30' / '26:30' → '26:30（翌2:30）'
+function fmtTimeLabel(s) {
+  var parts = s.split(':');
+  var h = parseInt(parts[0], 10);
+  var m = parts[1];
+  if (h >= 24) return s + '（翌' + (h - 24) + ':' + m + '）';
+  if (h === 0 && m === '00') return '0:00（深夜）';
+  return s;
+}
+
+function timeOptions(fromHalfHours, toHalfHours) {
+  var html = '';
+  for (var i = fromHalfHours; i <= toHalfHours; i++) {
+    var h = Math.floor(i / 2);
+    var m = (i % 2) === 0 ? '00' : '30';
+    var v = (h < 10 ? '0' + h : '' + h) + ':' + m;
+    html += '<option value="' + v + '">' + fmtTimeLabel(v) + '</option>';
+  }
+  return html;
+}
+
+window.renderHoursEditor = function() {
+  var container = document.getElementById('hours-by-dow');
+  if (!container) return;
+  // start: 0:00〜23:30 / end: 0:30〜29:30（翌5:30 まで対応）
+  var startOpts = timeOptions(0, 47);
+  var endOpts = timeOptions(1, 59);
+  var html = '';
+  DOW_INFO.forEach(function(d) {
+    var ranges = window._businessHours[d.key] || [];
+    var closed = ranges.length === 0;
+    var start = (ranges[0] && ranges[0].start) || '17:30';
+    var end = (ranges[0] && ranges[0].end) || '24:00';
+    html += '<div class="hours-row ' + d.cls + (closed ? ' closed' : '') + '" data-dow="' + d.key + '">'
+      + '<span class="dow">' + d.label + '</span>'
+      + '<label class="closed-label"><input type="checkbox" data-role="closed" ' + (closed ? 'checked' : '') + '>定休</label>'
+      + '<select data-role="start" ' + (closed ? 'disabled' : '') + '>' + startOpts + '</select>'
+      + '<span class="sep">〜</span>'
+      + '<select data-role="end" ' + (closed ? 'disabled' : '') + '>' + endOpts + '</select>'
+      + '</div>';
+  });
+  container.innerHTML = html;
+  // 初期値セット + イベント
+  container.querySelectorAll('.hours-row').forEach(function(row) {
+    var dow = row.dataset.dow;
+    var ranges = window._businessHours[dow] || [];
+    var start = (ranges[0] && ranges[0].start) || '17:30';
+    var end = (ranges[0] && ranges[0].end) || '24:00';
+    row.querySelector('[data-role="start"]').value = start;
+    row.querySelector('[data-role="end"]').value = end;
+    row.querySelector('[data-role="closed"]').addEventListener('change', function(e) {
+      var c = e.target.checked;
+      row.classList.toggle('closed', c);
+      row.querySelector('[data-role="start"]').disabled = c;
+      row.querySelector('[data-role="end"]').disabled = c;
+      collectHours();
+    });
+    row.querySelector('[data-role="start"]').addEventListener('change', collectHours);
+    row.querySelector('[data-role="end"]').addEventListener('change', collectHours);
+  });
+};
+
+function collectHours() {
+  var out = {};
+  document.querySelectorAll('#hours-by-dow .hours-row').forEach(function(row) {
+    var dow = row.dataset.dow;
+    var closed = row.querySelector('[data-role="closed"]').checked;
+    if (closed) {
+      out[dow] = [];
+    } else {
+      out[dow] = [{
+        start: row.querySelector('[data-role="start"]').value,
+        end: row.querySelector('[data-role="end"]').value
+      }];
+    }
+  });
+  window._businessHours = out;
+}
+
 // デフォルト値
 // 支払方法マスタ定義（kitchen.html / sales.html と同期）
 var PAYMENT_METHOD_DEFS_MASTER = {
@@ -491,6 +612,10 @@ get(ref(db, 'store_config')).then(function(snap) {
   document.getElementById('has_call_button').checked = !!cfg.has_call_button;
   document.getElementById('show_set_on_customer').checked = !!cfg.show_set_on_customer;
   document.getElementById('day_start_hour').value = cfg.day_start_hour !== undefined ? cfg.day_start_hour : 8;
+  window._businessHours = (cfg.business_hours_by_dow && typeof cfg.business_hours_by_dow === 'object')
+    ? cfg.business_hours_by_dow
+    : JSON.parse(JSON.stringify(DEFAULT_BUSINESS_HOURS));
+  window.renderHoursEditor();
   document.getElementById('apps_script_url').value = cfg.apps_script_url || '';
   document.getElementById('base_url').value = cfg.base_url || '';
   document.getElementById('qr_note1').value = cfg.qr_note1 || '';
@@ -565,6 +690,7 @@ function getFormState() {
     discount_presets: JSON.stringify(window._discountPresets || []),
     payment_methods: JSON.stringify(window._paymentMethodsEnabled || []),
     custom_payment_methods: JSON.stringify(window._customPaymentMethods || {}),
+    business_hours_by_dow: JSON.stringify(window._businessHours || {}),
   });
 }
 
@@ -798,7 +924,8 @@ window.saveAll = async function() {
     discount_presets: window._discountPresets && window._discountPresets.length > 0 ? window._discountPresets : null,
     payment_methods: (window._paymentMethodsEnabled || []).slice(),
     custom_payment_methods: (window._customPaymentMethods && Object.keys(window._customPaymentMethods).length > 0)
-      ? window._customPaymentMethods : null
+      ? window._customPaymentMethods : null,
+    business_hours_by_dow: window._businessHours || {}
   };
   if (!cfg.payment_methods || cfg.payment_methods.length === 0) {
     alert('支払方法を少なくとも1つ選択してください。');
@@ -827,7 +954,8 @@ window.saveAll = async function() {
     'table_count','nomi_table_count','table_names','table_names_short',
     'has_ohiya','has_nomi_hodai','has_call_button','show_set_on_customer',
     'day_start_hour','apps_script_url','base_url','qr_note1','qr_note2',
-    'discount_presets','payment_methods','custom_payment_methods'
+    'discount_presets','payment_methods','custom_payment_methods',
+    'business_hours_by_dow'
   ]);
   // UI未管理のキー（enable_approval_flow / item_category_overrides 等）を既存から温存
   try {
