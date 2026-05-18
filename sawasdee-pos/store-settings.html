@@ -119,7 +119,7 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
 
   <div class="section">
     <div class="accordion-header" onclick="window.toggleAccordion(this)">
-      <span class="accordion-title">基本情報</span>
+      <span class="accordion-title">店舗基本情報</span>
       <span class="accordion-arrow">▼</span>
     </div>
     <div class="accordion-body">
@@ -127,10 +127,41 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
       <div class="field-row">
         <div class="field-label">
           <div class="field-label-main">店舗名</div>
-    </div>
-  </div>
+          <div class="field-label-sub">公式サイト・予約システム・伝票に表示</div>
+        </div>
         <input class="field-input wide" type="text" id="store_name">
       </div>
+      <div class="field-row">
+        <div class="field-label">
+          <div class="field-label-main">住所</div>
+          <div class="field-label-sub">公式サイト・予約メールに表示</div>
+        </div>
+        <input class="field-input wide" type="text" id="store_address" placeholder="〒211-0053 神奈川県川崎市中原区上小田中5-3-10">
+      </div>
+      <div class="field-row">
+        <div class="field-label">
+          <div class="field-label-main">電話番号</div>
+          <div class="field-label-sub">公式サイト・予約画面・予約メールに表示</div>
+        </div>
+        <input class="field-input wide" type="tel" id="store_phone" placeholder="044-777-6759">
+      </div>
+      <div class="field-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div class="field-label">
+          <div class="field-label-main">営業時間（曜日別）</div>
+          <div class="field-label-sub">公式サイトの営業時間表示と「営業中」判定に使用。<br>予約システムの「予約可能時間」とは別物です。</div>
+        </div>
+        <div id="hours-by-dow" class="hours-by-dow"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="accordion-header" onclick="window.toggleAccordion(this)">
+      <span class="accordion-title">税率・端数処理</span>
+      <span class="accordion-arrow">▼</span>
+    </div>
+    <div class="accordion-body">
+      <div class="card" style="border-radius:0;border:none;">
       <div class="field-row">
         <div class="field-label">
           <div class="field-label-main">消費税率</div>
@@ -273,14 +304,6 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
           <!-- JSで生成 -->
         </select>
         <span class="field-unit">時</span>
-      </div>
-
-      <div class="field-row" style="flex-direction:column;align-items:stretch;gap:8px;">
-        <div class="field-label">
-          <div class="field-label-main">営業時間（曜日別）</div>
-          <div class="field-label-sub">公式サイトの営業時間表示と「ただいま営業中」判定に使われます。<br>予約システムの「予約可能時間」とは別物です。</div>
-        </div>
-        <div id="hours-by-dow" class="hours-by-dow"></div>
       </div>
     </div>
   </div>
@@ -589,6 +612,8 @@ var DEFAULTS = {
 get(ref(db, 'store_config')).then(function(snap) {
   var cfg = Object.assign({}, DEFAULTS, snap.val() || {});
   document.getElementById('store_name').value = cfg.store_name || '';
+  document.getElementById('store_address').value = cfg.store_address || '';
+  document.getElementById('store_phone').value = cfg.store_phone || '';
   var displayTax = cfg.tax_rate < 1 ? Math.round(cfg.tax_rate * 100) : cfg.tax_rate;
   document.getElementById('tax_rate').value = displayTax;
   var roundingMode = cfg.rounding_mode || 'floor';
@@ -675,6 +700,8 @@ function getFormState() {
   var modeEl = document.querySelector('input[name="charge_mode"]:checked');
   return JSON.stringify({
     store_name: document.getElementById('store_name').value,
+    store_address: document.getElementById('store_address').value,
+    store_phone: document.getElementById('store_phone').value,
     tax_rate: document.getElementById('tax_rate').value,
     charge_per_person: document.getElementById('charge_per_person').value,
     charge_free_drink_count: document.getElementById('charge_free_drink_count').value,
@@ -904,6 +931,8 @@ window.saveAll = async function() {
   btn.textContent = '保存中...';
   var cfg = {
     store_name: document.getElementById('store_name').value,
+    store_address: document.getElementById('store_address').value.trim() || null,
+    store_phone: document.getElementById('store_phone').value.trim() || null,
     tax_rate: parseInt(document.getElementById('tax_rate').value) || 10,
     rounding_mode: (document.querySelector('input[name="rounding_mode"]:checked') || {value:'floor'}).value,
     rounding_unit: parseInt((document.querySelector('input[name="rounding_unit"]:checked') || {value:'10'}).value),
@@ -949,7 +978,7 @@ window.saveAll = async function() {
   // UI管理キーリスト（cfg に存在するキー = この画面で管理しているもの）
   var MANAGED_KEYS = Object.keys(cfg).concat([
     // cfg.payment_methodsなどnull除去対象も保護候補に含めるため明示
-    'store_name','tax_rate','rounding_mode','rounding_unit',
+    'store_name','store_address','store_phone','tax_rate','rounding_mode','rounding_unit',
     'charge_per_person','charge_free_drink_count','charge_mode',
     'table_count','nomi_table_count','table_names','table_names_short',
     'has_ohiya','has_nomi_hodai','has_call_button','show_set_on_customer',
