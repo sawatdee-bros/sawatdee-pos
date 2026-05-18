@@ -429,10 +429,17 @@ header h1 { font-size: 18px; font-weight: 600; color: #f1f5f9; flex: 1; }
       <div class="card" style="border-radius:0;border:none;">
       <div class="field-row" style="flex-direction:column;align-items:stretch;gap:8px;">
         <div class="field-label">
-          <div class="field-label-main">Apps Script URL</div>
-          <div class="field-label-sub">スプレッドシートへのバックアップ用。デプロイ後のウェブアプリURLを貼り付け</div>
+          <div class="field-label-main">売上バックアップ GAS URL</div>
+          <div class="field-label-sub">sales.html の「スプレッドシートに保存」ボタンが叩く URL</div>
         </div>
         <input class="field-input wide" type="url" id="apps_script_url" placeholder="https://script.google.com/macros/s/..." style="width:100%;font-size:12px;overflow:hidden;text-overflow:ellipsis;">
+      </div>
+      <div class="field-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div class="field-label">
+          <div class="field-label-main">メニュー同期 GAS URL</div>
+          <div class="field-label-sub">menu-admin.html の保存時にスプレッドシート（menu_master_v2）へ同期する URL</div>
+        </div>
+        <input class="field-input wide" type="url" id="menu_sync_url" placeholder="https://script.google.com/macros/s/..." style="width:100%;font-size:12px;overflow:hidden;text-overflow:ellipsis;">
       </div>
       </div>
     </div>
@@ -644,6 +651,7 @@ get(ref(db, 'store_config')).then(function(snap) {
     : JSON.parse(JSON.stringify(DEFAULT_BUSINESS_HOURS));
   window.renderHoursEditor();
   document.getElementById('apps_script_url').value = cfg.apps_script_url || '';
+  document.getElementById('menu_sync_url').value = cfg.menu_sync_url || '';
   document.getElementById('base_url').value = cfg.base_url || '';
   document.getElementById('qr_note1').value = cfg.qr_note1 || '';
   document.getElementById('qr_note2').value = cfg.qr_note2 || '';
@@ -717,6 +725,7 @@ function getFormState() {
     show_set_on_customer: document.getElementById('show_set_on_customer').checked,
     day_start_hour: document.getElementById('day_start_hour').value,
     apps_script_url: document.getElementById('apps_script_url').value,
+    menu_sync_url: document.getElementById('menu_sync_url').value,
     discount_presets: JSON.stringify(window._discountPresets || []),
     payment_methods: JSON.stringify(window._paymentMethodsEnabled || []),
     custom_payment_methods: JSON.stringify(window._customPaymentMethods || {}),
@@ -950,6 +959,7 @@ window.saveAll = async function() {
     show_set_on_customer: document.getElementById('show_set_on_customer').checked,
     day_start_hour: parseInt(document.getElementById('day_start_hour').value),
     apps_script_url: document.getElementById('apps_script_url').value.trim() || null,
+    menu_sync_url: document.getElementById('menu_sync_url').value.trim() || null,
     base_url: document.getElementById('base_url').value.trim() || null,
     qr_note1: document.getElementById('qr_note1').value.trim() || null,
     qr_note2: document.getElementById('qr_note2').value.trim() || null,
@@ -985,7 +995,7 @@ window.saveAll = async function() {
     'charge_per_person','charge_free_drink_count','charge_mode',
     'table_count','nomi_table_count','table_names','table_names_short',
     'has_ohiya','has_nomi_hodai','has_call_button','show_set_on_customer',
-    'day_start_hour','apps_script_url','base_url','qr_note1','qr_note2',
+    'day_start_hour','apps_script_url','menu_sync_url','base_url','qr_note1','qr_note2',
     'discount_presets','payment_methods','custom_payment_methods',
     'business_hours_by_dow'
   ]);

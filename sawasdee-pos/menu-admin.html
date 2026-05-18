@@ -417,9 +417,12 @@ window.saveItem = async (id) => {
   }
 
   // 2. スプレッドシートにも反映（Apps Script WebAPI経由）
-  const appsScriptUrl = await get(ref(db, 'store_config/apps_script_url')).then(s => s.val()).catch(() => null);
-  if (appsScriptUrl && Object.keys(fieldsToSync).length > 0) {
-    var syncUrl = appsScriptUrl + '?id=' + encodeURIComponent(id) + '&fields=' + encodeURIComponent(JSON.stringify(fieldsToSync));
+  //    store_config/menu_sync_url を優先。未設定なら旧 apps_script_url を fallback
+  //    （apps_script_url は売上バックアップ用と命名衝突していた経緯あり）
+  const menuSyncUrl = await get(ref(db, 'store_config/menu_sync_url')).then(s => s.val()).catch(() => null)
+    || await get(ref(db, 'store_config/apps_script_url')).then(s => s.val()).catch(() => null);
+  if (menuSyncUrl && Object.keys(fieldsToSync).length > 0) {
+    var syncUrl = menuSyncUrl + '?id=' + encodeURIComponent(id) + '&fields=' + encodeURIComponent(JSON.stringify(fieldsToSync));
     fetch(syncUrl).catch(function(e) { console.warn('スプレッドシート同期失敗:', e); });
   }
 
