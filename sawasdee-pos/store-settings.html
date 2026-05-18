@@ -668,15 +668,16 @@ window.renderTableNamesEditor = function() {
   var count = parseInt(document.getElementById('table_count').value) || 1;
   var names = window._loadedTableNames || {};
   var shorts = window._loadedTableNamesShort || {};
-  var html = '<div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:6px;align-items:center;font-size:12px;color:#64748b;margin-bottom:4px;">'
-    + '<div>番号</div><div>テーブル名</div><div>略称（ハンディ用）</div></div>';
+  var inputStyle = 'background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:6px 8px;font-size:13px;width:100%;min-width:0;box-sizing:border-box;';
+  var html = '<div style="display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;align-items:center;font-size:12px;color:#64748b;margin-bottom:4px;">'
+    + '<div>番号</div><div>テーブル名</div><div>略称</div></div>';
   for (var i = 1; i <= count; i++) {
     var defaultName = 'テーブル' + i;
     var defaultShort = 'T' + i;
-    html += '<div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:6px;align-items:center;margin-bottom:6px;">'
+    html += '<div style="display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;align-items:center;margin-bottom:6px;">'
       + '<div style="font-size:13px;color:#94a3b8;">T' + i + '</div>'
-      + '<input id="tname-' + i + '" type="text" placeholder="' + defaultName + '" value="' + (names[String(i)] || '') + '" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:6px 8px;font-size:13px;">'
-      + '<input id="tname-short-' + i + '" type="text" placeholder="' + defaultShort + '" value="' + (shorts[String(i)] || '') + '" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:6px 8px;font-size:13px;">'
+      + '<input id="tname-' + i + '" type="text" placeholder="' + defaultName + '" value="' + (names[String(i)] || '') + '" style="' + inputStyle + '">'
+      + '<input id="tname-short-' + i + '" type="text" placeholder="' + defaultShort + '" value="' + (shorts[String(i)] || '') + '" style="' + inputStyle + '">'
       + '</div>';
   }
   document.getElementById('table-names-editor').innerHTML = html;
