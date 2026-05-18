@@ -585,6 +585,32 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
+// === 売り切れの営業日切り替え自動リセット ===
+// menu-admin と同等のロジックを kitchen 側に常駐。kitchen は営業中ずっと開いているので、
+// 日付切り替え後の最初のチェック（1分以内）で即リセットされる。これがないと
+// 「誰も menu-admin を開かない日は customer に売り切れが残る」問題が起きていた。
+(function setupSoldoutAutoReset() {
+  let DAY_START = 8;
+  async function tick() {
+    try {
+      const cfgSnap = await get(ref(db, 'store_config/day_start_hour'));
+      if (cfgSnap.val() !== null) DAY_START = cfgSnap.val();
+      const snap = await get(ref(db, 'soldout'));
+      const data = snap.val() || {};
+      const lastResetTs = data._reset_at || null;
+      const now = new Date();
+      const todayReset = new Date(now);
+      if (now.getHours() < DAY_START) todayReset.setDate(todayReset.getDate() - 1);
+      todayReset.setHours(DAY_START, 0, 0, 0);
+      if (!lastResetTs || lastResetTs < todayReset.getTime()) {
+        await set(ref(db, 'soldout'), { _reset_at: Date.now() });
+      }
+    } catch(e) { console.warn('soldout auto-reset tick failed:', e); }
+  }
+  tick();                          // 起動直後
+  setInterval(tick, 60 * 1000);    // 1分ごと
+})();
+
 // === REST書き込みヘルパー（tables/ 等の新規ノードへの書き込み専用） ===
 // SDKのset()はFirebase Rules拒否時に内部キューが詰まり他の書き込みに副作用を与える可能性があるため、
 // 新規ノードへの書き込みはRESTで独立させる。既存のorders/pax等のSDK書き込みはそのまま。

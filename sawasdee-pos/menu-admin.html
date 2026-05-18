@@ -110,7 +110,9 @@ let localEdits = {}; // ローカル編集中のデータ
 let currentFilter = 'all';
 let openCards = new Set();
 
-// 朝6時に売り切れ自動リセット（Firebaseのタイムスタンプで管理）
+// 営業日切り替え時刻に売り切れ自動リセット（Firebaseのタイムスタンプで管理）
+// リセット発動時は true を返す。呼び出し側で「古い soldout を一瞬表示してから消える」
+// フリッカーを避けるため、true の時はローカル state も即時クリアして再描画する。
   function checkAutoReset(lastResetTs) {
     const now = new Date();
     const todayReset = new Date(now);
@@ -118,7 +120,9 @@ let openCards = new Set();
     todayReset.setHours(DAY_START, 0, 0, 0);
     if (!lastResetTs || lastResetTs < todayReset.getTime()) {
       set(ref(db, 'soldout'), { _reset_at: Date.now() });
+      return true;
     }
+    return false;
   }
 
 // Firebase: soldout読み込み
@@ -188,8 +192,9 @@ function startSoldoutWatch() {
     const data = snap.val() || {};
     // _reset_at が古ければリセットを発動。Firebase上の値で判定するので、
     // リセット後はnow()が書き込まれて以降はトリガーされない（無限ループ防止）
-    checkAutoReset(data._reset_at || null);
-    soldoutState = data;
+    // 発動時は古い state を捨てて即座にクリア状態を反映（次の onValue を待たない）
+    const didReset = checkAutoReset(data._reset_at || null);
+    soldoutState = didReset ? { _reset_at: Date.now() } : data;
     renderList();
   });
   // 念のためFirebaseリスナーが切断された場合に備えて定期的に明示取得して同期
@@ -198,8 +203,8 @@ function startSoldoutWatch() {
     try {
       const snap = await get(ref(db, 'soldout'));
       const data = snap.val() || {};
-      checkAutoReset(data._reset_at || null);
-      soldoutState = data;
+      const didReset = checkAutoReset(data._reset_at || null);
+      soldoutState = didReset ? { _reset_at: Date.now() } : data;
       renderList();
     } catch(e) { console.warn('soldout periodic sync failed:', e); }
   }, 60 * 1000);
