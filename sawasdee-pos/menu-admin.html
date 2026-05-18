@@ -257,7 +257,7 @@ function getFiltered() {
     if (currentFilter.startsWith('f_') && (item.category !== 'food' || item.subcat !== currentFilter.slice(2))) return false;
     if (currentFilter.startsWith('d_') && (item.category !== 'drink' || item.subcat !== currentFilter.slice(2))) return false;
     if (currentFilter.startsWith('s_') && (item.category !== 'set' || item.subcat !== currentFilter.slice(2))) return false;
-    if (q && !item.name.includes(q) && !item.kata.includes(q)) return false;
+    if (q && !(item.name || '').includes(q) && !(item.kana || '').includes(q)) return false;
     return true;
   });
 }
@@ -308,7 +308,7 @@ window.renderList = function() {
         <div class="detail-row">
           <div class="detail-field">
             <label>カタカナタイ語</label>
-            <input type="text" value="${ed.kata||''}" onchange="editField('${item.id}','kata',this.value)">
+            <input type="text" value="${ed.kana||''}" onchange="editField('${item.id}','kana',this.value)">
           </div>
           <div class="detail-field">
             <label>タイ語</label>
@@ -396,7 +396,7 @@ window.saveItem = async (id) => {
   if (Object.keys(ed).length === 0) return;
 
   // スプレッドシートに同期するフィールドとmenu_overridesのみで管理するフィールドを分ける
-  const sheetFields = ['name','kitchen_name','kana','kata','thai','en','price','desc','pakchi','spicy','popular','sake','warning'];
+  const sheetFields = ['name','kitchen_name','kana','thai','en','price','desc','pakchi','spicy','popular','sake','warning'];
   const overridesOnly = {}; // item_options等スプレッドシートにないもの
   const fieldsToSync = {}; // スプレッドシートに同期するもの
   const nullifyInOverrides = {}; // スプレッドシート同期済みはoverridesから削除
