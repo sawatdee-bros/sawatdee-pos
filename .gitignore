@@ -2,6 +2,9 @@
 /sawatdee-attendance/
 /sawatdee-official/
 
+# Claude Code セッション固有・worktree（git 管理しない）
+.claude/
+
 # Firebase CLI
 .firebase/
 firebase-debug.log
